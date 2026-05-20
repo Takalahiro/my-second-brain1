@@ -213,8 +213,7 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
   function attach() {
     if (attached) return;
     if (opts.enabled === false) {
-      // 即使禁用也要把存储里的 offset apply 一次，避免桌面端跳屏
-      // 但 enabled=false 通常意味着移动端抽屉，不需要 transform
+      // 移动端抽屉：不附加 listener，也不 transform；CSS 自然布局接管。
       return;
     }
     attached = true;
@@ -226,17 +225,22 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
     window.addEventListener('pointerup', onPointerUp);
     node.addEventListener('dblclick', onDoubleClick);
     window.addEventListener('resize', onWindowResize, { passive: true });
-    // 在下一帧 apply 初始 transform，避开 hydration 期间的布局闪烁
-    requestAnimationFrame(() => {
-      // 元素可能已被销毁
-      if (!node.isConnected) return;
-      // 应用存储位置前先 clamp 到当前视口，避免换屏 / 换设备时跑出屏幕
+
+    // 同步 clamp + apply transform。之前用 rAF 会留下「element 已 mount
+    // 但 transform 还没生效」的窗口；如果 CSS 用 visibility 控制可见性，
+    // 这个窗口会让浏览器（Chrome/Edge）渲染出隐藏的 panel。同步 apply
+    // 后浏览器在第一帧就能拿到最终位置。
+    try {
       const r = node.getBoundingClientRect();
-      const base = new DOMRect(r.left - offset.x, r.top - offset.y, r.width, r.height);
-      offset = clampToBoundary(offset, base, opts.boundary ?? 'viewport');
-      applyTransform(node, offset);
-      node.dataset.dragReady = '1';
-    });
+      if (r.width > 0) {
+        const base = new DOMRect(r.left - offset.x, r.top - offset.y, r.width, r.height);
+        offset = clampToBoundary(offset, base, opts.boundary ?? 'viewport');
+      }
+    } catch {
+      /* getBoundingClientRect 在极个别情况下抛错，保守跳过 clamp */
+    }
+    applyTransform(node, offset);
+    node.dataset.dragReady = '1';
   }
 
   function detach() {

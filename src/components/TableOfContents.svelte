@@ -68,17 +68,29 @@
     const mql = window.matchMedia('(min-width: 1024px)');
     isDesktop = mql.matches;
 
+    // 默认所有设备都是 orb 状态。用户点开后会通过 localStorage 记住偏好。
+    // 之前根据屏宽自动展开 panel，配合 visibility 控制会在桌面 Chrome/Edge
+    // 上出现「orb 被卸载但 panel 还没 visible」的窗口，导致看上去什么都没有。
     const stored = localStorage.getItem(MIN_KEY);
     if (stored === '1') minimized = true;
     else if (stored === '0') minimized = false;
-    else minimized = !mql.matches; // 没有偏好：桌面默认展开，移动默认 orb
+    // 没有偏好 → 保持 minimized=true（构造函数默认值，所有设备都先看到 orb）
     hydrated = true;
 
     const onChange = (e: MediaQueryListEvent) => {
       isDesktop = e.matches;
     };
-    mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
+    // Safari < 14 没有 addEventListener('change')，回退到旧的 addListener
+    if (typeof mql.addEventListener === 'function') {
+      mql.addEventListener('change', onChange);
+      return () => mql.removeEventListener('change', onChange);
+    }
+    // @ts-expect-error: legacy MediaQueryList API
+    mql.addListener(onChange);
+    return () => {
+      // @ts-expect-error: legacy MediaQueryList API
+      mql.removeListener(onChange);
+    };
   });
 
   /** 仅 panel 展开 + 桌面端 跑 IO（移动端抽屉用完即收，无需高亮当前章节） */
@@ -139,7 +151,6 @@
     <aside
       class="toc-floating"
       class:is-mobile={!isDesktop}
-      class:is-hydrated={hydrated}
       use:draggable={PANEL_DRAG_OPTS}
     >
       <header class="toc-handle">
@@ -216,11 +227,12 @@
     z-index: 60;
     overflow: hidden;
     contain: layout style;
-    /* 默认隐藏；移动端 hydration 后即可见，桌面端等 draggable 就绪 */
-    visibility: hidden;
-  }
-  .toc-floating.is-mobile.is-hydrated {
-    visibility: visible;
+    /*
+     * 不设 visibility:hidden！panel 是 hydration 后才 mount 的
+     * （SSR 只直出 orb），没有 SSR-vs-hydration 位置跳动问题。
+     * 之前用 visibility 等 [data-drag-ready=1] 反而在桌面 Chrome/Edge 上
+     * 制造了「panel mount 但 visibility 永远 hidden」的 bug。
+     */
   }
   :global(.dark) .toc-floating {
     background: rgb(17 24 39);
@@ -238,9 +250,6 @@
       box-shadow: 0 4px 14px -2px rgb(0 0 0 / 0.08);
       z-index: 5;
       transition: box-shadow 0.15s;
-    }
-    .toc-floating[data-drag-ready='1'] {
-      visibility: visible;
     }
     .toc-floating:global(.is-dragging) {
       box-shadow: 0 12px 28px -4px rgb(0 0 0 / 0.25);
