@@ -246,4 +246,60 @@
     min-width: 86px;
     padding: 0.4rem 0.6rem;
   }
+
+  @media (max-width: 768px) {
+    .notes-toolbar {
+      padding: 0.72rem 0.75rem;
+      margin-bottom: 1rem;
+      gap: 0.65rem;
+    }
+    .notes-toolbar-title {
+      gap: 0.45rem;
+    }
+    .notes-toolbar-emoji {
+      font-size: 1.25rem;
+    }
+    .notes-toolbar-text {
+      font-size: 1.25rem;
+    }
+    .notes-toolbar-actions {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+    .notes-search {
+      width: 100%;
+      min-width: 0;
+      padding: 0.5rem 0.65rem;
+    }
+    .notes-layout-switch {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .layout-btn {
+      min-width: 0;
+      width: 100%;
+      padding: 0.42rem 0.4rem;
+    }
+    .tree-actions-bar {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin: -0.35rem 0 0.75rem;
+      padding: 0.46rem;
+    }
+    .tree-action-btn {
+      min-width: 0;
+      width: 100%;
+      padding: 0.4rem 0.35rem;
+    }
+    .recursive-wrap {
+      padding: 0.55rem 0.58rem;
+      margin-bottom: 0.6rem;
+    }
+  }
 </style>

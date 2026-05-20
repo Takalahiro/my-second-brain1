@@ -279,4 +279,71 @@
     margin: 6px 0 6px 24px;
     font-style: italic;
   }
+
+  @media (max-width: 768px) {
+    .folder-block:not(.depth-0) > .folder-children {
+      padding-left: 10px;
+      margin-left: 3px;
+    }
+
+    .root-title {
+      font-size: 1.25rem;
+      margin-bottom: 0.2rem;
+    }
+    .root-meta {
+      font-size: 0.78rem;
+      margin-bottom: 0.72rem;
+    }
+
+    .folder-row {
+      gap: 5px;
+      padding: 7px 8px;
+      margin: 3px 0;
+    }
+    .folder-block.depth-1 > .folder-row,
+    .folder-block.depth-2 > .folder-row,
+    .folder-block.depth-3 > .folder-row,
+    .folder-block.depth-4 > .folder-row,
+    .folder-block.depth-5 > .folder-row {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .folder-name {
+      white-space: normal;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      word-break: break-word;
+    }
+    .folder-count {
+      font-size: 0.7rem;
+      padding: 1px 5px;
+    }
+
+    .notes-list {
+      margin: 2px 0 6px;
+    }
+    .note-link {
+      gap: 5px;
+      padding: 6px 8px;
+      margin: 4px 0;
+      align-items: flex-start;
+    }
+    .note-title {
+      white-space: normal;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+    .note-date {
+      font-size: 0.68rem;
+      margin-top: 1px;
+    }
+    .empty-folder {
+      margin-left: 12px;
+      font-size: 0.78rem;
+    }
+  }
 </style>
