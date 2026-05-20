@@ -1,17 +1,55 @@
 ---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { noteIdToSlug } from '../lib/backlinks';
 
+const notes = await getCollection('notes', ({ data }) => !data.draft);
+
+notes.sort((a, b) => {
+  const da = a.data.date?.getTime() ?? 0;
+  const db = b.data.date?.getTime() ?? 0;
+  return db - da;
+});
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="My Second Brain">
+  <section class="mb-10">
+    <h1 class="text-4xl font-bold mb-3">🧠 My Second Brain</h1>
+    <p class="text-gray-600 dark:text-gray-400">
+      共 {notes.length} 篇笔记 · 来自 Obsidian Vault
+    </p>
+  </section>
+
+  <ul class="space-y-3">
+    {notes.map((note) => {
+      const slug = noteIdToSlug(note.id);
+      const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
+      return (
+        <li>
+          <a href={`/notes/${slug}`} class="block p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-sm transition">
+            <div class="flex items-baseline justify-between gap-4">
+              <h2 class="font-semibold text-lg">{title}</h2>
+              {note.data.date && (
+                <time class="text-xs text-gray-500 shrink-0">
+                  {note.data.date.toLocaleDateString('zh-CN')}
+                </time>
+              )}
+            </div>
+            {note.data.description && (
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{note.data.description}</p>
+            )}
+            {note.data.tags && note.data.tags.length > 0 && (
+              <div class="flex flex-wrap gap-1.5 mt-2">
+                {note.data.tags.map((tag) => (
+                  <span class="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+</BaseLayout>

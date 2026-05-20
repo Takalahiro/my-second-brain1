@@ -1,0 +1,34 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { noteIdToSlug } from '../lib/backlinks';
+
+interface Props {
+  backlinks: CollectionEntry<'notes'>[];
+}
+
+const { backlinks } = Astro.props;
+---
+
+{backlinks.length > 0 && (
+  <section class="not-prose mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
+    <h2 class="text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mb-4">
+      🔗 反向链接 ({backlinks.length})
+    </h2>
+    <ul class="space-y-2">
+      {backlinks.map((note) => {
+        const slug = noteIdToSlug(note.id);
+        const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
+        return (
+          <li>
+            <a href={`/notes/${slug}`} class="block p-3 rounded border border-gray-200 dark:border-gray-800 hover:border-blue-500 dark:hover:border-blue-500 transition">
+              <div class="font-medium">{title}</div>
+              {note.data.description && (
+                <div class="text-sm text-gray-500 mt-1">{note.data.description}</div>
+              )}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+)}

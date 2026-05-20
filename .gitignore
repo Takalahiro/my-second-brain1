@@ -22,3 +22,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# 同步出来的笔记资源（每次 build 重新生成）
+public/vault-assets/
+

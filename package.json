@@ -6,8 +6,9 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
+    "dev": "pnpm sync && astro dev",
+    "build": "pnpm sync && astro build",
+    "sync": "node scripts/sync-assets.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -16,8 +17,18 @@
     "@astrojs/svelte": "^8.1.1",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.3.5",
+    "github-slugger": "^2.0.0",
+    "gray-matter": "^4.0.3",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-slug": "^6.0.0",
+    "remark-obsidian-callout": "^1.5.1",
+    "remark-wiki-link": "^2.0.1",
     "svelte": "^5.55.8",
     "tailwindcss": "^4.3.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "unist-util-visit": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4"
   }
 }
