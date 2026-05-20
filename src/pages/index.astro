@@ -1,14 +1,12 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeHero from '../components/HomeHero.svelte';
+import WidgetHost from '../components/widgets/WidgetHost.svelte';
 ---
 
 <BaseLayout title="My Second Brain">
-  <div class="home-blank" aria-hidden="true"></div>
-</BaseLayout>
+  <HomeHero client:only="svelte" />
 
-<style>
-  /* 占位空白主界面：为后续设计预留容器；不显示任何文字。 */
-  .home-blank {
-    min-height: 60vh;
-  }
-</style>
+  <!-- 小组件 + 背景：仅首页加载 -->
+  <WidgetHost client:idle backgroundDefault={true} />
+</BaseLayout>

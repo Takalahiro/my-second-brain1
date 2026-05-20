@@ -1,0 +1,8 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import MatlabCalculator from '../components/MatlabCalculator.svelte';
+---
+
+<ToolLayout title="MATLAB 计算器 · My Second Brain" description="矩阵运算与函数可视化">
+  <MatlabCalculator client:only="svelte" />
+</ToolLayout>

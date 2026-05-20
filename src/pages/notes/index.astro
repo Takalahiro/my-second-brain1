@@ -70,5 +70,10 @@ const categories = topFolders.map((folder) => ({
 ---
 
 <BaseLayout title="笔记 · My Second Brain">
-  <NotesExplorer categories={categories} tree={tree} client:load />
+  <!--
+    client:only：禁止 SSR；
+    与 BaseLayout 的预水合脚本（写 <html data-notes-mode>）配合，
+    可保证首屏渲染就用对的折叠模式，避免线上反复闪烁。
+  -->
+  <NotesExplorer categories={categories} tree={tree} client:only="svelte" />
 </BaseLayout>

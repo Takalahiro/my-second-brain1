@@ -33,24 +33,42 @@
 
   let { categories, tree }: Props = $props();
   let searchQuery = $state('');
-  let mode = $state<'widgets' | 'recursive'>('widgets');
   let forceTick = $state(0);
   let forceAction = $state<'expand-all' | 'collapse-all' | null>(null);
 
   const MODE_KEY = 'second-brain:notes-display-mode';
 
-  $effect(() => {
-    if (typeof localStorage === 'undefined') return;
-    const stored = localStorage.getItem(MODE_KEY);
-    if (stored === 'widgets' || stored === 'recursive') {
-      mode = stored;
+  /**
+   * 同步读取折叠模式：
+   * 1. <html data-notes-mode> 是 BaseLayout 预水合脚本写的，最早可用
+   * 2. localStorage 兜底
+   * 3. 默认 widgets
+   * 这样 client:only 组件首次渲染就是正确状态，不会闪烁。
+   */
+  function readInitialMode(): 'widgets' | 'recursive' {
+    if (typeof document !== 'undefined') {
+      const html = document.documentElement.getAttribute('data-notes-mode');
+      if (html === 'widgets' || html === 'recursive') return html;
     }
-  });
+    if (typeof localStorage !== 'undefined') {
+      try {
+        const v = localStorage.getItem(MODE_KEY);
+        if (v === 'widgets' || v === 'recursive') return v;
+      } catch {}
+    }
+    return 'widgets';
+  }
+  let mode = $state<'widgets' | 'recursive'>(readInitialMode());
 
   function setMode(next: 'widgets' | 'recursive') {
     mode = next;
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(MODE_KEY, next);
+      try {
+        localStorage.setItem(MODE_KEY, next);
+      } catch {}
+    }
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-notes-mode', next);
     }
   }
 

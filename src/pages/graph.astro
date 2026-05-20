@@ -1,0 +1,8 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GraphExplorer from '../components/GraphExplorer.svelte';
+---
+
+<BaseLayout title="关系图谱 · My Second Brain" description="多种风格的关系图谱与笔记瓦片">
+  <GraphExplorer client:only="svelte" />
+</BaseLayout>

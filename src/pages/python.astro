@@ -1,0 +1,8 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import PythonIDE from '../components/PythonIDE.svelte';
+---
+
+<ToolLayout title="Python 在线编译器 · My Second Brain" description="基于 Pyodide 的浏览器内 Python 运行环境">
+  <PythonIDE client:only="svelte" />
+</ToolLayout>

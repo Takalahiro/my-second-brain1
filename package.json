@@ -25,6 +25,7 @@
     "astro": "^6.3.5",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
+    "mathjs": "^15.2.0",
     "mermaid": "^11.15.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-katex": "^7.0.1",

@@ -69,4 +69,13 @@ runRequired('node', [path.join(SCRIPTS, 'sync-assets.mjs')]);
 // Step 4: 生成 mtime manifest（git log + fs.statSync 双重读取）
 runRequired('node', [path.join(SCRIPTS, 'build-mtime-manifest.mjs')]);
 
+// Step 5: 扫描 public/video|picture|music 生成 media-manifest.json（背景 + 音乐播放器使用）
+runRequired('node', [path.join(SCRIPTS, 'build-media-manifest.mjs')]);
+
+// Step 6: 生成学习统计 stats.json（笔记数 / 字数 / 标签 / 月度趋势 / 热力图）
+runRequired('node', [path.join(SCRIPTS, 'build-stats.mjs')]);
+
+// Step 7: 扫描 [[wikilinks]] 双链：报告 + graph 数据
+runRequired('node', [path.join(SCRIPTS, 'build-wikilinks.mjs')]);
+
 console.log('✅ vault prepared.');

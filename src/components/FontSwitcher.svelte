@@ -63,10 +63,21 @@
     cursor: pointer;
   }
   :global(.dark) .font-switcher {
-    background: #2a2138;
-    border-color: #594d73;
+    background: #15101e;
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 4px 10px rgba(0, 0, 0, 0.35);
   }
   :global(.dark) .font-switcher-icon {
-    color: #c5b9df;
+    color: #b3a4d4;
+  }
+  :global(.dark) .font-switcher-select {
+    color: #ece4ff;
+  }
+  /* 下拉项在深色模式下保持深底浅字（Edge/Chrome/Firefox 都支持） */
+  :global(.dark) .font-switcher-select option {
+    background: #15101e;
+    color: #ece4ff;
   }
 </style>
