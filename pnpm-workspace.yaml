@@ -1,3 +1,11 @@
+# pnpm 11+ 的项目级配置统一放这里
+# https://pnpm.io/settings
+#
+# pnpm 11 默认会忽略所有 install / postinstall 脚本，在 CI（如 Cloudflare Pages）
+# 会把忽略直接升级成 ERR_PNPM_IGNORED_BUILDS。
+# 这里显式逐个允许：
 allowBuilds:
+  workerd: true
   esbuild: true
   sharp: true
+  "@parcel/watcher": true
