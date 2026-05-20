@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=DotGothic16&display=swap');
 @import './global.css';
 @import './pixel.css';
 
@@ -41,6 +42,10 @@
   --radius-card: 16px;
   --radius-button: 12px;
   --radius-small: 8px;
+
+  /* 全局字体方案（默认：温楷） */
+  --font-body-current: 'LXGW WenKai', 'Inter', sans-serif;
+  --font-heading-current: 'Pixelify Sans', 'LXGW WenKai', sans-serif;
 }
 
 /* 按你要求保留 data-theme 入口；同时兼容现有 .dark 切换逻辑 */
@@ -69,7 +74,7 @@
 }
 
 body {
-  font-family: 'LXGW WenKai', 'Inter', sans-serif;
+  font-family: var(--font-body-current);
   background-color: var(--bg-primary);
   color: var(--text-primary);
 }
@@ -80,5 +85,27 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Pixelify Sans', 'LXGW WenKai', sans-serif;
+  font-family: var(--font-heading-current);
+}
+
+/* 字体切换方案 */
+html[data-font='wenkai'] {
+  --font-body-current: 'LXGW WenKai', 'Inter', sans-serif;
+  --font-heading-current: 'Pixelify Sans', 'LXGW WenKai', sans-serif;
+}
+html[data-font='inter'] {
+  --font-body-current: 'Inter', 'LXGW WenKai', sans-serif;
+  --font-heading-current: 'Inter', 'Pixelify Sans', 'LXGW WenKai', sans-serif;
+}
+html[data-font='serif'] {
+  --font-body-current: 'Noto Serif SC', 'LXGW WenKai', serif;
+  --font-heading-current: 'Noto Serif SC', 'Pixelify Sans', serif;
+}
+html[data-font='plex'] {
+  --font-body-current: 'IBM Plex Sans', 'LXGW WenKai', sans-serif;
+  --font-heading-current: 'IBM Plex Sans', 'Pixelify Sans', sans-serif;
+}
+html[data-font='jp-pixel'] {
+  --font-body-current: 'DotGothic16', 'LXGW WenKai', 'Inter', sans-serif;
+  --font-heading-current: 'DotGothic16', 'Pixelify Sans', 'LXGW WenKai', sans-serif;
 }

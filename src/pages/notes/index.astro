@@ -26,22 +26,49 @@ function encodeFolderPath(path: string) {
     .join('/');
 }
 
+function flattenFolders(node: (typeof topFolders)[number], depth = 0): Array<{
+  id: string;
+  title: string;
+  emoji: string;
+  count: number;
+  lastUpdated: string;
+  href: string;
+  depth: number;
+}> {
+  const acc: Array<{
+    id: string;
+    title: string;
+    emoji: string;
+    count: number;
+    lastUpdated: string;
+    href: string;
+    depth: number;
+  }> = [];
+
+  for (const child of node.children) {
+    acc.push({
+      id: `folder:${child.path}`,
+      title: child.name,
+      emoji: '📁',
+      count: countNotes(child),
+      lastUpdated: '',
+      href: `/folder/${encodeFolderPath(child.path)}`,
+      depth,
+    });
+    acc.push(...flattenFolders(child as (typeof topFolders)[number], depth + 1));
+  }
+  return acc;
+}
+
 const categories = topFolders.map((folder) => ({
   title: folder.name,
   folderEmoji: guessFolderEmoji(folder.name),
-  folders: folder.children.map((child) => ({
-    id: `folder:${child.path}`,
-    title: child.name,
-    emoji: '📁',
-    count: countNotes(child),
-    lastUpdated: '',
-    href: `/folder/${encodeFolderPath(child.path)}`,
-  })),
+  folders: flattenFolders(folder),
   // 主列表页只展示目录卡片；笔记内容在目录页内展示
   notes: [],
 }));
 ---
 
 <BaseLayout title="笔记 · My Second Brain">
-  <NotesExplorer categories={categories} client:load />
+  <NotesExplorer categories={categories} tree={tree} client:load />
 </BaseLayout>

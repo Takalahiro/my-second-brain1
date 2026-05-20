@@ -1,6 +1,7 @@
 ---
 import '../styles/globals.css';
 import ThemeToggle from '../components/ThemeToggle.svelte';
+import FontSwitcher from '../components/FontSwitcher.svelte';
 import Mermaid from '../components/Mermaid.svelte';
 import MobileViewModeToggle from '../components/MobileViewModeToggle.svelte';
 
@@ -13,7 +14,7 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
 ---
 
 <!doctype html>
-<html lang="zh-CN" class="scroll-smooth">
+<html lang="zh-CN" class="scroll-smooth" data-font="wenkai">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -32,6 +33,11 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
       if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       }
+
+      const font = localStorage.getItem('second-brain:font-family');
+      if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {
+        document.documentElement.setAttribute('data-font', font);
+      }
     </script>
   </head>
   <body class="min-h-screen transition-colors">
@@ -41,6 +47,7 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
         <div class="flex items-center gap-2 text-sm">
           <a href="/notes" class="pixel-button nav-link">笔记</a>
           <a href="/tags" class="pixel-button nav-link">标签</a>
+          <FontSwitcher client:load />
           <ThemeToggle client:load />
         </div>
       </nav>

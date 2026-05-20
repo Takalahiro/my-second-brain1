@@ -68,6 +68,11 @@
     background: var(--accent-mint);
     color: var(--text-primary);
   }
+  :global(.dark) .note-count {
+    background: #365245;
+    border-color: #4f705f;
+    color: #e8f8ef;
+  }
   .note-updated {
     font-size: 0.72rem;
     color: var(--text-secondary);

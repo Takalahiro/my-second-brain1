@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { FolderNode as TreeNode } from '../../lib/folder-tree';
+  import FolderNode from '../FolderNode.svelte';
   import NoteGrid from './NoteGrid.svelte';
 
   interface Note {
@@ -16,6 +18,7 @@
     count?: number;
     lastUpdated?: string;
     href: string;
+    depth?: number;
   }
   interface Category {
     title: string;
@@ -25,11 +28,40 @@
   }
   interface Props {
     categories: Category[];
+    tree: TreeNode;
   }
 
-  let { categories }: Props = $props();
+  let { categories, tree }: Props = $props();
   let searchQuery = $state('');
-  let viewMode = $state<'grid' | 'list'>('grid');
+  let mode = $state<'widgets' | 'recursive'>('widgets');
+  let forceTick = $state(0);
+  let forceAction = $state<'expand-all' | 'collapse-all' | null>(null);
+
+  const MODE_KEY = 'second-brain:notes-display-mode';
+
+  $effect(() => {
+    if (typeof localStorage === 'undefined') return;
+    const stored = localStorage.getItem(MODE_KEY);
+    if (stored === 'widgets' || stored === 'recursive') {
+      mode = stored;
+    }
+  });
+
+  function setMode(next: 'widgets' | 'recursive') {
+    mode = next;
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(MODE_KEY, next);
+    }
+  }
+
+  function collapseAllFolders() {
+    forceAction = 'collapse-all';
+    forceTick++;
+  }
+  function expandAllFolders() {
+    forceAction = 'expand-all';
+    forceTick++;
+  }
 
   const filtered = $derived.by(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -47,8 +79,14 @@
       if (matchedNotes.length > 0 || matchedFolders.length > 0 || c.title.toLowerCase().includes(q)) {
         next.push({
           ...c,
-          folders: matchedFolders.length > 0 || q ? matchedFolders : c.folders,
-          notes: matchedNotes.length > 0 || q ? matchedNotes : c.notes,
+          folders:
+            q.length > 0
+              ? matchedFolders
+              : (c.folders ?? []),
+          notes:
+            q.length > 0
+              ? matchedNotes
+              : c.notes,
         });
       }
     }
@@ -69,33 +107,61 @@
       bind:value={searchQuery}
       class="notes-search"
     />
-    <div class="notes-view-switch">
+    <div class="notes-layout-switch">
       <button
         type="button"
-        class="pixel-button view-btn {viewMode === 'grid' ? 'is-active' : ''}"
-        onclick={() => (viewMode = 'grid')}
-      >🔲</button>
+        class="pixel-button layout-btn {mode === 'widgets' ? 'is-active' : ''}"
+        onclick={() => setMode('widgets')}
+      >小组件</button>
       <button
         type="button"
-        class="pixel-button view-btn {viewMode === 'list' ? 'is-active' : ''}"
-        onclick={() => (viewMode = 'list')}
-      >📋</button>
+        class="pixel-button layout-btn {mode === 'recursive' ? 'is-active' : ''}"
+        onclick={() => setMode('recursive')}
+      >折叠</button>
     </div>
   </div>
 </section>
 
-{#if filtered.length === 0}
-  <p class="notes-empty">没有匹配的笔记。</p>
+{#if mode === 'recursive'}
+  <section class="tree-actions-bar pixel-card glass-container">
+    <button
+      type="button"
+      class="pixel-button tree-action-btn"
+      onclick={expandAllFolders}
+    >一键展开</button>
+    <button
+      type="button"
+      class="pixel-button tree-action-btn"
+      onclick={collapseAllFolders}
+    >一键折叠</button>
+  </section>
+{/if}
+
+{#if mode === 'recursive'}
+  <section class="recursive-wrap pixel-card glass-container">
+    {#each tree.children as root (root.path)}
+      <FolderNode
+        node={root}
+        depth={1}
+        defaultExpandDepth={99}
+        {forceTick}
+        {forceAction}
+      />
+    {/each}
+  </section>
 {:else}
-  {#each filtered as category (category.title)}
-    <NoteGrid
-      title={category.title}
-      folders={category.folders ?? []}
-      notes={category.notes}
-      folderEmoji={category.folderEmoji}
-      {viewMode}
-    />
-  {/each}
+  {#if filtered.length === 0}
+    <p class="notes-empty">没有匹配的笔记。</p>
+  {:else}
+    {#each filtered as category (category.title)}
+      <NoteGrid
+        title={category.title}
+        folders={category.folders ?? []}
+        notes={category.notes}
+        folderEmoji={category.folderEmoji}
+      />
+    {/each}
+  {/if}
 {/if}
 
 <style>
@@ -143,20 +209,41 @@
     border-color: var(--accent-pink);
     box-shadow: var(--shadow-pixel);
   }
-  .notes-view-switch {
+  .notes-layout-switch {
     display: inline-flex;
     gap: 0.4rem;
   }
-  .view-btn {
-    min-width: 40px;
-    padding: 0.45rem 0.6rem;
+  .layout-btn {
+    min-width: 52px;
+    padding: 0.45rem 0.65rem;
   }
-  .view-btn.is-active {
-    background: var(--accent-pink);
+  .layout-btn.is-active {
+    background: var(--accent-lavender);
   }
 
   .notes-empty {
     margin: 1.25rem 0;
     color: var(--text-secondary);
+  }
+
+  .recursive-wrap {
+    border-width: var(--border-thin);
+    padding: 0.7rem 0.85rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .tree-actions-bar {
+    border-width: var(--border-thin);
+    padding: 0.5rem 0.65rem;
+    margin: -0.65rem 0 1rem;
+    display: inline-flex;
+    gap: 0.45rem;
+    align-items: center;
+    transition: opacity var(--motion-fast) var(--motion-ease),
+      transform var(--motion-fast) var(--motion-ease);
+  }
+  .tree-action-btn {
+    min-width: 86px;
+    padding: 0.4rem 0.6rem;
   }
 </style>

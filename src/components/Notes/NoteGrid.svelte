@@ -16,6 +16,7 @@
     count?: number;
     lastUpdated?: string;
     href: string;
+    depth?: number;
   }
 
   interface Props {
@@ -30,25 +31,29 @@
 </script>
 
 <section class="mb-10">
-  <div class="grid-title-wrap">
-    <span class="grid-title-emoji">{folderEmoji}</span>
-    <h2 class="grid-title">{title}</h2>
-    <div class="grid-divider"></div>
-  </div>
+  {#if title}
+    <div class="grid-title-wrap">
+      <span class="grid-title-emoji">{folderEmoji}</span>
+      <h2 class="grid-title">{title}</h2>
+      <div class="grid-divider"></div>
+    </div>
+  {/if}
 
   {#if folders.length > 0}
     <h3 class="sub-title">目录</h3>
-    <div class="notes-grid" class:is-list={viewMode === 'list'}>
+    <div class="folders-stack">
       {#each folders as folder (folder.id)}
-        <NoteCard
-          id={folder.id}
-          title={folder.title}
-          emoji={folder.emoji ?? '📁'}
-          count={folder.count}
-          lastUpdated={folder.lastUpdated}
-          href={folder.href}
-          {viewMode}
-        />
+        <div class="folder-item" style={`--depth:${folder.depth ?? 0}`}>
+          <NoteCard
+            id={folder.id}
+            title={folder.title}
+            emoji={folder.emoji ?? '📁'}
+            count={folder.count}
+            lastUpdated={folder.lastUpdated}
+            href={folder.href}
+            viewMode="list"
+          />
+        </div>
       {/each}
     </div>
   {/if}
@@ -97,6 +102,13 @@
     font-size: 0.95rem;
     color: var(--text-secondary);
     font-weight: 600;
+  }
+  .folders-stack {
+    display: grid;
+    gap: 0.55rem;
+  }
+  .folder-item {
+    padding-left: calc(var(--depth) * 14px);
   }
 
   .notes-grid {
