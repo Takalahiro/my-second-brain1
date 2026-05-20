@@ -22,7 +22,20 @@
 <button
   onclick={toggle}
   aria-label="切换主题"
-  class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+  class="pixel-button theme-toggle-btn"
 >
   {isDark ? '☀️' : '🌙'}
 </button>
+
+<style>
+  .theme-toggle-btn {
+    min-width: 42px;
+    height: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 1rem;
+  }
+</style>

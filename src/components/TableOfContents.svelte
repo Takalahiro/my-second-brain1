@@ -149,7 +149,7 @@
       ></button>
     {/if}
     <aside
-      class="toc-floating"
+      class="toc-floating pixel-card glass-container"
       class:is-mobile={!isDesktop}
       use:draggable={PANEL_DRAG_OPTS}
     >
@@ -159,7 +159,7 @@
         <div class="toc-actions">
           <button
             type="button"
-            class="toc-action-btn"
+            class="toc-action-btn pixel-button"
             title="折叠到一级标题（H2）"
             aria-label="折叠到一级标题"
             onclick={collapseToH2}
@@ -170,7 +170,7 @@
           </button>
           <button
             type="button"
-            class="toc-action-btn"
+            class="toc-action-btn pixel-button"
             title="全部展开"
             aria-label="全部展开"
             onclick={expandAll}
@@ -181,7 +181,7 @@
           </button>
           <button
             type="button"
-            class="toc-action-btn"
+            class="toc-action-btn pixel-button"
             title="最小化为悬浮球"
             aria-label="最小化"
             onclick={() => setMinimized(true)}
@@ -232,17 +232,21 @@
     right: 0.5rem;
     bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
     width: min(82vw, 320px);
-    border-radius: 0.5rem;
-    background: rgb(255 255 255);
-    border: 1px solid rgb(229 231 235);
-    box-shadow: 0 10px 30px -4px rgb(0 0 0 / 0.25);
+    border-radius: var(--radius-card);
+    background: var(--glass-bg);
+    border-width: var(--border-thin);
+    box-shadow: var(--shadow-normal);
     z-index: 60;
     overflow: hidden;
     contain: layout style;
+    transition: transform var(--motion-fast) var(--motion-ease),
+      box-shadow var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease),
+      background-color var(--motion-fast) var(--motion-ease);
   }
   :global(.dark) .toc-floating {
-    background: rgb(17 24 39);
-    border-color: rgb(31 41 55);
+    background: var(--glass-bg);
+    border-color: var(--border-color);
   }
 
   /* 桌面端：右侧浮窗，可拖。
@@ -254,12 +258,15 @@
       bottom: auto;
       width: 240px;
       max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 7rem);
-      box-shadow: 0 4px 14px -2px rgb(0 0 0 / 0.08);
+      box-shadow: var(--shadow-normal);
       z-index: 5;
-      transition: box-shadow 0.15s;
+      transition: transform var(--motion-fast) var(--motion-ease),
+        box-shadow var(--motion-fast) var(--motion-ease),
+        border-color var(--motion-fast) var(--motion-ease),
+        background-color var(--motion-fast) var(--motion-ease);
     }
     .toc-floating:global(.is-dragging) {
-      box-shadow: 0 12px 28px -4px rgb(0 0 0 / 0.25);
+      box-shadow: var(--shadow-hover);
       transition: none;
     }
   }
@@ -286,21 +293,21 @@
     align-items: center;
     gap: 6px;
     padding: 8px 10px;
-    border-bottom: 1px solid rgb(229 231 235);
+    border-bottom: var(--border-thin) solid var(--border-color);
     cursor: grab;
     user-select: none;
-    background: rgb(249 250 251);
+    background: var(--bg-secondary);
   }
   :global(.dark) .toc-handle {
-    background: rgb(17 24 39);
-    border-color: rgb(31 41 55);
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
   }
   .toc-handle:active {
     cursor: grabbing;
   }
   .toc-handle-grip {
     font-size: 12px;
-    color: rgb(156 163 175);
+    color: var(--text-secondary);
     letter-spacing: -2px;
   }
 
@@ -309,14 +316,14 @@
     flex: 0 0 auto;
     justify-content: center;
     padding: 6px 10px 8px;
-    border-top: 1px solid rgb(229 231 235);
+    border-top: var(--border-thin) solid var(--border-color);
     border-bottom: none;
-    background: rgb(249 250 251);
+    background: var(--bg-secondary);
     display: flex;
   }
   :global(.dark) .toc-handle-bottom {
-    background: rgb(17 24 39);
-    border-top-color: rgb(31 41 55);
+    background: var(--bg-secondary);
+    border-top-color: var(--border-color);
   }
   /* 移动端抽屉不允许拖动，隐藏底部 handle */
   .toc-floating.is-mobile .toc-handle-bottom {
@@ -328,7 +335,7 @@
     height: 4px;
     border-radius: 2px;
     background: rgb(209 213 219);
-    transition: background 0.12s;
+    transition: background-color var(--motion-fast) var(--motion-ease);
   }
   .toc-handle-bottom:hover .toc-handle-grip-bar {
     background: rgb(156 163 175);
@@ -346,10 +353,10 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: rgb(107 114 128);
+    color: var(--text-secondary);
   }
   :global(.dark) .toc-title {
-    color: rgb(156 163 175);
+    color: var(--text-secondary);
   }
 
   .toc-actions {
@@ -361,23 +368,27 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     padding: 0;
-    border: none;
-    background: transparent;
-    color: rgb(107 114 128);
+    color: var(--text-secondary);
     cursor: pointer;
-    border-radius: 3px;
-    transition: background 0.12s, color 0.12s;
+    border-radius: var(--radius-small);
+    border-width: var(--border-thin);
+    transition: transform var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease),
+      box-shadow var(--motion-fast) var(--motion-ease),
+      background-color var(--motion-fast) var(--motion-ease);
+    box-shadow: var(--shadow-pixel);
   }
   .toc-action-btn:hover {
-    background: rgb(229 231 235);
-    color: rgb(37 99 235);
+    color: var(--text-primary);
+    border-color: var(--accent-lavender);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
   }
-  :global(.dark) .toc-action-btn:hover {
-    background: rgb(31 41 55);
-    color: rgb(96 165 250);
+  .toc-action-btn:active {
+    box-shadow: var(--shadow-active);
   }
 
   .toc-scroll {

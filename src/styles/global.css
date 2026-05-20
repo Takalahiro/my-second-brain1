@@ -157,8 +157,7 @@ body {
 /* 表格外层滚动容器（由 rehype-wrap-tables 注入） */
 .prose .table-wrap {
   margin: 1.25rem 0;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   border-radius: 0.5rem;
   border: 1px solid rgb(229 231 235);
 }
@@ -170,6 +169,7 @@ body {
   width: 100%;
   margin: 0;
   border-collapse: collapse;
+  table-layout: fixed;
   font-size: 0.9375rem;
   line-height: 1.5;
 }
@@ -180,13 +180,16 @@ body {
   padding: 0.625rem 0.875rem;
   text-align: left;
   vertical-align: middle;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
 }
 
 .prose th {
   background: rgb(249 250 251);
   font-weight: 600;
   color: rgb(31 41 55);
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .prose tbody tr:nth-child(even) td {
@@ -205,6 +208,49 @@ body {
 
 .dark .prose tbody tr:nth-child(even) td {
   background: rgb(17 24 39 / 0.5);
+}
+
+/* 移动端两档模式：默认紧凑，可切换到阅读模式（html.mobile-reading） */
+@media (max-width: 768px) {
+  :root {
+    --mobile-table-font-size: 0.78rem;
+    --mobile-table-line-height: 1.35;
+    --mobile-table-cell-px: 0.42rem;
+    --mobile-table-cell-py: 0.38rem;
+    --mobile-mermaid-scale: 1;
+  }
+  :root.mobile-reading,
+  .mobile-reading {
+    --mobile-table-font-size: 0.9rem;
+    --mobile-table-line-height: 1.55;
+    --mobile-table-cell-px: 0.62rem;
+    --mobile-table-cell-py: 0.52rem;
+    --mobile-mermaid-scale: 0.92;
+  }
+
+  .prose .table-wrap {
+    margin: 1rem 0;
+  }
+  .prose table {
+    font-size: var(--mobile-table-font-size);
+    line-height: var(--mobile-table-line-height);
+  }
+  .prose th,
+  .prose td {
+    padding: var(--mobile-table-cell-py) var(--mobile-table-cell-px);
+  }
+
+  /* Mermaid 在两档模式下统一随屏缩放（不横滚） */
+  .prose .mermaid-block svg,
+  .prose .mermaid svg {
+    width: calc(100% * var(--mobile-mermaid-scale));
+    max-width: 100%;
+    margin-inline: auto;
+  }
+  .prose .mermaid-block,
+  .prose .mermaid {
+    overflow: hidden;
+  }
 }
 
 .prose hr { margin: 2rem 0; border-top: 1px solid rgb(209 213 219); }

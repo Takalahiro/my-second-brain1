@@ -75,7 +75,7 @@
     <h1 class="root-title">{node.name === '根目录' ? '📚 全部笔记' : node.name}</h1>
     <p class="root-meta">共 {total} 篇</p>
   {:else}
-    <button type="button" class="folder-row" onclick={toggle} aria-expanded={!collapsed}>
+    <button type="button" class="folder-row pixel-card glass-container" onclick={toggle} aria-expanded={!collapsed}>
       <svg viewBox="0 0 10 10" class="folder-caret {collapsed ? 'collapsed' : ''}" aria-hidden="true">
         <path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
@@ -91,11 +91,11 @@
         <ul class="notes-list">
           {#each node.notes as n (n.slug)}
             <li>
-              <a href={'/notes/' + n.slug} class="note-link">
+              <a href={'/notes/' + n.slug} class="note-link pixel-card glass-container">
                 <span class="note-icon">📄</span>
                 <span class="note-title">{n.title}</span>
                 {#if n.date}
-                  <time class="note-date">{n.date.toLocaleDateString('zh-CN')}</time>
+                  <time class="note-date pixel-digits">{n.date.toLocaleDateString('zh-CN')}</time>
                 {/if}
               </a>
             </li>
@@ -135,10 +135,7 @@
   .folder-block:not(.depth-0) > .folder-children {
     padding-left: 18px;
     margin-left: 6px;
-    border-left: 1px solid rgb(229 231 235);
-  }
-  :global(.dark) .folder-block:not(.depth-0) > .folder-children {
-    border-left-color: rgb(31 41 55);
+    border-left: var(--border-thin) solid var(--border-color);
   }
 
   .root-title {
@@ -148,7 +145,7 @@
   }
   .root-meta {
     font-size: 0.875rem;
-    color: rgb(107 114 128);
+    color: var(--text-secondary);
     margin: 0 0 1rem;
   }
 
@@ -157,24 +154,26 @@
     align-items: center;
     gap: 6px;
     width: 100%;
-    padding: 6px 8px;
-    border: none;
-    background: transparent;
+    padding: 8px 10px;
     text-align: left;
     cursor: pointer;
-    border-radius: 6px;
+    border-width: var(--border-thin);
     font-weight: 600;
-    color: rgb(31 41 55);
-    transition: background 0.12s;
-  }
-  :global(.dark) .folder-row {
-    color: rgb(229 231 235);
+    color: var(--text-primary);
+    margin: 4px 0;
+    box-shadow: var(--shadow-normal);
+    transition: transform var(--motion-fast) var(--motion-ease),
+      box-shadow var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease),
+      background-color var(--motion-fast) var(--motion-ease);
   }
   .folder-row:hover {
-    background: rgb(243 244 246);
+    border-color: var(--accent-pink);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-1px);
   }
-  :global(.dark) .folder-row:hover {
-    background: rgb(31 41 55);
+  .folder-row:active {
+    box-shadow: var(--shadow-active);
   }
 
   .folder-block.depth-1 > .folder-row {
@@ -193,8 +192,8 @@
   .folder-caret {
     width: 10px;
     height: 10px;
-    color: rgb(107 114 128);
-    transition: transform 0.15s ease;
+    color: var(--text-secondary);
+    transition: transform var(--motion-fast) var(--motion-ease);
     flex: 0 0 10px;
   }
   .folder-caret:not(.collapsed) {
@@ -213,15 +212,12 @@
   .folder-count {
     flex: 0 0 auto;
     font-size: 0.75rem;
-    color: rgb(107 114 128);
-    background: rgb(243 244 246);
+    color: var(--text-secondary);
+    background: var(--accent-peach);
     padding: 1px 6px;
-    border-radius: 999px;
+    border-radius: var(--radius-small);
+    border: 1px solid var(--border-color);
     font-weight: 400;
-  }
-  :global(.dark) .folder-count {
-    background: rgb(31 41 55);
-    color: rgb(156 163 175);
   }
 
   .notes-list {
@@ -234,23 +230,26 @@
     display: flex;
     align-items: baseline;
     gap: 6px;
-    padding: 5px 8px;
-    border-radius: 4px;
-    color: rgb(55 65 81);
+    padding: 7px 10px;
+    border-radius: var(--radius-small);
+    color: var(--text-primary);
+    border-width: var(--border-thin);
     text-decoration: none;
     font-size: 0.9375rem;
-    transition: background 0.12s, color 0.12s;
-  }
-  :global(.dark) .note-link {
-    color: rgb(209 213 219);
+    margin: 6px 0;
+    box-shadow: var(--shadow-normal);
+    transition: transform var(--motion-fast) var(--motion-ease),
+      box-shadow var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease),
+      background-color var(--motion-fast) var(--motion-ease);
   }
   .note-link:hover {
-    background: rgb(239 246 255);
-    color: rgb(37 99 235);
+    border-color: var(--accent-lavender);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
   }
-  :global(.dark) .note-link:hover {
-    background: rgb(30 58 138 / 0.3);
-    color: rgb(147 197 253);
+  .note-link:active {
+    box-shadow: var(--shadow-active);
   }
   .note-icon {
     flex: 0 0 auto;
@@ -267,7 +266,7 @@
   .note-date {
     flex: 0 0 auto;
     font-size: 0.75rem;
-    color: rgb(156 163 175);
+    color: var(--text-secondary);
   }
 
   .subfolders {
@@ -276,7 +275,7 @@
 
   .empty-folder {
     font-size: 0.875rem;
-    color: rgb(156 163 175);
+    color: var(--text-secondary);
     margin: 6px 0 6px 24px;
     font-style: italic;
   }

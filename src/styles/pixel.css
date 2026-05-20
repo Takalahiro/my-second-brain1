@@ -1,0 +1,90 @@
+/* pixel.css - 像素风通用样式 */
+
+/* 像素卡片 */
+.pixel-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: var(--border-thin) solid var(--border-color);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-normal);
+  transition: transform var(--motion-base) var(--motion-ease),
+    box-shadow var(--motion-base) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease);
+}
+
+.pixel-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  background: var(--glass-bg-hover);
+  border-color: var(--accent-pink);
+}
+
+.pixel-card:active {
+  box-shadow: var(--shadow-active);
+}
+
+/* 像素按钮 */
+.pixel-button {
+  font-family: 'Pixelify Sans', sans-serif;
+  padding: 8px 16px;
+  border: var(--border-thick) solid var(--text-primary);
+  border-radius: var(--radius-button);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: transform var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease);
+  box-shadow: var(--shadow-pixel);
+}
+
+.pixel-button:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 rgb(0 0 0 / 0.16);
+}
+
+.pixel-button:active {
+  transform: translate(0, 0);
+  box-shadow: 1px 1px 0 rgb(0 0 0 / 0.12);
+}
+
+/* 像素徽章 */
+.pixel-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-family: 'Pixelify Sans', sans-serif;
+  border: var(--border-thin) solid currentColor;
+  border-radius: var(--radius-small);
+  background: var(--accent-mint);
+  box-shadow: 1px 1px 0 rgb(0 0 0 / 0.1);
+  transition: transform var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease);
+}
+
+/* 毛玻璃容器 */
+.glass-container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: var(--border-thin) solid var(--glass-border);
+  border-radius: var(--radius-card);
+  transition: background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease);
+}
+
+[data-theme='dark'] .glass-container,
+.dark .glass-container {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+}
+
+/* 像素数字字体 */
+.pixel-digits {
+  font-family: 'Pixelify Sans', monospace;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 0 rgb(0 0 0 / 0.1);
+}

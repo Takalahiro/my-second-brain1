@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css');
+@import './global.css';
+@import './pixel.css';
+
+:root {
+  /* 浅色模式 */
+  --bg-primary: #fff8f0;
+  --bg-secondary: #fff0e5;
+  --accent-pink: #ffd6e0;
+  --accent-mint: #d4f0e0;
+  --accent-lavender: #e0d6ff;
+  --accent-peach: #ffe4d6;
+  --text-primary: #3d3d3d;
+  --text-secondary: #7a7a7a;
+  --border-color: #e0e0e0;
+
+  /* 阴影 */
+  --shadow-soft: 0 8px 24px rgb(0 0 0 / 0.08);
+  --shadow-pixel: 2px 2px 0 rgb(0 0 0 / 0.1);
+  --shadow-normal: 0 8px 24px rgb(0 0 0 / 0.08), 2px 2px 0 rgb(0 0 0 / 0.1);
+  --shadow-hover: 0 12px 32px rgb(0 0 0 / 0.12), 4px 4px 0 rgb(0 0 0 / 0.15);
+  --shadow-active: 0 4px 12px rgb(0 0 0 / 0.08), 1px 1px 0 rgb(0 0 0 / 0.1);
+
+  /* 边框厚度（统一两档） */
+  --border-thin: 1px;
+  --border-thick: 2px;
+
+  /* 动效节奏 */
+  --motion-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-fast: 0.2s;
+  --motion-base: 0.3s;
+
+  /* 玻璃透明度曲线（浅色） */
+  --glass-bg: rgb(255 255 255 / 0.62);
+  --glass-bg-hover: rgb(255 255 255 / 0.74);
+  --glass-bg-strong: rgb(255 255 255 / 0.68);
+  --glass-border: rgb(255 255 255 / 0.34);
+
+  /* 圆角 */
+  --radius-card: 16px;
+  --radius-button: 12px;
+  --radius-small: 8px;
+}
+
+/* 按你要求保留 data-theme 入口；同时兼容现有 .dark 切换逻辑 */
+[data-theme='dark'],
+:root.dark,
+.dark {
+  --bg-primary: #1a1625;
+  --bg-secondary: #2d2438;
+  --accent-neon-pink: #ff6b9d;
+  --accent-neon-cyan: #6bffe0;
+  --accent-neon-purple: #b66bff;
+  --text-primary: #f0e8ff;
+  --text-secondary: #a8a0c0;
+  --border-color: #4a4458;
+
+  /* 玻璃透明度曲线（深色，整体更深） */
+  --glass-bg: rgb(37 30 50 / 0.68);
+  --glass-bg-hover: rgb(48 38 66 / 0.78);
+  --glass-bg-strong: rgb(33 27 46 / 0.74);
+  --glass-border: rgb(255 255 255 / 0.12);
+
+  /* 深色下阴影略收敛，避免发灰 */
+  --shadow-normal: 0 8px 24px rgb(0 0 0 / 0.32), 2px 2px 0 rgb(0 0 0 / 0.26);
+  --shadow-hover: 0 12px 30px rgb(0 0 0 / 0.42), 4px 4px 0 rgb(0 0 0 / 0.3);
+  --shadow-active: 0 4px 12px rgb(0 0 0 / 0.24), 1px 1px 0 rgb(0 0 0 / 0.2);
+}
+
+body {
+  font-family: 'LXGW WenKai', 'Inter', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Pixelify Sans', 'LXGW WenKai', sans-serif;
+}

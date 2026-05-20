@@ -34,7 +34,7 @@ const lastUpdated = getNoteLastUpdated((note as any).filePath ?? note.id);
       {note.data.tags && note.data.tags.length > 0 && (
         <div class="flex flex-wrap gap-2 mt-3">
           {note.data.tags.map((tag) => (
-            <a href={`/tags/${tag}`} class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">
+            <a href={`/tags/${tag}`} class="pixel-badge note-tag-chip">
               #{tag}
             </a>
           ))}
@@ -55,3 +55,30 @@ const lastUpdated = getNoteLastUpdated((note as any).filePath ?? note.id);
 
   <TableOfContents headings={headings} client:load />
 </BaseLayout>
+
+<style>
+  .note-tag-chip {
+    text-decoration: none;
+    color: var(--text-primary);
+    background: var(--accent-lavender);
+    border-color: var(--border-color);
+    transition: transform var(--motion-fast) var(--motion-ease),
+      box-shadow var(--motion-fast) var(--motion-ease),
+      background-color var(--motion-fast) var(--motion-ease),
+      border-color var(--motion-fast) var(--motion-ease);
+  }
+  .note-tag-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-pixel);
+    background: var(--accent-peach);
+  }
+  :global(.dark) .note-tag-chip {
+    background: #4a355f;
+    border-color: #6a4f87;
+    color: #f0e8ff;
+  }
+  :global(.dark) .note-tag-chip:hover {
+    background: #5b4275;
+    border-color: #7a5e99;
+  }
+</style>

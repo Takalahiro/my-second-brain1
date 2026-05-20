@@ -1,7 +1,8 @@
 ---
-import '../styles/global.css';
+import '../styles/globals.css';
 import ThemeToggle from '../components/ThemeToggle.svelte';
 import Mermaid from '../components/Mermaid.svelte';
+import MobileViewModeToggle from '../components/MobileViewModeToggle.svelte';
 
 interface Props {
   title?: string;
@@ -33,13 +34,13 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
       }
     </script>
   </head>
-  <body class="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors">
-    <header class="border-b border-gray-200 dark:border-gray-800 sticky top-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur z-10">
-      <nav class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="/" class="font-bold text-lg" aria-label="首页">🧠</a>
-        <div class="flex items-center gap-4 text-sm">
-          <a href="/notes" class="hover:underline">笔记</a>
-          <a href="/tags" class="hover:underline">标签</a>
+  <body class="min-h-screen transition-colors">
+    <header class="sticky top-0 z-20 px-3 pt-3">
+      <nav class="pixel-card glass-container nav-shell max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <a href="/" class="nav-brand" aria-label="首页">🧠</a>
+        <div class="flex items-center gap-2 text-sm">
+          <a href="/notes" class="pixel-button nav-link">笔记</a>
+          <a href="/tags" class="pixel-button nav-link">标签</a>
           <ThemeToggle client:load />
         </div>
       </nav>
@@ -54,5 +55,30 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
       Mermaid 渲染本身还有 IntersectionObserver 懒加载，所以延迟挂载完全安全。
     -->
     <Mermaid client:idle />
+    <MobileViewModeToggle client:load />
   </body>
 </html>
+
+<style>
+  .nav-shell {
+    border-width: 1px;
+  }
+  .nav-brand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-button);
+    text-decoration: none;
+    font-size: 1.2rem;
+    background: var(--bg-secondary);
+    box-shadow: var(--shadow-pixel);
+    border: 1px solid var(--border-color);
+  }
+  .nav-link {
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 6px 12px;
+  }
+</style>
