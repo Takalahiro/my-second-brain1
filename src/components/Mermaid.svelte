@@ -2,10 +2,14 @@
   /**
    * 全局 Mermaid 渲染器组件。
    *
-   * - 在客户端启动后扫描页面里 `<pre><code class="language-mermaid">…</code></pre>`，
-   *   Shiki 已经把代码做了语法高亮，需要把原始文本还原后交给 mermaid 渲染。
-   * - 监听 <html class> 变化以适配明暗主题切换。
+   * - 在 markdown → HTML 阶段，`src/lib/remark-mermaid.mjs` 已经把每一个 ```mermaid 代码块
+   *   替换为 `<div class="mermaid-block" data-source="…" data-state="pending"></div>` 占位。
+   *   此组件在客户端 hydrate 后，扫描这些占位并把 `data-source` 交给 mermaid 渲染成 SVG。
    * - 用 IntersectionObserver 懒渲染：图表滚动进可视区域才解析，避免长文档一次 parse 几十个图表卡死主线程。
+   * - 监听 `<html class>` 变化以适配明暗主题切换。
+   *
+   * 同时兼容回退情形：如果将来某条 markdown 还是被走了 Shiki（出现了 `<pre><code class="language-mermaid">`），
+   * 这里也会把它转成 mermaid-block 再渲染。
    */
   import { onMount } from 'svelte';
 
@@ -28,28 +32,36 @@
     return mermaidPromise;
   }
 
-  /** 把 Shiki 高亮过的 mermaid 代码块替换为占位 `<div class="mermaid-block">` */
-  function prepareBlocks(): HTMLElement[] {
-    const blocks = document.querySelectorAll('pre code.language-mermaid, code.language-mermaid');
-    const result: HTMLElement[] = [];
-    blocks.forEach((codeEl) => {
+  /** 收集页面上所有 mermaid 占位 div；同时把残留的 `<pre><code class="language-mermaid">` 兜底转成占位 */
+  function collectBlocks(): HTMLElement[] {
+    document.querySelectorAll('pre code.language-mermaid, code.language-mermaid').forEach((codeEl) => {
       const pre = codeEl.closest('pre');
       const raw = (codeEl as HTMLElement).textContent ?? '';
       if (!raw.trim()) return;
       const div = document.createElement('div');
       div.className = 'mermaid-block';
-      div.dataset.source = raw;
       div.dataset.state = 'pending';
+      div.dataset.srcEncoded = encodeURIComponent(raw);
       (pre ?? codeEl).replaceWith(div);
-      result.push(div);
     });
-    return result;
+    return Array.from(document.querySelectorAll<HTMLElement>('.mermaid-block'));
+  }
+
+  function readSource(el: HTMLElement): string {
+    if (el.dataset.srcEncoded) {
+      try {
+        return decodeURIComponent(el.dataset.srcEncoded);
+      } catch {
+        /* fall through */
+      }
+    }
+    return el.dataset.source ?? '';
   }
 
   async function renderOne(el: HTMLElement) {
     if (el.dataset.state === 'done') return;
-    const source = el.dataset.source;
-    if (!source) return;
+    const source = readSource(el);
+    if (!source.trim()) return;
     el.dataset.state = 'rendering';
     const mermaid = await loadMermaid();
     try {
@@ -59,7 +71,8 @@
       bindFunctions?.(el);
       el.dataset.state = 'done';
     } catch (err) {
-      el.innerHTML = `<pre class="mermaid-error">Mermaid 渲染失败：${(err as Error).message}\n\n${escapeHTML(source)}</pre>`;
+      const msg = (err as Error).message ?? String(err);
+      el.innerHTML = `<pre class="mermaid-error">Mermaid 渲染失败：${escapeHTML(msg)}\n\n${escapeHTML(source)}</pre>`;
       el.dataset.state = 'error';
     }
   }
@@ -71,11 +84,14 @@
   /** 重新渲染所有 mermaid 块（主题切换用） */
   async function reRenderAll() {
     const all = document.querySelectorAll<HTMLElement>('.mermaid-block');
+    const sources: Array<{ el: HTMLElement; src: string }> = [];
     all.forEach((el) => {
-      const src = el.dataset.source;
-      if (!src) return;
+      const src = readSource(el);
+      if (!src.trim()) return;
+      // 清空已渲染的 SVG，重新置 pending；source 仍保留在 data-src-encoded 上
       el.innerHTML = '';
       el.dataset.state = 'pending';
+      sources.push({ el, src });
     });
     const mermaid = await loadMermaid();
     mermaid.initialize({
@@ -83,11 +99,11 @@
       theme: document.documentElement.classList.contains('dark') ? 'dark' : 'default',
       securityLevel: 'loose',
     });
-    for (const el of all) await renderOne(el);
+    for (const { el } of sources) await renderOne(el);
   }
 
   onMount(() => {
-    const blocks = prepareBlocks();
+    const blocks = collectBlocks();
     if (blocks.length === 0) return;
 
     if (typeof IntersectionObserver === 'undefined') {
