@@ -30,4 +30,7 @@ public/vault-assets/
 scripts/sweep-report.json
 scripts/sweep-report.html
 
+# auto-sync-vault 的日志和锁文件（仅本地）
+logs/
+
 

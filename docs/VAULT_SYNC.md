@@ -32,7 +32,61 @@ my-second-brain1 (父仓库 - Astro 站点)
                 └────────────────────────────┘
 ```
 
-## 三种同步方式
+## 每小时自动同步（无人值守）
+
+系统提供 **双层兜底** 的自动同步：
+
+### 第一层：本地 Windows 计划任务（每 1 小时）
+
+一次性安装：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-windows-scheduler.ps1
+```
+
+注册一个名为 `MySecondBrain-VaultAutoSync` 的计划任务：
+
+- **触发**：安装 2 分钟后第一次跑，然后**每 1 小时**重复，开机会补跑错过的
+- **动作**：`node scripts/auto-sync-vault.mjs`
+- **行为**：
+  1. 如果本地 vault 有未提交改动 → commit + push 到 GitHub vault
+  2. fetch GitHub vault，能 fast-forward 就 reset 本地到远端（diverge 时跳过避免数据丢失）
+  3. 重新生成 `src/lib/notes-mtime.json`
+  4. **仅** commit + push 这两个白名单文件到父仓库：`obsidian-vault`（submodule pointer）和 `src/lib/notes-mtime.json` —— 不会误推你正在写的其他代码
+- **日志**：`logs/auto-sync.log`（自动保留最近 200 行）
+- **并发保护**：lockfile（`logs/auto-sync.lock`）防止上一次未完又开新一次
+
+常用操作：
+
+```powershell
+# 看下一次运行时间 / 上次状态
+Get-ScheduledTaskInfo -TaskName MySecondBrain-VaultAutoSync
+
+# 立即手动触发
+Start-ScheduledTask -TaskName MySecondBrain-VaultAutoSync
+
+# 卸载
+powershell -ExecutionPolicy Bypass -File scripts/install-windows-scheduler.ps1 -Uninstall
+
+# 不通过 task scheduler 直接跑一次（调试）
+pnpm vault:auto --verbose
+```
+
+### 第二层：GitHub Actions（每 10 分钟，云端兜底）
+
+`.github/workflows/sync-vault-submodule.yml` 每 10 分钟在 GitHub 上跑一次，无需你的机器开机。如果云端检测到 vault 上游有新 commit：
+
+1. 重建 `src/lib/notes-mtime.json` manifest
+2. bump 父仓库的 submodule pointer
+3. git push → 触发 Cloudflare Pages 自动重部署
+
+这样即使你的电脑关机一周，回家打开网站仍然是最新的。
+
+> **两层不会打架**：白名单 add（只 `obsidian-vault` + `notes-mtime.json`）+ 本地脚本 push 前先 `git pull --rebase` + lockfile，三重保险。
+
+---
+
+## 三种手动同步方式
 
 ### 方式 A：本地写笔记，一键全链路同步（最常用）
 
@@ -95,6 +149,7 @@ GitHub Action `.github/workflows/sync-vault-submodule.yml` 提供两种触发：
 |------|------|
 | `pnpm vault:sync ["msg"]` | 本地 vault → GitHub vault → 父仓库 submodule pointer |
 | `pnpm vault:pull` | GitHub vault → 本地 vault |
+| `pnpm vault:auto` | 双向自动同步（计划任务每小时调用，也可手动跑） |
 | `pnpm vault:audit` | 看 vault 目录结构 / 散落笔记 |
 | `pnpm vault:diagnose` | 检查 vault 笔记格式问题 |
 | `pnpm dev` | 本地开发 |
