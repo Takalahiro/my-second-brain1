@@ -75,11 +75,11 @@
     <h1 class="root-title">{node.name === '根目录' ? '📚 全部笔记' : node.name}</h1>
     <p class="root-meta">共 {total} 篇</p>
   {:else}
-    <button type="button" class="folder-row pixel-card glass-container" onclick={toggle} aria-expanded={!collapsed}>
+    <button type="button" class="folder-row" onclick={toggle} aria-expanded={!collapsed}>
       <span class="folder-caret {collapsed ? 'collapsed' : ''}" aria-hidden="true">›</span>
       <span class="folder-icon">{collapsed ? '📁' : '📂'}</span>
       <span class="folder-name">{node.name}</span>
-      <span class="pixel-badge folder-count">{total}</span>
+      <span class="folder-count">{total}</span>
     </button>
   {/if}
 
@@ -89,7 +89,7 @@
         <ul class="notes-list">
           {#each node.notes as n (n.slug)}
             <li>
-              <a href={'/notes/' + n.slug} class="note-link pixel-card glass-container">
+              <a href={'/notes/' + n.slug} class="note-link">
                 <span class="note-icon">📄</span>
                 <span class="note-title">{n.title}</span>
                 {#if n.date}
@@ -159,6 +159,9 @@
     font-weight: 600;
     color: #f3ecff;
     margin: 5px 0;
+    box-sizing: border-box;
+    appearance: none;
+    -webkit-appearance: none;
     background: linear-gradient(180deg, rgb(36 31 53 / 0.88), rgb(29 25 43 / 0.88));
     box-shadow: 0 8px 18px rgb(0 0 0 / 0.2), inset 0 1px 0 rgb(255 255 255 / 0.04);
     border-radius: 14px;
@@ -231,6 +234,7 @@
     border: 1px solid rgb(108 97 141 / 0.42);
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
     font-weight: 600;
+    letter-spacing: 0;
   }
   :global(.dark) .folder-count {
     color: #f1e9ff;
