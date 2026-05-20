@@ -1,0 +1,68 @@
+name: Sync obsidian-vault submodule
+
+on:
+  # 每 10 分钟自动检查一次 obsidian-vault 上游
+  schedule:
+    - cron: '*/10 * * * *'
+  # 允许手动触发
+  workflow_dispatch:
+  # 允许从 obsidian-vault 仓库通过 repository_dispatch 远程触发
+  repository_dispatch:
+    types: [vault-updated]
+
+concurrency:
+  group: sync-vault
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo (with submodule)
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update submodule to remote HEAD
+        id: update
+        run: |
+          set -e
+          cd obsidian-vault
+          OLD_SHA=$(git rev-parse HEAD)
+          git fetch origin
+          # 兼容 main / master 两种默认分支名
+          DEFAULT_BRANCH=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
+          DEFAULT_BRANCH=${DEFAULT_BRANCH:-main}
+          git checkout "origin/${DEFAULT_BRANCH}"
+          NEW_SHA=$(git rev-parse HEAD)
+          cd ..
+          echo "old_sha=${OLD_SHA}" >> "$GITHUB_OUTPUT"
+          echo "new_sha=${NEW_SHA}" >> "$GITHUB_OUTPUT"
+          echo "branch=${DEFAULT_BRANCH}" >> "$GITHUB_OUTPUT"
+          if [ "${OLD_SHA}" = "${NEW_SHA}" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit & push if updated
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add obsidian-vault
+          git commit -m "chore(vault): auto-sync submodule ${{ steps.update.outputs.new_sha }}"
+          git push
+
+      - name: Summary
+        run: |
+          echo "## Vault sync summary" >> $GITHUB_STEP_SUMMARY
+          echo "- old SHA: \`${{ steps.update.outputs.old_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- new SHA: \`${{ steps.update.outputs.new_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- branch: \`${{ steps.update.outputs.branch }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- updated: \`${{ steps.update.outputs.changed }}\`" >> $GITHUB_STEP_SUMMARY

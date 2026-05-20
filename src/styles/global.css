@@ -126,17 +126,90 @@
 
 .prose img { border-radius: 0.5rem; margin: 1rem 0; max-width: 100%; height: auto; }
 
-.prose table { width: 100%; margin: 1rem 0; border-collapse: collapse; }
-.prose th, .prose td {
-  border: 1px solid rgb(209 213 219);
-  padding: 0.5rem 0.75rem;
+/* 表格外层滚动容器（由 rehype-wrap-tables 注入） */
+.prose .table-wrap {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(229 231 235);
 }
+.dark .prose .table-wrap {
+  border-color: rgb(55 65 81);
+}
+
+.prose table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid rgb(229 231 235);
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
 .prose th {
-  background: rgb(243 244 246);
+  background: rgb(249 250 251);
   font-weight: 600;
+  color: rgb(31 41 55);
+  white-space: nowrap;
 }
-.dark .prose th, .dark .prose td { border-color: rgb(75 85 99); }
-.dark .prose th { background: rgb(31 41 55); }
+
+.prose tbody tr:nth-child(even) td {
+  background: rgb(249 250 251 / 0.6);
+}
+
+.dark .prose th,
+.dark .prose td {
+  border-color: rgb(55 65 81);
+}
+
+.dark .prose th {
+  background: rgb(31 41 55);
+  color: rgb(229 231 235);
+}
+
+.dark .prose tbody tr:nth-child(even) td {
+  background: rgb(17 24 39 / 0.5);
+}
 
 .prose hr { margin: 2rem 0; border-top: 1px solid rgb(209 213 219); }
 .dark .prose hr { border-color: rgb(75 85 99); }
+
+/* Mermaid 图表容器 */
+.prose pre:has(code.language-mermaid),
+.prose pre.mermaid {
+  background: transparent !important;
+  padding: 0;
+  text-align: center;
+}
+.mermaid {
+  text-align: center;
+  margin: 1rem 0;
+}
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* KaTeX 块级公式居中 + 横向滚动 */
+.prose .katex-display {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}
+.prose .katex {
+  font-size: 1.05em;
+}
+
+/* 暗黑模式下 KaTeX 文字颜色继承 */
+.dark .katex {
+  color: rgb(229 231 235);
+}

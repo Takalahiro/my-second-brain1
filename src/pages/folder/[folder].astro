@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { noteIdToSlug } from '../../lib/backlinks';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  const folderSet = new Set<string>();
+  for (const note of notes) {
+    const parts = note.id.split('/');
+    const folder = parts.length > 1 ? parts[0] : '根目录';
+    folderSet.add(folder);
+  }
+  return [...folderSet].map((folder) => ({
+    params: { folder },
+    props: {
+      folder,
+      notes: notes.filter((n) => {
+        const parts = n.id.split('/');
+        const f = parts.length > 1 ? parts[0] : '根目录';
+        return f === folder;
+      }),
+    },
+  }));
+}
+
+const { folder, notes } = Astro.props;
+
+notes.sort((a, b) => {
+  const da = a.data.date?.getTime() ?? 0;
+  const db = b.data.date?.getTime() ?? 0;
+  return db - da;
+});
+---
+
+<BaseLayout title={`📁 ${folder}`}>
+  <nav class="text-sm text-gray-500 mb-4">
+    <a href="/" class="hover:underline">首页</a>
+    <span class="mx-2">/</span>
+    <span>📁 {folder}</span>
+  </nav>
+
+  <h1 class="text-3xl font-bold mb-3">📁 {folder}</h1>
+  <p class="text-gray-500 mb-6">{notes.length} 篇笔记</p>
+
+  <ul class="space-y-3">
+    {notes.map((note) => {
+      const slug = noteIdToSlug(note.id);
+      const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
+      return (
+        <li>
+          <a href={`/notes/${slug}`} class="block p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 transition">
+            <div class="flex items-baseline justify-between gap-4">
+              <h2 class="font-semibold">{title}</h2>
+              {note.data.date && (
+                <time class="text-xs text-gray-500 shrink-0">
+                  {note.data.date.toLocaleDateString('zh-CN')}
+                </time>
+              )}
+            </div>
+            {note.data.description && (
+              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{note.data.description}</p>
+            )}
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+</BaseLayout>

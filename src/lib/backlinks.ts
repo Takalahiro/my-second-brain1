@@ -1,4 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { slugify, noteIdToSlug } from './slugify';
+
+export { noteIdToSlug };
 
 export type Note = CollectionEntry<'notes'>;
 
@@ -8,19 +11,9 @@ function extractWikiLinks(body: string): string[] {
   const links: string[] = [];
   let m: RegExpExecArray | null;
   while ((m = re.exec(body)) !== null) {
-    links.push(m[1].trim().replace(/ /g, '-').toLowerCase());
+    links.push(slugify(m[1].trim()));
   }
   return links;
-}
-
-// 把笔记的 id（含子路径）规范化为 slug：只取文件名（不含 .md），小写，空格转 -
-export function noteIdToSlug(id: string): string {
-  return id
-    .replace(/\.md$/, '')
-    .split('/')
-    .pop()!
-    .replace(/ /g, '-')
-    .toLowerCase();
 }
 
 // 取得某篇笔记的所有反向链接

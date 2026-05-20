@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FolderTreeContainer from '../../components/FolderTreeContainer.svelte';
+import { buildFolderTree, countNotes } from '../../lib/folder-tree';
+
+const notes = await getCollection('notes', ({ data }) => !data.draft);
+const tree = buildFolderTree(notes);
+const total = countNotes(tree);
+
+// 顶层一级目录用于"快速跳转"导航
+const topFolders = tree.children;
+---
+
+<BaseLayout title="笔记 · My Second Brain">
+  <section class="mb-6">
+    <h1 class="text-4xl font-bold mb-2">📚 笔记</h1>
+    <p class="text-gray-600 dark:text-gray-400">
+      共 {total} 篇笔记 · 严格按 obsidian-vault 目录结构展示 · {topFolders.length} 个一级目录
+    </p>
+  </section>
+
+  <nav class="mb-6 flex flex-wrap gap-2">
+    {topFolders.map((f) => (
+      <a
+        href={`#folder-${encodeURIComponent(f.path)}`}
+        class="text-sm px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900 transition"
+      >
+        {f.name} ({countNotes(f)})
+      </a>
+    ))}
+  </nav>
+
+  <FolderTreeContainer
+    tree={tree}
+    defaultExpandDepth={2}
+    storagePrefix="second-brain:folder"
+    client:load
+  />
+</BaseLayout>

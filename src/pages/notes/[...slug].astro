@@ -1,9 +1,10 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import TableOfContents from '../../components/TableOfContents.astro';
+import TableOfContents from '../../components/TableOfContents.svelte';
 import Backlinks from '../../components/Backlinks.astro';
 import { getBacklinks, noteIdToSlug } from '../../lib/backlinks';
+import { getNoteLastUpdated, formatLastUpdated } from '../../lib/git-mtime';
 
 export async function getStaticPaths() {
   const notes = await getCollection('notes', ({ data }) => !data.draft);
@@ -18,38 +19,39 @@ const { Content, headings } = await render(note);
 const backlinks = await getBacklinks(noteIdToSlug(note.id));
 
 const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
+const lastUpdated = getNoteLastUpdated((note as any).filePath ?? note.id);
 ---
 
 <BaseLayout title={title} description={note.data.description}>
-  <div class="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-8">
-    <article class="prose dark:prose-invert min-w-0">
-      <header class="mb-6 not-prose">
-        <h1 class="text-4xl font-bold mb-2">{title}</h1>
-        {note.data.date && (
-          <time class="text-sm text-gray-500">
-            {note.data.date.toLocaleDateString('zh-CN')}
-          </time>
-        )}
-        {note.data.tags && note.data.tags.length > 0 && (
-          <div class="flex flex-wrap gap-2 mt-3">
-            {note.data.tags.map((tag) => (
-              <a href={`/tags/${tag}`} class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">
-                #{tag}
-              </a>
-            ))}
-          </div>
-        )}
-      </header>
+  <article class="prose dark:prose-invert min-w-0">
+    <header class="mb-6 not-prose">
+      <h1 class="text-4xl font-bold mb-2">{title}</h1>
+      {note.data.date && (
+        <time class="text-sm text-gray-500">
+          {note.data.date.toLocaleDateString('zh-CN')}
+        </time>
+      )}
+      {note.data.tags && note.data.tags.length > 0 && (
+        <div class="flex flex-wrap gap-2 mt-3">
+          {note.data.tags.map((tag) => (
+            <a href={`/tags/${tag}`} class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700">
+              #{tag}
+            </a>
+          ))}
+        </div>
+      )}
+    </header>
 
-      <Content />
+    <Content />
 
-      <Backlinks backlinks={backlinks} />
-    </article>
+    {lastUpdated && (
+      <p class="not-prose mt-12 mb-6 text-xs text-gray-400 dark:text-gray-600 text-right select-none">
+        最后更新 · <time datetime={lastUpdated.toISOString()}>{formatLastUpdated(lastUpdated)}</time>
+      </p>
+    )}
 
-    <aside class="hidden lg:block">
-      <div class="sticky top-20">
-        <TableOfContents headings={headings} />
-      </div>
-    </aside>
-  </div>
+    <Backlinks backlinks={backlinks} />
+  </article>
+
+  <TableOfContents headings={headings} client:load />
 </BaseLayout>

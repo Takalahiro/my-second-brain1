@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import ThemeToggle from '../components/ThemeToggle.svelte';
+import Mermaid from '../components/Mermaid.svelte';
 
 interface Props {
   title?: string;
@@ -17,6 +18,14 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title}</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+      integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
+      crossorigin="anonymous"
+    />
+
     <script is:inline>
       const theme = localStorage.getItem('theme');
       if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -30,6 +39,7 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
         <a href="/" class="font-bold text-lg">🧠 Second Brain</a>
         <div class="flex items-center gap-4 text-sm">
           <a href="/" class="hover:underline">首页</a>
+          <a href="/notes" class="hover:underline">笔记</a>
           <a href="/tags" class="hover:underline">标签</a>
           <ThemeToggle client:load />
         </div>
@@ -43,5 +53,7 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
         Built with Astro 6 + Tailwind v4 + Svelte 5
       </div>
     </footer>
+
+    <Mermaid client:idle />
   </body>
 </html>

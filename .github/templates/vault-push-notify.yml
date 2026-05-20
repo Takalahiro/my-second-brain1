@@ -1,0 +1,27 @@
+# ════════════════════════════════════════════════════════════════════
+#  这是一个【模板文件】—— 请把它复制到 obsidian-vault 仓库的
+#    .github/workflows/notify-parent.yml
+#  下，然后在 obsidian-vault 仓库的 Settings → Secrets → Actions 里
+#  新建一个 PARENT_REPO_TOKEN，值为一个有 `repo` scope 的 fine-grained
+#  Personal Access Token（仅限 Takalahiro/my-second-brain1 仓库 contents 读写）。
+#  之后每次 vault push 都会即时通知父仓库 sync workflow，无需等 cron。
+# ════════════════════════════════════════════════════════════════════
+name: Notify parent (my-second-brain) on push
+
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  notify-parent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger parent repo sync
+        env:
+          GH_TOKEN: ${{ secrets.PARENT_REPO_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            https://api.github.com/repos/Takalahiro/my-second-brain1/dispatches \
+            -d '{"event_type":"vault-updated","client_payload":{"sha":"${{ github.sha }}"}}'

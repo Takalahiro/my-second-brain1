@@ -26,3 +26,8 @@ pnpm-debug.log*
 # 同步出来的笔记资源（每次 build 重新生成）
 public/vault-assets/
 
+# full-sweep / verify scripts 的本地缓存报告
+scripts/sweep-report.json
+scripts/sweep-report.html
+
+
