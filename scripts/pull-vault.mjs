@@ -42,7 +42,7 @@ if (parentDirty) {
   console.log('   运行：git add obsidian-vault && git commit -m "chore: bump vault"');
 }
 
-// 资源同步
-run('pnpm sync');
+// 资源同步 + 重新生成 mtime manifest
+run('pnpm prepare:vault');
 
 console.log('\n✅ vault 拉取完成');
