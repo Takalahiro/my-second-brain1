@@ -156,7 +156,7 @@
 {/if}
 
 {#if mode === 'recursive'}
-  <section class="recursive-wrap pixel-card glass-container">
+  <section class="recursive-wrap pixel-card glass-container notes-recursive-panel">
     {#each tree.children as root (root.path)}
       <FolderNode
         node={root}
@@ -244,10 +244,26 @@
     color: var(--text-secondary);
   }
 
-  .recursive-wrap {
+  /* 折叠树：固定深色毛玻璃面板，与 localhost / 线上表现一致 */
+  .recursive-wrap.notes-recursive-panel {
     border-width: var(--border-thin);
     padding: 0.7rem 0.85rem;
     margin-bottom: 0.85rem;
+    background: rgb(26 20 38 / 0.82) !important;
+    border-color: rgb(255 255 255 / 0.14) !important;
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    color: #f3ecff;
+    box-shadow: var(--shadow-normal);
+  }
+  .notes-recursive-panel :global(.root-title) {
+    color: #f3ecff;
+  }
+  .notes-recursive-panel :global(.root-meta) {
+    color: #c8b9e2;
+  }
+  .notes-recursive-panel :global(.empty-folder) {
+    color: #a89bc4;
   }
 
   .tree-actions-bar {
