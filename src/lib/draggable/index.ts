@@ -113,12 +113,29 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
   let pendingX = 0;
   let pendingY = 0;
 
-  function getHandle(): HTMLElement {
+  /**
+   * Handle 解析：返回所有匹配元素。支持「顶部 + 底部 + 边缘多个 handle」的场景。
+   * 用 querySelectorAll，对每个元素都会附加 cursor 样式，并在 hit-test 时检查
+   * pointerdown 落在任意一个 handle 内即可开始拖动。
+   */
+  function getHandles(): HTMLElement[] {
     if (opts.handle) {
-      const el = node.querySelector<HTMLElement>(opts.handle);
-      if (el) return el;
+      const list = node.querySelectorAll<HTMLElement>(opts.handle);
+      if (list.length > 0) return Array.from(list);
     }
-    return node;
+    return [node];
+  }
+
+  function getPrimaryHandle(): HTMLElement {
+    return getHandles()[0] ?? node;
+  }
+
+  function isInHandle(target: EventTarget | null): boolean {
+    if (!target) return false;
+    for (const h of getHandles()) {
+      if (h.contains(target as Node)) return true;
+    }
+    return false;
   }
 
   function flushTransform() {
@@ -141,8 +158,7 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
 
   function onPointerDown(e: PointerEvent) {
     if (e.button !== 0) return;
-    const handle = getHandle();
-    if (!handle.contains(e.target as Node)) return;
+    if (!isInHandle(e.target)) return;
     const tag = (e.target as HTMLElement).tagName;
     if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'SELECT') return;
 
@@ -157,7 +173,13 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
     const r = node.getBoundingClientRect();
     baseRect = new DOMRect(r.left - offset.x, r.top - offset.y, r.width, r.height);
 
-    handle.setPointerCapture(pointerId);
+    // 在实际触发的 handle 上 setPointerCapture，确保 pointermove 路由正确
+    const captureHost = (e.currentTarget as HTMLElement) || getPrimaryHandle();
+    try {
+      captureHost.setPointerCapture(pointerId);
+    } catch {
+      /* 老浏览器没 pointer capture，pointermove 仍会通过 window listener 收到 */
+    }
     node.style.willChange = 'transform';
     if (opts.draggingClass) node.classList.add(opts.draggingClass);
     e.preventDefault();
@@ -179,10 +201,13 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
       rafId = 0;
       flushTransform();
     }
-    try {
-      getHandle().releasePointerCapture(pointerId);
-    } catch {
-      /* ignore */
+    // 尝试在每个 handle 上 release（不知道当时 capture 在哪个上）
+    for (const h of getHandles()) {
+      try {
+        h.releasePointerCapture(pointerId);
+      } catch {
+        /* ignore */
+      }
     }
     node.style.willChange = '';
     if (opts.draggingClass) node.classList.remove(opts.draggingClass);
@@ -192,8 +217,7 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
 
   function onDoubleClick(e: MouseEvent) {
     if (opts.doubleClickReset === false) return;
-    const handle = getHandle();
-    if (!handle.contains(e.target as Node)) return;
+    if (!isInHandle(e.target)) return;
     const tag = (e.target as HTMLElement).tagName;
     if (tag === 'A' || tag === 'BUTTON') return;
     offset = { x: 0, y: 0 };
@@ -217,9 +241,10 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
       return;
     }
     attached = true;
-    const handle = getHandle();
-    handle.style.cursor = 'grab';
-    handle.style.touchAction = 'none';
+    for (const h of getHandles()) {
+      h.style.cursor = 'grab';
+      h.style.touchAction = 'none';
+    }
     node.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerup', onPointerUp);
@@ -248,9 +273,10 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
     node.style.willChange = '';
     if (!attached) return;
     attached = false;
-    const handle = getHandle();
-    handle.style.cursor = '';
-    handle.style.touchAction = '';
+    for (const h of getHandles()) {
+      h.style.cursor = '';
+      h.style.touchAction = '';
+    }
     node.removeEventListener('pointerdown', onPointerDown);
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerup', onPointerUp);

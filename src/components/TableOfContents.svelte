@@ -206,6 +206,14 @@
           {/each}
         </ul>
       </div>
+
+      <!--
+        底部拖动条：与顶部 .toc-handle 用相同 class，draggable 会把每个匹配的
+        元素都当作拖动入口。在桌面端可见，移动端隐藏（移动端是抽屉不需要拖）。
+      -->
+      <footer class="toc-handle toc-handle-bottom" aria-label="拖动目录窗口">
+        <span class="toc-handle-grip-bar" aria-hidden="true"></span>
+      </footer>
     </aside>
   {/if}
 {/if}
@@ -237,14 +245,15 @@
     border-color: rgb(31 41 55);
   }
 
-  /* 桌面端：右侧浮窗，可拖 */
+  /* 桌面端：右侧浮窗，可拖。
+     iPad 横屏（>= 1024px）也走这个分支；用 safe-area-inset-top 确保不被 sticky header 遮住 */
   @media (min-width: 1024px) {
     .toc-floating {
-      top: 5rem;
+      top: calc(env(safe-area-inset-top, 0px) + 5.5rem);
       right: max(1rem, calc((100vw - 64rem) / 2 - 240px));
       bottom: auto;
       width: 240px;
-      max-height: calc(100vh - 6rem);
+      max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 7rem);
       box-shadow: 0 4px 14px -2px rgb(0 0 0 / 0.08);
       z-index: 5;
       transition: box-shadow 0.15s;
@@ -293,6 +302,42 @@
     font-size: 12px;
     color: rgb(156 163 175);
     letter-spacing: -2px;
+  }
+
+  /* 底部拖动条：薄薄一条，居中显示一个小 grip bar */
+  .toc-handle-bottom {
+    flex: 0 0 auto;
+    justify-content: center;
+    padding: 6px 10px 8px;
+    border-top: 1px solid rgb(229 231 235);
+    border-bottom: none;
+    background: rgb(249 250 251);
+    display: flex;
+  }
+  :global(.dark) .toc-handle-bottom {
+    background: rgb(17 24 39);
+    border-top-color: rgb(31 41 55);
+  }
+  /* 移动端抽屉不允许拖动，隐藏底部 handle */
+  .toc-floating.is-mobile .toc-handle-bottom {
+    display: none;
+  }
+  .toc-handle-grip-bar {
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: rgb(209 213 219);
+    transition: background 0.12s;
+  }
+  .toc-handle-bottom:hover .toc-handle-grip-bar {
+    background: rgb(156 163 175);
+  }
+  :global(.dark) .toc-handle-grip-bar {
+    background: rgb(55 65 81);
+  }
+  :global(.dark) .toc-handle-bottom:hover .toc-handle-grip-bar {
+    background: rgb(107 114 128);
   }
   .toc-title {
     flex: 1;
