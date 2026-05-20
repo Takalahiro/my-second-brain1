@@ -79,7 +79,7 @@
       <span class="folder-caret {collapsed ? 'collapsed' : ''}" aria-hidden="true">›</span>
       <span class="folder-icon">{collapsed ? '📁' : '📂'}</span>
       <span class="folder-name">{node.name}</span>
-      <span class="folder-count">{total}</span>
+      <span class="pixel-badge folder-count">{total}</span>
     </button>
   {/if}
 
@@ -214,14 +214,24 @@
     white-space: nowrap;
   }
   .folder-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 0 0 auto;
     font-size: 0.75rem;
-    color: var(--text-secondary);
-    background: var(--accent-peach);
-    padding: 1px 6px;
+    line-height: 1;
+    color: #5b4a76;
+    background: #f0d9ff;
+    padding: 2px 7px;
     border-radius: var(--radius-small);
-    border: 1px solid var(--border-color);
-    font-weight: 400;
+    border: 1px solid #8d74bb;
+    box-shadow: 1px 1px 0 rgb(0 0 0 / 0.12);
+    font-weight: 600;
+  }
+  :global(.dark) .folder-count {
+    color: #e9dcff;
+    background: #493966;
+    border-color: #6f5a92;
   }
 
   .notes-list {
@@ -329,7 +339,7 @@
     }
     .folder-count {
       font-size: 0.7rem;
-      padding: 1px 5px;
+      padding: 2px 6px;
     }
 
     .notes-list {
