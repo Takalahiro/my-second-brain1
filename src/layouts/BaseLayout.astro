@@ -54,6 +54,11 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
       </div>
     </footer>
 
-    <Mermaid client:load />
+    <!--
+      client:idle 让浏览器在空闲帧才 hydrate Mermaid，
+      避免首屏 JS 主线程被立即占用（这是「巨卡」的主要来源之一）。
+      Mermaid 渲染本身还有 IntersectionObserver 懒加载，所以延迟挂载完全安全。
+    -->
+    <Mermaid client:idle />
   </body>
 </html>

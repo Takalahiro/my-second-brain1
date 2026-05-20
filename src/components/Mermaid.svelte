@@ -58,6 +58,35 @@
     return el.dataset.source ?? '';
   }
 
+  /**
+   * Mermaid 默认 SVG 输出会带 width="100%"，节点多的图被压缩到极小看不清，
+   * 文字甚至会被截断。这里改成：保留 viewBox 原始尺寸（minWidth），
+   * 容器可横向滚动，从根本上避免「显示不全」。
+   */
+  function postProcessSvg(host: HTMLElement) {
+    const svg = host.querySelector<SVGSVGElement>('svg');
+    if (!svg) return;
+    const vb = svg.viewBox?.baseVal;
+    if (!vb || !vb.width || !vb.height) return;
+    const intrinsicW = Math.ceil(vb.width);
+    // 容器可用宽度（减去 padding）
+    const hostWidth = host.clientWidth || host.parentElement?.clientWidth || 0;
+    if (hostWidth > 0 && intrinsicW > hostWidth) {
+      // 宽图：取消 mermaid 默认的 width:100%，用原始尺寸 + 横滚
+      svg.removeAttribute('width');
+      svg.removeAttribute('height');
+      svg.style.maxWidth = 'none';
+      svg.style.width = `${intrinsicW}px`;
+      svg.style.height = 'auto';
+      host.dataset.wide = '1';
+    } else {
+      // 小图：保持自适应居中（mermaid 默认行为已经够好），删掉冗余属性避免某些浏览器渲染异常
+      svg.removeAttribute('height');
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+    }
+  }
+
   async function renderOne(el: HTMLElement) {
     if (el.dataset.state === 'done') return;
     const source = readSource(el);
@@ -69,6 +98,7 @@
       const { svg, bindFunctions } = await mermaid.render(id, source);
       el.innerHTML = svg;
       bindFunctions?.(el);
+      postProcessSvg(el);
       el.dataset.state = 'done';
     } catch (err) {
       const msg = (err as Error).message ?? String(err);
@@ -142,12 +172,32 @@
 <style>
   :global(.mermaid-block) {
     margin: 1.25rem 0;
-    text-align: center;
     min-height: 1rem;
+    text-align: center;
+    /* 大图允许横向滚动，避免被裁切 */
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem 0;
   }
+  /* 默认状态：SVG 自适应容器（小图，居中） */
   :global(.mermaid-block svg) {
     max-width: 100%;
     height: auto;
+    display: inline-block;
+  }
+  /* 宽图：渲染后由 postProcessSvg 标记，关闭 max-width，让 SVG 用原始宽度 */
+  :global(.mermaid-block[data-wide="1"]) {
+    text-align: left;
+    background: rgb(249 250 251);
+    border-radius: 0.5rem;
+  }
+  :global(.dark .mermaid-block[data-wide="1"]) {
+    background: rgb(17 24 39);
+  }
+  :global(.mermaid-block[data-wide="1"] svg) {
+    max-width: none !important;
+    width: auto;
   }
   :global(.mermaid-error) {
     color: rgb(220 38 38);

@@ -95,15 +95,24 @@
     startY = e.clientY;
     startLeft = left;
     startTop = top;
-    orbEl.setPointerCapture(e.pointerId);
-    e.preventDefault();
+    try {
+      orbEl.setPointerCapture(e.pointerId);
+    } catch {
+      /* 旧浏览器没有 setPointerCapture：忽略，pointermove 仍能工作 */
+    }
+    // 注意：不要 preventDefault，否则 Safari < 16 会吞掉随后的 click 事件
   }
 
   function onPointerMove(e: PointerEvent) {
     if (!dragging) return;
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) didMove = true;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+      didMove = true;
+      // 第一次确认拖动后再 preventDefault，阻止误触发的滚动 / 选区
+      e.preventDefault?.();
+    }
+    if (!didMove) return;
     const c = clampPos(startLeft + dx, startTop + dy);
     left = c.left;
     top = c.top;
@@ -135,8 +144,8 @@
   class="toc-orb"
   class:is-ready={ready}
   class:is-dragging={dragging}
-  style:left="{left}px"
-  style:top="{top}px"
+  style:left={ready ? `${left}px` : undefined}
+  style:top={ready ? `${top}px` : undefined}
   role="button"
   tabindex="0"
   title="展开目录（拖动移动）"
@@ -159,11 +168,22 @@
 </div>
 
 <style>
+  /*
+   * 重要：默认 opacity 必须为 1（可见），且必须有一个 CSS-only 默认位置。
+   * 否则在某些浏览器（Safari < 16.4 / 老 Edge / hydration 慢的设备）上，
+   * 如果 $effect 没及时跑完 ready=true，悬浮球会永远不可见。
+   * JS 加载完成后会通过 inline left/top 接管位置（参见 is-ready）。
+   */
   .toc-orb {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     position: fixed;
+    /* CSS-only 默认位置：移动端右下，桌面端右上 */
+    right: 12px;
+    bottom: 24px;
+    top: auto;
+    left: auto;
     width: 44px;
     height: 44px;
     border-radius: 50%;
@@ -175,13 +195,14 @@
     z-index: 50;
     touch-action: none;
     user-select: none;
-    opacity: 0;
-    pointer-events: none;
     transition: box-shadow 0.15s, transform 0.15s;
+    /* 避免在长笔记里被某个 overflow 容器裁掉 */
+    will-change: transform;
   }
+  /* 一旦 JS hydrated，inline left/top 覆盖上面的 right/bottom */
   .toc-orb.is-ready {
-    opacity: 1;
-    pointer-events: auto;
+    right: auto;
+    bottom: auto;
   }
   .toc-orb:hover {
     transform: scale(1.05);
@@ -196,9 +217,11 @@
     border-color: rgb(55 65 81);
     color: rgb(229 231 235);
   }
-  /* 桌面端轻微缩小，避免太抢眼 */
   @media (min-width: 1024px) {
     .toc-orb {
+      /* 桌面端默认右上 */
+      top: 80px;
+      bottom: auto;
       width: 40px;
       height: 40px;
       box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
