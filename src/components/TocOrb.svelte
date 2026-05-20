@@ -59,12 +59,29 @@
       left = c.left;
       top = c.top;
     } else {
-      // 默认右上角（相对 viewport）
+      // 默认位置：移动端右下角好按，桌面端右上角不挡正文
+      const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
       left = Math.max(8, window.innerWidth - 56);
-      top = 80;
+      top = isDesktop ? 80 : Math.max(80, window.innerHeight - 96);
     }
     ready = true;
   }
+
+  function onWindowResize() {
+    if (!ready) return;
+    const c = clampPos(left, top);
+    if (c.left !== left || c.top !== top) {
+      left = c.left;
+      top = c.top;
+      savePos();
+    }
+  }
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+    window.addEventListener('resize', onWindowResize, { passive: true });
+    return () => window.removeEventListener('resize', onWindowResize);
+  });
 
   $effect(() => {
     if (orbEl && !ready) initPos();
@@ -143,40 +160,48 @@
 
 <style>
   .toc-orb {
-    display: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgb(229 231 235);
+    background: rgb(255 255 255);
+    color: rgb(55 65 81);
+    cursor: grab;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+    z-index: 50;
+    touch-action: none;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: box-shadow 0.15s, transform 0.15s;
   }
+  .toc-orb.is-ready {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .toc-orb:hover {
+    transform: scale(1.05);
+  }
+  .toc-orb.is-dragging {
+    cursor: grabbing;
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.25);
+    transition: none;
+  }
+  :global(.dark) .toc-orb {
+    background: rgb(17 24 39);
+    border-color: rgb(55 65 81);
+    color: rgb(229 231 235);
+  }
+  /* 桌面端轻微缩小，避免太抢眼 */
   @media (min-width: 1024px) {
     .toc-orb {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      position: fixed;
       width: 40px;
       height: 40px;
-      border-radius: 50%;
-      border: 1px solid rgb(229 231 235);
-      background: rgb(255 255 255);
-      color: rgb(55 65 81);
-      cursor: grab;
       box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
-      z-index: 50;
-      touch-action: none;
-      user-select: none;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .toc-orb.is-ready {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .toc-orb.is-dragging {
-      cursor: grabbing;
-      box-shadow: 0 4px 16px rgb(0 0 0 / 0.2);
-    }
-    :global(.dark) .toc-orb {
-      background: rgb(17 24 39);
-      border-color: rgb(55 65 81);
-      color: rgb(229 231 235);
     }
   }
 </style>

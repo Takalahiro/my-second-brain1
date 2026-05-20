@@ -10,6 +10,8 @@
 import type { Action } from 'svelte/action';
 
 export interface DraggableOptions {
+  /** false 时不附加任何 listener；运行期切换 enabled 会动态 attach/detach */
+  enabled?: boolean;
   handle?: string;
   storageKey?: string;
   boundary?: 'viewport' | HTMLElement | null;
@@ -23,7 +25,7 @@ interface Offset {
   y: number;
 }
 
-const STRUCT_KEYS = ['handle', 'storageKey', 'boundary', 'draggingClass', 'doubleClickReset'] as const;
+const STRUCT_KEYS = ['handle', 'storageKey', 'boundary', 'draggingClass', 'doubleClickReset', 'enabled'] as const;
 
 function structChanged(a: DraggableOptions, b: DraggableOptions): boolean {
   for (const k of STRUCT_KEYS) {
@@ -206,7 +208,16 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
     applyTransform(node, offset);
   }
 
+  let attached = false;
+
   function attach() {
+    if (attached) return;
+    if (opts.enabled === false) {
+      // 即使禁用也要把存储里的 offset apply 一次，避免桌面端跳屏
+      // 但 enabled=false 通常意味着移动端抽屉，不需要 transform
+      return;
+    }
+    attached = true;
     const handle = getHandle();
     handle.style.cursor = 'grab';
     handle.style.touchAction = 'none';
@@ -215,17 +226,35 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
     window.addEventListener('pointerup', onPointerUp);
     node.addEventListener('dblclick', onDoubleClick);
     window.addEventListener('resize', onWindowResize, { passive: true });
-    applyTransform(node, offset);
+    // 在下一帧 apply 初始 transform，避开 hydration 期间的布局闪烁
+    requestAnimationFrame(() => {
+      // 元素可能已被销毁
+      if (!node.isConnected) return;
+      // 应用存储位置前先 clamp 到当前视口，避免换屏 / 换设备时跑出屏幕
+      const r = node.getBoundingClientRect();
+      const base = new DOMRect(r.left - offset.x, r.top - offset.y, r.width, r.height);
+      offset = clampToBoundary(offset, base, opts.boundary ?? 'viewport');
+      applyTransform(node, offset);
+      node.dataset.dragReady = '1';
+    });
   }
 
   function detach() {
     if (rafId) cancelAnimationFrame(rafId);
     node.style.willChange = '';
+    if (!attached) return;
+    attached = false;
+    const handle = getHandle();
+    handle.style.cursor = '';
+    handle.style.touchAction = '';
     node.removeEventListener('pointerdown', onPointerDown);
     window.removeEventListener('pointermove', onPointerMove);
     window.removeEventListener('pointerup', onPointerUp);
     node.removeEventListener('dblclick', onDoubleClick);
     window.removeEventListener('resize', onWindowResize);
+    // 禁用时去掉之前的 transform，让 CSS 自然布局接管
+    node.style.transform = '';
+    delete node.dataset.dragReady;
   }
 
   attach();

@@ -1,17 +1,9 @@
 <script lang="ts">
   import type { MarkdownHeading } from 'astro';
-  import { untrack } from 'svelte';
   import { buildHeadingTree } from '../lib/heading-tree';
   import { draggable, type DraggableOptions } from '../lib/draggable';
   import TocNode from './TocNode.svelte';
   import TocOrb from './TocOrb.svelte';
-
-  const PANEL_DRAG_OPTS: DraggableOptions = {
-    handle: '.toc-handle',
-    storageKey: 'second-brain:toc-pos',
-    boundary: 'viewport',
-    draggingClass: 'is-dragging',
-  };
 
   interface Props {
     headings: MarkdownHeading[];
@@ -21,24 +13,32 @@
   const tree = $derived(buildHeadingTree(headings, 2, 4));
 
   let activeSlug = $state<string | null>(null);
-
-  // 最小化状态（持久化到 localStorage）
-  const MIN_KEY = 'second-brain:toc-minimized';
-  let minimized = $state(
-    untrack(() => {
-      if (typeof localStorage === 'undefined') return false;
-      return localStorage.getItem(MIN_KEY) === '1';
-    })
-  );
-
-  // 折叠状态集中管理（避免每个 TocNode 维护 $effect 导致折叠卡顿）
   let collapsedMap = $state<Record<string, boolean>>({});
+
+  const MIN_KEY = 'second-brain:toc-minimized';
+
+  // SSR 默认 minimized=true（直出小悬浮球，避免 hydration 期间 panel 跳动）
+  // 客户端 mount 后再根据 localStorage / 屏宽决定。
+  let minimized = $state(true);
+  let isDesktop = $state(false);
+  let hydrated = $state(false);
+
+  // 桌面端 panel 可拖；移动端抽屉不可拖
+  const PANEL_DRAG_OPTS = $derived<DraggableOptions>({
+    enabled: isDesktop,
+    handle: '.toc-handle',
+    storageKey: 'second-brain:toc-pos',
+    boundary: 'viewport',
+    draggingClass: 'is-dragging',
+  });
 
   function navigate(slug: string) {
     const el = document.getElementById(slug);
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     history.replaceState(null, '', '#' + slug);
+    // 移动端：点了之后自动收起 panel，避免挡正文
+    if (!isDesktop) setMinimized(true);
   }
 
   function toggleNode(slug: string) {
@@ -46,7 +46,6 @@
   }
 
   function collapseToH2() {
-    // 折叠所有有子节点的 H2 节点（即只展示一级 H2 列表）
     const next: Record<string, boolean> = {};
     for (const n of tree) {
       if (n.children.length > 0) next[n.slug] = true;
@@ -63,23 +62,36 @@
     }
   }
 
-  /** 仅展开 TOC 时监听标题（最小化球模式不跑 IO，避免数百个 heading 拖慢交互） */
+  /** 一次性 hydration：读偏好 + 监听断点切换 */
   $effect(() => {
-    if (minimized || typeof IntersectionObserver === 'undefined') return;
+    if (typeof window === 'undefined') return;
+    const mql = window.matchMedia('(min-width: 1024px)');
+    isDesktop = mql.matches;
 
-    const allSlugs: string[] = [];
-    (function walk(nodes: typeof tree) {
-      for (const n of nodes) {
-        allSlugs.push(n.slug);
-        walk(n.children);
-      }
-    })(tree);
+    const stored = localStorage.getItem(MIN_KEY);
+    if (stored === '1') minimized = true;
+    else if (stored === '0') minimized = false;
+    else minimized = !mql.matches; // 没有偏好：桌面默认展开，移动默认 orb
+    hydrated = true;
 
-    const elements: HTMLElement[] = [];
-    for (const slug of allSlugs) {
-      const el = document.getElementById(slug);
-      if (el) elements.push(el);
-    }
+    const onChange = (e: MediaQueryListEvent) => {
+      isDesktop = e.matches;
+    };
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  });
+
+  /** 仅 panel 展开 + 桌面端 跑 IO（移动端抽屉用完即收，无需高亮当前章节） */
+  $effect(() => {
+    if (!hydrated || minimized || !isDesktop) return;
+    if (typeof IntersectionObserver === 'undefined') return;
+
+    // 直接从 DOM 取真实存在的 heading，不依赖 tree 数据
+    const article = document.querySelector('article');
+    if (!article) return;
+    const elements = Array.from(
+      article.querySelectorAll<HTMLElement>('h2[id], h3[id], h4[id]')
+    );
     if (elements.length === 0) return;
 
     const visible = new Set<string>();
@@ -116,8 +128,18 @@
   {#if minimized}
     <TocOrb onExpand={() => setMinimized(false)} />
   {:else}
+    {#if !isDesktop && hydrated}
+      <button
+        type="button"
+        class="toc-backdrop"
+        aria-label="关闭目录"
+        onclick={() => setMinimized(true)}
+      ></button>
+    {/if}
     <aside
       class="toc-floating"
+      class:is-mobile={!isDesktop}
+      class:is-hydrated={hydrated}
       use:draggable={PANEL_DRAG_OPTS}
     >
       <header class="toc-handle">
@@ -178,37 +200,69 @@
 {/if}
 
 <style>
+  /* 默认（移动端 / 平板 < 1024px）：右侧贴边抽屉 */
   .toc-floating {
-    display: none;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 4rem;
+    right: 0.5rem;
+    bottom: 1rem;
+    width: min(82vw, 320px);
+    border-radius: 0.5rem;
+    background: rgb(255 255 255);
+    border: 1px solid rgb(229 231 235);
+    box-shadow: 0 10px 30px -4px rgb(0 0 0 / 0.25);
+    z-index: 60;
+    overflow: hidden;
+    contain: layout style;
+    /* 默认隐藏；移动端 hydration 后即可见，桌面端等 draggable 就绪 */
+    visibility: hidden;
   }
+  .toc-floating.is-mobile.is-hydrated {
+    visibility: visible;
+  }
+  :global(.dark) .toc-floating {
+    background: rgb(17 24 39);
+    border-color: rgb(31 41 55);
+  }
+
+  /* 桌面端：右侧浮窗，可拖 */
   @media (min-width: 1024px) {
     .toc-floating {
-      display: flex;
-      flex-direction: column;
-      position: fixed;
       top: 5rem;
       right: max(1rem, calc((100vw - 64rem) / 2 - 240px));
+      bottom: auto;
       width: 240px;
       max-height: calc(100vh - 6rem);
-      padding: 0;
-      border-radius: 0.5rem;
-      background: rgb(255 255 255);
-      border: 1px solid rgb(229 231 235);
       box-shadow: 0 4px 14px -2px rgb(0 0 0 / 0.08);
       z-index: 5;
-      overflow: hidden;
-      contain: layout style;
       transition: box-shadow 0.15s;
+    }
+    .toc-floating[data-drag-ready='1'] {
+      visibility: visible;
     }
     .toc-floating:global(.is-dragging) {
       box-shadow: 0 12px 28px -4px rgb(0 0 0 / 0.25);
       transition: none;
     }
-    :global(.dark) .toc-floating {
-      background: rgb(17 24 39);
-      border-color: rgb(31 41 55);
-    }
+  }
 
+  /* 移动端遮罩：点击关闭，且阻挡正文滚动穿透 */
+  .toc-backdrop {
+    position: fixed;
+    inset: 0;
+    border: none;
+    padding: 0;
+    background: rgb(0 0 0 / 0.35);
+    z-index: 55;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (min-width: 1024px) {
+    .toc-backdrop {
+      display: none;
+    }
   }
 
   .toc-handle {
