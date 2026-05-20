@@ -160,6 +160,7 @@
     color: var(--text-primary);
     margin: 4px 0;
     box-shadow: var(--shadow-normal);
+    border-radius: 14px;
     transition: transform var(--motion-fast) var(--motion-ease),
       box-shadow var(--motion-fast) var(--motion-ease),
       border-color var(--motion-fast) var(--motion-ease),
@@ -175,15 +176,15 @@
   }
 
   .folder-block.depth-1 > .folder-row {
-    font-size: 1.125rem;
+    font-size: 1.03rem;
   }
   .folder-block.depth-2 > .folder-row {
-    font-size: 1rem;
+    font-size: 0.96rem;
   }
   .folder-block.depth-3 > .folder-row,
   .folder-block.depth-4 > .folder-row,
   .folder-block.depth-5 > .folder-row {
-    font-size: 0.9375rem;
+    font-size: 0.88rem;
     font-weight: 500;
   }
 
@@ -212,6 +213,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: clamp(0.76rem, 0.22vw + 0.8rem, 1rem);
+    line-height: 1.15;
   }
   .folder-count {
     display: inline-flex;
@@ -220,18 +223,19 @@
     flex: 0 0 auto;
     font-size: 0.75rem;
     line-height: 1;
-    color: #5b4a76;
-    background: #f0d9ff;
+    color: #4f3c70;
+    background: #ead2ff;
     padding: 2px 7px;
     border-radius: var(--radius-small);
-    border: 1px solid #8d74bb;
+    border: 1px solid #7f63b0;
     box-shadow: 1px 1px 0 rgb(0 0 0 / 0.12);
     font-weight: 600;
   }
   :global(.dark) .folder-count {
-    color: #e9dcff;
-    background: #493966;
-    border-color: #6f5a92;
+    color: #f1e9ff;
+    background: #17141f;
+    border-color: #3b334a;
+    box-shadow: 1px 1px 0 rgb(0 0 0 / 0.35);
   }
 
   .notes-list {
@@ -319,27 +323,16 @@
       height: 1em;
       flex: 0 0 1em;
     }
-    .folder-block.depth-1 > .folder-row,
-    .folder-block.depth-2 > .folder-row,
-    .folder-block.depth-3 > .folder-row,
-    .folder-block.depth-4 > .folder-row,
-    .folder-block.depth-5 > .folder-row {
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
     .folder-name {
-      white-space: normal;
-      line-height: 1.2;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2;
+      white-space: nowrap;
+      font-size: clamp(0.68rem, 2.6vw, 0.9rem);
+      line-height: 1.1;
       overflow: hidden;
       text-overflow: ellipsis;
-      word-break: break-word;
     }
     .folder-count {
-      font-size: 0.7rem;
-      padding: 2px 6px;
+      font-size: 0.64rem;
+      padding: 2px 5px;
     }
 
     .notes-list {
