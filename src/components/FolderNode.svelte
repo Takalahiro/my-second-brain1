@@ -76,9 +76,7 @@
     <p class="root-meta">共 {total} 篇</p>
   {:else}
     <button type="button" class="folder-row pixel-card glass-container" onclick={toggle} aria-expanded={!collapsed}>
-      <svg viewBox="0 0 10 10" class="folder-caret {collapsed ? 'collapsed' : ''}" aria-hidden="true">
-        <path class="folder-caret-path" d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
+      <span class="folder-caret {collapsed ? 'collapsed' : ''}" aria-hidden="true">›</span>
       <span class="folder-icon">{collapsed ? '📁' : '📂'}</span>
       <span class="folder-name">{node.name}</span>
       <span class="folder-count">{total}</span>
@@ -190,17 +188,20 @@
   }
 
   .folder-caret {
-    width: 8px;
-    height: 8px;
+    width: 1em;
+    height: 1em;
     color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 1em;
+    font-weight: 700;
     transition: transform var(--motion-fast) var(--motion-ease);
-    flex: 0 0 8px;
+    flex: 0 0 1em;
   }
   .folder-caret:not(.collapsed) {
     transform: rotate(90deg);
-  }
-  .folder-caret-path {
-    stroke-width: 1.3;
   }
   .folder-icon {
     flex: 0 0 auto;
@@ -304,12 +305,9 @@
       margin: 3px 0;
     }
     .folder-caret {
-      width: 0.9em;
-      height: 0.9em;
-      flex: 0 0 0.9em;
-    }
-    .folder-caret-path {
-      stroke-width: 1;
+      width: 1em;
+      height: 1em;
+      flex: 0 0 1em;
     }
     .folder-block.depth-1 > .folder-row,
     .folder-block.depth-2 > .folder-row,
