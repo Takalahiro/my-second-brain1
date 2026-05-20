@@ -1,0 +1,200 @@
+---
+interface OutlineItem {
+  id: string;
+  title: string;
+  level: number;
+}
+interface BacklinkItem {
+  title: string;
+  href: string;
+}
+interface Props {
+  title: string;
+  tags?: string[];
+  outline?: OutlineItem[];
+  backlinks?: BacklinkItem[];
+  lastUpdatedText?: string | null;
+}
+
+const {
+  title,
+  tags = [],
+  outline = [],
+  backlinks = [],
+  lastUpdatedText = null,
+} = Astro.props;
+---
+
+<section class="detail-toolbar pixel-card glass-container">
+  <div class="detail-left">
+    <a href="/notes" class="pixel-button">← 返回</a>
+    <h1 class="detail-title">{title}</h1>
+  </div>
+  <div class="detail-actions">
+    <button type="button" class="pixel-button detail-action-btn" title="收藏">⭐</button>
+    <button type="button" class="pixel-button detail-action-btn" title="复制链接">🔗</button>
+  </div>
+</section>
+
+{tags.length > 0 && (
+  <div class="detail-tags">
+    {tags.map((tag) => (
+      <a href={`/tags/${tag}`} class="pixel-badge detail-tag">#{tag}</a>
+    ))}
+  </div>
+)}
+
+<div class="detail-grid">
+  <article class="glass-container detail-article prose dark:prose-invert max-w-none">
+    <slot />
+    {lastUpdatedText && (
+      <p class="not-prose detail-updated pixel-digits">{lastUpdatedText}</p>
+    )}
+  </article>
+
+  <aside class="detail-sidebar">
+    {outline.length > 0 && (
+      <section class="glass-container detail-panel">
+        <h3 class="detail-panel-title">📋 大纲</h3>
+        <nav class="detail-outline">
+          {outline.map((item) => (
+            <a
+              href={`#${item.id}`}
+              class="detail-outline-link"
+              style={`padding-left:${Math.max(0, item.level - 2) * 12}px`}
+            >
+              {item.title}
+            </a>
+          ))}
+        </nav>
+      </section>
+    )}
+
+    {backlinks.length > 0 && (
+      <section class="glass-container detail-panel">
+        <h3 class="detail-panel-title">🔗 反向链接</h3>
+        <div class="detail-backlinks">
+          {backlinks.map((link) => (
+            <a href={link.href} class="detail-backlink-link">→ {link.title}</a>
+          ))}
+        </div>
+      </section>
+    )}
+  </aside>
+</div>
+
+<style>
+  .detail-toolbar {
+    border-width: var(--border-thin);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+  .detail-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+  .detail-title {
+    margin: 0;
+    font-size: 1.45rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .detail-actions {
+    display: inline-flex;
+    gap: 0.4rem;
+  }
+  .detail-action-btn {
+    min-width: 38px;
+    padding: 0.42rem 0.6rem;
+  }
+
+  .detail-tags {
+    display: flex;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .detail-tag {
+    text-decoration: none;
+    color: var(--text-primary);
+    background: var(--accent-lavender);
+    border-color: var(--border-color);
+  }
+  :global(.dark) .detail-tag {
+    background: #4a355f;
+    border-color: #6a4f87;
+    color: #f0e8ff;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 1024px) {
+    .detail-grid {
+      grid-template-columns: minmax(0, 3fr) minmax(250px, 1fr);
+      gap: 1.2rem;
+      align-items: start;
+    }
+  }
+
+  .detail-article {
+    padding: 1.2rem;
+    border: var(--border-thin) solid var(--glass-border);
+  }
+  .detail-updated {
+    margin-top: 1.5rem;
+    text-align: right;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+  }
+
+  .detail-sidebar {
+    display: grid;
+    gap: 0.8rem;
+  }
+  @media (min-width: 1024px) {
+    .detail-sidebar {
+      position: sticky;
+      top: 86px;
+    }
+  }
+  .detail-panel {
+    padding: 0.8rem;
+    border: var(--border-thin) solid var(--glass-border);
+  }
+  .detail-panel-title {
+    margin: 0 0 0.55rem;
+    font-size: 1rem;
+  }
+  .detail-outline,
+  .detail-backlinks {
+    display: grid;
+    gap: 0.35rem;
+  }
+  .detail-outline-link,
+  .detail-backlink-link {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    border-radius: var(--radius-small);
+    padding: 0.25rem 0.35rem;
+    transition: color var(--motion-fast) var(--motion-ease),
+      background-color var(--motion-fast) var(--motion-ease);
+  }
+  .detail-outline-link:hover,
+  .detail-backlink-link:hover {
+    color: var(--text-primary);
+    background: var(--glass-bg-hover);
+  }
+</style>

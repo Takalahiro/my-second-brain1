@@ -1,8 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import TableOfContents from '../../components/TableOfContents.svelte';
-import Backlinks from '../../components/Backlinks.astro';
+import NoteDetailLayout from '../../components/Notes/NoteDetailLayout.astro';
 import { getBacklinks, noteIdToSlug } from '../../lib/backlinks';
 import { getNoteLastUpdated, formatLastUpdated } from '../../lib/git-mtime';
 
@@ -20,65 +19,23 @@ const backlinks = await getBacklinks(noteIdToSlug(note.id));
 
 const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
 const lastUpdated = getNoteLastUpdated((note as any).filePath ?? note.id);
+const outline = headings
+  .filter((h) => h.depth >= 2 && h.depth <= 4)
+  .map((h) => ({ id: h.slug, title: h.text, level: h.depth }));
+const backlinkItems = backlinks.map((b) => ({
+  title: b.data.title ?? b.id.replace(/\.md$/, '').split('/').pop() ?? b.id,
+  href: `/notes/${noteIdToSlug(b.id)}`,
+}));
 ---
 
 <BaseLayout title={title} description={note.data.description}>
-  <article class="prose dark:prose-invert min-w-0">
-    <header class="mb-6 not-prose">
-      <h1 class="text-4xl font-bold mb-2">{title}</h1>
-      {note.data.date && (
-        <time class="text-sm text-gray-500">
-          {note.data.date.toLocaleDateString('zh-CN')}
-        </time>
-      )}
-      {note.data.tags && note.data.tags.length > 0 && (
-        <div class="flex flex-wrap gap-2 mt-3">
-          {note.data.tags.map((tag) => (
-            <a href={`/tags/${tag}`} class="pixel-badge note-tag-chip">
-              #{tag}
-            </a>
-          ))}
-        </div>
-      )}
-    </header>
-
+  <NoteDetailLayout
+    title={title}
+    tags={note.data.tags ?? []}
+    outline={outline}
+    backlinks={backlinkItems}
+    lastUpdatedText={lastUpdated ? `最后更新 · ${formatLastUpdated(lastUpdated)}` : null}
+  >
     <Content />
-
-    {lastUpdated && (
-      <p class="not-prose mt-12 mb-6 text-xs text-gray-400 dark:text-gray-600 text-right select-none">
-        最后更新 · <time datetime={lastUpdated.toISOString()}>{formatLastUpdated(lastUpdated)}</time>
-      </p>
-    )}
-
-    <Backlinks backlinks={backlinks} />
-  </article>
-
-  <TableOfContents headings={headings} client:load />
+  </NoteDetailLayout>
 </BaseLayout>
-
-<style>
-  .note-tag-chip {
-    text-decoration: none;
-    color: var(--text-primary);
-    background: var(--accent-lavender);
-    border-color: var(--border-color);
-    transition: transform var(--motion-fast) var(--motion-ease),
-      box-shadow var(--motion-fast) var(--motion-ease),
-      background-color var(--motion-fast) var(--motion-ease),
-      border-color var(--motion-fast) var(--motion-ease);
-  }
-  .note-tag-chip:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-pixel);
-    background: var(--accent-peach);
-  }
-  :global(.dark) .note-tag-chip {
-    background: #4a355f;
-    border-color: #6a4f87;
-    color: #f0e8ff;
-  }
-  :global(.dark) .note-tag-chip:hover {
-    background: #5b4275;
-    border-color: #7a5e99;
-  }
-</style>

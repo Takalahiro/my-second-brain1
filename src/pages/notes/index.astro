@@ -1,75 +1,47 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import FolderTreeContainer from '../../components/FolderTreeContainer.svelte';
+import NotesExplorer from '../../components/Notes/NotesExplorer.svelte';
 import { buildFolderTree, countNotes } from '../../lib/folder-tree';
 
 const notes = await getCollection('notes', ({ data }) => !data.draft);
 const tree = buildFolderTree(notes);
-const total = countNotes(tree);
 
-// 顶层一级目录用于"快速跳转"导航
 const topFolders = tree.children;
+
+function guessFolderEmoji(name: string) {
+  const lower = name.toLowerCase();
+  if (name.includes('数学') || lower.includes('math')) return '📐';
+  if (name.includes('计算机') || lower.includes('computer')) return '💻';
+  if (name.includes('data') || name.includes('统计')) return '📊';
+  if (name.includes('info')) return '🧠';
+  return '📁';
+}
+
+function encodeFolderPath(path: string) {
+  return path
+    .split('/')
+    .filter(Boolean)
+    .map((seg) => encodeURIComponent(seg))
+    .join('/');
+}
+
+const categories = topFolders.map((folder) => ({
+  title: folder.name,
+  folderEmoji: guessFolderEmoji(folder.name),
+  folders: folder.children.map((child) => ({
+    id: `folder:${child.path}`,
+    title: child.name,
+    emoji: '📁',
+    count: countNotes(child),
+    lastUpdated: '',
+    href: `/folder/${encodeFolderPath(child.path)}`,
+  })),
+  // 主列表页只展示目录卡片；笔记内容在目录页内展示
+  notes: [],
+}));
 ---
 
 <BaseLayout title="笔记 · My Second Brain">
-  <section class="mb-6 pixel-card glass-container notes-summary">
-    <h1 class="text-4xl font-bold mb-2">📚 笔记</h1>
-    <p class="notes-summary-meta">
-      共 {total} 篇笔记 · {topFolders.length} 个一级目录
-    </p>
-  </section>
-
-  <nav class="mb-6 flex flex-wrap gap-2">
-    {topFolders.map((f) => (
-      <a
-        href={`#folder-${encodeURIComponent(f.path)}`}
-        class="pixel-badge note-chip"
-      >
-        {f.name} ({countNotes(f)})
-      </a>
-    ))}
-  </nav>
-
-  <FolderTreeContainer
-    tree={tree}
-    defaultExpandDepth={2}
-    storagePrefix="second-brain:folder"
-    client:load
-  />
+  <NotesExplorer categories={categories} client:load />
 </BaseLayout>
-
-<style>
-  .notes-summary {
-    padding: 1rem 1.25rem;
-    border-width: 1px;
-  }
-  .notes-summary-meta {
-    color: var(--text-secondary);
-  }
-  .note-chip {
-    text-decoration: none;
-    color: var(--text-primary);
-    background: var(--accent-lavender);
-    border-color: var(--border-color);
-    transition: transform var(--motion-fast) var(--motion-ease),
-      box-shadow var(--motion-fast) var(--motion-ease),
-      background-color var(--motion-fast) var(--motion-ease),
-      border-color var(--motion-fast) var(--motion-ease);
-  }
-  .note-chip:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-pixel);
-    background: var(--accent-peach);
-  }
-  :global(.dark) .note-chip {
-    /* 暗色 tag 再压深一点 */
-    background: #4a355f;
-    border-color: #6a4f87;
-    color: #f0e8ff;
-  }
-  :global(.dark) .note-chip:hover {
-    background: #5b4275;
-    border-color: #7a5e99;
-  }
-</style>
