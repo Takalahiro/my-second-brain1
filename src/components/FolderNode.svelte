@@ -125,15 +125,15 @@
 
 <style>
   .folder-block {
-    margin-bottom: 4px;
+    margin-bottom: 8px;
   }
   .folder-block.depth-0 > .folder-children {
     padding-left: 0;
   }
   .folder-block:not(.depth-0) > .folder-children {
-    padding-left: 18px;
-    margin-left: 6px;
-    border-left: var(--border-thin) solid var(--border-color);
+    padding-left: 14px;
+    margin-left: 8px;
+    border-left: 1px solid rgb(132 122 166 / 0.28);
   }
 
   .root-title {
@@ -150,54 +150,54 @@
   .folder-row {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
-    padding: 8px 10px;
+    padding: 9px 12px;
     text-align: left;
     cursor: pointer;
-    border-width: var(--border-thin);
+    border: 1px solid rgb(126 116 158 / 0.36);
     font-weight: 600;
-    color: var(--text-primary);
-    margin: 4px 0;
-    box-shadow: var(--shadow-normal);
+    color: #f3ecff;
+    margin: 5px 0;
+    background: linear-gradient(180deg, rgb(36 31 53 / 0.88), rgb(29 25 43 / 0.88));
+    box-shadow: 0 8px 18px rgb(0 0 0 / 0.2), inset 0 1px 0 rgb(255 255 255 / 0.04);
     border-radius: 14px;
-    transition: transform var(--motion-fast) var(--motion-ease),
+    transition: background-color var(--motion-fast) var(--motion-ease),
       box-shadow var(--motion-fast) var(--motion-ease),
-      border-color var(--motion-fast) var(--motion-ease),
-      background-color var(--motion-fast) var(--motion-ease);
+      border-color var(--motion-fast) var(--motion-ease);
   }
   .folder-row:hover {
-    border-color: var(--accent-pink);
-    box-shadow: var(--shadow-hover);
-    transform: translateY(-1px);
+    border-color: rgb(156 142 202 / 0.5);
+    background: linear-gradient(180deg, rgb(42 36 62 / 0.94), rgb(33 28 50 / 0.94));
+    box-shadow: 0 10px 22px rgb(0 0 0 / 0.24), inset 0 1px 0 rgb(255 255 255 / 0.05);
   }
   .folder-row:active {
-    box-shadow: var(--shadow-active);
+    box-shadow: 0 5px 12px rgb(0 0 0 / 0.2), inset 0 1px 0 rgb(255 255 255 / 0.04);
   }
 
   .folder-block.depth-1 > .folder-row {
-    font-size: 1.03rem;
+    font-size: 1rem;
   }
   .folder-block.depth-2 > .folder-row {
-    font-size: 0.96rem;
+    font-size: 0.95rem;
   }
   .folder-block.depth-3 > .folder-row,
   .folder-block.depth-4 > .folder-row,
   .folder-block.depth-5 > .folder-row {
-    font-size: 0.88rem;
+    font-size: 0.9rem;
     font-weight: 500;
   }
 
   .folder-caret {
-    width: 1em;
-    height: 1em;
-    color: var(--text-secondary);
+    width: 0.86em;
+    height: 0.86em;
+    color: #d4c9ee;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
     font-size: 1em;
-    font-weight: 700;
+    font-weight: 600;
     transition: transform var(--motion-fast) var(--motion-ease);
     flex: 0 0 1em;
   }
@@ -206,6 +206,7 @@
   }
   .folder-icon {
     flex: 0 0 auto;
+    font-size: 0.92rem;
   }
   .folder-name {
     flex: 1;
@@ -213,29 +214,29 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: clamp(0.76rem, 0.22vw + 0.8rem, 1rem);
-    line-height: 1.15;
+    font-size: clamp(0.74rem, 0.18vw + 0.82rem, 1rem);
+    line-height: 1.2;
   }
   .folder-count {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    font-size: 0.75rem;
+    font-size: 0.66rem;
     line-height: 1;
-    color: #4f3c70;
-    background: #ead2ff;
+    color: #e9e1fc;
+    background: rgb(20 18 30 / 0.95);
     padding: 2px 7px;
-    border-radius: var(--radius-small);
-    border: 1px solid #7f63b0;
-    box-shadow: 1px 1px 0 rgb(0 0 0 / 0.12);
+    border-radius: 999px;
+    border: 1px solid rgb(108 97 141 / 0.42);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
     font-weight: 600;
   }
   :global(.dark) .folder-count {
     color: #f1e9ff;
-    background: #17141f;
-    border-color: #3b334a;
-    box-shadow: 1px 1px 0 rgb(0 0 0 / 0.35);
+    background: rgb(14 12 21 / 0.98);
+    border-color: rgb(85 74 116 / 0.52);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
   }
 
   .notes-list {
@@ -246,28 +247,28 @@
 
   .note-link {
     display: flex;
-    align-items: baseline;
-    gap: 6px;
-    padding: 7px 10px;
-    border-radius: var(--radius-small);
-    color: var(--text-primary);
-    border-width: var(--border-thin);
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    color: #ece4ff;
+    border: 1px solid rgb(118 108 150 / 0.28);
     text-decoration: none;
-    font-size: 0.9375rem;
-    margin: 6px 0;
-    box-shadow: var(--shadow-normal);
-    transition: transform var(--motion-fast) var(--motion-ease),
+    font-size: 0.9rem;
+    margin: 5px 0;
+    background: linear-gradient(180deg, rgb(34 30 50 / 0.78), rgb(27 24 40 / 0.78));
+    box-shadow: 0 6px 14px rgb(0 0 0 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.03);
+    transition: background-color var(--motion-fast) var(--motion-ease),
       box-shadow var(--motion-fast) var(--motion-ease),
-      border-color var(--motion-fast) var(--motion-ease),
-      background-color var(--motion-fast) var(--motion-ease);
+      border-color var(--motion-fast) var(--motion-ease);
   }
   .note-link:hover {
-    border-color: var(--accent-lavender);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-hover);
+    border-color: rgb(148 137 188 / 0.48);
+    background: linear-gradient(180deg, rgb(40 35 58 / 0.86), rgb(32 28 47 / 0.86));
+    box-shadow: 0 9px 18px rgb(0 0 0 / 0.22), inset 0 1px 0 rgb(255 255 255 / 0.04);
   }
   .note-link:active {
-    box-shadow: var(--shadow-active);
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.16), inset 0 1px 0 rgb(255 255 255 / 0.03);
   }
   .note-icon {
     flex: 0 0 auto;
@@ -280,6 +281,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-size: clamp(0.72rem, 0.16vw + 0.8rem, 0.94rem);
   }
   .note-date {
     flex: 0 0 auto;
@@ -288,7 +290,7 @@
   }
 
   .subfolders {
-    margin: 4px 0;
+    margin: 6px 0;
   }
 
   .empty-folder {
@@ -315,7 +317,7 @@
 
     .folder-row {
       gap: 5px;
-      padding: 7px 8px;
+      padding: 8px 9px;
       margin: 3px 0;
     }
     .folder-caret {
@@ -325,14 +327,14 @@
     }
     .folder-name {
       white-space: nowrap;
-      font-size: clamp(0.68rem, 2.6vw, 0.9rem);
+      font-size: clamp(0.64rem, 2.2vw, 0.86rem);
       line-height: 1.1;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .folder-count {
-      font-size: 0.64rem;
-      padding: 2px 5px;
+      font-size: 0.58rem;
+      padding: 1px 5px;
     }
 
     .notes-list {
@@ -340,7 +342,7 @@
     }
     .note-link {
       gap: 5px;
-      padding: 6px 8px;
+      padding: 7px 9px;
       margin: 4px 0;
       align-items: flex-start;
     }
