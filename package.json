@@ -5,10 +5,11 @@
   "engines": {
     "node": ">=22.12.0"
   },
+  "packageManager": "pnpm@11.1.3",
   "scripts": {
-    "dev": "pnpm sync && astro dev",
-    "build": "pnpm sync && astro build",
-    "sync": "node scripts/sync-assets.mjs",
+    "dev": "pnpm prepare:vault && astro dev",
+    "build": "pnpm prepare:vault && astro build",
+    "prepare:vault": "node scripts/prepare-vault.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "vault:sync": "node scripts/sync-vault.mjs",

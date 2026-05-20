@@ -1,9 +1,19 @@
 import { cp, mkdir, readdir } from 'node:fs/promises';
+import { existsSync, readdirSync } from 'node:fs';
 import { join, extname, dirname } from 'node:path';
 
 const VAULT = './obsidian-vault';
 const TARGET = './public/vault-assets';
 const EXTS = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.pdf', '.mp4', '.webm']);
+
+if (!existsSync(VAULT) || readdirSync(VAULT).length === 0) {
+  console.error('✗ obsidian-vault submodule 为空或不存在。');
+  console.error('  本地：  git submodule update --init --recursive');
+  console.error('  Cloudflare Pages：在 Settings → Builds & deployments 启用 "Include git submodules"');
+  process.exit(1);
+}
+
+let copied = 0;
 
 async function walk(dir, base) {
   const entries = await readdir(dir, { withFileTypes: true });
@@ -17,10 +27,11 @@ async function walk(dir, base) {
       const dest = join(TARGET, e.name);
       await mkdir(dirname(dest), { recursive: true });
       await cp(full, dest);
+      copied++;
     }
   }
 }
 
 await mkdir(TARGET, { recursive: true });
 await walk(VAULT, VAULT);
-console.log('✅ Assets synced to', TARGET);
+console.log(`✅ Assets synced to ${TARGET} (${copied} files)`);
