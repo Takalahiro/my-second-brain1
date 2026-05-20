@@ -92,7 +92,9 @@
               <a href={'/notes/' + n.slug} class="note-link">
                 <span class="note-icon">📄</span>
                 <span class="note-title">{n.title}</span>
-                {#if n.date}
+                {#if n.lastUpdated}
+                  <time class="note-date pixel-digits" title="最后更新">{n.lastUpdated}</time>
+                {:else if n.date}
                   <time class="note-date pixel-digits">{n.date.toLocaleDateString('zh-CN')}</time>
                 {/if}
               </a>

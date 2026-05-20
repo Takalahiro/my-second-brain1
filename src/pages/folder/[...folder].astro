@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { noteIdToSlug } from '../../lib/backlinks';
+import { getNoteLastUpdated, formatLastUpdated } from '../../lib/git-mtime';
 
 function decodeFolderPath(raw: string) {
   return raw
@@ -53,14 +54,16 @@ notes.sort((a, b) => {
     {notes.map((note) => {
       const slug = noteIdToSlug(note.id);
       const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
+      const updated = getNoteLastUpdated(note.id);
+      const updatedText = updated ? formatLastUpdated(updated) : null;
       return (
         <li>
           <a href={`/notes/${slug}`} class="block p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 transition">
             <div class="flex items-baseline justify-between gap-4">
               <h2 class="font-semibold">{title}</h2>
-              {note.data.date && (
-                <time class="text-xs text-gray-500 shrink-0">
-                  {note.data.date.toLocaleDateString('zh-CN')}
+              {updatedText && (
+                <time class="text-xs text-gray-500 shrink-0 pixel-digits" datetime={updated.toISOString()}>
+                  更新 {updatedText}
                 </time>
               )}
             </div>

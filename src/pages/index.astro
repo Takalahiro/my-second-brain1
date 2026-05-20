@@ -2,10 +2,33 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HomeHero from '../components/HomeHero.svelte';
 import WidgetHost from '../components/widgets/WidgetHost.svelte';
+import notesMtime from '../lib/notes-mtime.json';
+import { execSync } from 'node:child_process';
+
+const mtimeValues = Object.values(notesMtime as Record<string, string>);
+const latestNoteUpdate = mtimeValues.length
+  ? mtimeValues.sort().at(-1)!.replace('T', ' ').slice(0, 16)
+  : null;
+
+let vaultSyncCommit: string | null = null;
+try {
+  vaultSyncCommit = execSync('git log -1 --format=%ci --grep=chore(vault)', {
+    encoding: 'utf8',
+    cwd: process.cwd(),
+  }).trim() || null;
+} catch {
+  vaultSyncCommit = null;
+}
+
+const syncInfo = {
+  noteCount: Object.keys(notesMtime).length,
+  latestNoteUpdate,
+  vaultSyncCommit,
+};
 ---
 
 <BaseLayout title="My Second Brain">
-  <HomeHero client:only="svelte" />
+  <HomeHero client:only="svelte" {syncInfo} />
 
   <!-- 小组件 + 背景：仅首页加载 -->
   <WidgetHost client:idle backgroundDefault={true} />

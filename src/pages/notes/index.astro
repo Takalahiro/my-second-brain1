@@ -3,9 +3,12 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import NotesExplorer from '../../components/Notes/NotesExplorer.svelte';
 import { buildFolderTree, countNotes } from '../../lib/folder-tree';
+import { maxMtimeForFolder, enrichFolderTreeMtime } from '../../lib/note-mtime-helpers';
 
 const notes = await getCollection('notes', ({ data }) => !data.draft);
 const tree = buildFolderTree(notes);
+enrichFolderTreeMtime(tree);
+const allNoteIds = notes.map((n) => n.id);
 
 const topFolders = tree.children;
 
@@ -51,7 +54,7 @@ function flattenFolders(node: (typeof topFolders)[number], depth = 0): Array<{
       title: child.name,
       emoji: '📁',
       count: countNotes(child),
-      lastUpdated: '',
+      lastUpdated: maxMtimeForFolder(child.path, allNoteIds),
       href: `/folder/${encodeFolderPath(child.path)}`,
       depth,
     });

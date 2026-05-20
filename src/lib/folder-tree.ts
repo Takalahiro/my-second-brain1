@@ -9,6 +9,8 @@ export interface NoteRef {
   slug: string;
   /** 可选元数据 */
   date?: Date;
+  /** 构建期 git/fs 最后更新（展示用） */
+  lastUpdated?: string;
   tags?: string[];
   description?: string;
 }
