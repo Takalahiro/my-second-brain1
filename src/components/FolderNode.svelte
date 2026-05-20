@@ -77,7 +77,7 @@
   {:else}
     <button type="button" class="folder-row pixel-card glass-container" onclick={toggle} aria-expanded={!collapsed}>
       <svg viewBox="0 0 10 10" class="folder-caret {collapsed ? 'collapsed' : ''}" aria-hidden="true">
-        <path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="M3 1.5 L7 5 L3 8.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       <span class="folder-icon">{collapsed ? '📁' : '📂'}</span>
       <span class="folder-name">{node.name}</span>
@@ -190,11 +190,11 @@
   }
 
   .folder-caret {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     color: var(--text-secondary);
     transition: transform var(--motion-fast) var(--motion-ease);
-    flex: 0 0 10px;
+    flex: 0 0 8px;
   }
   .folder-caret:not(.collapsed) {
     transform: rotate(90deg);
