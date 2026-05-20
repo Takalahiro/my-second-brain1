@@ -63,27 +63,27 @@
    * 文字甚至会被截断。这里改成：保留 viewBox 原始尺寸（minWidth），
    * 容器可横向滚动，从根本上避免「显示不全」。
    */
+  /** Mermaid 渲染尺寸默认偏大，整体缩到 50% （viewBox 不变，字和图等比缩小） */
+  const SCALE = 0.5;
+
   function postProcessSvg(host: HTMLElement) {
     const svg = host.querySelector<SVGSVGElement>('svg');
     if (!svg) return;
     const vb = svg.viewBox?.baseVal;
     if (!vb || !vb.width || !vb.height) return;
-    const intrinsicW = Math.ceil(vb.width);
-    // 容器可用宽度（减去 padding）
+    const targetW = Math.ceil(vb.width * SCALE);
     const hostWidth = host.clientWidth || host.parentElement?.clientWidth || 0;
-    if (hostWidth > 0 && intrinsicW > hostWidth) {
-      // 宽图：取消 mermaid 默认的 width:100%，用原始尺寸 + 横滚
-      svg.removeAttribute('width');
-      svg.removeAttribute('height');
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+    svg.style.height = 'auto';
+    if (hostWidth > 0 && targetW > hostWidth) {
+      // 缩到 50% 后仍比容器宽（节点超多）→ 启用横滚，按 50% 尺寸展示
       svg.style.maxWidth = 'none';
-      svg.style.width = `${intrinsicW}px`;
-      svg.style.height = 'auto';
+      svg.style.width = `${targetW}px`;
       host.dataset.wide = '1';
     } else {
-      // 小图：保持自适应居中（mermaid 默认行为已经够好），删掉冗余属性避免某些浏览器渲染异常
-      svg.removeAttribute('height');
       svg.style.maxWidth = '100%';
-      svg.style.height = 'auto';
+      svg.style.width = `${targetW}px`;
     }
   }
 

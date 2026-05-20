@@ -36,9 +36,8 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
   <body class="min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors">
     <header class="border-b border-gray-200 dark:border-gray-800 sticky top-0 bg-white/80 dark:bg-gray-950/80 backdrop-blur z-10">
       <nav class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-        <a href="/" class="font-bold text-lg">🧠 Second Brain</a>
+        <a href="/" class="font-bold text-lg" aria-label="首页">🧠</a>
         <div class="flex items-center gap-4 text-sm">
-          <a href="/" class="hover:underline">首页</a>
           <a href="/notes" class="hover:underline">笔记</a>
           <a href="/tags" class="hover:underline">标签</a>
           <ThemeToggle client:load />
@@ -48,11 +47,6 @@ const { title = 'My Second Brain', description = '我的第二大脑' } = Astro.
     <main class="max-w-5xl mx-auto px-4 py-8">
       <slot />
     </main>
-    <footer class="border-t border-gray-200 dark:border-gray-800 mt-16">
-      <div class="max-w-5xl mx-auto px-4 py-6 text-sm text-gray-500 text-center">
-        Built with Astro 6 + Tailwind v4 + Svelte 5
-      </div>
-    </footer>
 
     <!--
       client:idle 让浏览器在空闲帧才 hydrate Mermaid，

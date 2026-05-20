@@ -216,9 +216,13 @@
     display: flex;
     flex-direction: column;
     position: fixed;
-    top: 4rem;
+    /*
+     * iPad Safari 顶部 URL bar / 安全区会推下页面 header。
+     * 用 env(safe-area-inset-top) 自适应，再加 4.5rem 给我们自己的 header（高约 3.5rem）+ 一点呼吸空间。
+     */
+    top: calc(env(safe-area-inset-top, 0px) + 4.5rem);
     right: 0.5rem;
-    bottom: 1rem;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
     width: min(82vw, 320px);
     border-radius: 0.5rem;
     background: rgb(255 255 255);
@@ -227,12 +231,6 @@
     z-index: 60;
     overflow: hidden;
     contain: layout style;
-    /*
-     * 不设 visibility:hidden！panel 是 hydration 后才 mount 的
-     * （SSR 只直出 orb），没有 SSR-vs-hydration 位置跳动问题。
-     * 之前用 visibility 等 [data-drag-ready=1] 反而在桌面 Chrome/Edge 上
-     * 制造了「panel mount 但 visibility 永远 hidden」的 bug。
-     */
   }
   :global(.dark) .toc-floating {
     background: rgb(17 24 39);
