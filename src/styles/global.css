@@ -228,8 +228,19 @@ body {
     --mobile-mermaid-scale: 0.92;
   }
 
+  /* 触屏：减少误触延迟，按钮最小点击区域 */
+  button,
+  .pixel-button,
+  a.pixel-button,
+  .pixel-badge {
+    touch-action: manipulation;
+  }
+
   .prose .table-wrap {
     margin: 1rem 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
   .prose table {
     font-size: var(--mobile-table-font-size);
@@ -250,6 +261,17 @@ body {
   .prose .mermaid-block,
   .prose .mermaid {
     overflow: hidden;
+  }
+
+  /* 阅读模式：正文字号与行距 */
+  :root.mobile-reading .detail-article.prose,
+  .mobile-reading .detail-article.prose {
+    font-size: 1.02rem;
+    line-height: 1.75;
+  }
+  :root.mobile-reading .detail-article.prose :where(p, li),
+  .mobile-reading .detail-article.prose :where(p, li) {
+    line-height: 1.75;
   }
 }
 
@@ -286,4 +308,54 @@ body {
 /* 暗黑模式下 KaTeX 文字颜色继承 */
 .dark .katex {
   color: rgb(229 231 235);
+}
+
+/* ── 小部件三档尺寸：紧凑 / 标准 / 宽屏 ── */
+.widget-tier-compact {
+  --widget-pad: 8px;
+  --widget-font: 0.72rem;
+}
+.widget-tier-medium {
+  --widget-pad: 12px;
+  --widget-font: 0.78rem;
+}
+.widget-tier-expanded {
+  --widget-pad: 14px;
+  --widget-font: 0.84rem;
+}
+[class*='-widget'].widget-tier-compact [class*='-header'],
+.floating-widget.widget-tier-compact .fw-header {
+  padding-block: 6px;
+}
+[class*='-widget'] [class*='-tier'],
+[class*='-widget'] [class*='-mode-tag'] {
+  font-size: 0.62rem;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  color: rgb(200 210 230 / 0.85);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.notes-widget.widget-tier-compact .nw-body {
+  grid-template-columns: 1fr;
+}
+.notes-widget.widget-tier-expanded .nw-body {
+  grid-template-columns: minmax(180px, 34%) 1fr;
+}
+.weather-widget.widget-tier-compact .ww-current {
+  padding: 10px 12px;
+}
+.weather-widget.widget-tier-compact .ww-cur-temp {
+  font-size: 2rem;
+}
+.graph-widget.widget-tier-compact .gw-detail {
+  display: none;
+}
+.stats-widget.widget-tier-compact .sw-grid .card-trend,
+.stats-widget.widget-tier-compact .sw-grid .card-heat {
+  display: none;
+}
+.stats-widget.widget-tier-expanded .sw-grid {
+  grid-template-columns: 1fr 1fr;
 }

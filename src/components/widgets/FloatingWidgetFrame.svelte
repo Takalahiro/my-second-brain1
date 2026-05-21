@@ -12,6 +12,7 @@
     clamp,
   } from '../../lib/floating-widget-layout';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
+  import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
 
   interface Props {
     layoutKey: string;
@@ -170,11 +171,13 @@
     },
     onEnd: persistLayout,
   });
+
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized }));
 </script>
 
 <section
   bind:this={rootEl}
-  class="floating-widget {className} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
+  class="floating-widget {tierClass(tier)} {className} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style="{frameStyle}; z-index: {zIndex};"
   aria-label={ariaLabel}
   use:widgetTouchGestures={touchOpts}
@@ -242,6 +245,7 @@
     -webkit-backdrop-filter: blur(16px);
     overflow: hidden;
     color: #f3ecff;
+    touch-action: pan-y pinch-zoom;
   }
   .floating-widget.is-maximized {
     left: 24px !important;

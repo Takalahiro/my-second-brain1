@@ -6,6 +6,7 @@
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
+  import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
 
   interface Props {
     onClose?: () => void;
@@ -278,11 +279,14 @@
       { minWidth: 320, minHeight: 300, maxWidth: 1200, maxHeight: 1100 }
     )
   );
+
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized }));
+  const showPreview = $derived(tier !== 'compact');
 </script>
 
 <section
   bind:this={rootEl}
-  class="notes-widget {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
+  class="notes-widget {tierClass(tier)} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style={rotationStyle(rotation, (maximized ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${minimized ? 'auto' : height + 'px'};`) + ` --w-bg-alpha: ${bgAlpha};`)}
   aria-label="笔记小组件"
   use:widgetTouchGestures={touchOpts}
@@ -299,10 +303,13 @@
     />
     <div class="nw-title">
       <span aria-hidden="true">📖</span>
-      <span>笔记 {selected ? `· ${selected.title}` : ''}</span>
+      <span>笔记 {tier !== 'compact' && selected ? `· ${selected.title}` : ''}</span>
+      <span class="nw-tier">{TIER_LABEL[tier]}</span>
     </div>
     <div class="nw-tail" data-no-drag>
-      <input type="search" class="nw-search" placeholder="搜索…" bind:value={query} aria-label="搜索笔记" />
+      {#if tier !== 'compact'}
+        <input type="search" class="nw-search" placeholder="搜索…" bind:value={query} aria-label="搜索笔记" />
+      {/if}
       <button type="button" class="nw-cog" onclick={toggleSettings} aria-label="设置" title="设置" data-no-drag>⚙</button>
     </div>
   </header>
@@ -344,6 +351,7 @@
         {/if}
       </ul>
 
+      {#if showPreview}
       <div class="nw-preview prose dark:prose-invert" data-no-drag>
         {#if selected}
           {#if loadingContent}
@@ -360,6 +368,7 @@
           <div class="nw-empty">选择一篇笔记查看正文</div>
         {/if}
       </div>
+      {/if}
     </div>
 
     <ResizeHandles

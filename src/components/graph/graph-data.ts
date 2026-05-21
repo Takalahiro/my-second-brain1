@@ -49,10 +49,30 @@ export function folderColor(folder: string, folders: string[]) {
   return PALETTE[(i < 0 ? 0 : i) % PALETTE.length];
 }
 
-export async function loadWiki(): Promise<WikiData> {
-  const res = await fetch('/data/wikilinks.json');
+export async function loadWiki(options?: { fresh?: boolean }): Promise<WikiData> {
+  const q = options?.fresh ? `?t=${Date.now()}` : '';
+  const res = await fetch(`/data/wikilinks.json${q}`, options?.fresh ? { cache: 'no-store' } : undefined);
   if (!res.ok) throw new Error(`wikilinks ${res.status}`);
   return (await res.json()) as WikiData;
+}
+
+/** 页面可见时每 intervalMs 刷新 wikilink（新增双链后弧线自动补齐） */
+export function watchWikiRefresh(onData: (d: WikiData) => void, intervalMs = 5 * 60_000) {
+  if (typeof document === 'undefined') return () => {};
+  let timer: ReturnType<typeof setInterval> | null = null;
+  const tick = () => {
+    if (document.visibilityState !== 'visible') return;
+    void loadWiki({ fresh: true }).then(onData).catch(() => {});
+  };
+  const onVis = () => {
+    if (document.visibilityState === 'visible') tick();
+  };
+  timer = setInterval(tick, intervalMs);
+  document.addEventListener('visibilitychange', onVis);
+  return () => {
+    if (timer) clearInterval(timer);
+    document.removeEventListener('visibilitychange', onVis);
+  };
 }
 
 /** 把笔记 id（例：`MATH/Algebra`）转成 `/notes/<basename>/` */

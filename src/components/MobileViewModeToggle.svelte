@@ -60,13 +60,16 @@
 <style>
   .mobile-mode-toggle {
     position: fixed;
-    right: max(env(safe-area-inset-right, 0px), 10px);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
-    z-index: 70;
+    right: max(env(safe-area-inset-right, 0px), 12px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+    z-index: 64;
     min-width: 56px;
-    padding: 6px 9px;
-    font-size: 11px;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 12px;
     line-height: 1;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
     background: var(--bg-secondary);
     border-color: var(--border-color);
     box-shadow: var(--shadow-normal);

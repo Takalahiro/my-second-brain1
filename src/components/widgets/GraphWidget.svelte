@@ -4,7 +4,14 @@
   import ResizeHandles from './ResizeHandles.svelte';
   import RotateHandle from './RotateHandle.svelte';
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
-  import { noteHref } from '../graph/graph-data';
+  import { noteHref, loadWiki, watchWikiRefresh } from '../graph/graph-data';
+  import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
+  import {
+    createForceController,
+    reheatForce,
+    stepForceSimulation,
+    type ForceSimController,
+  } from '../graph/force-simulation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
 
@@ -47,9 +54,8 @@
   // 力学参数
   let kRepel = $state(820);
   let kSpring = $state(0.022);
-  let damping = $state(0.86);
   let edgeLen = $state(70);
-  let running = false;
+  let simCtrl: ForceSimController = createForceController();
 
   /** 单击节点直接跳转笔记 */
   let clickToOpen = $state(true);
@@ -97,6 +103,9 @@
 
   onMount(() => {
     void loadGraph();
+    const stopWatch = watchWikiRefresh(() => {
+      void loadGraph(false);
+    });
     try {
       const raw = localStorage.getItem(STATE_KEY);
       if (raw) {
@@ -130,6 +139,7 @@
     const onResize = () => clampPos();
     window.addEventListener('resize', onResize);
     return () => {
+      stopWatch();
       window.removeEventListener('resize', onResize);
       if (raf) cancelAnimationFrame(raf);
     };
@@ -148,28 +158,32 @@
     return () => ro.disconnect();
   });
 
-  async function loadGraph() {
+  async function loadGraph(reseed = true) {
     try {
-      const res = await fetch('/data/wikilinks.json');
-      if (!res.ok) throw new Error(String(res.status));
-      const data = (await res.json()) as RawWiki;
+      const data = await loadWiki({ fresh: !reseed });
+      const prevPos = reseed ? null : new Map(nodes.map((n) => [n.id, { x: n.x, y: n.y, fixed: n.fixed }]));
       const folders = Array.from(new Set(data.nodes.map((n) => n.folder)));
       const folderIdx = new Map(folders.map((f, i) => [f, i] as const));
       const useNodes = onlyConnected
         ? data.nodes.filter((n) => n.inDegree + n.outDegree > 0)
         : data.nodes;
       const ids = new Set(useNodes.map((n) => n.id));
-      nodes = useNodes.map((n, i) => ({
-        ...n,
-        x: (Math.random() - 0.5) * 400,
-        y: (Math.random() - 0.5) * 300,
-        vx: 0, vy: 0,
-        color: colorForFolder(n.folder, folderIdx.get(n.folder) ?? 0),
-      }));
+      nodes = useNodes.map((n) => {
+        const prev = prevPos?.get(n.id);
+        return {
+          ...n,
+          x: prev?.x ?? (Math.random() - 0.5) * 400,
+          y: prev?.y ?? (Math.random() - 0.5) * 300,
+          vx: 0,
+          vy: 0,
+          fixed: prev?.fixed,
+          color: colorForFolder(n.folder, folderIdx.get(n.folder) ?? 0),
+        };
+      });
       nodeMap = new Map(nodes.map((n) => [n.id, n]));
       links = data.links.filter((l) => ids.has(l.source) && ids.has(l.target));
       kickSimulation();
-    } catch (e) {
+    } catch {
       loadErr = '尚未生成 wikilinks.json，请运行 pnpm prepare:vault';
     }
   }
@@ -178,68 +192,21 @@
 
   function kickSimulation() {
     if (raf) cancelAnimationFrame(raf);
-    running = true;
-    let energy = 1;
+    reheatForce(simCtrl, 1);
     const tick = () => {
-      if (!running) return;
-      step();
-      // 估算能量，低能时降速
-      energy = nodes.reduce((s, n) => s + (n.vx * n.vx + n.vy * n.vy), 0) / Math.max(1, nodes.length);
+      if (simCtrl.running && nodes.length > 0) {
+        const moved = stepForceSimulation(nodes, links, nodeMap, simCtrl, {
+          kRepel,
+          kSpring,
+          edgeLen,
+          repelCutoff: 40000,
+          centerPull: 0.002,
+        });
+        if (moved) simFrame++;
+      }
       raf = requestAnimationFrame(tick);
     };
     tick();
-  }
-
-  /** 一帧力学：库仑斥力 + Hooke 弹簧 + 阻尼 + 中心引力 */
-  function step() {
-    const N = nodes.length;
-    if (N === 0) return;
-    const filtered = folderFilter ? nodes.filter((n) => n.folder === folderFilter) : nodes;
-    // 斥力 O(N^2)，N<=200 OK
-    for (let i = 0; i < N; i++) {
-      const a = nodes[i];
-      if (a.fixed) continue;
-      for (let j = i + 1; j < N; j++) {
-        const b = nodes[j];
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        let d2 = dx * dx + dy * dy + 0.01;
-        if (d2 > 40000) continue;
-        const inv = kRepel / d2;
-        const fx = dx * inv;
-        const fy = dy * inv;
-        a.vx += fx; a.vy += fy;
-        if (!b.fixed) { b.vx -= fx; b.vy -= fy; }
-      }
-    }
-    // 弹簧
-    for (const l of links) {
-      const a = nodeMap.get(l.source);
-      const b = nodeMap.get(l.target);
-      if (!a || !b) continue;
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const d = Math.sqrt(dx * dx + dy * dy) || 0.0001;
-      const diff = (d - edgeLen) * kSpring;
-      const fx = (dx / d) * diff;
-      const fy = (dy / d) * diff;
-      if (!a.fixed) { a.vx += fx; a.vy += fy; }
-      if (!b.fixed) { b.vx -= fx; b.vy -= fy; }
-    }
-    // 中心引力 + 阻尼 + 积分
-    for (const n of nodes) {
-      if (n.fixed) { n.vx = 0; n.vy = 0; continue; }
-      n.vx -= n.x * 0.002;
-      n.vy -= n.y * 0.002;
-      n.vx *= damping;
-      n.vy *= damping;
-      // 限制最大速度，避免抖动飞出
-      const sp = Math.hypot(n.vx, n.vy);
-      if (sp > 20) { n.vx = (n.vx / sp) * 20; n.vy = (n.vy / sp) * 20; }
-      n.x += n.vx;
-      n.y += n.vy;
-    }
-    simFrame++;
   }
 
   function nodeR(n: Node) {
@@ -302,6 +269,7 @@
       const n = nodeMap.get(dragNodeId);
       if (n) n.fixed = false;
       dragNodeId = null;
+      reheatForce(simCtrl, 0.25);
     }
     if (panning) panning = false;
     svgEl?.releasePointerCapture?.(e.pointerId);
@@ -334,10 +302,7 @@
     zoom = 1; panX = 0; panY = 0;
   }
   function rekick() {
-    for (const n of nodes) {
-      n.vx = (Math.random() - 0.5) * 30;
-      n.vy = (Math.random() - 0.5) * 30;
-    }
+    reheatForce(simCtrl, 0.9);
     kickSimulation();
   }
 
@@ -388,6 +353,7 @@
   function toggleSettings() { showSettings = !showSettings; }
 
   const selectedNode = $derived(selectedId ? nodeMap.get(selectedId) ?? null : null);
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized }));
 
   const touchOpts = $derived(
     makeWidgetTouchBindings(
@@ -408,7 +374,7 @@
 
 <section
   bind:this={rootEl}
-  class="graph-widget {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
+  class="graph-widget {tierClass(tier)} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style={rotationStyle(rotation, (maximized ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${minimized ? 'auto' : height + 'px'};`) + ` --w-bg-alpha: ${bgAlpha};`)}
   aria-label="关系图谱"
   use:widgetTouchGestures={touchOpts}
@@ -421,14 +387,17 @@
     <div class="gw-title">
       <span aria-hidden="true">🕸️</span>
       <span>关系图谱</span>
+      <span class="gw-tier">{TIER_LABEL[tier]}</span>
     </div>
-    <span class="gw-stats" data-no-drag>{nodes.length} 节点 · {links.length} 边</span>
+    {#if tier !== 'compact'}
+      <span class="gw-stats" data-no-drag>{nodes.length} 节点 · {links.length} 边</span>
+    {/if}
     <button type="button" class="gw-cog" onclick={toggleSettings} aria-label="设置" data-no-drag>⚙</button>
     <a href="/graph" class="gw-cog" data-no-drag title="打开独立页面">↗</a>
   </header>
 
   {#if !minimized}
-    {#if showSettings}
+    {#if showSettings && tier !== 'compact'}
       <div class="gw-cfg" data-no-drag>
         <div class="gw-cfg-row">
           <span class="gw-cfg-lbl">毛玻璃</span>
@@ -566,7 +535,7 @@
         </svg>
       {/if}
 
-      {#if selectedNode}
+      {#if selectedNode && tier === 'expanded'}
         <aside class="gw-detail">
           <div class="gw-det-title">{selectedNode.title}</div>
           <div class="gw-det-sub">{selectedNode.folder} · 入度 {selectedNode.inDegree} · 出度 {selectedNode.outDegree}</div>
@@ -630,6 +599,7 @@
   .graph-widget.is-maximized .gw-header { cursor: default; }
   .gw-title { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; letter-spacing: 1px; font-weight: 600; color: rgb(255 255 255 / 0.78); }
   .gw-stats { margin-left: auto; font-size: 0.7rem; color: #b6a8d3; }
+  .gw-tier { font-size: 0.62rem; padding: 1px 7px; border-radius: 999px; background: rgb(255 255 255 / 0.08); color: #b6a8d3; }
   .gw-cog {
     width: 26px; height: 26px; border-radius: 8px;
     background: rgb(255 255 255 / 0.08);

@@ -6,6 +6,7 @@
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
+  import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
 
   interface Props {
     onClose?: () => void;
@@ -282,11 +283,14 @@
       { minWidth: 280, minHeight: 280, maxWidth: 900, maxHeight: 1000 }
     )
   );
+
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized, compactMax: 300 }));
+  const dailyCount = $derived(tier === 'compact' ? 0 : tier === 'medium' ? 3 : 5);
 </script>
 
 <section
   bind:this={rootEl}
-  class="weather-widget {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
+  class="weather-widget {tierClass(tier)} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style={rotationStyle(rotation, (maximized ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${minimized ? 'auto' : height + 'px'};`) + ` --w-bg-alpha: ${bgAlpha};`)}
   aria-label="天气"
   use:widgetTouchGestures={touchOpts}
@@ -299,6 +303,7 @@
     <div class="ww-title">
       <span aria-hidden="true">☁️</span>
       <span>天气</span>
+      <span class="ww-tier">{TIER_LABEL[tier]}</span>
     </div>
     <button
       type="button"
@@ -363,7 +368,7 @@
         </div>
 
         <ul class="ww-daily">
-          {#each forecast.daily.slice(0, 5) as d, i}
+          {#each forecast.daily.slice(0, dailyCount) as d, i}
             {@const di = codeInfo(d.code, 1)}
             <li>
               <span class="ww-day-name">{i === 0 ? '今天' : `周${weekday(d.date)}`}</span>
@@ -374,7 +379,9 @@
           {/each}
         </ul>
 
-        <footer class="ww-foot">{ageStr()} · {forecast.timezone}</footer>
+        {#if tier !== 'compact'}
+          <footer class="ww-foot">{ageStr()} · {forecast.timezone}</footer>
+        {/if}
       {/if}
     </div>
 

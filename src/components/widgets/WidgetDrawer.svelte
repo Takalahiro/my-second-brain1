@@ -1,5 +1,5 @@
 <script lang="ts">
-  type WidgetKey = 'background' | 'clock' | 'music' | 'notes' | 'todo' | 'calendar' | 'pomodoro' | 'weather' | 'stats' | 'world' | 'graph' | 'calculator' | 'python' | 'whiteboard' | 'whitenoise';
+  type WidgetKey = 'background' | 'clock' | 'music' | 'notes' | 'todo' | 'calendar' | 'pomodoro' | 'weather' | 'stats' | 'world' | 'graph' | 'territory' | 'calculator' | 'python' | 'whiteboard' | 'whitenoise';
 
   interface Widget {
     id: WidgetKey;
@@ -74,7 +74,8 @@
     { id: 'weather',    name: '天气', icon: '☁️', desc: 'Open-Meteo · 5 天预报' },
     { id: 'world',      name: '世界时钟', icon: '🌍', desc: '点击地图切城市/天气/主时钟' },
     { id: 'stats',      name: '学习统计', icon: '📊', desc: '笔记 / 字数 / 三档自适应' },
-    { id: 'graph',      name: '关系图谱', icon: '🕸️', desc: '力导向；中心辐射版见 /graph' },
+    { id: 'graph',      name: '关系图谱', icon: '🕸️', desc: '力导向双链网络' },
+    { id: 'territory',  name: '文件夹地图', icon: '🗺️', desc: '缩放自动切块；笔记间双链白光弧线' },
     { id: 'calculator', name: 'MATLAB 计算器', icon: '🧮', desc: '表达式 / 绘图；完整版见 /matlab' },
     { id: 'python', name: 'Python', icon: '🐍', desc: 'Pyodide 在线运行；完整版见 /python' },
     { id: 'whiteboard', name: '白板', icon: '✏️', desc: 'Excalidraw；完整版见 /whiteboard' },

@@ -6,6 +6,7 @@
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
+  import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
 
   interface Props {
     onClose?: () => void;
@@ -136,8 +137,9 @@
   function doMaximize() { maximized = !maximized; if (maximized) minimized = false; persistState(); }
   function toggleSettings() { showSettings = !showSettings; }
 
-  /** 三档自适应：small / medium / large */
-  const sizeMode = $derived<'sm' | 'md' | 'lg'>(width < 460 ? 'sm' : width < 780 ? 'md' : 'lg');
+  /** 三档自适应：compact / medium / expanded */
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized, compactMax: 460, expandedMin: 780 }));
+  const sizeMode = $derived<'sm' | 'md' | 'lg'>(tier === 'compact' ? 'sm' : tier === 'expanded' ? 'lg' : 'md');
 
   // ---- 图表计算 ----
   const maxFolder = $derived<number>(stats ? Math.max(1, ...stats.byFolder.map((f) => f.count)) : 1);
@@ -213,7 +215,7 @@
 
 <section
   bind:this={rootEl}
-  class="stats-widget size-{sizeMode} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
+  class="stats-widget {tierClass(tier)} size-{sizeMode} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style={rotationStyle(rotation, (maximized ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${minimized ? 'auto' : height + 'px'};`) + ` --w-bg-alpha: ${bgAlpha};`)}
   aria-label="学习统计"
   use:widgetTouchGestures={touchOpts}
@@ -226,7 +228,7 @@
     <div class="sw-title">
       <span aria-hidden="true">📊</span>
       <span>学习统计</span>
-      <span class="sw-mode-tag">{sizeMode === 'sm' ? '紧凑' : sizeMode === 'md' ? '标准' : '宽屏'}</span>
+      <span class="sw-mode-tag">{TIER_LABEL[tier]}</span>
     </div>
     {#if stats}
       <span class="sw-meta" data-no-drag>更新于 {new Date(stats.generatedAt).toLocaleDateString()}</span>

@@ -78,9 +78,9 @@
   }
 
   .toc-toggle {
-    flex: 0 0 14px;
-    width: 14px;
-    height: 14px;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -90,9 +90,12 @@
     background: transparent;
     color: rgb(107 114 128);
     cursor: pointer;
-    border-radius: 2px;
+    border-radius: 8px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
-  .toc-toggle:hover {
+  .toc-toggle:hover,
+  .toc-toggle:active {
     background: rgb(243 244 246);
     color: rgb(37 99 235);
   }
@@ -101,9 +104,9 @@
     color: rgb(96 165 250);
   }
   .toc-toggle-spacer {
-    flex: 0 0 14px;
-    width: 14px;
-    height: 14px;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
   }
   .toc-caret {
     width: 10px;
@@ -115,21 +118,26 @@
   }
 
   .toc-link {
-    display: block;
     flex: 1;
     min-width: 0;
-    padding: 2px 4px;
-    border-radius: 3px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 8px;
     color: rgb(75 85 99);
     text-decoration: none;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   :global(.dark) .toc-link {
     color: rgb(156 163 175);
   }
-  .toc-link:hover {
+  .toc-link:hover,
+  .toc-link:active {
     color: rgb(37 99 235);
     background: rgb(243 244 246);
   }

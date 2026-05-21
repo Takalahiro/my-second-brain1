@@ -1,9 +1,7 @@
 ---
-interface OutlineItem {
-  id: string;
-  title: string;
-  level: number;
-}
+import NoteOutlineHost from './NoteOutlineHost.svelte';
+import type { MarkdownHeading } from 'astro';
+
 interface BacklinkItem {
   title: string;
   href: string;
@@ -11,7 +9,7 @@ interface BacklinkItem {
 interface Props {
   title: string;
   tags?: string[];
-  outline?: OutlineItem[];
+  headings?: MarkdownHeading[];
   backlinks?: BacklinkItem[];
   lastUpdatedText?: string | null;
 }
@@ -19,10 +17,12 @@ interface Props {
 const {
   title,
   tags = [],
-  outline = [],
+  headings = [],
   backlinks = [],
   lastUpdatedText = null,
 } = Astro.props;
+
+const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
 ---
 
 <section class="detail-toolbar pixel-card glass-container">
@@ -53,35 +53,35 @@ const {
   </article>
 
   <aside class="detail-sidebar">
-    {outline.length > 0 && (
-      <section class="glass-container detail-panel">
-        <h3 class="detail-panel-title">📋 大纲</h3>
-        <nav class="detail-outline">
-          {outline.map((item) => (
-            <a
-              href={`#${item.id}`}
-              class="detail-outline-link"
-              style={`padding-left:${Math.max(0, item.level - 2) * 12}px`}
-            >
-              {item.title}
-            </a>
-          ))}
-        </nav>
+    {tocHeadings.length > 0 && (
+      <section class="glass-container detail-panel detail-panel-outline">
+        <div class="detail-panel-head">
+          <h3 class="detail-panel-title">📋 大纲</h3>
+        </div>
+        <div class="detail-outline-scroll">
+          <NoteOutlineHost headings={tocHeadings} variant="sidebar" client:load />
+        </div>
       </section>
     )}
 
     {backlinks.length > 0 && (
-      <section class="glass-container detail-panel">
+      <section class="glass-container detail-panel detail-panel-backlinks">
         <h3 class="detail-panel-title">🔗 反向链接</h3>
-        <div class="detail-backlinks">
-          {backlinks.map((link) => (
-            <a href={link.href} class="detail-backlink-link">→ {link.title}</a>
-          ))}
+        <div class="detail-backlinks-scroll">
+          <div class="detail-backlinks">
+            {backlinks.map((link) => (
+              <a href={link.href} class="detail-backlink-link">→ {link.title}</a>
+            ))}
+          </div>
         </div>
       </section>
     )}
   </aside>
 </div>
+
+{tocHeadings.length > 0 && (
+  <NoteOutlineHost headings={tocHeadings} variant="mobile" client:load />
+)}
 
 <style>
   .detail-toolbar {
@@ -113,8 +113,10 @@ const {
     gap: 0.4rem;
   }
   .detail-action-btn {
-    min-width: 38px;
+    min-width: 44px;
+    min-height: 44px;
     padding: 0.42rem 0.6rem;
+    touch-action: manipulation;
   }
 
   .detail-tags {
@@ -162,27 +164,84 @@ const {
   .detail-sidebar {
     display: grid;
     gap: 0.8rem;
+    align-content: start;
   }
   @media (min-width: 1024px) {
     .detail-sidebar {
       position: sticky;
       top: 86px;
+      max-height: calc(100dvh - 96px);
+      overflow: visible;
     }
   }
   .detail-panel {
     padding: 0.8rem;
     border: var(--border-thin) solid var(--glass-border);
+    min-height: 0;
+  }
+  .detail-panel-outline {
+    display: flex;
+    flex-direction: column;
+    max-height: min(72vh, calc(100dvh - 140px));
+  }
+  @media (min-width: 1024px) {
+    .detail-panel-outline {
+      max-height: min(68vh, calc(100dvh - 180px));
+    }
+  }
+  .detail-panel-backlinks {
+    display: flex;
+    flex-direction: column;
+    max-height: min(36vh, 280px);
   }
   .detail-panel-title {
-    margin: 0 0 0.55rem;
+    margin: 0;
     font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .detail-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.55rem;
+    flex-shrink: 0;
+  }
+  .detail-outline-scroll,
+  .detail-backlinks-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    margin-right: -0.15rem;
+    padding-right: 0.35rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(156 163 175 / 0.55) transparent;
+  }
+  .detail-outline-scroll::-webkit-scrollbar,
+  .detail-backlinks-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  .detail-outline-scroll::-webkit-scrollbar-thumb,
+  .detail-backlinks-scroll::-webkit-scrollbar-thumb {
+    background: rgb(156 163 175 / 0.55);
+    border-radius: 999px;
+  }
+  :global(.dark) .detail-outline-scroll,
+  :global(.dark) .detail-backlinks-scroll {
+    scrollbar-color: rgb(75 85 99 / 0.7) transparent;
+  }
+  :global(.dark) .detail-outline-scroll::-webkit-scrollbar-thumb,
+  :global(.dark) .detail-backlinks-scroll::-webkit-scrollbar-thumb {
+    background: rgb(75 85 99 / 0.7);
   }
   .detail-outline,
   .detail-backlinks {
     display: grid;
     gap: 0.35rem;
   }
-  .detail-outline-link,
   .detail-backlink-link {
     text-decoration: none;
     color: var(--text-secondary);
@@ -192,9 +251,33 @@ const {
     transition: color var(--motion-fast) var(--motion-ease),
       background-color var(--motion-fast) var(--motion-ease);
   }
-  .detail-outline-link:hover,
   .detail-backlink-link:hover {
     color: var(--text-primary);
     background: var(--glass-bg-hover);
+  }
+
+  @media (max-width: 1023px) {
+    .detail-toolbar {
+      padding: 0.72rem 0.85rem;
+    }
+    .detail-title {
+      font-size: 1.15rem;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .detail-panel-outline {
+      display: none;
+    }
+    .detail-sidebar {
+      gap: 0.65rem;
+    }
+    .detail-article {
+      padding: 1rem 0.85rem;
+    }
+    .detail-grid {
+      gap: 0.75rem;
+    }
   }
 </style>

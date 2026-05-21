@@ -8,6 +8,12 @@
   import { folderColor, noteHref } from './graph-data';
   import { ZP_MIN, ZP_MAX, clamp } from './use-zoom-pan';
   import ZoomControls from './ZoomControls.svelte';
+  import {
+    createForceController,
+    reheatForce,
+    stepForceSimulation,
+    type ForceSimController,
+  } from './force-simulation';
 
   interface Props {
     data: WikiData;
@@ -35,7 +41,8 @@
   const kRepel = $derived(settings.forceRepel);
   const kSpring = $derived(settings.forceSpring);
   const edgeLen = $derived(settings.forceEdgeLen);
-  const damping = 0.86;
+
+  let simCtrl: ForceSimController = createForceController();
 
   let panning = false;
   let panStart = { x: 0, y: 0, px: 0, py: 0 };
@@ -64,7 +71,15 @@
     nodeMap = new Map(nodes.map((n) => [n.id, n]));
     const ids = new Set(nodes.map((n) => n.id));
     links = data.links.filter((l) => ids.has(l.source) && ids.has(l.target));
+    reheatForce(simCtrl, 1);
   }
+
+  $effect(() => {
+    kRepel;
+    kSpring;
+    edgeLen;
+    if (nodes.length > 0) reheatForce(simCtrl, 0.45);
+  });
 
   // settings 变化时（如显示/隐藏孤岛）需要重建节点集合
   let lastShowOrphans = settings.showOrphans;
@@ -77,56 +92,16 @@
 
   function tickLoop() {
     raf = requestAnimationFrame(() => {
-      step();
+      if (simCtrl.running && nodes.length > 0) {
+        const moved = stepForceSimulation(nodes, links, nodeMap, simCtrl, {
+          kRepel,
+          kSpring,
+          edgeLen,
+        });
+        if (moved) simFrame++;
+      }
       tickLoop();
     });
-  }
-
-  function step() {
-    const N = nodes.length;
-    if (N === 0) return;
-    for (let i = 0; i < N; i++) {
-      const a = nodes[i];
-      if (a.fixed) continue;
-      for (let j = i + 1; j < N; j++) {
-        const b = nodes[j];
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        const d2 = dx * dx + dy * dy + 0.01;
-        if (d2 > 70000) continue;
-        const inv = kRepel / d2;
-        const fx = dx * inv;
-        const fy = dy * inv;
-        a.vx += fx; a.vy += fy;
-        if (!b.fixed) { b.vx -= fx; b.vy -= fy; }
-      }
-    }
-    for (const l of links) {
-      const a = nodeMap.get(l.source);
-      const b = nodeMap.get(l.target);
-      if (!a || !b) continue;
-      const dx = b.x - a.x;
-      const dy = b.y - a.y;
-      const d = Math.sqrt(dx * dx + dy * dy) || 0.0001;
-      const diff = (d - edgeLen) * kSpring;
-      const fx = (dx / d) * diff;
-      const fy = (dy / d) * diff;
-      if (!a.fixed) { a.vx += fx; a.vy += fy; }
-      if (!b.fixed) { b.vx -= fx; b.vy -= fy; }
-    }
-    for (const n of nodes) {
-      if (n.fixed) { n.vx = 0; n.vy = 0; continue; }
-      // 中心引力——孤岛也会被拉回
-      n.vx -= n.x * 0.0018;
-      n.vy -= n.y * 0.0018;
-      n.vx *= damping;
-      n.vy *= damping;
-      const sp = Math.hypot(n.vx, n.vy);
-      if (sp > 20) { n.vx = (n.vx / sp) * 20; n.vy = (n.vy / sp) * 20; }
-      n.x += n.vx;
-      n.y += n.vy;
-    }
-    simFrame++;
   }
 
   function nodeR(n: Node) {
@@ -175,7 +150,8 @@
       const box = svgEl.getBoundingClientRect();
       n.x = (e.clientX - box.left - box.width / 2 - panX) / zoom;
       n.y = (e.clientY - box.top - box.height / 2 - panY) / zoom;
-      n.vx = 0; n.vy = 0;
+      n.vx = 0;
+      n.vy = 0;
       simFrame++;
     } else if (panning) {
       panX = panStart.px + (e.clientX - panStart.x);
@@ -187,6 +163,7 @@
       const n = nodeMap.get(dragNodeId);
       if (n) n.fixed = false;
       dragNodeId = null;
+      reheatForce(simCtrl, 0.25);
     }
     if (panning) panning = false;
     svgEl?.releasePointerCapture?.(e.pointerId);

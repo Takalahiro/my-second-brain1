@@ -292,8 +292,16 @@ const {
       margin: 0;
     }
     .nav-tools .nav-link {
-      padding: 7px 11px;
+      padding: 10px 12px;
       font-size: 0.72rem;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .nav-brand,
+    .nav-actions :global(.theme-toggle-btn) {
+      min-width: 44px;
+      min-height: 44px;
     }
   }
 </style>

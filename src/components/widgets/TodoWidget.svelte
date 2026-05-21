@@ -6,6 +6,7 @@
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
+  import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
 
   interface Props {
     onClose?: () => void;
@@ -185,11 +186,13 @@
       { minWidth: 260, minHeight: 260, maxWidth: 900, maxHeight: 900 }
     )
   );
+
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized, compactMax: 280 }));
 </script>
 
 <section
   bind:this={rootEl}
-  class="todo-widget {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
+  class="todo-widget {tierClass(tier)} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style={rotationStyle(rotation, (maximized ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${minimized ? 'auto' : height + 'px'};`) + ` --w-bg-alpha: ${bgAlpha};`)}
   aria-label="待办清单"
   use:widgetTouchGestures={touchOpts}
@@ -202,6 +205,7 @@
     <div class="tw-title">
       <span aria-hidden="true">✅</span>
       <span>待办</span>
+      <span class="tw-tier">{TIER_LABEL[tier]}</span>
     </div>
     <div class="tw-stats" data-no-drag title={`已完成 ${stats.done} · 已取消 ${stats.cancelled} · 未完成 ${stats.active}`}>
       {stats.done + stats.cancelled}/{stats.total}
@@ -235,9 +239,11 @@
     </div>
 
     {#if stats.done + stats.cancelled > 0}
+      {#if tier !== 'compact'}
       <div class="tw-actions" data-no-drag>
         <button type="button" class="tw-clear" onclick={clearFinished}>清除已完成 / 已划掉</button>
       </div>
+      {/if}
     {/if}
 
     <ul class="tw-list" data-no-drag>

@@ -19,9 +19,6 @@ const backlinks = await getBacklinks(noteIdToSlug(note.id));
 
 const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
 const lastUpdated = getNoteLastUpdated((note as any).filePath ?? note.id);
-const outline = headings
-  .filter((h) => h.depth >= 2 && h.depth <= 4)
-  .map((h) => ({ id: h.slug, title: h.text, level: h.depth }));
 const backlinkItems = backlinks.map((b) => ({
   title: b.data.title ?? b.id.replace(/\.md$/, '').split('/').pop() ?? b.id,
   href: `/notes/${noteIdToSlug(b.id)}`,
@@ -32,7 +29,7 @@ const backlinkItems = backlinks.map((b) => ({
   <NoteDetailLayout
     title={title}
     tags={note.data.tags ?? []}
-    outline={outline}
+    headings={headings}
     backlinks={backlinkItems}
     lastUpdatedText={lastUpdated ? `最后更新 · ${formatLastUpdated(lastUpdated)}` : null}
   >

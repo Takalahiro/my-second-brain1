@@ -12,6 +12,7 @@
   import StatsWidget from './StatsWidget.svelte';
   import WorldClockWidget from './WorldClockWidget.svelte';
   import GraphWidget from './GraphWidget.svelte';
+  import TerritoryMapWidget from './TerritoryMapWidget.svelte';
   import CalculatorWidget from './CalculatorWidget.svelte';
   import PythonWidget from './PythonWidget.svelte';
   import WhiteboardWidget from './WhiteboardWidget.svelte';
@@ -26,7 +27,7 @@
 
   const STORAGE_KEY = 'second-brain:widgets';
 
-  type WidgetKey = 'background' | 'clock' | 'music' | 'notes' | 'todo' | 'calendar' | 'pomodoro' | 'weather' | 'stats' | 'world' | 'graph' | 'calculator' | 'python' | 'whiteboard' | 'whitenoise';
+  type WidgetKey = 'background' | 'clock' | 'music' | 'notes' | 'todo' | 'calendar' | 'pomodoro' | 'weather' | 'stats' | 'world' | 'graph' | 'territory' | 'calculator' | 'python' | 'whiteboard' | 'whitenoise';
   type Enabled = Record<WidgetKey, boolean>;
   type BgState = {
     sceneId: string;
@@ -50,6 +51,7 @@
     stats: false,
     world: false,
     graph: false,
+    territory: false,
     calculator: false,
     python: false,
     whiteboard: false,
@@ -100,6 +102,7 @@
       stats: false,
       world: false,
       graph: false,
+    territory: false,
       calculator: false,
       python: false,
       whiteboard: false,
@@ -232,6 +235,17 @@
         } catch { return ''; }
       },
     },
+    territory: {
+      key: 'second-brain:territory-layout',
+      serialize: ({ x, y }) => {
+        try {
+          const cur = JSON.parse(localStorage.getItem('second-brain:territory-layout') || '{}');
+          const w = typeof cur.w === 'number' ? cur.w : 720;
+          const h = typeof cur.h === 'number' ? cur.h : 520;
+          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+        } catch { return ''; }
+      },
+    },
     calculator: {
       key: 'second-brain:calc-layout',
       serialize: ({ x, y }) => {
@@ -315,6 +329,7 @@
       stats: false,
       world: false,
       graph: false,
+    territory: false,
       calculator: false,
       python: false,
       whiteboard: false,
@@ -390,6 +405,9 @@
 {/if}
 {#if ready && enabled.graph}
   <GraphWidget onClose={() => toggleEnabled('graph')} />
+{/if}
+{#if ready && enabled.territory}
+  <TerritoryMapWidget onClose={() => toggleEnabled('territory')} />
 {/if}
 {#if ready && enabled.calculator}
   <CalculatorWidget onClose={() => toggleEnabled('calculator')} />

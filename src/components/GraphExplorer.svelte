@@ -9,13 +9,15 @@
   import ArcView from './graph/ArcView.svelte';
   import ClusterView from './graph/ClusterView.svelte';
   import NoteTiles from './graph/NoteTiles.svelte';
+  import TerritoryMapCanvas from './graph/TerritoryMapCanvas.svelte';
   import SettingsPanel from './graph/SettingsPanel.svelte';
 
-  type ViewKey = 'force' | 'radial' | 'arc' | 'cluster' | 'tiles' | 'settings';
+  type ViewKey = 'force' | 'radial' | 'arc' | 'cluster' | 'territory' | 'tiles' | 'settings';
   type Tab = { id: ViewKey; name: string; icon: string; desc: string };
   const tabs: Tab[] = [
-    { id: 'force',    name: '力导向',   icon: '✨', desc: '物理仿真布局；单击/双击 = 选中/跳转（可在设置中改）' },
-    { id: 'radial',   name: '圆环辐射', icon: '🌌', desc: '按目录划扇区，度高靠外' },
+    { id: 'force',     name: '力导向',   icon: '✨', desc: '物理仿真布局；收敛后静止，不再抖动' },
+    { id: 'territory', name: '文件夹地图', icon: '🗺️', desc: '滚轮缩放自动展开：国家→州→城市→笔记；双链白光弧线' },
+    { id: 'radial',    name: '圆环辐射', icon: '🌌', desc: '按目录划扇区，度高靠外' },
     { id: 'arc',      name: '弧线和弦', icon: '🌈', desc: '一字排开，弧线连接' },
     { id: 'cluster',  name: '同心簇环', icon: '🪐', desc: '每目录一个小行星系' },
     { id: 'tiles',    name: '笔记瓦片', icon: '🗂', desc: '卡片网格全览' },
@@ -117,7 +119,7 @@
     <div class="kpi"><strong>{stats.orphans}</strong><span>孤岛笔记</span></div>
   </div>
 
-  {#if view !== 'settings'}
+  {#if view !== 'settings' && view !== 'territory' && view !== 'tiles'}
     <div class="gp-folders" aria-label="目录过滤">
       <button type="button" class:active={folderFocus === null} onclick={() => (folderFocus = null)}>
         <span class="dot all"></span>全部
@@ -146,6 +148,8 @@
         <ArcView data={data} folderFocus={folderFocus} settings={settings} onSelect={(id) => (selectedId = id)} />
       {:else if view === 'cluster'}
         <ClusterView data={data} folderFocus={folderFocus} settings={settings} onSelect={(id) => (selectedId = id)} />
+      {:else if view === 'territory'}
+        <TerritoryMapCanvas {data} onSelectPath={() => {}} />
       {:else if view === 'tiles'}
         <NoteTiles data={data} folderFocus={folderFocus} onSelect={(id) => (selectedId = id)} />
       {:else if view === 'settings'}

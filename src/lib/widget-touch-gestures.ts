@@ -109,6 +109,7 @@ export function attachWidgetTouchGestures(
       beginScale(touches);
       e.preventDefault();
     }
+    /* 单指不 preventDefault，允许页面在小组件上垂直滚动 */
   }
 
   function onTouchMove(e: TouchEvent) {
