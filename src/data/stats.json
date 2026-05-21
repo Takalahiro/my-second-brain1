@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-21T08:44:17.181Z",
+  "generatedAt": "2026-05-21T10:28:52.613Z",
   "totalNotes": 126,
-  "totalWords": 230993,
+  "totalWords": 230998,
   "byFolder": [
     {
       "name": "计算机",
@@ -31,7 +31,7 @@
     {
       "name": "_Inbox 入口",
       "count": 1,
-      "words": 2998
+      "words": 3003
     }
   ],
   "byMonth": [
