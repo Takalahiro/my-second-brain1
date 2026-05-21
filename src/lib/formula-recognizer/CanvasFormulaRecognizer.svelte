@@ -3,10 +3,15 @@
   import {
     formulaModelLoader,
     scheduleFormulaModelPreload,
+    disposeFormulaModel,
   } from './model-loader';
+  import { disposeFormulaSolver } from './pyodide-solver';
   import { copyText, renderLatexPreview } from './mathjax';
-  import { FORMULA_INPUT_SIZE } from './types';
+  import { getFormulaDeviceProfile } from './mobile-profile';
+  import { FORMULA_DRAW_SIZE } from './types';
   import FormulaSolverPanel from './FormulaSolverPanel.svelte';
+
+  const deviceProfile = getFormulaDeviceProfile();
 
   interface Props {
     width?: number;
@@ -18,8 +23,8 @@
   }
 
   let {
-    width = FORMULA_INPUT_SIZE,
-    height = FORMULA_INPUT_SIZE,
+    width = FORMULA_DRAW_SIZE,
+    height = FORMULA_DRAW_SIZE,
     embedded = false,
     answerLabel = '识别答案',
     active = true,
@@ -41,7 +46,8 @@
   let isRecognizing = $state(false);
   let copyOk = $state(false);
   let showLatex = $state(false);
-  let highAccuracy = $state(true);
+  let highAccuracy = $state(deviceProfile.highAccuracyDefault);
+  let autoSolve = $state(deviceProfile.autoSolveDefault);
   let modelPhase = $state(formulaModelLoader.state);
   let accelerator = $state(formulaModelLoader.accelerator);
 
@@ -53,7 +59,7 @@
       modelPhase = phase;
       accelerator = formulaModelLoader.accelerator;
     });
-    scheduleFormulaModelPreload();
+    if (deviceProfile.preloadModel) scheduleFormulaModelPreload();
     return () => {
       unsub();
       clearDebounce();
@@ -62,15 +68,27 @@
     };
   });
 
+  /** 移动端离开公式 Tab 时释放 OCR Worker + Pyodide，避免 Safari OOM */
+  $effect(() => {
+    if (active || !deviceProfile.disposeOnInactive) return;
+    clearDebounce();
+    recognizeSeq += 1;
+    isRecognizing = false;
+    disposeFormulaModel();
+    disposeFormulaSolver();
+  });
+
   $effect(() => {
     if (!active || !canvas) return;
     const seq = ++initSeq;
     canvasReady = false;
-    void tick().then(() => {
+    void (async () => {
+      await tick();
+      await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
       if (seq !== initSeq || !canvas || !active) return;
       initCanvas();
       canvasReady = true;
-    });
+    })();
   });
 
   $effect(() => {
@@ -108,7 +126,7 @@
 
   function setupStroke(ctx: CanvasRenderingContext2D) {
     ctx.strokeStyle = '#000000';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = width >= 512 ? 4 : 3;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
   }
@@ -182,7 +200,7 @@
 
   async function canvasToBlob(): Promise<Blob> {
     if (!canvas) throw new Error('画布未就绪');
-    const scale = 2;
+    const scale = deviceProfile.exportScale;
     const exportCanvas = new OffscreenCanvas(canvas.width * scale, canvas.height * scale);
     const ctx = exportCanvas.getContext('2d');
     if (!ctx) throw new Error('无法创建导出画布');
@@ -326,6 +344,12 @@
         <span class="fr-hint">{width}×{height}px 方屏 · 抬笔自动识别</span>
       </div>
 
+      {#if deviceProfile.constrained}
+        <p class="fr-mobile-note">
+          移动端已启用省内存模式：单路推理、按需加载模型；SymPy 求解请点「重新求解」。
+        </p>
+      {/if}
+
       <div class="fr-canvas-wrap">
         <canvas
           bind:this={canvas}
@@ -395,7 +419,9 @@
   </div>
 
   {#if latex}
-    <FormulaSolverPanel {latex} autoSolve={true} />
+    <FormulaSolverPanel {latex} {autoSolve} />
+  {:else if active}
+    <FormulaSolverPanel latex="" {autoSolve} />
   {/if}
 </div>
 
@@ -519,7 +545,7 @@
 
   .fr-canvas-wrap {
     width: 100%;
-    max-width: 384px;
+    max-width: 512px;
     margin-inline: auto;
     aspect-ratio: 1 / 1;
     border-radius: 12px;
@@ -529,6 +555,23 @@
     background: #fff;
     position: relative;
     z-index: 2;
+  }
+
+  @media (max-width: 768px) {
+    .fr-canvas-wrap {
+      max-width: 100%;
+    }
+  }
+
+  .fr-mobile-note {
+    margin: 0;
+    font-size: 0.72rem;
+    line-height: 1.45;
+    color: var(--text-secondary);
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgb(180 140 255 / 0.08);
+    border: 1px solid rgb(180 140 255 / 0.18);
   }
 
   .fr-canvas {

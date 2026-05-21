@@ -2,11 +2,15 @@ import {
   PreTrainedTokenizer,
   Tensor,
   VisionEncoderDecoderModel,
-  cat,
   env,
   type ProgressInfo,
 } from '@huggingface/transformers';
-import { FORMULA_GENERATION, FORMULA_MODEL_ID } from './types';
+import {
+  FORMULA_GENERATION,
+  FORMULA_GENERATION_LITE,
+  FORMULA_INPUT_SIZE,
+  FORMULA_MODEL_ID,
+} from './types';
 import type { WorkerInputMessage, WorkerOutputMessage } from './types';
 import { preprocessImageBlob, preprocessImageVariants } from './image-preprocess';
 import { latexQualityScore, sanitizeLatex } from './latex-sanitize';
@@ -18,6 +22,7 @@ env.backends.onnx.wasm!.proxy = true;
 let model: VisionEncoderDecoderModel | null = null;
 let tokenizer: PreTrainedTokenizer | null = null;
 let activeDevice: 'webgpu' | 'wasm' = 'wasm';
+let useLiteGeneration = false;
 
 function post(data: WorkerOutputMessage) {
   self.postMessage(data);
@@ -48,8 +53,13 @@ async function loadWithDevice(device: 'webgpu' | 'wasm') {
   activeDevice = device;
 }
 
-async function initModel() {
+async function initModel(preferWasm = false) {
   if (model && tokenizer) return;
+
+  if (preferWasm) {
+    await loadWithDevice('wasm');
+    return;
+  }
 
   try {
     await loadWithDevice('webgpu');
@@ -64,14 +74,27 @@ async function initModel() {
   }
 }
 
+function greyToRgbTensor(array: Float32Array): Tensor {
+  const size = FORMULA_INPUT_SIZE;
+  const plane = size * size;
+  const rgb = new Float32Array(plane * 3);
+  for (let i = 0; i < plane; i++) {
+    const v = array[i]!;
+    rgb[i] = v;
+    rgb[i + plane] = v;
+    rgb[i + 2 * plane] = v;
+  }
+  return new Tensor('float32', rgb, [1, 3, size, size]);
+}
+
 async function decodeFromTensor(array: Float32Array): Promise<string> {
   if (!model || !tokenizer) throw new Error('模型尚未就绪');
 
-  const tensor = new Tensor('float32', array, [1, 1, 384, 384]);
-  const pixelValues = cat([tensor, tensor, tensor], 1);
+  const pixelValues = greyToRgbTensor(array);
+  const genConfig = useLiteGeneration ? FORMULA_GENERATION_LITE : FORMULA_GENERATION;
   const outputs = await model.generate({
     inputs: pixelValues,
-    ...FORMULA_GENERATION,
+    ...genConfig,
   });
   const raw = tokenizer.batch_decode(outputs, { skip_special_tokens: true })[0] ?? '';
   return sanitizeLatex(raw);
@@ -114,7 +137,8 @@ self.onmessage = async (event: MessageEvent<WorkerInputMessage>) => {
 
   if (data.type === 'init') {
     try {
-      await initModel();
+      useLiteGeneration = data.liteGeneration ?? false;
+      await initModel(data.preferWasm ?? false);
       post({ type: 'ready', device: activeDevice });
     } catch (err) {
       post({
@@ -127,7 +151,7 @@ self.onmessage = async (event: MessageEvent<WorkerInputMessage>) => {
 
   if (data.type === 'recognize') {
     try {
-      if (!model || !tokenizer) await initModel();
+      if (!model || !tokenizer) await initModel(false);
       const latex = await predict(data.image, data.highAccuracy ?? false);
       post({ type: 'result', key: data.key, latex });
     } catch (err) {

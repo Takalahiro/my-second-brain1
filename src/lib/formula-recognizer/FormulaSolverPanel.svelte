@@ -1,6 +1,7 @@
 <script lang="ts">
   import { formulaSolver, formatSolverError } from './pyodide-solver';
   import { renderLatexPreview } from './mathjax';
+  import StepLatexPreview from './StepLatexPreview.svelte';
   import type { SolveResult } from './solver-types';
   import { detectFormulaTask } from './latex-to-sympy';
 
@@ -121,7 +122,7 @@
           <span class="fs-step-num">{i + 1}</span>
           <div class="fs-step-body">
             <strong>{step.title}</strong>
-            <pre class="fs-step-latex">{step.latex}</pre>
+            <StepLatexPreview latex={step.latex} />
             {#if step.note}
               <span class="fs-step-note">{step.note}</span>
             {/if}
@@ -129,8 +130,14 @@
         </li>
       {/each}
     </ol>
-  {:else if latex && !solving && !solverError}
-    <p class="fs-note">识别完成后将自动尝试符号求解与化简。</p>
+  {:else if !solving && !solverError}
+    <p class="fs-note">
+      {#if latex}
+        {autoSolve ? '识别完成后将自动尝试符号求解与化简。' : '点击「重新求解」进行 SymPy 符号运算。'}
+      {:else}
+        手写或上传公式后，可在此查看求解步骤与答案。
+      {/if}
+    </p>
   {/if}
 </section>
 
@@ -268,19 +275,7 @@
   .fs-step-body strong {
     display: block;
     font-size: 0.82rem;
-    margin-bottom: 4px;
-  }
-
-  .fs-step-latex {
-    margin: 0;
-    padding: 8px 10px;
-    border-radius: 8px;
-    font-family: 'IBM Plex Mono', ui-monospace, monospace;
-    font-size: 0.75rem;
-    white-space: pre-wrap;
-    word-break: break-word;
-    background: rgb(0 0 0 / 0.18);
-    border: 1px solid var(--border-color);
+    margin-bottom: 6px;
   }
 
   .fs-step-note {

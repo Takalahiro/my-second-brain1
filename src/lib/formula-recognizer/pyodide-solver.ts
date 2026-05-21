@@ -2,7 +2,7 @@ import solverScript from './formula-solver.py?raw';
 import type { SolveResult, SolverPhase } from './solver-types';
 
 /** Bump when formula-solver.py changes — helps detect stale bundles */
-export const FORMULA_SOLVER_VERSION = 'v3';
+export const FORMULA_SOLVER_VERSION = 'v5';
 
 const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
 
@@ -41,6 +41,13 @@ class FormulaSolverEngine {
 
   get version(): string {
     return FORMULA_SOLVER_VERSION;
+  }
+
+  dispose() {
+    this.pyodide = null;
+    this.initPromise = null;
+    this.loadedVersion = null;
+    this.phase = 'idle';
   }
 
   async solve(latex: string): Promise<SolveResult> {
@@ -101,7 +108,7 @@ class FormulaSolverEngine {
       const loadPyodide = window.loadPyodide as (cfg: { indexURL: string }) => Promise<PyodideApi>;
       this.pyodide = await loadPyodide({ indexURL: PYODIDE_URL });
       await this.pyodide.loadPackage('sympy');
-      if (!solverScript.includes('formula-solver v3')) {
+      if (!solverScript.includes('formula-solver v5')) {
         throw new Error('SymPy 求解脚本未正确加载，请刷新页面');
       }
       await this.pyodide.runPythonAsync(solverScript);
@@ -116,3 +123,7 @@ class FormulaSolverEngine {
 }
 
 export const formulaSolver = new FormulaSolverEngine();
+
+export function disposeFormulaSolver() {
+  formulaSolver.dispose();
+}

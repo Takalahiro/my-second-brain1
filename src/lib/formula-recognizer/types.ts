@@ -4,10 +4,21 @@ export const FORMULA_MODEL_ID = 'alephpi/FormulaNet' as const;
 /** 模型输入尺寸（与 FormulaNet 训练一致） */
 export const FORMULA_INPUT_SIZE = 384;
 
+/** 手写画板内部分辨率（导出时缩放至 FORMULA_INPUT_SIZE） */
+export const FORMULA_DRAW_SIZE = 512;
+
 /** 生成参数：略增 beam 宽度以提升精度 */
 export const FORMULA_GENERATION = {
   max_new_tokens: 768,
   num_beams: 2,
+  early_stopping: true,
+  do_sample: false,
+} as const;
+
+/** 移动端 / 低内存设备：单 beam、较短输出，降低推理峰值内存 */
+export const FORMULA_GENERATION_LITE = {
+  max_new_tokens: 384,
+  num_beams: 1,
   early_stopping: true,
   do_sample: false,
 } as const;
@@ -48,7 +59,11 @@ export type RecognizeProgress = {
   progress?: ModelProgress;
 };
 
-export type WorkerInitMessage = { type: 'init' };
+export type WorkerInitMessage = {
+  type: 'init';
+  preferWasm?: boolean;
+  liteGeneration?: boolean;
+};
 
 export type WorkerRecognizeMessage = {
   type: 'recognize';

@@ -6,6 +6,7 @@ export function latexToSympyHints(latex: string): string {
   s = s.replace(/\\cdot/g, '*');
   s = s.replace(/\\times/g, '*');
   s = s.replace(/\\div/g, '/');
+  s = s.replace(/\bdiv\b/g, '/');
   s = s.replace(/\\pi/g, 'pi');
   s = s.replace(/\\infty/g, 'oo');
   s = s.replace(/\\sqrt\{([^}]+)\}/g, 'sqrt($1)');

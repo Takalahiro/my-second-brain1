@@ -1,4 +1,4 @@
-# formula-solver v3 — Pyodide SymPy (variance from sympy.stats, not sympy.Var)
+# formula-solver v5 — human-readable LaTeX steps + SymPy fixes
 import json
 import re
 import sympy as sp
@@ -32,20 +32,33 @@ def _clean(latex_str):
     return re.sub(r'^\$+|\$+$', '', s)
 
 
-def _to_expr(latex_str):
+def _latex_to_sympy_str(latex_str):
+    """LaTeX / OCR 片段 → SymPy 可 sympify 的 Python 表达式字符串"""
     s = _clean(latex_str)
     s = s.replace(r'\left', '').replace(r'\right', '')
     s = s.replace(r'\cdot', '*').replace(r'\times', '*')
+    s = s.replace(r'\div', '/')
     s = s.replace(r'\pi', 'pi').replace(r'\infty', 'oo')
-    s = re.sub(r'\\frac\{([^{}]+)\}\{([^{}]+)\}', r'((\1)/(\2))', s)
+    s = re.sub(r'\\(?:d|t)?frac\{([^{}]+)\}\{([^{}]+)\}', r'((\1)/(\2))', s)
     s = re.sub(r'\\sqrt\{([^{}]+)\}', r'sqrt(\1)', s)
     s = re.sub(r'\^\{([^{}]+)\}', r'**(\1)', s)
     s = re.sub(r'\^([a-zA-Z0-9]+)', r'**\1', s)
     s = re.sub(r'\\([a-zA-Z]+)', r'\1', s)
+    s = re.sub(r'\bdiv\b', '/', s)
+    s = re.sub(r'\s+', ' ', s).strip()
+    return s
+
+
+def _to_expr(latex_str):
+    s = _latex_to_sympy_str(latex_str)
     try:
         return sympify(s)
     except Exception:
         return sympify(s.replace('^', '**'))
+
+
+def _format_eq(lhs, rhs):
+    return rf'{sp_latex(lhs)} = {sp_latex(rhs)}'
 
 
 def _normal_task(latex_str, steps):
@@ -54,9 +67,9 @@ def _normal_task(latex_str, steps):
     if m:
         z = _to_expr(m.group(1))
         steps.append(_step('识别为标准正态分布', r'Z \sim \mathcal{N}(0,1)'))
-        steps.append(_step('代入', rf'\Phi({sp_latex(z)})'))
+        steps.append(_step('代入', rf'\Phi\left({sp_latex(z)}\right)'))
         val = cdf(Normal('Z', 0, 1))(z)
-        steps.append(_step('标准正态累积分布', sp_latex(val)))
+        steps.append(_step('查标准正态累积分布', _format_eq(rf'\Phi\left({sp_latex(z)}\right)', val)))
         return {'ok': True, 'task': 'normal', 'answerLatex': sp_latex(val), 'steps': steps}
 
     m2 = re.search(r'\\mathcal\{N\}\s*\(([^,]+),\s*([^)]+)\)', s)
@@ -67,10 +80,10 @@ def _normal_task(latex_str, steps):
         steps.append(_step('识别正态分布', sp_latex(rv)))
         if 'operatorname{Var}' in s or 'mathrm{Var}' in s or 'D(' in s or '\\Var' in s:
             ans = variance(rv)
-            steps.append(_step('计算方差', sp_latex(ans)))
+            steps.append(_step('计算方差', _format_eq(r'\mathrm{Var}(X)', ans)))
             return {'ok': True, 'task': 'normal', 'answerLatex': sp_latex(ans), 'steps': steps}
         ans = E(rv)
-        steps.append(_step('计算期望', sp_latex(ans)))
+        steps.append(_step('计算期望', _format_eq(r'E[X]', ans)))
         return {'ok': True, 'task': 'normal', 'answerLatex': sp_latex(ans), 'steps': steps}
 
     return {'ok': False, 'task': 'normal', 'error': '未能解析正态分布表达式', 'steps': steps}
@@ -88,12 +101,15 @@ def _integral_task(latex_str, steps):
         steps.append(_step('被积函数', sp_latex(integrand)))
         if a is not None and b is not None:
             res = integrate(integrand, (var, a, b))
-            steps.append(_step('定积分', rf'\int_{{{sp_latex(a)}}}^{{{sp_latex(b)}}} {sp_latex(integrand)} \, d{var}'))
+            steps.append(_step(
+                '求定积分',
+                rf'\int_{{{sp_latex(a)}}}^{{{sp_latex(b)}}} {sp_latex(integrand)} \, d{var}',
+            ))
         else:
             res = integrate(integrand, var)
-            steps.append(_step('不定积分', rf'\int {sp_latex(integrand)} \, d{var}'))
+            steps.append(_step('求不定积分', rf'\int {sp_latex(integrand)} \, d{var}'))
         res = simplify(res)
-        steps.append(_step('化简结果', sp_latex(res)))
+        steps.append(_step('化简结果', _format_eq('I', res)))
         return {'ok': True, 'task': 'integral', 'answerLatex': sp_latex(res), 'steps': steps}
     return {'ok': False, 'task': 'integral', 'error': '未能解析积分式', 'steps': steps}
 
@@ -108,7 +124,7 @@ def _derivative_task(latex_str, steps):
         expr = _to_expr(m.group(2))
         steps.append(_step('原函数', sp_latex(expr)))
         res = simplify(diff(expr, var))
-        steps.append(_step(f'对 {var} 求导', sp_latex(res)))
+        steps.append(_step(f'对 {var} 求导', _format_eq(sp_latex(expr), res)))
         return {'ok': True, 'task': 'derivative', 'answerLatex': sp_latex(res), 'steps': steps}
     return {'ok': False, 'task': 'derivative', 'error': '未能解析求导式', 'steps': steps}
 
@@ -116,31 +132,40 @@ def _derivative_task(latex_str, steps):
 def _equation_task(latex_str, steps):
     s = _clean(latex_str)
     left, right = s.split('=', 1)
-    eq = Eq(_to_expr(left), _to_expr(right))
-    steps.append(_step('整理方程', sp_latex(eq)))
+    lhs = _to_expr(left)
+    rhs = _to_expr(right)
+    eq = Eq(lhs, rhs)
+    steps.append(_step('原方程', _format_eq(lhs, rhs)))
     unknown = x if 'x' in s else (y if 'y' in s else x)
     sol = solve(eq, unknown)
-    steps.append(_step(f'求解 {unknown}', sp_latex(sol)))
-    ans = sol[0] if sol else eq
-    return {'ok': True, 'task': 'equation', 'answerLatex': sp_latex(ans), 'steps': steps}
+    if not sol:
+        return {'ok': False, 'task': 'equation', 'error': '未找到解', 'steps': steps}
+    ans = sol[0]
+    steps.append(_step('移项并求解', sp_latex(eq)))
+    steps.append(_step('解得', _format_eq(unknown, ans)))
+    return {'ok': True, 'task': 'equation', 'answerLatex': _format_eq(unknown, ans), 'steps': steps}
 
 
 def _simplify_task(latex_str, steps):
+    raw = _clean(latex_str)
+    steps.append(_step('识别式子', raw))
     expr = _to_expr(latex_str)
-    steps.append(_step('识别表达式', sp_latex(expr)))
+    steps.append(_step('化为标准形式', sp_latex(expr)))
     simp = simplify(expr)
-    steps.append(_step('化简', sp_latex(simp)))
+    if not expr.equals(simp):
+        steps.append(_step('合并化简', _format_eq(expr, simp)))
     try:
-        val = simp.evalf()
-        if val != simp:
-            steps.append(_step('数值近似', sp_latex(val), note='若可计算'))
+        if not simp.free_symbols:
+            val = simp.evalf()
+            if val != simp:
+                steps.append(_step('代入计算', _format_eq(simp, val)))
     except Exception:
         pass
     return {'ok': True, 'task': 'simplify', 'answerLatex': sp_latex(simp), 'steps': steps}
 
 
 def solve_latex(latex_str):
-    steps = [_step('读取识别结果', _clean(latex_str))]
+    steps = []
     s = _clean(latex_str)
     try:
         if re.search(r'\\Phi|\\mathcal\{N\}|Normal', s):

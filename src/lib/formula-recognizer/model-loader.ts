@@ -1,4 +1,5 @@
 import FormulaWorker from './formula-ocr.worker?worker';
+import { getFormulaDeviceProfile } from './mobile-profile';
 import type {
   ModelLoadPhase,
   ProgressCallback,
@@ -20,6 +21,8 @@ class FormulaModelLoader {
   private device: 'webgpu' | 'wasm' | null = null;
   private initPromise: Promise<void> | null = null;
   private idleScheduled = false;
+  private recognizeCount = 0;
+  private recognizing = false;
   private listeners = new Set<(phase: ModelLoadPhase) => void>();
 
   get state(): ModelLoadPhase {
@@ -45,8 +48,9 @@ class FormulaModelLoader {
     for (const listener of this.listeners) listener(phase);
   }
 
-  /** 浏览器空闲时预加载（不阻塞首屏） */
+  /** 浏览器空闲时预加载（不阻塞首屏；移动端跳过以节省内存） */
   scheduleIdlePreload() {
+    if (!getFormulaDeviceProfile().preloadModel) return;
     if (this.idleScheduled || this.phase === 'ready' || this.phase === 'loading') return;
     this.idleScheduled = true;
 
@@ -69,14 +73,33 @@ class FormulaModelLoader {
     onProgress?: ProgressCallback,
     options?: { highAccuracy?: boolean }
   ): Promise<string> {
-    await this.ensureReady(onProgress);
-    return this.runRecognize(image, onProgress, options?.highAccuracy ?? false);
+    if (this.recognizing) {
+      throw new Error('上一次识别尚未完成，请稍候');
+    }
+    this.recognizing = true;
+    try {
+      await this.ensureReady(onProgress);
+      const result = await this.runRecognize(image, onProgress, options?.highAccuracy ?? false);
+      const recycleEvery = getFormulaDeviceProfile().recycleWorkerEvery;
+      if (recycleEvery > 0) {
+        this.recognizeCount += 1;
+        if (this.recognizeCount >= recycleEvery) {
+          this.recognizeCount = 0;
+          this.dispose();
+        }
+      }
+      return result;
+    } finally {
+      this.recognizing = false;
+    }
   }
 
   dispose() {
     this.worker?.terminate();
     this.worker = null;
     this.initPromise = null;
+    this.recognizing = false;
+    this.recognizeCount = 0;
     this.setPhase('idle');
     this.device = null;
     this.loadError = null;
@@ -188,8 +211,13 @@ class FormulaModelLoader {
         worker.removeEventListener('message', onMessage);
       };
 
+      const profile = getFormulaDeviceProfile();
       worker.addEventListener('message', onMessage);
-      worker.postMessage({ type: 'init' } satisfies WorkerInputMessage);
+      worker.postMessage({
+        type: 'init',
+        preferWasm: profile.preferWasm,
+        liteGeneration: profile.liteGeneration,
+      } satisfies WorkerInputMessage);
     });
   }
 

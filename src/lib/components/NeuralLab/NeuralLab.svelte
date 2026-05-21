@@ -5,34 +5,46 @@
     disposeFormulaModel,
     scheduleFormulaModelPreload,
   } from '../../formula-recognizer/model-loader';
+  import { disposeFormulaSolver } from '../../formula-recognizer/pyodide-solver';
+  import { getFormulaDeviceProfile } from '../../formula-recognizer/mobile-profile';
   import DigitRecognizer from '../DigitRecognizer/DigitRecognizer.svelte';
   import CanvasFormulaRecognizer from '../../formula-recognizer/CanvasFormulaRecognizer.svelte';
 
-  let activeDemo = $state<NeuralLabDemoId>(NEURAL_LAB.demoMnist.id);
-  /** 首次打开公式 Tab 后保持挂载，避免反复销毁 canvas / worker */
-  let formulaMounted = $state(false);
+  const deviceProfile = getFormulaDeviceProfile();
+
+  function readInitialDemo(): NeuralLabDemoId {
+    if (typeof window === 'undefined') return NEURAL_LAB.demoMnist.id;
+    const demo = new URLSearchParams(window.location.search).get('demo');
+    if (demo === NEURAL_LAB.demoFormula.id || demo === NEURAL_LAB.demoMnist.id) {
+      return demo;
+    }
+    return NEURAL_LAB.demoMnist.id;
+  }
+
+  let activeDemo = $state<NeuralLabDemoId>(readInitialDemo());
+  const isMnist = $derived(activeDemo === NEURAL_LAB.demoMnist.id);
+  const isFormula = $derived(activeDemo === NEURAL_LAB.demoFormula.id);
 
   const activeMeta = $derived(
     activeDemo === NEURAL_LAB.demoFormula.id ? NEURAL_LAB.demoFormula : NEURAL_LAB.demoMnist
   );
-  const isMnist = $derived(activeDemo === NEURAL_LAB.demoMnist.id);
-  const isFormula = $derived(activeDemo === NEURAL_LAB.demoFormula.id);
 
+  /** 移动端切回 MNIST Tab 时释放公式 OCR / SymPy 占用的内存 */
   $effect(() => {
-    if (isFormula) formulaMounted = true;
+    if (isFormula || !deviceProfile.disposeOnInactive) return;
+    disposeFormulaModel();
+    disposeFormulaSolver();
   });
 
   onMount(() => {
-    const params = new URLSearchParams(window.location.search);
-    const demo = params.get('demo');
-    if (demo === NEURAL_LAB.demoFormula.id || demo === NEURAL_LAB.demoMnist.id) {
-      activeDemo = demo;
-      if (demo === NEURAL_LAB.demoFormula.id) formulaMounted = true;
+    if (deviceProfile.preloadModel && !isFormula) {
+      scheduleFormulaModelPreload();
     }
 
-    scheduleFormulaModelPreload();
-
-    const onPageHide = () => disposeFormulaModel();
+    const onPageHide = () => {
+      disposeFormulaModel();
+      disposeFormulaSolver();
+    };
     window.addEventListener('pagehide', onPageHide);
     return () => window.removeEventListener('pagehide', onPageHide);
   });
@@ -81,18 +93,16 @@
   </header>
 
   <div class="nl-body">
-    <div class="nl-panel" class:is-active={isMnist}>
+    <div class="nl-panel" class:is-active={isMnist} aria-hidden={!isMnist}>
       <DigitRecognizer embedded paused={!isMnist} />
     </div>
-    {#if formulaMounted}
-      <div class="nl-panel" class:is-active={isFormula}>
-        <CanvasFormulaRecognizer
-          embedded
-          active={isFormula}
-          answerLabel={NEURAL_LAB.demoFormula.answerLabel}
-        />
-      </div>
-    {/if}
+    <div class="nl-panel" class:is-active={isFormula} aria-hidden={!isFormula}>
+      <CanvasFormulaRecognizer
+        embedded
+        active={isFormula}
+        answerLabel={NEURAL_LAB.demoFormula.answerLabel}
+      />
+    </div>
   </div>
 </div>
 
@@ -183,15 +193,26 @@
   }
 
   .nl-panel {
+    width: 100%;
     min-height: 0;
   }
 
+  /* 用 visibility 替代 display:none，避免首次切换时 canvas 布局为 0 */
   .nl-panel:not(.is-active) {
-    display: none;
+    visibility: hidden;
+    position: absolute;
+    inset: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
   }
 
   .nl-panel.is-active {
-    display: block;
+    visibility: visible;
+    position: relative;
+    height: auto;
+    overflow: visible;
+    pointer-events: auto;
   }
 
   .nl-body :global(.digit-lab),
