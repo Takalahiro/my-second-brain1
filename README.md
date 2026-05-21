@@ -1,22 +1,121 @@
 # My Second Brain
 
-个人知识库静态站点：将 Obsidian vault 发布为可浏览、可搜索、带桌面小组件与多种数学/ML 交互工具的 Web 应用。
+[English README](./README.en.md)
 
-**在线站点：** [my-second-brain1.pages.dev](https://my-second-brain1.pages.dev)
+个人知识库静态站点：将 Obsidian vault 发布为可浏览、可搜索的 Web 应用，并集成桌面小组件、关系图谱，以及 Python / 数学 / 神经网络等浏览器内交互工具。
+
+**在线演示：** [my-second-brain1.pages.dev](https://my-second-brain1.pages.dev)
+
+---
+
+## 项目概述
+
+本项目采用 **静态站点生成（SSG）+ 客户端岛屿（Islands）** 架构：笔记内容在构建期从 `obsidian-vault` 子模块编译为 HTML；复杂交互（图谱、ML 推理、Pyodide 等）在浏览器端按需加载，无需自建后端。
 
 ---
 
 ## 技术栈
 
-| 类别 | 技术 | 说明 |
-|------|------|------|
-| 框架 | **Astro 6** | SSG、内容集合、MDX |
-| UI | **Svelte 5** | 交互组件（桌面、工具、可视化） |
-| 样式 | **Tailwind CSS v4** | `@tailwindcss/vite` |
-| 笔记 | **remark/rehype** | WikiLink、Callout、KaTeX、Mermaid |
-| ML / 数值 | **TensorFlow.js**、**Transformers.js**、**Pyodide + SymPy** | 手写数字、公式 OCR、符号求解 |
-| 3D | **Three.js** | CNN 网络 3D 可视化 |
-| 包管理 | **pnpm 11** | Node **≥ 22.12**（`.nvmrc` → 22.22.0） |
+### 核心框架
+
+| 层级 | 技术 | 版本 / 说明 |
+|------|------|-------------|
+| 元框架 | [Astro](https://astro.build/) | 6.x — SSG、Content Collections、MDX |
+| 交互 UI | [Svelte](https://svelte.dev/) | 5.x — Runes、客户端岛屿 |
+| 样式 | [Tailwind CSS](https://tailwindcss.com/) | 4.x — `@tailwindcss/vite` |
+| 语言 | TypeScript | 6.x |
+| 包管理 | pnpm | 11.x（见 `packageManager` 字段） |
+| 运行时 | Node.js | ≥ 22.12（`.nvmrc` → 22.22.0） |
+
+### 内容与 Markdown
+
+| 能力 | 依赖 |
+|------|------|
+| Wiki 双链 | `remark-wiki-link` |
+| Obsidian Callout | `remark-obsidian-callout` |
+| 图片嵌入 `![[…]]` | 自研 `remark-obsidian-image.mjs` |
+| 数学公式 | `remark-math` + `rehype-katex` + `remark-normalize-math.mjs` |
+| Mermaid | `remark-mermaid.mjs` + `mermaid@11` |
+| 代码高亮 | Astro 内置 Shiki |
+
+### 交互与计算
+
+| 模块 | 技术 |
+|------|------|
+| 关系图谱 | Cytoscape.js、自研多视图布局 |
+| 矩阵 / 表达式 | `mathjs`、`fraction.js` |
+| 手写数字 CNN | TensorFlow.js、Three.js（3D 可视化） |
+| 公式 OCR | `@huggingface/transformers`（FormulaNet）、Web Worker |
+| 符号求解 | Pyodide + SymPy（`formula-solver.py`） |
+| Python IDE | Pyodide + `sys.settrace` + Python `ast` |
+| 白板 | Excalidraw（嵌入） |
+
+### 部署
+
+- **Cloudflare Pages** — 静态托管，`public/_headers` 配置缓存策略
+- **Git Submodule** — `obsidian-vault` 独立仓库，构建时同步
+
+---
+
+## 复现所需知识
+
+若要本地开发、二次开发或部署，建议具备以下背景（不必全部精通，可按模块深入）：
+
+### 必备
+
+| 领域 | 要求 |
+|------|------|
+| **HTML / CSS / JavaScript** | ES2022+、模块化、异步编程 |
+| **TypeScript** | 类型、泛型、模块解析 |
+| **Git** | submodule、基本工作流 |
+| **Node.js 生态** | pnpm、npm scripts、Vite 基本概念 |
+| **Markdown** | GFM、Front Matter |
+
+### 框架相关
+
+| 领域 | 要求 |
+|------|------|
+| **Astro** | 页面路由、`client:*` 指令、Content Collections、MDX |
+| **Svelte 5** | Runes（`$state` / `$derived` / `$effect`）、组件通信 |
+| **Tailwind CSS** | 工具类、响应式、CSS 变量 |
+| **remark / rehype** | Unified 插件链、MDAST/HAST 基本概念 |
+
+### 按功能模块
+
+| 模块 | 建议知识 |
+|------|----------|
+| 笔记 / WikiLink | Obsidian 语法、slug 归一化、静态路由 |
+| 关系图谱 | 图论基础、力导向布局、JSON 图数据 |
+| MATLAB 计算器 | 线性代数、微积分、概率论；矩阵算法 |
+| Python IDE | CPython 执行模型、`sys.settrace`、AST |
+| 手写数字 | CNN 基础、MNIST、TensorFlow.js Layers API |
+| 公式识别 | 图像预处理、Encoder-Decoder OCR、LaTeX |
+| 公式求解 | 计算机代数系统（CAS）、SymPy、LaTeX→表达式 |
+| MNIST 训练 | Keras / TF.js 模型导出（可选） |
+
+### 环境与工具
+
+- **Python 3.10+** — 运行 `pnpm model:export-mnist`（需 `tensorflow`、`Pillow`）
+- **Obsidian**（可选）— 编辑 vault 内容
+- 现代浏览器 — 支持 WebGL、WebGPU（可选）、Web Worker、ES Module
+
+---
+
+## 快速开始
+
+```bash
+git clone --recursive https://github.com/Takalahiro/my-second-brain1.git
+cd my-second-brain1
+pnpm install
+pnpm dev    # http://localhost:4321
+```
+
+```bash
+pnpm build          # 生产构建 → dist/
+pnpm preview        # 本地预览
+pnpm check:25mib    # 校验 git 跟踪文件 ≤ 25 MiB
+pnpm check:self http://localhost:4321   # 路由自检（需 preview 运行中）
+```
 
 ---
 
@@ -24,323 +123,169 @@
 
 ```
 my-second-brain/
-├── astro.config.mjs          # Astro / Vite / Markdown 插件链、分包策略
-├── package.json
-├── pnpm-workspace.yaml
-├── obsidian-vault/           # git submodule — 所有 .md 笔记源
-│
-├── public/                   # 静态资源（构建时部分由脚本生成）
-│   ├── _headers              # Cloudflare 缓存头
-│   ├── models/mnist/         # TF.js LeNet 权重（pnpm model:export-mnist）
-│   ├── music/ picture/ video/ voice/
-│   └── vault-assets/         # prepare:vault 从 vault 同步（.gitignore）
-│
-├── scripts/                  # 构建与维护脚本（见「脚本命令」）
-├── docs/
-│   ├── VAULT_SYNC.md         # Vault 双向同步说明
-│   └── WIKILINKS_REPORT.md   # 双链扫描报告（构建生成）
-│
-└── src/
-    ├── content.config.ts     # notes 集合：glob obsidian-vault/**/*.md
-    ├── env.d.ts
-    │
-    ├── data/                 # prepare:vault / build 生成的 JSON
-    │   ├── stats.json        # 笔记统计、热力图
-    │   ├── wikilinks.json    # 图谱节点/边
-    │   └── media-manifest.json
-    │
-    ├── layouts/
-    │   ├── BaseLayout.astro      # 标准内容页
-    │   ├── DesktopLayout.astro   # 首页桌面 + 开屏
-    │   └── ToolLayout.astro      # 工具页（可选 MathJax）
-    │
-    ├── pages/                  # 路由 → 功能
-    │   ├── index.astro           # 桌面首页（WidgetHost + HomeHero）
-    │   ├── notes/[...slug].astro # 单篇笔记
-    │   ├── notes/index.astro     # 笔记目录
-    │   ├── folder/[...folder].astro
-    │   ├── tags/                 # 标签索引与筛选
-    │   ├── graph.astro           # 关系图谱
-    │   ├── python.astro          # Python IDE（Pyodide）
-    │   ├── matlab.astro          # 矩阵 / 微积分 / 离散 / 统计
-    │   ├── digits.astro          # 神经网络实验室
-    │   ├── formula.astro         # → 重定向 /digits?demo=formula
-    │   ├── whiteboard.astro      # Excalidraw 白板
-    │   └── data/notes.json.ts    # 搜索 API
-    │
-    ├── components/             # 通用 Svelte / Astro 组件
-    │   ├── widgets/            # 桌面小组件（时钟、音乐、图谱等）
-    │   ├── graph/              # GraphExplorer 多视图
-    │   ├── matrix/             # 矩阵实验室
-    │   ├── calculus/           # 微积分步进
-    │   ├── statistics/         # 统计实验室
-    │   ├── python/             # Python 编辑器
-    │   ├── HomeHero.svelte
-    │   ├── PythonIDE.svelte
-    │   ├── MatlabCalculator.svelte
-    │   └── ExcalidrawBoard.svelte
-    │
-    ├── lib/
-    │   ├── site-nav.ts         # 全站导航定义
-    │   ├── neural-lab-meta.ts  # 神经网络实验室文案
-    │   │
-    │   ├── components/
-    │   │   ├── NeuralLab/          # 实验室壳（Tab：手写数字 | 数学公式）
-    │   │   └── DigitRecognizer/    # MNIST CNN + 2D/3D 可视化
-    │   │       ├── canvas/         # 280×280 画板
-    │   │       ├── model/          # 加载、预处理、双路推理
-    │   │       └── visualization/  # 网络图、特征图、PredictionBars
-    │   │
-    │   ├── formula-recognizer/     # FormulaNet OCR + SymPy 求解
-    │   │   ├── formula-ocr.worker.ts
-    │   │   ├── formula-solver.py   # Pyodide 加载
-    │   │   ├── CanvasFormulaRecognizer.svelte
-    │   │   └── FormulaSolverPanel.svelte
-    │   │
-    │   ├── matrix/ calculus/ discrete/ statistics/  # MATLAB 页引擎
-    │   ├── remark-*.mjs / rehype-*.mjs              # Markdown 扩展
-    │   └── notes-mtime.json        # prepare:vault 生成
-    │
-    └── styles/
-        ├── globals.css
-        └── global.css
+├── astro.config.mjs       # Markdown 插件链、Vite 分包
+├── obsidian-vault/        # git submodule — 笔记源
+├── public/
+│   ├── models/mnist/      # TF.js 权重
+│   └── _headers           # Cloudflare 缓存
+├── scripts/               # 构建与 vault 维护
+├── src/
+│   ├── content.config.ts  # notes 集合
+│   ├── pages/             # 路由
+│   ├── components/        # UI 组件
+│   ├── lib/               # 业务逻辑、ML、Markdown 插件
+│   └── data/              # 构建期生成的 JSON
+└── docs/                  # Vault 同步等文档
 ```
 
 ---
 
-## 功能与运行逻辑
+## 核心功能实现逻辑
 
-### 1. 构建流水线
+### 1. 构建流水线（`prepare:vault`）
 
-每次 `pnpm dev` / `pnpm build` 先执行 **`pnpm prepare:vault`**：
+每次 `dev` / `build` 前执行：
+
+1. 校验并初始化 `obsidian-vault` submodule
+2. CI 环境下 `git fetch --unshallow` 以获取笔记 git 历史
+3. 同步 vault 资源 → `public/vault-assets/`
+4. 生成 `notes-mtime.json`、`stats.json`、`wikilinks.json`、`media-manifest.json`
+
+Astro Content Layer 读取 vault 中 `**/*.md`，经 remark/rehype 管道输出静态 HTML。
+
+### 2. 笔记与 WikiLink
 
 ```
-prepare-vault.mjs
-  ├─ 校验 obsidian-vault submodule
-  ├─ CI 浅克隆时 git fetch --unshallow（笔记更新时间）
-  ├─ sync-assets.mjs        → public/vault-assets/
-  ├─ build-mtime-manifest.mjs → src/lib/notes-mtime.json
-  ├─ build-media-manifest.mjs → src/data/media-manifest.json
-  ├─ build-stats.mjs        → src/data/stats.json
-  └─ build-wikilinks.mjs      → src/data/wikilinks.json + docs/WIKILINKS_REPORT.md
+obsidian-vault/*.md
+  → remark-wiki-link（[[page]] → /notes/{slug}）
+  → remark-obsidian-image（![[img]] → /vault-assets/…）
+  → rehype-katex（$…$ → KaTeX HTML）
+  → 静态页面 + Backlinks 反向链接
 ```
 
-Astro 读取 `obsidian-vault` 生成静态 HTML；Svelte 岛屿在客户端 hydration。
+已存在笔记渲染为蓝色链接，未创建笔记为红色「待建链」。
 
-### 2. 笔记系统
+### 3. Python IDE — 逐步解释（`/python`）
 
-| 能力 | 实现 |
-|------|------|
-| Wiki 双链 `[[…]]` | `remark-wiki-link`（蓝链 / 红链未创建） |
-| 嵌入 `![[…]]` | `remark-obsidian-image.mjs` |
-| Callout | `remark-obsidian-callout` |
-| 数学公式 | `remark-normalize-math` + `rehype-katex` |
-| Mermaid | `remark-mermaid.mjs` 懒渲染 |
-| 反向链接 | `Backlinks.astro` |
-| 目录 TOC | 可折叠 / 可拖动 |
-| 最后更新 | `notes-mtime.json` + git log |
+```
+用户代码
+  → Pyodide 执行 run_traced()
+  → sys.settrace 捕获 line / call / return 事件
+  → ast.parse 按语句类型生成中文说明
+  → JSON steps 返回前端
+  → PythonStepPanel 逐步播放 + 编辑器行高亮
+```
 
-### 3. 桌面首页 (`/`)
+非 LLM 生成；解释来自 AST 规则模板（赋值、循环、`print`、函数调用等）。
 
-- **DesktopLayout**：Mac 风格菜单栏、开屏动画
-- **WidgetHost**：可拖拽小组件（音乐、天气、时钟、笔记、图谱等）
-- **HomeHero**：统计概览、快捷入口
-
-### 4. 关系图谱 (`/graph`)
-
-- **GraphExplorer**：力导向 / 径向 / 聚类 / 弧线图 / 领地地图
-- 数据源：`src/data/wikilinks.json`
-
-### 5. Python IDE (`/python`)
-
-- **Pyodide** 浏览器内运行 Python
-- 代码高亮、逐步执行说明
-
-### 6. MATLAB 计算器 (`/matlab`)
-
-**MatlabCalculator** 五个 Tab：
-
-| Tab | 模块 | 路径 |
-|-----|------|------|
-| 矩阵 | 行化简、秩、解方程 | `src/lib/matrix/` |
-| 微积分 | 符号步进 | `src/lib/calculus/` |
-| 离散 | 逻辑表达式 | `src/lib/discrete/` |
-| 统计 | 概率、假设检验 | `src/lib/statistics/` |
-| 表达式 | mathjs 求值 | 组件内 |
-
-### 7. 神经网络实验室 (`/digits`)
-
-**NeuralLab** 两个演示 Tab（URL：`?demo=formula` 切换公式）：
+### 4. 神经网络实验室（`/digits`）
 
 #### 手写数字 · MNIST
 
 ```
-DrawingCanvas (280×280)
-  → mnist-preprocess（单路 / 双路）
-  → TF.js LeNet (/models/mnist/model.json)
-  → runInference → NetworkPanel（diagram / 2D / 3D）+ PredictionBars
+280×280 画板
+  → mnist-preprocess（直接缩放 | 居中裁剪+加粗）  // 双路高精度
+  → TF.js LeNet 推理 + vizModel 中间层输出
+  → NetworkPanel：SVG 结构图 / 2D 特征图 / Three.js 3D
+  → PredictionBars：Softmax 置信度
 ```
 
-- **高精度（双路推理）**：`直接缩放` vs `居中裁剪+加粗`，按置信度选优
-- **可视化**：SVG 结构图、卷积特征图、Three.js 3D、层间数据流动画
+切换至公式 Tab 时释放 TF.js GPU，避免与 OCR Worker 争抢 WebGPU。
 
 #### 数学公式 · FormulaNet + SymPy
 
 ```
-CanvasFormulaRecognizer (384×384)
-  → formula-ocr.worker（Transformers.js / FormulaNet）
-  → LaTeX 预览（MathJax）
-  → FormulaSolverPanel（Pyodide + formula-solver.py）
+384×384 画板
+  → Web Worker：Transformers.js + FormulaNet OCR
+  → 双路预处理（加粗 / 不加粗）+ latexQualityScore 选优
+  → MathJax 渲染 LaTeX
+  → Pyodide 加载 formula-solver.py
+  → SymPy：积分 / 求导 / 方程 / 正态分布 Φ(x)
 ```
 
-- OCR 模型**运行时**从 Hugging Face 下载（不入 git）
-- 支持：化简、方程、微积分、正态分布 Φ(x) 等
+FormulaNet 从 Hugging Face **运行时下载**（不入 git）；SymPy 经 Pyodide CDN 按需加载。
 
-### 8. 白板 (`/whiteboard`)
+### 5. MATLAB 计算器（`/matlab`）
 
-- **Excalidraw** 嵌入，手绘风格
+| Tab | 实现 |
+|-----|------|
+| 矩阵 | 分步行化简引擎（`src/lib/matrix/`），KaTeX 展示 |
+| 微积分 | 符号步进 + Canvas 2D 曲线 |
+| 离散数学 | 逻辑表达式解析与真值表 |
+| 统计学 | 分布采样、假设检验步骤 |
+| 表达式 | `mathjs` 求值与函数绘图 |
+
+子模块按需 lazy import，降低首屏体积。
+
+### 6. 关系图谱（`/graph`）
+
+构建期 `build-wikilinks.mjs` 扫描全部 `[[wikilink]]`，输出 `wikilinks.json`（节点 + 边）。`GraphExplorer` 提供力导向、径向、聚类等多种视图，数据纯前端渲染。
 
 ---
 
-## 路由一览
+## 路由
 
-| 路径 | 页面 | 主要组件 |
-|------|------|----------|
-| `/` | 桌面首页 | WidgetHost, HomeHero |
-| `/notes`, `/notes/*` | 笔记 | NoteDetailLayout, Toc |
-| `/folder/*` | 文件夹浏览 | FolderTree |
-| `/tags`, `/tags/*` | 标签 | — |
-| `/graph` | 关系图谱 | GraphExplorer |
-| `/python` | Python IDE | PythonIDE |
-| `/matlab` | 数学工具 | MatlabCalculator |
-| `/digits` | 神经网络实验室 | NeuralLab |
-| `/digits?demo=formula` | 公式识别 Tab | CanvasFormulaRecognizer |
-| `/formula` | 重定向 | → `/digits?demo=formula` |
-| `/whiteboard` | 白板 | ExcalidrawBoard |
-| `/data/notes.json` | 搜索数据 | API route |
-
-导航定义：`src/lib/site-nav.ts`
-
----
-
-## 本地开发
-
-```bash
-# 首次克隆（含 submodule）
-git clone --recursive https://github.com/Takalahiro/my-second-brain1.git
-cd my-second-brain1
-
-pnpm install
-pnpm dev          # http://localhost:4321
-```
-
-```bash
-pnpm build        # 生产构建 → dist/
-pnpm preview      # 预览 dist/
-```
-
-### 自检
-
-```bash
-pnpm build
-node scripts/check-25mib.mjs    # git 跟踪文件 ≤ 25 MiB
-node scripts/self-check.mjs http://localhost:4321   # preview 启动后
-```
-
----
-
-## 脚本命令
-
-| 命令 | 作用 |
+| 路径 | 功能 |
 |------|------|
-| `pnpm dev` | prepare:vault + 开发服务器 |
-| `pnpm build` | prepare:vault + 静态构建 |
-| `pnpm prepare:vault` | Vault 预处理（见上文流水线） |
-| `pnpm vault:sync "msg"` | commit + push vault + 更新 submodule 指针 |
-| `pnpm vault:pull` | 拉取 vault 远程 |
-| `pnpm vault:audit` | 检查 vault 目录结构 |
-| `pnpm vault:diagnose` | 扫描笔记常见问题 |
-| `pnpm model:export-mnist` | Python 训练 3 epoch + 导出 TF.js 到 `public/models/mnist/` |
-
-其他维护脚本见 `scripts/`：`full-sweep.mjs`、`verify-katex.mjs`、`find-broken-wikilinks.mjs` 等。
+| `/` | 桌面首页（WidgetHost） |
+| `/notes/*` | 笔记详情 |
+| `/graph` | 关系图谱 |
+| `/python` | Python IDE |
+| `/matlab` | 数学计算器 |
+| `/digits` | 神经网络实验室 |
+| `/digits?demo=formula` | 公式 OCR + SymPy |
+| `/whiteboard` | Excalidraw 白板 |
 
 ---
 
-## 模型与体积限制
+## 常用命令
 
-| 模型 | 位置 | 说明 |
-|------|------|------|
-| MNIST LeNet | `public/models/mnist/` | git 跟踪，~879 KB 参数 |
-| FormulaNet | Hugging Face CDN | 运行时下载，encoder ~52 MiB + decoder ~25 MiB |
-| SymPy | Pyodide CDN | 首次求解时加载 ~10–20 MB |
+| 命令 | 说明 |
+|------|------|
+| `pnpm dev` | 开发服务器 |
+| `pnpm build` | 生产构建 |
+| `pnpm model:export-mnist` | 训练并导出 MNIST TF.js 模型 |
+| `pnpm vault:sync "msg"` | 同步 vault 子模块 |
+| `pnpm check:25mib` | 单文件体积审计 |
 
-`scripts/check-25mib.mjs` 确保**入库文件**单文件 ≤ 25 MiB（Cloudflare Pages 限制）。大模型走浏览器缓存，不提交进 git。
+Vault 同步详见 [docs/VAULT_SYNC.md](docs/VAULT_SYNC.md)。
 
 ---
 
 ## Cloudflare Pages 部署
 
-| 设置 | 值 |
-|------|-----|
+| 配置项 | 值 |
+|--------|-----|
 | Build command | `pnpm build` |
 | Output directory | `dist` |
-| Node | 22.x（`.nvmrc`） |
-| Package manager | pnpm（`packageManager` 字段） |
+| Node version | 22.x |
 | **Include git submodules** | **必须开启** |
 
-构建第一步 `prepare:vault` 会初始化 submodule、同步资源、生成 manifest。详见 [docs/VAULT_SYNC.md](docs/VAULT_SYNC.md)。
+---
+
+## 模型与体积
+
+| 资产 | 来源 | 说明 |
+|------|------|------|
+| MNIST LeNet | `public/models/mnist/` | 入库，~879 KB |
+| FormulaNet | Hugging Face CDN | 运行时下载，~77 MiB |
+| SymPy | Pyodide CDN | 首次求解 ~10–20 MB |
+
+单文件入库限制 ≤ 25 MiB（Cloudflare Pages）。见 `scripts/check-25mib.mjs`。
 
 ---
 
-## Vault 同步（简要）
+## 开源协议
 
-- 本地：`pnpm vault:sync "说明"` — 一键 push vault 并更新父仓库 submodule
-- CI：`.github/workflows/sync-vault-submodule.yml` 定期 poll vault 上游
+本项目采用 **[MIT License](./LICENSE)** 发布。
 
----
-
-## 数据流总览
-
-```mermaid
-flowchart TB
-  subgraph source [内容源]
-    V[obsidian-vault submodule]
-  end
-
-  subgraph build [prepare:vault + astro build]
-    P[prepare-vault.mjs]
-    A[Astro SSG]
-    V --> P
-    P --> M[manifests: mtime / stats / wikilinks / media]
-    V --> A
-    M --> A
-  end
-
-  subgraph output [产物]
-    D[dist/ 静态 HTML]
-    J[src/data/*.json]
-  end
-
-  A --> D
-  P --> J
-
-  subgraph runtime [浏览器运行时]
-    W[WidgetHost / 笔记页]
-    G[GraphExplorer]
-    N[NeuralLab: TF.js + Transformers.js + Pyodide]
-  end
-
-  D --> W
-  D --> G
-  D --> N
-  J --> G
-```
+您可以自由使用、修改、分发本软件，但需保留版权声明与许可全文。笔记内容（`obsidian-vault`）可能适用独立许可，请以 vault 仓库为准。
 
 ---
 
-## 贡献与联系
+## 贡献
+
+欢迎通过 [Issue](https://github.com/Takalahiro/my-second-brain1/issues) 或 Pull Request 参与贡献。
 
 - 作者：Takahiro
 - 仓库：[Takalahiro/my-second-brain1](https://github.com/Takalahiro/my-second-brain1)
-
-欢迎 Issue / PR。笔记内容在独立 vault 仓库，通过 submodule 关联。
