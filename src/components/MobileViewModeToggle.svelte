@@ -60,12 +60,12 @@
 <style>
   .mobile-mode-toggle {
     position: fixed;
-    right: 10px;
+    right: max(env(safe-area-inset-right, 0px), 10px);
     bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
     z-index: 70;
-    min-width: 62px;
-    padding: 6px 10px;
-    font-size: 12px;
+    min-width: 56px;
+    padding: 6px 9px;
+    font-size: 11px;
     line-height: 1;
     background: var(--bg-secondary);
     border-color: var(--border-color);

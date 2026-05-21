@@ -286,9 +286,10 @@
     margin-top: 4px;
   }
   @media (max-width: 768px) {
-    .note-search { width: 200px; }
+    .note-search { width: 100%; min-width: 0; }
     .ns-it-tags { display: none; }
     .ns-kbd { display: none; }
-    .ns-input { padding-right: 28px; }
+    .ns-input { padding-right: 28px; font-size: 0.8rem; }
+    .ns-input-wrap { min-width: 0; }
   }
 </style>

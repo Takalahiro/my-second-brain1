@@ -80,4 +80,18 @@
     background: #15101e;
     color: #ece4ff;
   }
+  @media (max-width: 768px) {
+    .font-switcher {
+      padding: 2px 5px;
+      gap: 2px;
+    }
+    .font-switcher-icon {
+      font-size: 0.72rem;
+    }
+    .font-switcher-select {
+      min-width: 3.2rem;
+      max-width: 4.2rem;
+      font-size: 0.72rem;
+    }
+  }
 </style>

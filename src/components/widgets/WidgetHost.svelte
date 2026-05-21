@@ -446,4 +446,14 @@
     background: rgb(180 60 80 / 0.55);
     border-color: rgb(255 180 190 / 0.45);
   }
+  @media (max-width: 768px) {
+    .wallpaper-mute-btn {
+      top: auto;
+      left: max(env(safe-area-inset-left, 0px), 16px);
+      bottom: calc(max(env(safe-area-inset-bottom, 0px), 16px) + 48px);
+      width: 38px;
+      height: 38px;
+      font-size: 1rem;
+    }
+  }
 </style>

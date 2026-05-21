@@ -280,6 +280,15 @@
   }
   .gear-btn:hover { background: rgb(40 28 60 / 0.65); }
 
+  @media (max-width: 768px) {
+    .gear-btn {
+      top: calc(max(env(safe-area-inset-top, 0px), 10px) + 112px);
+    }
+    .clear-btn {
+      top: calc(max(env(safe-area-inset-top, 0px), 10px) + 160px);
+    }
+  }
+
   /* 浮动「清屏/恢复」按钮：紧贴 gear-btn 下方 */
   .clear-btn {
     position: fixed;
