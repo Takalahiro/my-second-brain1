@@ -1,9 +1,6 @@
 <script lang="ts">
+  import type { Component } from 'svelte';
   import { evaluate, plotFunction, CALC_HELP, type CalcResult } from '../lib/calc-engine';
-  import MatrixLab from './matrix/MatrixLab.svelte';
-  import CalculusLab from './calculus/CalculusLab.svelte';
-  import DiscreteLab from './discrete/DiscreteLab.svelte';
-  import StatisticsLab from './statistics/StatisticsLab.svelte';
 
   interface Props {
     /** 紧凑模式（小组件） */
@@ -13,6 +10,18 @@
 
   type TabId = 'matrix' | 'calculus' | 'discrete' | 'statistics' | 'expr';
   let tab = $state<TabId>('matrix');
+
+  const labLoaders: Record<Exclude<TabId, 'expr'>, () => Promise<{ default: Component }>> = {
+    matrix: () => import('./matrix/MatrixLab.svelte'),
+    calculus: () => import('./calculus/CalculusLab.svelte'),
+    discrete: () => import('./discrete/DiscreteLab.svelte'),
+    statistics: () => import('./statistics/StatisticsLab.svelte'),
+  };
+
+  let LabComponent = $state<Component | null>(null);
+  let labLoading = $state(false);
+  let labError = $state<string | null>(null);
+  let labLoadSeq = 0;
 
   let expr = $state('');
   let plotExpr = $state('sin(x)');
@@ -132,6 +141,32 @@
     }
   });
 
+  $effect(() => {
+    if (compact || tab === 'expr') {
+      LabComponent = null;
+      labLoading = false;
+      labError = null;
+      return;
+    }
+    const currentTab = tab;
+    const seq = ++labLoadSeq;
+    labLoading = true;
+    labError = null;
+    LabComponent = null;
+    labLoaders[currentTab]()
+      .then((mod) => {
+        if (seq !== labLoadSeq) return;
+        LabComponent = mod.default;
+      })
+      .catch((err) => {
+        if (seq !== labLoadSeq) return;
+        labError = err instanceof Error ? err.message : String(err);
+      })
+      .finally(() => {
+        if (seq === labLoadSeq) labLoading = false;
+      });
+  });
+
   const KEYPAD = [
     ['7', '8', '9', '/', '*'],
     ['4', '5', '6', '+', '-'],
@@ -169,14 +204,14 @@
     </header>
   {/if}
 
-  {#if !compact && tab === 'matrix'}
-    <MatrixLab />
-  {:else if !compact && tab === 'calculus'}
-    <CalculusLab />
-  {:else if !compact && tab === 'discrete'}
-    <DiscreteLab />
-  {:else if !compact && tab === 'statistics'}
-    <StatisticsLab />
+  {#if !compact && tab !== 'expr'}
+    {#if labLoading}
+      <div class="mc-lab-loading">正在加载{tab === 'matrix' ? '矩阵' : tab === 'calculus' ? '微积分' : tab === 'discrete' ? '离散数学' : '统计学'}模块…</div>
+    {:else if labError}
+      <div class="mc-lab-error" role="alert">模块加载失败：{labError}</div>
+    {:else if LabComponent}
+      <LabComponent />
+    {/if}
   {:else}
   <div class="mc-body">
     <section class="mc-command">
@@ -297,6 +332,23 @@
     gap: 12px;
     flex-wrap: wrap;
     padding: 0 16px;
+  }
+
+  .mc-lab-loading,
+  .mc-lab-error {
+    margin: 0 16px;
+    padding: 24px 16px;
+    border-radius: 12px;
+    border: 1px dashed rgb(180 140 255 / 0.25);
+    text-align: center;
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+  }
+
+  .mc-lab-error {
+    color: #ff9d9d;
+    border-color: rgb(255 120 120 / 0.35);
+    background: rgb(255 80 80 / 0.08);
   }
 
   .mc-body {

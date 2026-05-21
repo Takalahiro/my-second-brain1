@@ -14,9 +14,10 @@ import {
   scorePrediction,
   type VariantSpec,
 } from './mnist-preprocess';
+import { tf as tfRuntime } from '../../../tfjs-client';
 
-async function getTf() {
-  return import('@tensorflow/tfjs');
+function getTf() {
+  return Promise.resolve(tfRuntime);
 }
 
 function layerKind(className: string): LayerKind {

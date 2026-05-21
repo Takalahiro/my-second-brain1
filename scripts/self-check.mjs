@@ -9,6 +9,7 @@ const routes = [
   '/graph/',
   '/python/',
   '/matlab/',
+  '/matlab/',
   '/digits/',
   '/digits/?demo=formula',
   '/whiteboard/',

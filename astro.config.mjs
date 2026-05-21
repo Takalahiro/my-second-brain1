@@ -28,6 +28,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     optimizeDeps: {
+      include: ['@tensorflow/tfjs', 'mathjs', 'fraction.js'],
       exclude: ['@huggingface/transformers'],
     },
     worker: {
@@ -40,10 +41,10 @@ export default defineConfig({
             if (id.includes('node_modules/@huggingface/transformers')) return 'transformers';
             if (id.includes('formula-recognizer')) return 'formula-ocr';
             if (id.includes('pyodide') || id.includes('sympy')) return 'pyodide';
-            if (id.includes('node_modules/@tensorflow')) return 'tfjs';
+            if (id.includes('node_modules/@tensorflow/tfjs')) return 'tfjs';
+            if (id.includes('/tfjs-client')) return 'tfjs';
             if (id.includes('node_modules/three')) return 'three';
             if (id.includes('DigitRecognizer')) return 'digits';
-            if (id.includes('pyodide')) return 'pyodide';
             if (id.includes('cytoscape') || id.includes('GraphWidget')) return 'graph-viz';
           },
         },

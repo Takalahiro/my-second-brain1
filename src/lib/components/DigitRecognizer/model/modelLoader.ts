@@ -1,11 +1,12 @@
 import type * as tf from '@tensorflow/tfjs';
 import type { ModelState } from './types';
+import { tf as tfRuntime } from '../../../tfjs-client';
 
 /** 本地托管 LeNet 风格 MNIST 模型 — 见 scripts/export-mnist-model.py */
 export const MNIST_MODEL_URL = '/models/mnist/model.json';
 
-async function getTf() {
-  return import('@tensorflow/tfjs');
+function getTf() {
+  return Promise.resolve(tfRuntime);
 }
 
 export async function loadMnistModel(): Promise<{

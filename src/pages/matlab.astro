@@ -4,5 +4,38 @@ import MatlabCalculator from '../components/MatlabCalculator.svelte';
 ---
 
 <ToolLayout title="MATLAB 计算器 · My Second Brain" description="矩阵、微积分、离散数学可视化与表达式计算">
-  <MatlabCalculator client:only="svelte" />
+  <MatlabCalculator client:only="svelte">
+    <div class="matlab-fallback" slot="fallback">
+      <div class="matlab-fallback-inner">
+        <p class="matlab-fallback-title">MATLAB 计算器</p>
+        <p class="matlab-fallback-hint">正在加载数学模块…</p>
+      </div>
+    </div>
+  </MatlabCalculator>
 </ToolLayout>
+
+<style>
+  .matlab-fallback {
+    min-height: calc(100vh - 88px);
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+  }
+  .matlab-fallback-inner {
+    text-align: center;
+    padding: 2rem 2.5rem;
+    border-radius: 16px;
+    border: 1px dashed rgb(180 140 255 / 0.25);
+    background: rgb(180 140 255 / 0.05);
+  }
+  .matlab-fallback-title {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+  .matlab-fallback-hint {
+    margin: 0;
+    font-size: 0.85rem;
+  }
+</style>
