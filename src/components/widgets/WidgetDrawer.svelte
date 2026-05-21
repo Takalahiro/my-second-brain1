@@ -39,8 +39,29 @@
   }: Props = $props();
 
   let open = $state(false);
-  let dragKey = $state<WidgetKey | null>(null);
   let dragGhost: HTMLDivElement | null = null;
+
+  const DRAG_THRESHOLD = 14;
+  type DragSession = {
+    key: WidgetKey | null;
+    startX: number;
+    startY: number;
+    dragging: boolean;
+    moved: boolean;
+  };
+  let drag: DragSession = {
+    key: null,
+    startX: 0,
+    startY: 0,
+    dragging: false,
+    moved: false,
+  };
+  let suppressTileClick = false;
+
+  function resetDrag() {
+    drag = { key: null, startX: 0, startY: 0, dragging: false, moved: false };
+    clearGhost();
+  }
 
   const items: Widget[] = [
     { id: 'background', name: '背景', icon: '🌄', desc: '响应式视频/图片背景', pinned: true },
@@ -83,27 +104,59 @@
 
   function onTilePointerDown(e: PointerEvent, w: Widget) {
     if (w.pinned) return;
-    dragKey = w.id;
-    ensureGhost(`${w.icon} ${w.name}`);
-    moveGhost(e.clientX, e.clientY);
-    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
-    e.preventDefault();
+    if ((e.target as HTMLElement).closest('.switch, [data-no-drag]')) return;
+    drag = {
+      key: w.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      dragging: false,
+      moved: false,
+    };
   }
   function onTilePointerMove(e: PointerEvent) {
-    if (!dragKey) return;
+    if (!drag.key) return;
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    if (!drag.dragging) {
+      if (Math.hypot(dx, dy) <= DRAG_THRESHOLD) return;
+      // 垂直滑动 → 交给抽屉滚动，不启动拖拽
+      if (Math.abs(dy) > Math.abs(dx)) {
+        suppressTileClick = true;
+        resetDrag();
+        return;
+      }
+      const w = items.find((i) => i.id === drag.key);
+      if (!w) return;
+      drag = { ...drag, dragging: true, moved: true };
+      ensureGhost(`${w.icon} ${w.name}`);
+      moveGhost(e.clientX, e.clientY);
+      (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+      e.preventDefault();
+      return;
+    }
+    drag = { ...drag, moved: true };
     moveGhost(e.clientX, e.clientY);
   }
   function onTilePointerUp(e: PointerEvent, w: Widget) {
-    if (!dragKey) return;
-    (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
-    const target = document.elementFromPoint(e.clientX, e.clientY);
-    const onDrawer = !!target?.closest('.widget-drawer, .gear-btn');
-    if (!onDrawer) {
-      // 拖到画布 → 启用，并把位置传给宿主用来初始化
-      onToggle(w.id, { x: e.clientX, y: e.clientY });
+    const el = e.currentTarget as HTMLElement;
+    if (drag.dragging && drag.key === w.id) {
+      el.releasePointerCapture?.(e.pointerId);
+      const target = document.elementFromPoint(e.clientX, e.clientY);
+      const onDrawer = !!target?.closest('.widget-drawer, .gear-btn');
+      if (!onDrawer) onToggle(w.id, { x: e.clientX, y: e.clientY });
+      suppressTileClick = true;
+    } else if (drag.moved) {
+      suppressTileClick = true;
     }
-    clearGhost();
-    dragKey = null;
+    resetDrag();
+  }
+  function onTileClick(e: MouseEvent, w: Widget) {
+    if (suppressTileClick) {
+      suppressTileClick = false;
+      return;
+    }
+    if ((e.target as HTMLElement).closest('.switch, [data-no-drag]')) return;
+    onToggle(w.id);
   }
 </script>
 
@@ -156,7 +209,7 @@
     <button type="button" class="wd-x" aria-label="关闭" onclick={() => (open = false)}>×</button>
   </header>
 
-  <p class="wd-hint">拖一个组件到主界面即可添加；已添加的可在卡片右上角直接开关</p>
+  <p class="wd-hint">点击卡片或开关添加组件；桌面端可拖到主界面。滑动列表时不会误触。</p>
 
   <!-- 一键清屏 / 恢复 操作条 -->
   <div class="wd-quick">
@@ -182,25 +235,33 @@
     {#each items as w (w.id)}
       <li>
         <div
-          class="wd-tile {dragKey === w.id ? 'is-dragging' : ''} {enabled[w.id] ? 'is-on' : ''}"
+          class="wd-tile {drag.dragging && drag.key === w.id ? 'is-dragging' : ''} {enabled[w.id] ? 'is-on' : ''}"
           role="button"
           tabindex="0"
+          onclick={(e) => onTileClick(e, w)}
           onpointerdown={(e) => onTilePointerDown(e, w)}
           onpointermove={onTilePointerMove}
           onpointerup={(e) => onTilePointerUp(e, w)}
-          onpointercancel={(e) => { (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId); clearGhost(); dragKey = null; }}
-          title={w.pinned ? '点击切换' : '拖动到主界面以添加，或点击切换'}
+          onpointercancel={(e) => {
+            (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+            resetDrag();
+          }}
+          title={w.pinned ? '点击切换' : '点击切换；桌面端可拖到主界面'}
         >
           <span class="wd-tile-icon" aria-hidden="true">{w.icon}</span>
           <div class="wd-tile-info">
             <div class="wd-tile-name">{w.name}</div>
             <div class="wd-tile-desc">{w.desc}</div>
           </div>
-          <label class="switch" data-no-drag>
+          <label class="switch" data-no-drag onclick={(e) => e.stopPropagation()} onpointerdown={(e) => e.stopPropagation()}>
             <input
               type="checkbox"
               checked={enabled[w.id]}
-              onchange={(e) => onToggle(w.id, undefined)}
+              onclick={(e) => {
+                e.stopPropagation();
+                suppressTileClick = true;
+                onToggle(w.id, undefined);
+              }}
               aria-label={`${w.name} 开关`}
             />
             <span></span>
@@ -418,13 +479,17 @@
     border-radius: 12px;
     background: rgb(255 255 255 / 0.06);
     border: 1px solid rgb(255 255 255 / 0.12);
-    cursor: grab;
+    cursor: pointer;
     user-select: none;
     transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
-    touch-action: none;
+    touch-action: pan-y;
   }
   .wd-tile:hover { background: rgb(255 255 255 / 0.1); border-color: rgb(255 255 255 / 0.2); }
-  .wd-tile.is-dragging { opacity: 0.5; cursor: grabbing; }
+  .wd-tile.is-dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    touch-action: none;
+  }
   .wd-tile.is-on { border-color: rgb(180 140 255 / 0.55); }
   .wd-tile-icon { font-size: 1.4rem; text-align: center; }
   .wd-tile-name { font-weight: 600; font-size: 0.88rem; }

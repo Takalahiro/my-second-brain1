@@ -79,9 +79,14 @@
     const lowCpu = (navigator.hardwareConcurrency ?? 8) <= 4;
     lowPerf = reduced || lowCpu;
 
+    document.addEventListener('touchstart', onDocTouchStart, { passive: true });
+    document.addEventListener('touchend', onDocTouchEnd, { passive: true });
+
     return () => {
       if (mql.removeEventListener) mql.removeEventListener('change', onChange);
       else if ('removeListener' in mql) (mql as any).removeListener(onChange);
+      document.removeEventListener('touchstart', onDocTouchStart);
+      document.removeEventListener('touchend', onDocTouchEnd);
     };
   });
 
@@ -229,6 +234,40 @@
     const len = media.mobile.length;
     if (len === 0) return;
     onMobileIndexChange?.((mobileIndex - 1 + len) % len);
+  }
+
+  const SWIPE_MIN = 48;
+  const SWIPE_SKIP =
+    'button, a, input, select, textarea, label, [role="button"], header, nav, .widget-drawer, .gear-btn, .clear-btn, .home-fab, .wallpaper-mute-btn, .mobile-mode-toggle, .note-search, .wd-tile, .bg-mobile-controls';
+
+  let swipeStartX = 0;
+  let swipeStartY = 0;
+  let swipeTracking = false;
+
+  function isMobileViewport() {
+    return window.matchMedia('(max-width: 768px)').matches;
+  }
+
+  function onDocTouchStart(e: TouchEvent) {
+    if (!isMobileViewport() || media.mobile.length <= 1) return;
+    if (e.touches.length !== 1) return;
+    const el = e.target as HTMLElement | null;
+    if (el?.closest(SWIPE_SKIP)) return;
+    swipeStartX = e.touches[0].clientX;
+    swipeStartY = e.touches[0].clientY;
+    swipeTracking = true;
+  }
+
+  function onDocTouchEnd(e: TouchEvent) {
+    if (!swipeTracking) return;
+    swipeTracking = false;
+    const t = e.changedTouches[0];
+    if (!t) return;
+    const dx = t.clientX - swipeStartX;
+    const dy = t.clientY - swipeStartY;
+    if (Math.abs(dx) < SWIPE_MIN || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < 0) nextMobile();
+    else prevMobile();
   }
 </script>
 
