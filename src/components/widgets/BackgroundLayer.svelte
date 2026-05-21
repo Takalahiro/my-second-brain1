@@ -251,7 +251,7 @@
 
   const SWIPE_MIN = 48;
   const SWIPE_SKIP =
-    'button, a, input, select, textarea, label, [role="button"], header, nav, .widget-drawer, .mac-menu-bar, .home-fab, .wallpaper-mute-btn, .mobile-mode-toggle, .note-search, .wd-tile, .bg-mobile-controls';
+    'button, a, input, select, textarea, label, [role="button"], header, nav, .widget-drawer, .mac-menu-bar, .mobile-home-dock, .home-fab, .wallpaper-mute-btn, .mobile-mode-toggle, .note-search, .wd-tile, .bg-mobile-controls';
 
   let swipeStartX = 0;
   let swipeStartY = 0;
@@ -399,7 +399,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+    bottom: calc(max(env(safe-area-inset-bottom, 0px), 10px) + 72px);
     display: flex;
     align-items: center;
     justify-content: center;

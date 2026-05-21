@@ -217,10 +217,12 @@
   }
   :global(.mac-os-body) .home-hero.desktop-overlay {
     position: fixed;
-    inset: 58px 0 16px;
+    inset: calc(max(env(safe-area-inset-top, 0px), 8px) + 52px) 0
+      calc(max(env(safe-area-inset-bottom, 0px), 10px) + 78px) 0;
     z-index: 118;
     min-height: 0;
-    padding: 20px 16px;
+    padding: 16px 12px;
+    align-items: flex-end;
   }
   :global(.mac-os-body) .home-hero.desktop-overlay.is-first-manual {
     z-index: 125;
@@ -519,6 +521,63 @@
     background: var(--glass-bg-hover);
     border-color: rgb(180 140 255 / 0.45);
     color: var(--text-primary);
+  }
+
+  @media (max-width: 768px) {
+    .home-hero {
+      min-height: 0;
+      padding: 12px 10px;
+      align-items: flex-end;
+    }
+    :global(.mac-os-body) .home-hero.desktop-overlay {
+      padding: 12px 10px 8px;
+    }
+    .hero-card {
+      padding: 22px 18px;
+      border-radius: 18px;
+      max-width: none;
+    }
+    .hero-title {
+      font-size: 1.45rem;
+    }
+    .hero-sub {
+      font-size: 0.86rem;
+      margin-bottom: 14px;
+    }
+    .hero-actions,
+    .manual-card-foot {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .hero-actions :global(.hero-btn),
+    .manual-card-foot :global(.hero-btn) {
+      width: 100%;
+      min-height: 44px;
+      justify-content: center;
+    }
+    .manual-card {
+      max-height: min(78dvh, calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 140px));
+      border-radius: 18px;
+    }
+    .manual-card-head {
+      padding: 18px 16px 10px;
+    }
+    .manual-body {
+      padding: 12px 16px 8px;
+      font-size: 0.78rem;
+    }
+    .manual-card-foot {
+      padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    }
+    .sync-status div {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+    .sync-status dd {
+      text-align: left;
+    }
   }
 
   @media (max-width: 640px) {

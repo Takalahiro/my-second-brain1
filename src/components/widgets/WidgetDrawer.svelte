@@ -1606,7 +1606,7 @@
     }
     :global(.mac-os-body) .mac-settings {
       top: max(env(safe-area-inset-top, 0px), 58px);
-      bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+      bottom: calc(max(env(safe-area-inset-bottom, 0px), 10px) + 72px);
     }
     .mac-category-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));

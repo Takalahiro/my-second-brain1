@@ -6,6 +6,7 @@
   import { widgetLoaders } from './widgetLoaders';
   import WidgetDrawer from './WidgetDrawer.svelte';
   import MacMenuBar from '../desktop/MacMenuBar.svelte';
+  import MobileHomeDock from '../desktop/MobileHomeDock.svelte';
   import { readGlobalMuted, writeGlobalMuted } from '../../lib/global-audio-mute';
   import {
     computeLinkedRainDrops,
@@ -460,6 +461,14 @@
       />
     {/if}
 
+    {#if ready}
+      <MobileHomeDock
+        {controlCenterOpen}
+        onOpenControlCenter={toggleControlCenter}
+        onOpenManual={toggleManualFromDesktop}
+      />
+    {/if}
+
     <div class="mac-desktop-stage">
       {#if enabled.background}
         <LazyWidget
@@ -689,7 +698,8 @@
   }
   .mac-desktop-stage {
     position: absolute;
-    inset: 58px 0 16px;
+    inset: calc(max(env(safe-area-inset-top, 0px), 8px) + 52px) 0
+      calc(max(env(safe-area-inset-bottom, 0px), 10px) + 78px) 0;
   }
 
   .wallpaper-mute-btn {
@@ -721,12 +731,7 @@
   }
   @media (max-width: 768px) {
     .wallpaper-mute-btn {
-      top: auto;
-      left: max(env(safe-area-inset-left, 0px), 16px);
-      bottom: calc(max(env(safe-area-inset-bottom, 0px), 16px) + 48px);
-      width: 38px;
-      height: 38px;
-      font-size: 1rem;
+      display: none;
     }
   }
 </style>

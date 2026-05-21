@@ -431,6 +431,35 @@
     border-radius: 10px;
     background: var(--chrome-subtle);
   }
+  @media (max-width: 768px) {
+    .mac-menu-bar {
+      top: max(env(safe-area-inset-top, 0px), 6px);
+      left: max(env(safe-area-inset-left, 0px), 8px);
+      right: max(env(safe-area-inset-right, 0px), 8px);
+      height: 48px;
+      padding: 0 6px 0 8px;
+      border-radius: 14px;
+      gap: 6px;
+    }
+    .mac-menu-left {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .mac-menu-clock {
+      max-width: 7.2rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 0.68rem;
+      padding: 4px 6px;
+    }
+    .mac-menu-dropdown {
+      min-width: min(280px, calc(100vw - 24px));
+      max-height: min(70dvh, 520px);
+      overflow: auto;
+    }
+  }
   @media (max-width: 480px) {
     .mac-menu-app-name { display: none; }
     .mac-menu-clock { font-size: 0.72rem; padding: 4px 6px; }
