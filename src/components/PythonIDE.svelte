@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import PythonStepPanel from './python/PythonStepPanel.svelte';
+  import PythonCodeEditor from './python/PythonCodeEditor.svelte';
   import {
     PY_TRACER_SETUP,
     SAMPLE_CODE,
@@ -29,7 +30,7 @@
   let activeStep = $state(0);
   let pyodide: PyodideApi | null = null;
 
-  let textareaEl: HTMLTextAreaElement | null = null;
+  let editorRef = $state<PythonCodeEditor | null>(null);
   let gutterEl: HTMLDivElement | null = null;
 
   const lines = $derived(code.split('\n'));
@@ -108,14 +109,12 @@ json.dumps(run_traced(${payload}))
   }
 
   function syncGutterScroll() {
-    if (textareaEl && gutterEl) gutterEl.scrollTop = textareaEl.scrollTop;
+    const ta = editorRef?.getTextarea();
+    if (ta && gutterEl) gutterEl.scrollTop = ta.scrollTop;
   }
 
   function scrollToActiveLine() {
-    if (!textareaEl || !activeLine) return;
-    const lh = 21;
-    const target = (activeLine - 1) * lh;
-    textareaEl.scrollTop = Math.max(0, target - textareaEl.clientHeight / 3);
+    editorRef?.scrollToLine(activeLine);
     syncGutterScroll();
   }
 
@@ -202,15 +201,12 @@ else:
             >{ln}</span>
           {/each}
         </div>
-        <textarea
-          id="py-code"
-          bind:this={textareaEl}
-          bind:value={code}
-          onscroll={syncGutterScroll}
-          spellcheck="false"
+        <PythonCodeEditor
+          bind:this={editorRef}
+          bind:code
           disabled={!pyodideReady}
-          aria-label="Python 代码"
-        ></textarea>
+          onscroll={syncGutterScroll}
+        />
         {#if activeLine && lines[activeLine - 1] !== undefined}
           <div class="py-line-highlight" style="--line: {activeLine - 1}"></div>
         {/if}
@@ -341,6 +337,9 @@ else:
     grid-template-columns: 42px 1fr;
     overflow: hidden;
   }
+  .py-code-wrap :global(.py-code-editor) {
+    min-height: 0;
+  }
   .py-gutter {
     padding: 12px 0;
     overflow: hidden;
@@ -367,20 +366,6 @@ else:
     animation: viz-row-pulse 1.3s ease-in-out infinite;
   }
 
-  #py-code {
-    flex: 1;
-    min-height: 0;
-    padding: 12px 14px;
-    border: 0;
-    resize: none;
-    font-family: 'IBM Plex Mono', 'Consolas', monospace;
-    font-size: 0.85rem;
-    line-height: 21px;
-    background: var(--code-bg);
-    color: var(--code-fg);
-    outline: none;
-    overflow: auto;
-  }
   .py-line-highlight {
     position: absolute;
     left: 42px;

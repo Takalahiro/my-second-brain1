@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+  import { clampFabPosition, loadFabPosition, saveFabPosition } from '../../lib/draggable-fab';
+
   type ToolKey = 'python' | 'matlab' | 'whiteboard';
 
   interface ToolItem {
@@ -17,6 +20,117 @@
   let open = $state(false);
   let dragKey = $state<ToolKey | null>(null);
   let dragGhost: HTMLDivElement | null = null;
+
+  const FAB_POS_KEY = 'second-brain:notes-tool-btn-pos';
+  let fabEl = $state<HTMLButtonElement | null>(null);
+  let fabLeft = $state(0);
+  let fabTop = $state(0);
+  let fabReady = $state(false);
+  let fabDragging = $state(false);
+
+  let fabDidMove = false;
+  let fabSuppressClick = false;
+  let fabStartX = 0;
+  let fabStartY = 0;
+  let fabStartLeft = 0;
+  let fabStartTop = 0;
+
+  function defaultFabPos() {
+    const w = fabEl?.offsetWidth ?? 40;
+    const h = fabEl?.offsetHeight ?? 40;
+    const narrow = window.matchMedia('(max-width: 640px)').matches;
+    const top = narrow ? 140 : 88;
+    const right = narrow ? 12 : 64;
+    return clampFabPosition(window.innerWidth - w - right, top, w, h);
+  }
+
+  function initFabPos() {
+    const stored = untrack(() => loadFabPosition(FAB_POS_KEY));
+    if (stored) {
+      const c = clampFabPosition(stored.left, stored.top, fabEl?.offsetWidth ?? 40, fabEl?.offsetHeight ?? 40);
+      fabLeft = c.left;
+      fabTop = c.top;
+    } else {
+      const c = defaultFabPos();
+      fabLeft = c.left;
+      fabTop = c.top;
+    }
+    fabReady = true;
+  }
+
+  function onFabResize() {
+    if (!fabReady) return;
+    const c = clampFabPosition(fabLeft, fabTop, fabEl?.offsetWidth ?? 40, fabEl?.offsetHeight ?? 40);
+    if (c.left !== fabLeft || c.top !== fabTop) {
+      fabLeft = c.left;
+      fabTop = c.top;
+      saveFabPosition(FAB_POS_KEY, fabLeft, fabTop);
+    }
+  }
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+    window.addEventListener('resize', onFabResize, { passive: true });
+    return () => window.removeEventListener('resize', onFabResize);
+  });
+
+  $effect(() => {
+    if (fabEl && !fabReady) initFabPos();
+  });
+
+  function onFabPointerDown(e: PointerEvent) {
+    if (e.button !== 0 || !fabEl) return;
+    fabDragging = true;
+    fabDidMove = false;
+    fabStartX = e.clientX;
+    fabStartY = e.clientY;
+    fabStartLeft = fabLeft;
+    fabStartTop = fabTop;
+    try {
+      fabEl.setPointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function onFabPointerMove(e: PointerEvent) {
+    if (!fabDragging) return;
+    const dx = e.clientX - fabStartX;
+    const dy = e.clientY - fabStartY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+      fabDidMove = true;
+      e.preventDefault?.();
+    }
+    if (!fabDidMove) return;
+    const c = clampFabPosition(
+      fabStartLeft + dx,
+      fabStartTop + dy,
+      fabEl?.offsetWidth ?? 40,
+      fabEl?.offsetHeight ?? 40,
+    );
+    fabLeft = c.left;
+    fabTop = c.top;
+  }
+
+  function onFabPointerUp(e: PointerEvent) {
+    if (!fabDragging || !fabEl) return;
+    fabDragging = false;
+    try {
+      fabEl.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    saveFabPosition(FAB_POS_KEY, fabLeft, fabTop);
+    if (fabDidMove) fabSuppressClick = true;
+  }
+
+  function toggleFab() {
+    if (fabSuppressClick) {
+      fabSuppressClick = false;
+      return;
+    }
+    open = !open;
+  }
 
   const items: ToolItem[] = [
     { id: 'python', name: 'Python', icon: '🐍', desc: 'Pyodide 在线运行' },
@@ -67,10 +181,19 @@
 
 <button
   type="button"
+  bind:this={fabEl}
   class="notes-tool-btn"
+  class:is-ready={fabReady}
+  class:is-dragging={fabDragging}
+  style:left={fabReady ? `${fabLeft}px` : undefined}
+  style:top={fabReady ? `${fabTop}px` : undefined}
   aria-label={open ? '关闭笔记工具' : '打开笔记工具'}
-  title="笔记工具：Python / MATLAB / 白板"
-  onclick={() => (open = !open)}
+  title="拖动移动 · 点击打开笔记工具"
+  onpointerdown={onFabPointerDown}
+  onpointermove={onFabPointerMove}
+  onpointerup={onFabPointerUp}
+  onpointercancel={onFabPointerUp}
+  onclick={toggleFab}
 >
   <span aria-hidden="true">🛠</span>
 </button>
@@ -134,12 +257,24 @@
     background: var(--glass-bg-strong);
     color: var(--text-primary);
     backdrop-filter: blur(14px);
-    cursor: pointer;
+    cursor: grab;
     font-size: 1.05rem;
     box-shadow: var(--shadow-normal);
+    touch-action: none;
+    user-select: none;
+    transition: box-shadow 0.15s, transform 0.15s;
   }
-  .notes-tool-btn:hover {
+  .notes-tool-btn.is-ready {
+    right: auto;
+  }
+  .notes-tool-btn.is-dragging {
+    cursor: grabbing;
+    box-shadow: var(--shadow-hover);
+    transition: none;
+  }
+  .notes-tool-btn:hover:not(.is-dragging) {
     background: var(--glass-bg-hover);
+    transform: scale(1.05);
   }
   .notes-tool-mask {
     position: fixed;
@@ -270,7 +405,7 @@
     transform: translateX(14px);
   }
   @media (max-width: 640px) {
-    .notes-tool-btn {
+    .notes-tool-btn:not(.is-ready) {
       right: max(env(safe-area-inset-right, 0px), 12px);
       top: calc(max(env(safe-area-inset-top, 0px), 88px) + 52px);
     }

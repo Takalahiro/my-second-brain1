@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import type { MarkdownHeading } from 'astro';
   import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
+  import { clampFabPosition, loadFabPosition, saveFabPosition } from '../../lib/draggable-fab';
   import NoteOutline from './NoteOutline.svelte';
 
   interface Props {
@@ -12,6 +14,113 @@
   let { headings, variant = 'sidebar' }: Props = $props();
 
   let drawerOpen = $state(false);
+
+  const FAB_POS_KEY = 'second-brain:outline-fab-pos';
+  let fabEl = $state<HTMLButtonElement | null>(null);
+  let fabLeft = $state(0);
+  let fabTop = $state(0);
+  let fabReady = $state(false);
+  let fabDragging = $state(false);
+  let fabDidMove = false;
+  let fabSuppressClick = false;
+  let fabStartX = 0;
+  let fabStartY = 0;
+  let fabStartLeft = 0;
+  let fabStartTop = 0;
+
+  function defaultFabPos() {
+    const w = fabEl?.offsetWidth ?? 56;
+    const h = fabEl?.offsetHeight ?? 44;
+    return clampFabPosition(12, Math.max(80, window.innerHeight - h - 64), w, h);
+  }
+
+  function initFabPos() {
+    const stored = untrack(() => loadFabPosition(FAB_POS_KEY));
+    if (stored) {
+      const c = clampFabPosition(stored.left, stored.top, fabEl?.offsetWidth ?? 56, fabEl?.offsetHeight ?? 44);
+      fabLeft = c.left;
+      fabTop = c.top;
+    } else {
+      const c = defaultFabPos();
+      fabLeft = c.left;
+      fabTop = c.top;
+    }
+    fabReady = true;
+  }
+
+  function onFabResize() {
+    if (!fabReady) return;
+    const c = clampFabPosition(fabLeft, fabTop, fabEl?.offsetWidth ?? 56, fabEl?.offsetHeight ?? 44);
+    if (c.left !== fabLeft || c.top !== fabTop) {
+      fabLeft = c.left;
+      fabTop = c.top;
+      saveFabPosition(FAB_POS_KEY, fabLeft, fabTop);
+    }
+  }
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+    window.addEventListener('resize', onFabResize, { passive: true });
+    return () => window.removeEventListener('resize', onFabResize);
+  });
+
+  $effect(() => {
+    if (fabEl && !fabReady) initFabPos();
+  });
+
+  function onFabPointerDown(e: PointerEvent) {
+    if (e.button !== 0 || !fabEl) return;
+    fabDragging = true;
+    fabDidMove = false;
+    fabStartX = e.clientX;
+    fabStartY = e.clientY;
+    fabStartLeft = fabLeft;
+    fabStartTop = fabTop;
+    try {
+      fabEl.setPointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function onFabPointerMove(e: PointerEvent) {
+    if (!fabDragging) return;
+    const dx = e.clientX - fabStartX;
+    const dy = e.clientY - fabStartY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+      fabDidMove = true;
+      e.preventDefault?.();
+    }
+    if (!fabDidMove) return;
+    const c = clampFabPosition(
+      fabStartLeft + dx,
+      fabStartTop + dy,
+      fabEl?.offsetWidth ?? 56,
+      fabEl?.offsetHeight ?? 44,
+    );
+    fabLeft = c.left;
+    fabTop = c.top;
+  }
+
+  function onFabPointerUp(e: PointerEvent) {
+    if (!fabDragging || !fabEl) return;
+    fabDragging = false;
+    try {
+      fabEl.releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    saveFabPosition(FAB_POS_KEY, fabLeft, fabTop);
+    if (fabDidMove) fabSuppressClick = true;
+  }
+
+  function toggleDrawer() {
+    if (fabSuppressClick) {
+      fabSuppressClick = false;
+      return;
+    }
+    setDrawer(!drawerOpen);
+  }
 
   function setDrawer(open: boolean) {
     drawerOpen = open;
@@ -38,10 +147,20 @@
   {:else}
     <button
       type="button"
+      bind:this={fabEl}
       class="outline-fab pixel-button"
+      class:is-ready={fabReady}
+      class:is-dragging={fabDragging}
+      style:left={fabReady ? `${fabLeft}px` : undefined}
+      style:top={fabReady ? `${fabTop}px` : undefined}
       aria-label="打开文章大纲"
       aria-expanded={drawerOpen}
-      onclick={() => setDrawer(!drawerOpen)}
+      title="拖动移动 · 点击打开大纲"
+      onpointerdown={onFabPointerDown}
+      onpointermove={onFabPointerMove}
+      onpointerup={onFabPointerUp}
+      onpointercancel={onFabPointerUp}
+      onclick={toggleDrawer}
     >
       📋 大纲
     </button>
@@ -85,8 +204,22 @@
     min-height: 44px;
     padding: 10px 14px;
     font-size: 0.82rem;
-    touch-action: manipulation;
+    touch-action: none;
+    user-select: none;
+    cursor: grab;
     box-shadow: var(--shadow-normal);
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .outline-fab.is-ready {
+    bottom: auto;
+  }
+  .outline-fab.is-dragging {
+    cursor: grabbing;
+    box-shadow: var(--shadow-hover);
+    transition: none;
+  }
+  .outline-fab:hover:not(.is-dragging) {
+    transform: scale(1.03);
   }
 
   .outline-backdrop {
