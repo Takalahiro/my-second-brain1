@@ -40,6 +40,8 @@
   let panning = false;
   let panStart = { x: 0, y: 0, px: 0, py: 0 };
   let dragNodeId: string | null = null;
+  /** 每帧递增，驱动 Svelte 5 重绘节点坐标 */
+  let simFrame = $state(0);
 
   onMount(() => {
     rebuild();
@@ -124,7 +126,7 @@
       n.x += n.vx;
       n.y += n.vy;
     }
-    nodes = nodes;
+    simFrame++;
   }
 
   function nodeR(n: Node) {
@@ -174,7 +176,7 @@
       n.x = (e.clientX - box.left - box.width / 2 - panX) / zoom;
       n.y = (e.clientY - box.top - box.height / 2 - panY) / zoom;
       n.vx = 0; n.vy = 0;
-      nodes = nodes;
+      simFrame++;
     } else if (panning) {
       panX = panStart.px + (e.clientX - panStart.x);
       panY = panStart.py + (e.clientY - panStart.y);
@@ -256,7 +258,7 @@
 
   <rect x="-500" y="-380" width="1000" height="760" fill="url(#fv-bg)" opacity={settings.bgDim} />
 
-  <g transform={`translate(${panX} ${panY}) scale(${zoom})`}>
+  <g transform={`translate(${panX} ${panY}) scale(${zoom})`} data-sim={simFrame}>
     <g opacity={settings.edgeOpacity}>
       {#each links as l}
         {@const a = nodeMap.get(l.source)}

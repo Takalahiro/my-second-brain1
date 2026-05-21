@@ -4,6 +4,7 @@
   import ResizeHandles from './ResizeHandles.svelte';
   import RotateHandle from './RotateHandle.svelte';
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
+  import { noteHref } from '../graph/graph-data';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
 
@@ -80,6 +81,9 @@
   let maximized = $state(false);
 
   let raf: number | null = null;
+  /** 每帧递增，驱动 Svelte 5 重绘节点坐标 */
+  let simFrame = $state(0);
+  let canvasEl: HTMLDivElement | null = null;
 
   /** 文件夹配色 */
   const folderPalette = [
@@ -131,10 +135,24 @@
     };
   });
 
+  $effect(() => {
+    const el = canvasEl;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const box = entries[0]?.contentRect;
+      if (!box) return;
+      viewW = Math.max(320, box.width);
+      viewH = Math.max(240, box.height);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  });
+
   async function loadGraph() {
     try {
-      const mod = await import('../../data/wikilinks.json');
-      const data = (mod.default ?? mod) as RawWiki;
+      const res = await fetch('/data/wikilinks.json');
+      if (!res.ok) throw new Error(String(res.status));
+      const data = (await res.json()) as RawWiki;
       const folders = Array.from(new Set(data.nodes.map((n) => n.folder)));
       const folderIdx = new Map(folders.map((f, i) => [f, i] as const));
       const useNodes = onlyConnected
@@ -221,7 +239,7 @@
       n.x += n.vx;
       n.y += n.vy;
     }
-    nodes = nodes; // trigger reactivity
+    simFrame++;
   }
 
   function nodeR(n: Node) {
@@ -273,7 +291,7 @@
       if (!n || !svgEl) return;
       const pt = clientToWorld(e.clientX, e.clientY);
       n.x = pt.x; n.y = pt.y; n.vx = 0; n.vy = 0;
-      nodes = nodes;
+      simFrame++;
     } else if (panning) {
       panX = panStart.px + (e.clientX - panStart.x);
       panY = panStart.py + (e.clientY - panStart.y);
@@ -309,8 +327,7 @@
     selectedId = selectedId === id ? null : id;
   }
   function gotoNote(id: string) {
-    // id 是 "folder/note" 没 .md；slug 由 noteIdToSlug 计算。这里直接跳到搜索友好版
-    location.href = `/notes/${encodeURI(id.split('/').pop()!)}/`;
+    location.href = noteHref(id);
   }
 
   function resetView() {
@@ -463,7 +480,7 @@
       </div>
     {/if}
 
-    <div class="gw-canvas" data-no-drag>
+    <div class="gw-canvas" data-no-drag bind:this={canvasEl}>
       {#if loadErr}
         <p class="gw-empty">{loadErr}</p>
       {:else if nodes.length === 0}
@@ -492,9 +509,13 @@
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
+            <linearGradient id="gw-link-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="rgb(255 208 230 / 0.55)" />
+              <stop offset="100%" stop-color="rgb(180 140 255 / 0.55)" />
+            </linearGradient>
           </defs>
 
-          <g transform={`translate(${panX} ${panY}) scale(${zoom})`}>
+          <g transform={`translate(${panX} ${panY}) scale(${zoom})`} data-sim={simFrame}>
             <!-- 边 -->
             <g class="gw-links">
               {#each links as l}
@@ -510,12 +531,6 @@
                   />
                 {/if}
               {/each}
-              <defs>
-                <linearGradient id="gw-link-grad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="rgb(255 208 230 / 0.55)" />
-                  <stop offset="100%" stop-color="rgb(180 140 255 / 0.55)" />
-                </linearGradient>
-              </defs>
             </g>
 
             <!-- 节点 -->
@@ -556,7 +571,7 @@
           <div class="gw-det-title">{selectedNode.title}</div>
           <div class="gw-det-sub">{selectedNode.folder} · 入度 {selectedNode.inDegree} · 出度 {selectedNode.outDegree}</div>
           <div class="gw-det-actions">
-            <a class="gw-btn" href={`/notes/${encodeURI(selectedNode.title)}/`}>打开笔记</a>
+            <a class="gw-btn" href={noteHref(selectedNode.id)}>打开笔记</a>
             <button type="button" class="gw-btn" onclick={() => (selectedId = null)}>取消选中</button>
           </div>
         </aside>

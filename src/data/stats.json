@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-20T14:31:32.697Z",
+  "generatedAt": "2026-05-21T01:10:08.768Z",
   "totalNotes": 126,
   "totalWords": 230623,
   "byFolder": [
@@ -98,10 +98,6 @@
   ],
   "topTags": [],
   "heatmap": [
-    {
-      "date": "2026-02-26",
-      "count": 0
-    },
     {
       "date": "2026-02-27",
       "count": 0
@@ -433,6 +429,10 @@
     {
       "date": "2026-05-20",
       "count": 126
+    },
+    {
+      "date": "2026-05-21",
+      "count": 0
     }
   ]
 }

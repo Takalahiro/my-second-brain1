@@ -50,8 +50,9 @@ export function folderColor(folder: string, folders: string[]) {
 }
 
 export async function loadWiki(): Promise<WikiData> {
-  const mod = await import('../../data/wikilinks.json');
-  return (mod.default ?? mod) as WikiData;
+  const res = await fetch('/data/wikilinks.json');
+  if (!res.ok) throw new Error(`wikilinks ${res.status}`);
+  return (await res.json()) as WikiData;
 }
 
 /** 把笔记 id（例：`MATH/Algebra`）转成 `/notes/<basename>/` */
