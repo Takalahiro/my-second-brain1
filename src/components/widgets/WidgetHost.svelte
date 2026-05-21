@@ -17,6 +17,7 @@
   import WhiteboardWidget from './WhiteboardWidget.svelte';
   import WhiteNoiseWidget from './WhiteNoiseWidget.svelte';
   import WidgetDrawer from './WidgetDrawer.svelte';
+  import { readGlobalMuted, writeGlobalMuted } from '../../lib/global-audio-mute';
 
   interface Props {
     backgroundDefault?: boolean;
@@ -39,8 +40,8 @@
   let ready = $state(false);
   let enabled = $state<Enabled>({
     background: backgroundDefault,
-    clock: true,
-    music: true,
+    clock: false,
+    music: false,
     notes: false,
     todo: false,
     calendar: false,
@@ -54,6 +55,8 @@
     whiteboard: false,
     whitenoise: false,
   });
+  /** 壁纸层一键静音（音乐 + 白噪音） */
+  let globalMuted = $state(false);
   /** 一键清屏前的快照；非 null 时显示"恢复"按钮 */
   let snapshot = $state<Enabled | null>(null);
   let isMobile = $state(false);
@@ -67,28 +70,14 @@
   });
 
   onMount(() => {
+    globalMuted = readGlobalMuted();
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
+      let savedBackground = backgroundDefault;
       if (raw) {
         const s = JSON.parse(raw);
-        if (s.enabled && typeof s.enabled === 'object') {
-          enabled = {
-            background: s.enabled.background !== undefined ? !!s.enabled.background : backgroundDefault,
-            clock: s.enabled.clock !== false,
-            music: s.enabled.music !== false,
-            notes: !!s.enabled.notes,
-            todo: !!s.enabled.todo,
-            calendar: !!s.enabled.calendar,
-            pomodoro: !!s.enabled.pomodoro,
-            weather: !!s.enabled.weather,
-            stats: !!s.enabled.stats,
-            world: !!s.enabled.world,
-            graph: !!s.enabled.graph,
-            calculator: !!s.enabled.calculator,
-            python: !!s.enabled.python,
-            whiteboard: !!s.enabled.whiteboard,
-            whitenoise: !!s.enabled.whitenoise,
-          };
+        if (s.enabled && typeof s.enabled === 'object' && s.enabled.background !== undefined) {
+          savedBackground = !!s.enabled.background;
         }
         if (s.bg && typeof s.bg === 'object') {
           bg = {
@@ -102,6 +91,25 @@
         }
       }
     } catch {}
+    // 每次打开主界面：仅保留壁纸，其余小组件清空（布局仍保存在各自 key 中）
+    enabled = {
+      background: savedBackground,
+      clock: false,
+      music: false,
+      notes: false,
+      todo: false,
+      calendar: false,
+      pomodoro: false,
+      weather: false,
+      stats: false,
+      world: false,
+      graph: false,
+      calculator: false,
+      python: false,
+      whiteboard: false,
+      whitenoise: false,
+    };
+    snapshot = null;
     // 监听移动端断点 —— 时钟在此条件下永远不 pin
     try {
       const mq = window.matchMedia('(max-width: 768px)');
@@ -119,6 +127,11 @@
   function persist() {
     if (!ready) return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ enabled, bg })); } catch {}
+  }
+
+  function toggleGlobalMute() {
+    globalMuted = !globalMuted;
+    writeGlobalMuted(globalMuted);
   }
 
   /** 拖入主界面时，给每个组件落点提示初始化位置 */
@@ -337,13 +350,23 @@
     mobileIndex={bg.mobileIndex}
     onMobileIndexChange={setMobileIndex}
   />
+  <button
+    type="button"
+    class="wallpaper-mute-btn"
+    class:is-muted={globalMuted}
+    aria-label={globalMuted ? '取消静音' : '一键静音'}
+    title={globalMuted ? '取消静音' : '一键静音（音乐 + 白噪音）'}
+    onclick={toggleGlobalMute}
+  >
+    {globalMuted ? '🔇' : '🔊'}
+  </button>
 {/if}
 
 {#if ready && enabled.clock}
   <PixelClock onClose={() => toggleEnabled('clock')} pinned={clockPinned} />
 {/if}
 {#if ready && enabled.music}
-  <MusicPlayer onClose={() => toggleEnabled('music')} />
+  <MusicPlayer onClose={() => toggleEnabled('music')} {globalMuted} />
 {/if}
 {#if ready && enabled.notes}
   <NotesWidget onClose={() => toggleEnabled('notes')} />
@@ -379,7 +402,7 @@
   <WhiteboardWidget onClose={() => toggleEnabled('whiteboard')} />
 {/if}
 {#if ready && enabled.whitenoise}
-  <WhiteNoiseWidget onClose={() => toggleEnabled('whitenoise')} />
+  <WhiteNoiseWidget onClose={() => toggleEnabled('whitenoise')} {globalMuted} />
 {/if}
 
 {#if ready}
@@ -395,3 +418,33 @@
     onRestore={restoreAll}
   />
 {/if}
+
+<style>
+  .wallpaper-mute-btn {
+    position: fixed;
+    z-index: 12;
+    top: max(env(safe-area-inset-top, 0px), 14px);
+    left: max(env(safe-area-inset-left, 0px), 14px);
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.28);
+    background: rgb(0 0 0 / 0.38);
+    color: #fff;
+    font-size: 1.15rem;
+    line-height: 1;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 0.28);
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .wallpaper-mute-btn:hover {
+    transform: scale(1.06);
+    background: rgb(0 0 0 / 0.48);
+  }
+  .wallpaper-mute-btn.is-muted {
+    background: rgb(180 60 80 / 0.55);
+    border-color: rgb(255 180 190 / 0.45);
+  }
+</style>

@@ -1,7 +1,7 @@
 /**
  * 移动端小组件手势：
- * - 双指：旋转
- * - 三指：以窗口中心缩放
+ * - 双指：以窗口中心 pinch 缩放
+ * （旋转请用桌面/移动端的 ↻ 手柄）
  */
 
 import type { Action } from 'svelte/action';
@@ -26,7 +26,7 @@ export interface WidgetTouchGestureOptions {
   onEnd?: () => void;
 }
 
-type GestureMode = 'none' | 'rotate' | 'scale';
+type GestureMode = 'none' | 'scale';
 
 function touchSpread(touches: Touch[]): number {
   if (touches.length < 2) return 0;
@@ -43,19 +43,6 @@ function touchSpread(touches: Touch[]): number {
   return n ? sum / n : 0;
 }
 
-function touchAngleDeg(touches: Touch[]): number {
-  const dx = touches[1].clientX - touches[0].clientX;
-  const dy = touches[1].clientY - touches[0].clientY;
-  return (Math.atan2(dy, dx) * 180) / Math.PI;
-}
-
-function normalizeDeg(deg: number): number {
-  let next = deg;
-  while (next > 180) next -= 360;
-  while (next < -180) next += 360;
-  return Math.round(next * 10) / 10;
-}
-
 export function attachWidgetTouchGestures(
   node: HTMLElement,
   options: WidgetTouchGestureOptions
@@ -65,8 +52,6 @@ export function attachWidgetTouchGestures(
   /** 落在小组件上的触点 id */
   const trackedIds = new Set<number>();
 
-  let startAngle = 0;
-  let startRot = 0;
   let startSpread = 0;
   let startW = 0;
   let startH = 0;
@@ -102,13 +87,6 @@ export function attachWidgetTouchGestures(
     opts.onEnd?.();
   }
 
-  function beginRotate(touches: Touch[]) {
-    const layout = opts.getLayout();
-    startRot = layout.r;
-    startAngle = touchAngleDeg(touches);
-    mode = 'rotate';
-  }
-
   function beginScale(touches: Touch[]) {
     const layout = opts.getLayout();
     startW = layout.w;
@@ -127,11 +105,8 @@ export function attachWidgetTouchGestures(
     }
 
     const touches = activeTouches(e);
-    if (touches.length >= 3) {
+    if (touches.length >= 2 && mode === 'none') {
       beginScale(touches);
-      e.preventDefault();
-    } else if (touches.length >= 2 && mode === 'none') {
-      beginRotate(touches);
       e.preventDefault();
     }
   }
@@ -140,16 +115,8 @@ export function attachWidgetTouchGestures(
     if (isDisabled() || mode === 'none') return;
 
     const touches = activeTouches(e);
-    if (mode === 'rotate') {
-      if (touches.length < 2) return;
-      e.preventDefault();
-      const delta = touchAngleDeg(touches) - startAngle;
-      opts.setLayout({ r: normalizeDeg(startRot + delta) });
-      return;
-    }
-
     if (mode === 'scale') {
-      if (touches.length < 3) return;
+      if (touches.length < 2) return;
       e.preventDefault();
       const spread = touchSpread(touches);
       if (startSpread <= 0) return;
@@ -170,8 +137,7 @@ export function attachWidgetTouchGestures(
       trackedIds.delete(t.identifier);
     }
     const remaining = activeTouches(e);
-    if (mode === 'rotate' && remaining.length < 2) endGesture();
-    if (mode === 'scale' && remaining.length < 3) endGesture();
+    if (mode === 'scale' && remaining.length < 2) endGesture();
     if (trackedIds.size === 0) endGesture();
   }
 

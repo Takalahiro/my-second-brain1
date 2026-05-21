@@ -10,8 +10,9 @@
 
   interface Props {
     onClose?: () => void;
+    globalMuted?: boolean;
   }
-  let { onClose }: Props = $props();
+  let { onClose, globalMuted = false }: Props = $props();
 
   const STORAGE_KEY = 'second-brain:music';
   const LAYOUT_KEY = 'second-brain:music-layout';
@@ -203,7 +204,7 @@
   $effect(() => {
     if (!audioEl) return;
     audioEl.volume = volume;
-    audioEl.muted = muted;
+    audioEl.muted = muted || globalMuted;
   });
 
   /** 切换 track 时主动 reload，避免某些浏览器卡在旧 src */

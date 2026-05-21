@@ -8,13 +8,15 @@
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import { VOICE_TRACKS, type VoiceTrack } from '../../lib/voice-tracks';
 
-  interface Props { onClose?: () => void; }
-  let { onClose }: Props = $props();
+  interface Props { onClose?: () => void; globalMuted?: boolean; }
+  let { onClose, globalMuted = false }: Props = $props();
 
   const STATE_KEY = 'second-brain:whitenoise-state';
   const LAYOUT_KEY = 'second-brain:whitenoise-layout';
 
   type TrackState = { key: string; volume: number; enabled: boolean };
+
+  const DEFAULT_TRACK_VOL = 0.55;
 
   let tracks = $state<TrackState[]>(
     VOICE_TRACKS.map((t) => ({ key: t.key, volume: 0, enabled: false }))
@@ -41,8 +43,8 @@
   let dryGain: GainNode | null = null;
   let wetGain: GainNode | null = null;
   let convolver: ConvolverNode | null = null;
-  /** key -> { source, gain, buffer } */
-  const nodes = new Map<string, { gain: GainNode; buffer: AudioBuffer }>();
+  /** key -> Web Audio 节点 + HTMLAudio 元素（移动端兼容性更好） */
+  const nodes = new Map<string, { gain: GainNode; audio: HTMLAudioElement }>();
 
   onMount(() => {
     try {
@@ -121,6 +123,34 @@
     return impulse;
   }
 
+  function trackSrc(src: string) {
+    return encodeURI(src);
+  }
+
+  function waitAudioReady(audio: HTMLAudioElement) {
+    return new Promise<void>((resolve, reject) => {
+      if (audio.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) {
+        resolve();
+        return;
+      }
+      const onReady = () => {
+        cleanup();
+        resolve();
+      };
+      const onErr = () => {
+        cleanup();
+        reject(new Error('audio load failed'));
+      };
+      const cleanup = () => {
+        audio.removeEventListener('canplaythrough', onReady);
+        audio.removeEventListener('error', onErr);
+      };
+      audio.addEventListener('canplaythrough', onReady, { once: true });
+      audio.addEventListener('error', onErr, { once: true });
+      audio.load();
+    });
+  }
+
   async function ensureAudio() {
     if (audioCtx) return;
     audioCtx = new AudioContext();
@@ -137,14 +167,21 @@
 
     for (const vt of VOICE_TRACKS) {
       try {
-        const res = await fetch(vt.src);
-        const buf = await res.arrayBuffer();
-        const buffer = await audioCtx.decodeAudioData(buf);
+        const audio = document.createElement('audio');
+        audio.src = trackSrc(vt.src);
+        audio.loop = true;
+        audio.preload = 'auto';
+        audio.crossOrigin = 'anonymous';
+        await waitAudioReady(audio);
+
         const gain = audioCtx.createGain();
         gain.gain.value = 0;
         gain.connect(dryGain!);
         gain.connect(wetGain!);
-        nodes.set(vt.key, { gain, buffer });
+
+        const source = audioCtx.createMediaElementSource(audio);
+        source.connect(gain);
+        nodes.set(vt.key, { gain, audio });
       } catch (e) {
         console.warn('Failed to load', vt.src, e);
       }
@@ -154,7 +191,7 @@
 
   function updateMix() {
     if (!masterGain || !dryGain || !wetGain) return;
-    masterGain.gain.value = masterVol;
+    masterGain.gain.value = globalMuted ? 0 : masterVol;
     const wet = reverbMix;
     const dry = 1 - wet * 0.85;
     dryGain.gain.value = dry;
@@ -168,30 +205,21 @@
     }
   }
 
-  const activeSources = new Map<string, AudioBufferSourceNode>();
-
   function startTrack(key: string) {
-    if (!audioCtx || !nodes.has(key)) return;
-    stopTrack(key);
-    const { buffer, gain } = nodes.get(key)!;
-    const src = audioCtx.createBufferSource();
-    src.buffer = buffer;
-    src.loop = true;
-    src.connect(gain);
-    src.start(0);
-    activeSources.set(key, src);
+    const n = nodes.get(key);
+    if (!n) return;
+    void n.audio.play().catch((e) => console.warn('play failed', key, e));
   }
 
   function stopTrack(key: string) {
-    const src = activeSources.get(key);
-    if (src) {
-      try { src.stop(); } catch {}
-      activeSources.delete(key);
-    }
+    const n = nodes.get(key);
+    if (!n) return;
+    n.audio.pause();
+    try { n.audio.currentTime = 0; } catch {}
   }
 
   function stopAll() {
-    for (const key of activeSources.keys()) stopTrack(key);
+    for (const key of nodes.keys()) stopTrack(key);
     playing = false;
   }
 
@@ -201,19 +229,35 @@
     if (playing) {
       stopAll();
     } else {
+      const active = tracks.filter((t) => t.enabled && t.volume > 0);
+      if (active.length === 0) {
+        const first = tracks[0];
+        if (first) {
+          tracks = tracks.map((t, i) =>
+            i === 0 ? { ...t, enabled: true, volume: DEFAULT_TRACK_VOL } : t
+          );
+        }
+      }
       playing = true;
       for (const t of tracks) {
         if (t.enabled && t.volume > 0) startTrack(t.key);
       }
+      updateMix();
+      persist();
     }
   }
 
   function setTrack(key: string, patch: Partial<TrackState>) {
+    const cur = tracks.find((t) => t.key === key);
+    if (patch.enabled && cur && (patch.volume === undefined ? cur.volume <= 0 : patch.volume <= 0)) {
+      patch = { ...patch, volume: DEFAULT_TRACK_VOL };
+    }
     tracks = tracks.map((t) => (t.key === key ? { ...t, ...patch } : t));
     const tr = tracks.find((t) => t.key === key)!;
     if (playing) {
-      if (tr.enabled && tr.volume > 0) startTrack(key);
-      else stopTrack(key);
+      if (tr.enabled && tr.volume > 0) {
+        void ensureAudio().then(() => startTrack(key));
+      } else stopTrack(key);
     }
     updateMix();
     persist();
@@ -227,6 +271,7 @@
     void masterVol;
     void reverbMix;
     void reverbSize;
+    void globalMuted;
     updateMix();
     persist();
   });
