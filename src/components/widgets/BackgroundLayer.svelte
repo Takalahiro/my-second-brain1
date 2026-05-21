@@ -238,7 +238,7 @@
 
   const SWIPE_MIN = 48;
   const SWIPE_SKIP =
-    'button, a, input, select, textarea, label, [role="button"], header, nav, .widget-drawer, .gear-btn, .clear-btn, .home-fab, .wallpaper-mute-btn, .mobile-mode-toggle, .note-search, .wd-tile, .bg-mobile-controls';
+    'button, a, input, select, textarea, label, [role="button"], header, nav, .widget-drawer, .gear-btn, .clear-btn, .widget-fab-stack, .home-fab, .wallpaper-mute-btn, .mobile-mode-toggle, .note-search, .wd-tile, .bg-mobile-controls';
 
   let swipeStartX = 0;
   let swipeStartY = 0;

@@ -142,7 +142,7 @@
     if (drag.dragging && drag.key === w.id) {
       el.releasePointerCapture?.(e.pointerId);
       const target = document.elementFromPoint(e.clientX, e.clientY);
-      const onDrawer = !!target?.closest('.widget-drawer, .gear-btn');
+      const onDrawer = !!target?.closest('.widget-drawer, .gear-btn, .widget-fab-stack');
       if (!onDrawer) onToggle(w.id, { x: e.clientX, y: e.clientY });
       suppressTileClick = true;
     } else if (drag.moved) {
@@ -160,39 +160,41 @@
   }
 </script>
 
-<button
-  type="button"
-  class="gear-btn"
-  aria-label={open ? '关闭组件面板' : '打开组件面板'}
-  title="组件面板"
-  onclick={() => (open = !open)}
->
-  <span aria-hidden="true">⚙</span>
-</button>
+<div class="widget-fab-stack" aria-label="主界面快捷操作">
+  <button
+    type="button"
+    class="gear-btn"
+    aria-label={open ? '关闭组件面板' : '打开组件面板'}
+    title="组件面板"
+    onclick={() => (open = !open)}
+  >
+    <span aria-hidden="true">⚙</span>
+  </button>
 
-<!-- 一键清屏 / 恢复浮动按钮：常驻主界面，不需打开抽屉 -->
-{#if hasSnapshot}
-  <button
-    type="button"
-    class="clear-btn is-restore"
-    aria-label="恢复清屏前的组件布局"
-    title="恢复刚才的组件"
-    onclick={() => onRestore?.()}
-  >
-    <span aria-hidden="true">↩</span>
-  </button>
-{:else}
-  <button
-    type="button"
-    class="clear-btn"
-    class:is-disabled={isCleared}
-    aria-label="一键清屏，只保留背景"
-    title={isCleared ? '当前已只剩背景' : '一键清屏，只保留背景'}
-    onclick={() => { if (!isCleared) onClearAll?.(); }}
-  >
-    <span aria-hidden="true">🧹</span>
-  </button>
-{/if}
+  <!-- 一键清屏 / 恢复浮动按钮：常驻主界面，不需打开抽屉 -->
+  {#if hasSnapshot}
+    <button
+      type="button"
+      class="clear-btn is-restore"
+      aria-label="恢复清屏前的组件布局"
+      title="恢复刚才的组件"
+      onclick={() => onRestore?.()}
+    >
+      <span aria-hidden="true">↩</span>
+    </button>
+  {:else}
+    <button
+      type="button"
+      class="clear-btn"
+      class:is-disabled={isCleared}
+      aria-label="一键清屏，只保留背景"
+      title={isCleared ? '当前已只剩背景' : '一键清屏，只保留背景'}
+      onclick={() => { if (!isCleared) onClearAll?.(); }}
+    >
+      <span aria-hidden="true">🧹</span>
+    </button>
+  {/if}
+</div>
 
 {#if open}
   <button
@@ -323,12 +325,24 @@
 </aside>
 
 <style>
-  .gear-btn {
+  .widget-fab-stack {
     position: fixed;
-    top: max(env(safe-area-inset-top, 0px), 88px);
-    right: max(env(safe-area-inset-right, 0px), 16px);
     z-index: 60;
-    width: 40px; height: 40px;
+    top: calc(max(env(safe-area-inset-top, 0px), 12px) + 92px);
+    right: max(env(safe-area-inset-right, 0px), 16px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .gear-btn,
+  .clear-btn {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     border: 1px solid rgb(255 255 255 / 0.22);
     background: rgb(20 16 32 / 0.55);
@@ -336,36 +350,17 @@
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     cursor: pointer;
-    font-size: 1.1rem;
     box-shadow: 0 8px 22px rgb(0 0 0 / 0.3);
+    flex-shrink: 0;
+  }
+
+  .gear-btn {
+    font-size: 1.1rem;
   }
   .gear-btn:hover { background: rgb(40 28 60 / 0.65); }
 
-  @media (max-width: 768px) {
-    .gear-btn {
-      top: calc(max(env(safe-area-inset-top, 0px), 10px) + 112px);
-    }
-    .clear-btn {
-      top: calc(max(env(safe-area-inset-top, 0px), 10px) + 160px);
-    }
-  }
-
-  /* 浮动「清屏/恢复」按钮：紧贴 gear-btn 下方 */
   .clear-btn {
-    position: fixed;
-    top: calc(max(env(safe-area-inset-top, 0px), 88px) + 48px);
-    right: max(env(safe-area-inset-right, 0px), 16px);
-    z-index: 60;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    border: 1px solid rgb(255 255 255 / 0.22);
-    background: rgb(20 16 32 / 0.55);
-    color: #fff;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    cursor: pointer;
     font-size: 1.05rem;
-    box-shadow: 0 8px 22px rgb(0 0 0 / 0.3);
     transition: background 0.15s ease, transform 0.15s ease, opacity 0.2s ease;
   }
   .clear-btn:hover { background: rgb(40 28 60 / 0.65); transform: translateY(-1px); }
@@ -383,6 +378,22 @@
     0%, 100% { box-shadow: 0 8px 24px rgb(180 140 255 / 0.45); }
     50%      { box-shadow: 0 8px 28px rgb(255 141 232 / 0.7); }
   }
+
+  @media (max-width: 768px) {
+    .widget-fab-stack {
+      top: auto;
+      bottom: calc(max(env(safe-area-inset-bottom, 0px), 12px) + 52px);
+      right: max(env(safe-area-inset-right, 0px), 12px);
+      gap: 14px;
+    }
+    .gear-btn,
+    .clear-btn {
+      width: 44px;
+      height: 44px;
+    }
+  }
+
+  /* 浮动「清屏/恢复」按钮：与齿轮同组堆叠 */
 
   .drawer-mask {
     position: fixed; inset: 0;
