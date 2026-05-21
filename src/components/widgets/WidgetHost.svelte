@@ -73,12 +73,8 @@
     globalMuted = readGlobalMuted();
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      let savedBackground = backgroundDefault;
       if (raw) {
         const s = JSON.parse(raw);
-        if (s.enabled && typeof s.enabled === 'object' && s.enabled.background !== undefined) {
-          savedBackground = !!s.enabled.background;
-        }
         if (s.bg && typeof s.bg === 'object') {
           bg = {
             sceneId: typeof s.bg.sceneId === 'string' ? s.bg.sceneId : bg.sceneId,
@@ -91,9 +87,9 @@
         }
       }
     } catch {}
-    // 每次打开主界面：仅保留壁纸，其余小组件清空（布局仍保存在各自 key 中）
+    // 每次打开主界面：壁纸始终保留（若页面默认开启），其余小组件清空
     enabled = {
-      background: savedBackground,
+      background: backgroundDefault,
       clock: false,
       music: false,
       notes: false,
@@ -119,6 +115,7 @@
       else mq.addListener(onChange);
     } catch {}
     ready = true;
+    persist();
   });
 
   /** 时钟仅在「桌面 + 启用了背景 + 使用视频」时锁定在右下角 */
@@ -340,7 +337,7 @@
   const scenes = media.scenes.map((s) => ({ id: s.id, label: s.label, hasRain: s.hasRain }));
 </script>
 
-{#if ready && enabled.background}
+{#if enabled.background}
   <BackgroundLayer
     sceneId={bg.sceneId}
     useVideo={bg.useVideo}
@@ -350,16 +347,18 @@
     mobileIndex={bg.mobileIndex}
     onMobileIndexChange={setMobileIndex}
   />
-  <button
-    type="button"
-    class="wallpaper-mute-btn"
-    class:is-muted={globalMuted}
-    aria-label={globalMuted ? '取消静音' : '一键静音'}
-    title={globalMuted ? '取消静音' : '一键静音（音乐 + 白噪音）'}
-    onclick={toggleGlobalMute}
-  >
-    {globalMuted ? '🔇' : '🔊'}
-  </button>
+  {#if ready}
+    <button
+      type="button"
+      class="wallpaper-mute-btn"
+      class:is-muted={globalMuted}
+      aria-label={globalMuted ? '取消静音' : '一键静音'}
+      title={globalMuted ? '取消静音' : '一键静音（音乐 + 白噪音）'}
+      onclick={toggleGlobalMute}
+    >
+      {globalMuted ? '🔇' : '🔊'}
+    </button>
+  {/if}
 {/if}
 
 {#if ready && enabled.clock}
