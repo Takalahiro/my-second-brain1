@@ -41,7 +41,9 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 4px 8px;
+    height: 38px;
+    box-sizing: border-box;
+    padding: 0 8px;
     border: var(--border-thin) solid var(--border-color);
     border-radius: var(--radius-button);
     background: var(--glass-bg);
@@ -82,16 +84,18 @@
   }
   @media (max-width: 768px) {
     .font-switcher {
-      padding: 2px 5px;
-      gap: 2px;
+      padding: 0 6px;
+      gap: 3px;
+      min-width: 38px;
     }
     .font-switcher-icon {
       font-size: 0.72rem;
     }
     .font-switcher-select {
-      min-width: 3.2rem;
-      max-width: 4.2rem;
-      font-size: 0.72rem;
+      min-width: 2.8rem;
+      max-width: 3.6rem;
+      font-size: 0.68rem;
+      padding: 0;
     }
   }
 </style>

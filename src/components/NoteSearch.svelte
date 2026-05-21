@@ -155,7 +155,8 @@
 <style>
   .note-search {
     position: relative;
-    width: min(360px, 50vw);
+    width: 100%;
+    max-width: 360px;
   }
   .ns-input-wrap {
     position: relative;
@@ -172,7 +173,9 @@
   }
   .ns-input {
     width: 100%;
-    padding: 7px 36px 7px 32px;
+    height: 38px;
+    box-sizing: border-box;
+    padding: 0 36px 0 32px;
     border-radius: var(--radius-button, 10px);
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);

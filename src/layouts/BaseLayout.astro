@@ -98,41 +98,46 @@ const {
     position: sticky;
     top: 0;
     z-index: 20;
-    padding: max(env(safe-area-inset-top, 0px), 10px) 10px 0;
+    padding: max(env(safe-area-inset-top, 0px), 10px) 12px 0;
   }
   .nav-shell {
+    --nav-control-h: 38px;
     border-width: 1px;
-    padding: 10px 12px;
+    padding: 12px 14px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
   .nav-primary {
     display: flex;
     align-items: center;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
     min-width: 0;
   }
   .nav-actions {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
     margin-left: auto;
+    padding-left: 10px;
+    border-left: 1px solid var(--border-color);
   }
   .nav-secondary {
     display: flex;
     min-width: 0;
+    padding-top: 2px;
   }
   .nav-brand {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: var(--nav-control-h);
+    height: var(--nav-control-h);
     border-radius: var(--radius-button);
     text-decoration: none;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     background: var(--bg-secondary);
     box-shadow: var(--shadow-pixel);
     border: 1px solid var(--border-color);
@@ -144,9 +149,26 @@ const {
     padding: 6px 12px;
   }
   .nav-search {
-    flex: 1;
-    max-width: 420px;
+    flex: 1 1 180px;
     min-width: 0;
+    max-width: 420px;
+  }
+  .nav-search :global(.note-search) {
+    width: 100%;
+    max-width: none;
+  }
+  .nav-actions :global(.font-switcher) {
+    height: var(--nav-control-h);
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+  .nav-actions :global(.theme-toggle-btn) {
+    width: var(--nav-control-h);
+    height: var(--nav-control-h);
+    min-width: var(--nav-control-h);
+    padding: 0;
+    flex-shrink: 0;
+    box-sizing: border-box;
   }
   .nav-crumb {
     display: inline-flex;
@@ -156,7 +178,9 @@ const {
     color: var(--text-primary);
     font-size: 0.84rem;
     font-weight: 600;
-    padding: 6px 12px;
+    height: var(--nav-control-h);
+    padding: 0 12px;
+    box-sizing: border-box;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-button);
@@ -168,7 +192,7 @@ const {
   .nav-crumb::before {
     content: '/';
     position: absolute;
-    left: -10px;
+    left: -9px;
     color: var(--text-secondary);
     font-weight: 400;
     pointer-events: none;
@@ -183,56 +207,92 @@ const {
   .nav-tools {
     display: flex;
     flex-wrap: nowrap;
-    gap: 6px;
+    gap: 8px;
     align-items: center;
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding-bottom: 2px;
+    padding: 2px 0 4px;
   }
   .nav-tools::-webkit-scrollbar { display: none; }
   .nav-tools .nav-link {
     font-size: 0.75rem;
-    padding: 5px 9px;
+    padding: 6px 10px;
     flex-shrink: 0;
     white-space: nowrap;
   }
 
   @media (min-width: 769px) {
     .site-header {
-      padding-left: 12px;
-      padding-right: 12px;
+      padding-left: 16px;
+      padding-right: 16px;
     }
     .nav-shell {
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
       padding: 12px 16px;
-      gap: 10px;
+      gap: 12px 14px;
     }
     .nav-primary {
-      flex: 1 1 320px;
+      flex: 1 1 360px;
+      flex-wrap: nowrap;
+      gap: 12px;
+    }
+    .nav-search {
+      margin: 0 4px;
     }
     .nav-secondary {
       flex: 1 1 auto;
       justify-content: flex-end;
+      padding-top: 0;
     }
     .nav-tools {
       flex-wrap: wrap;
       overflow: visible;
       width: auto;
       justify-content: flex-end;
+      padding: 0;
     }
   }
 
   @media (max-width: 768px) {
+    .site-header {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    .nav-shell {
+      padding: 12px 12px 10px;
+      gap: 10px;
+    }
+    .nav-primary {
+      row-gap: 10px;
+      column-gap: 10px;
+    }
+    .nav-brand { order: 1; }
+    .nav-crumb {
+      order: 2;
+      padding: 0 10px;
+    }
     .nav-crumb-text { display: none; }
-    .nav-crumb { padding: 6px 8px; }
     .nav-crumb::before { display: none; }
-    .nav-search { max-width: none; }
+    .nav-actions {
+      order: 3;
+      margin-left: auto;
+      padding-left: 0;
+      border-left: 0;
+      gap: 8px;
+    }
+    .nav-search {
+      order: 4;
+      flex: 1 1 100%;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+    }
     .nav-tools .nav-link {
-      padding: 6px 10px;
+      padding: 7px 11px;
       font-size: 0.72rem;
     }
   }
