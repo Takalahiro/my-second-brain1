@@ -17,11 +17,14 @@
     "vault:auto": "node scripts/auto-sync-vault.mjs",
     "vault:audit": "node scripts/audit-vault.mjs",
     "vault:diagnose": "node scripts/diagnose-notes.mjs",
-    "model:export-mnist": "python scripts/export-mnist-model.py && node scripts/bundle-mnist-model.mjs"
+    "model:export-mnist": "python scripts/export-mnist-model.py && node scripts/bundle-mnist-model.mjs",
+    "check:25mib": "node scripts/check-25mib.mjs",
+    "check:self": "node scripts/self-check.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.6",
     "@astrojs/svelte": "^8.1.1",
+    "@huggingface/transformers": "^4.2.0",
     "@tailwindcss/vite": "^4.3.0",
     "@tensorflow/tfjs": "^4.22.0",
     "astro": "^6.3.5",

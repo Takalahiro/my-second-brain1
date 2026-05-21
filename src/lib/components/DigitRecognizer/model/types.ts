@@ -24,10 +24,27 @@ export type PredictionResult = {
   confidence: number;
 };
 
+export type VariantSummary = {
+  label: string;
+  predicted: number;
+  confidence: number;
+  score: number;
+};
+
+export type InferenceOptions = {
+  highAccuracy?: boolean;
+  onProgress?: (current: number, total: number, label: string) => void;
+};
+
 export type InferenceResult = {
   layers: LayerActivation[];
   prediction: PredictionResult;
   inputPreview: Float32Array;
+  /** 双路推理时选中的路径 */
+  variantIndex?: number;
+  variantLabel?: string;
+  variantSummaries?: VariantSummary[];
+  highAccuracy?: boolean;
 };
 
 export type FlowState = {

@@ -1,17 +1,22 @@
 ---
 import ToolLayout from '../layouts/ToolLayout.astro';
-import DigitRecognizer from '../lib/components/DigitRecognizer/DigitRecognizer.svelte';
+import NeuralLab from '../lib/components/NeuralLab/NeuralLab.svelte';
+import { NEURAL_LAB } from '../lib/neural-lab-meta';
 ---
 
-<ToolLayout title="手写数字 · CNN 可视化 · My Second Brain" description="MNIST 手写识别与卷积神经网络特征图逐步可视化">
-  <DigitRecognizer client:only="svelte">
+<ToolLayout
+  title="{NEURAL_LAB.title} · My Second Brain"
+  description={NEURAL_LAB.description}
+  mathJax={true}
+>
+  <NeuralLab client:only="svelte">
     <div class="digits-fallback" slot="fallback">
       <div class="digits-fallback-inner">
-        <p class="digits-fallback-title">手写数字 · CNN 可视化</p>
-        <p class="digits-fallback-hint">正在加载 TensorFlow.js 与界面组件…</p>
+        <p class="digits-fallback-title">{NEURAL_LAB.title}</p>
+        <p class="digits-fallback-hint">正在加载实验室模块…</p>
       </div>
     </div>
-  </DigitRecognizer>
+  </NeuralLab>
 </ToolLayout>
 
 <style>

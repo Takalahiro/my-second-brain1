@@ -9,7 +9,10 @@ const routes = [
   '/graph/',
   '/python/',
   '/matlab/',
+  '/digits/',
+  '/digits/?demo=formula',
   '/whiteboard/',
+  '/models/mnist/model.json',
   '/data/notes.json',
   '/data/wikilinks.json',
 ];

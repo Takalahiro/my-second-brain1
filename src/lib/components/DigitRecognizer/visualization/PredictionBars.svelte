@@ -1,15 +1,20 @@
 <script lang="ts">
   import AnimatedNumber from '../../../../components/shared/AnimatedNumber.svelte';
+  import type { VariantSummary } from '../model/types';
 
   interface Props {
     probabilities?: number[];
     predicted?: number;
     confidence?: number;
+    variantLabel?: string;
+    variantSummaries?: VariantSummary[];
   }
   let {
     probabilities = Array(10).fill(0),
     predicted = 0,
     confidence = 0,
+    variantLabel = '',
+    variantSummaries = [],
   }: Props = $props();
 
   const confPct = $derived(Math.round(confidence * 1000) / 10);
@@ -21,7 +26,19 @@
     <span class="pb-label">预测</span>
     <span class="pb-digit" class:win={hasResult}>{predicted}</span>
     <span class="pb-conf">置信度 <AnimatedNumber value={confPct} decimals={1} duration={400} />%</span>
+    {#if variantLabel}
+      <span class="pb-variant">路径 · {variantLabel}</span>
+    {/if}
   </div>
+  {#if variantSummaries.length > 1}
+    <div class="pb-variants">
+      {#each variantSummaries as v}
+        <span class="pb-var" class:win={v.label === variantLabel}>
+          {v.label}: {v.predicted} ({Math.round(v.confidence * 1000) / 10}%)
+        </span>
+      {/each}
+    </div>
+  {/if}
   <div class="pb-grid">
     {#each probabilities as p, d}
       <div class="pb-col" class:win={d === predicted && hasResult}>
@@ -60,6 +77,32 @@
   }
   .pb-digit.win { color: #00ff9d; text-shadow: 0 0 24px rgb(0 255 157 / 0.4); }
   .pb-conf { font-size: 0.82rem; color: var(--text-secondary); }
+  .pb-variant {
+    font-size: 0.68rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgb(180 140 255 / 0.12);
+    color: #c4a8ff;
+    border: 1px solid rgb(180 140 255 / 0.22);
+  }
+  .pb-variants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: -6px 0 10px;
+  }
+  .pb-var {
+    font-size: 0.66rem;
+    padding: 3px 8px;
+    border-radius: 8px;
+    border: 1px solid rgb(180 140 255 / 0.15);
+    color: var(--text-secondary);
+  }
+  .pb-var.win {
+    color: #9dffd0;
+    border-color: rgb(0 255 157 / 0.35);
+    background: rgb(0 255 157 / 0.06);
+  }
   .pb-grid {
     display: grid;
     grid-template-columns: repeat(10, 1fr);

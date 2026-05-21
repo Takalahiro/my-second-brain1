@@ -1,6 +1,19 @@
 import type * as tf from '@tensorflow/tfjs';
-import type { InferenceResult, LayerActivation, LayerKind, LayerMeta, PredictionResult } from './types';
+import type {
+  InferenceOptions,
+  InferenceResult,
+  LayerActivation,
+  LayerKind,
+  LayerMeta,
+  PredictionResult,
+  VariantSummary,
+} from './types';
 import { ARCH_LAYERS } from './types';
+import {
+  preprocessVariants,
+  scorePrediction,
+  type VariantSpec,
+} from './mnist-preprocess';
 
 async function getTf() {
   return import('@tensorflow/tfjs');
@@ -85,30 +98,32 @@ function tensorToActivation(meta: LayerMeta, tensor: tf.Tensor): LayerActivation
   return { meta, data: Array.from(data), shape: [...shape] };
 }
 
-function preprocessCanvas(source: HTMLCanvasElement, tf: Awaited<ReturnType<typeof getTf>>): tf.Tensor4D {
-  const off = document.createElement('canvas');
-  off.width = 28;
-  off.height = 28;
-  const ctx = off.getContext('2d')!;
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, 28, 28);
-  ctx.drawImage(source, 0, 0, 28, 28);
-  const img = ctx.getImageData(0, 0, 28, 28);
-  const gray = new Float32Array(28 * 28);
-  for (let i = 0; i < 28 * 28; i++) {
-    gray[i] = img.data[i * 4] / 255;
-  }
-  return tf.tensor4d(gray, [1, 28, 28, 1]);
+function probabilitiesFromTensor(last: tf.Tensor): number[] {
+  const probs = last.flatten().dataSync() as Float32Array;
+  return Array.from(probs);
 }
 
-export async function runInference(
+function predictionFromProbabilities(probabilities: number[]): PredictionResult {
+  let predicted = 0;
+  let confidence = probabilities[0] ?? 0;
+  for (let d = 1; d < 10; d++) {
+    if ((probabilities[d] ?? 0) > confidence) {
+      confidence = probabilities[d] ?? 0;
+      predicted = d;
+    }
+  }
+  return { probabilities, predicted, confidence };
+}
+
+function runFromGray(
   model: tf.LayersModel,
   vizModel: tf.LayersModel,
-  sourceCanvas: HTMLCanvasElement
-): Promise<InferenceResult> {
-  const tf = await getTf();
-  const input = preprocessCanvas(sourceCanvas, tf);
-  const inputPreview = input.dataSync() as Float32Array;
+  gray: Float32Array,
+  tf: Awaited<ReturnType<typeof getTf>>,
+  variantLabel?: string
+): InferenceResult {
+  const input = tf.tensor4d(gray, [1, 28, 28, 1]);
+  const inputPreview = gray.slice();
 
   const inputMeta: LayerMeta = {
     id: 'input',
@@ -116,7 +131,9 @@ export async function runInference(
     kind: 'input',
     typeLabel: 'Input 28×28×1',
     shapeLabel: '28×28×1',
-    detail: '手写数字缩放到 MNIST 尺寸',
+    detail: variantLabel
+      ? `MNIST 预处理 · ${variantLabel}`
+      : '手写数字缩放到 MNIST 尺寸',
   };
 
   const layers: LayerActivation[] = [
@@ -144,20 +161,67 @@ export async function runInference(
     });
 
     const last = list[list.length - 1];
-    const probs = last.flatten().dataSync() as Float32Array;
-    const probabilities = Array.from(probs);
-    let predicted = 0;
-    let confidence = probabilities[0] ?? 0;
-    for (let d = 1; d < 10; d++) {
-      if ((probabilities[d] ?? 0) > confidence) {
-        confidence = probabilities[d] ?? 0;
-        predicted = d;
-      }
-    }
-    prediction = { probabilities, predicted, confidence };
+    prediction = predictionFromProbabilities(probabilitiesFromTensor(last));
   });
 
   input.dispose();
 
   return { layers, prediction, inputPreview };
 }
+
+export async function runInference(
+  model: tf.LayersModel,
+  vizModel: tf.LayersModel,
+  sourceCanvas: HTMLCanvasElement,
+  options: InferenceOptions = {}
+): Promise<InferenceResult> {
+  const tf = await getTf();
+  const highAccuracy = options.highAccuracy ?? false;
+  const onProgress = options.onProgress;
+
+  const variants = preprocessVariants(sourceCanvas, highAccuracy);
+
+  if (variants.length === 1) {
+    const only = variants[0]!;
+    onProgress?.(1, 1, only.spec.label);
+    return runFromGray(model, vizModel, only.gray, tf, only.spec.label);
+  }
+
+  const summaries: VariantSummary[] = [];
+  let best: InferenceResult | null = null;
+  let bestScore = -Infinity;
+  let bestIndex = 0;
+
+  for (let i = 0; i < variants.length; i++) {
+    const { spec, gray } = variants[i]!;
+    onProgress?.(i + 1, variants.length, spec.label);
+    const result = runFromGray(model, vizModel, gray, tf, spec.label);
+    const score = scorePrediction(result.prediction.probabilities);
+    summaries.push({
+      label: spec.label,
+      predicted: result.prediction.predicted,
+      confidence: result.prediction.confidence,
+      score,
+    });
+    if (score > bestScore) {
+      bestScore = score;
+      best = result;
+      bestIndex = i;
+    }
+  }
+
+  if (!best) {
+    const fallback = variants[0]!;
+    return runFromGray(model, vizModel, fallback.gray, tf, fallback.spec.label);
+  }
+
+  return {
+    ...best,
+    variantIndex: bestIndex,
+    variantLabel: variants[bestIndex]!.spec.label,
+    variantSummaries: summaries,
+    highAccuracy,
+  };
+}
+
+export type { VariantSpec };

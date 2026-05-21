@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Component } from 'svelte';
+  import { NEURAL_LAB } from '../../../neural-lab-meta';
   import NetworkDiagram from './NetworkDiagram.svelte';
   import type { InferenceResult } from '../model/types';
 
@@ -50,7 +51,7 @@
 <section class="net-panel">
   <header class="np-head">
     <div>
-      <h2>CNN 网络可视化</h2>
+      <h2>{NEURAL_LAB.demoMnist.panelTitle}</h2>
       <p>{subtitle}</p>
     </div>
     <div class="np-tabs" role="tablist" aria-label="可视化模式">

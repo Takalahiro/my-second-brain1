@@ -10,11 +10,17 @@
   } from '../canvas/canvasUtils';
 
   interface Props {
+    highAccuracy?: boolean;
     onstrokeend?: () => void;
     onrecognize?: () => void;
     onclear?: () => void;
   }
-  let { onstrokeend, onrecognize, onclear }: Props = $props();
+  let {
+    highAccuracy = $bindable(true),
+    onstrokeend,
+    onrecognize,
+    onclear,
+  }: Props = $props();
 
   let canvas: HTMLCanvasElement | null = null;
   let drawing = false;
@@ -100,6 +106,10 @@
   <div class="dp-actions">
     <button type="button" class="dp-btn" onclick={handleClear}>清除</button>
     <button type="button" class="dp-btn primary" onclick={() => onrecognize?.()}>识别</button>
+    <label class="dp-toggle">
+      <input type="checkbox" bind:checked={highAccuracy} />
+      高精度（双路推理）
+    </label>
   </div>
   <div class="dp-samples">
     <span class="dp-samples-lbl">示例</span>
@@ -148,7 +158,21 @@
       linear-gradient(90deg, rgb(180 140 255 / 0.06) 1px, transparent 1px);
     background-size: 28px 28px;
   }
-  .dp-actions { display: flex; gap: 8px; }
+  .dp-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .dp-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid rgb(180 140 255 / 0.2);
+    cursor: pointer;
+    user-select: none;
+    flex: 1 1 100%;
+  }
+  .dp-toggle input { accent-color: #b48cff; }
   .dp-btn {
     flex: 1; padding: 10px; border-radius: 10px;
     border: 1px solid rgb(180 140 255 / 0.3);

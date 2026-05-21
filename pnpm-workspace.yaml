@@ -11,3 +11,5 @@ allowBuilds:
   "@parcel/watcher": true
   core-js: false
   "@tensorflow/tfjs-node": false
+  onnxruntime-node: false
+  protobufjs: false

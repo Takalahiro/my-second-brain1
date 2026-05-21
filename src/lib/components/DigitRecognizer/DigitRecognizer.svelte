@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { NEURAL_LAB } from '../../neural-lab-meta';
   import DrawingCanvas from './canvas/DrawingCanvas.svelte';
   import NetworkPanel from './visualization/NetworkPanel.svelte';
   import PredictionBars from './visualization/PredictionBars.svelte';
@@ -7,6 +8,12 @@
   import { runInference } from './model/predictor';
   import { canvasHasInk } from './canvas/canvasUtils';
   import type { FlowState, InferenceResult, ModelState } from './model/types';
+
+  interface Props {
+    embedded?: boolean;
+  }
+
+  let { embedded = false }: Props = $props();
 
   let modelState = $state<ModelState>({
     status: 'idle',
@@ -17,12 +24,13 @@
   let inference = $state<InferenceResult | null>(null);
   let flow = $state<FlowState>({ activeLayerIndex: 0, playing: false, speed: 1 });
   let inferring = $state(false);
+  let inferStatus = $state('');
+  let highAccuracy = $state(true);
   let hoverLayer = $state<number | null>(null);
 
   let drawRef = $state<{ getCanvas: () => HTMLCanvasElement | null } | null>(null);
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
   let flowTimer: ReturnType<typeof setInterval> | null = null;
-
   function teardown() {
     flow.playing = false;
     clearDebounce();
@@ -78,11 +86,18 @@
     if (!canvasHasInk(canvas)) return;
 
     inferring = true;
+    inferStatus = highAccuracy ? '双路推理 1/2…' : '推理中…';
     flow.playing = false;
     clearFlowTimer();
 
     try {
-      inference = await runInference(modelState.model, modelState.vizModel, canvas);
+      inference = await runInference(modelState.model, modelState.vizModel, canvas, {
+        highAccuracy,
+        onProgress: (current, total, label) => {
+          inferStatus =
+            total > 1 ? `双路推理 ${current}/${total} · ${label}` : `推理中 · ${label}`;
+        },
+      });
       flow.activeLayerIndex = 0;
       startFlowPlayback();
     } catch (e) {
@@ -92,9 +107,9 @@
       };
     } finally {
       inferring = false;
+      inferStatus = '';
     }
   }
-
   function onStrokeEnd() {
     clearDebounce();
     debounceTimer = setTimeout(() => {
@@ -163,36 +178,55 @@
 </script>
 
 <div class="digit-lab">
-  <header class="dl-head">
-    <div>
-      <h1>手写数字 · CNN 可视化</h1>
-      <p class="dl-sub">MNIST 预训练模型 · 实时特征图与数据流演示</p>
-    </div>
-    <div class="dl-status">
-      {#if modelState.status === 'idle'}
-        <span class="badge">等待加载…</span>
-      {:else if modelState.status === 'loading'}
+  {#if !embedded}
+    <header class="dl-head">
+      <div>
+        <h1>{NEURAL_LAB.title}</h1>
+        <p class="dl-sub">
+          <span class="dl-demo-tag">演示</span>
+          {NEURAL_LAB.demoMnist.title}
+          <span class="dl-demo-desc">{NEURAL_LAB.demoMnist.subtitle}</span>
+        </p>
+      </div>
+      <div class="dl-status">
+        {#if modelState.status === 'idle'}
+          <span class="badge">等待加载…</span>
+        {:else if modelState.status === 'loading'}
+          <span class="badge">加载模型…</span>
+        {:else if modelState.status === 'error'}
+          <span class="badge err">{modelState.error}</span>
+          <button type="button" class="dl-btn" onclick={() => loadModel()}>重试</button>
+        {:else if modelState.status === 'ready'}
+          <span class="badge ok">模型就绪</span>
+        {/if}
+        {#if inferring}
+          <span class="badge run">{inferStatus || '推理中…'}</span>
+        {/if}      </div>
+    </header>
+  {:else}
+    <div class="dl-status dl-status--embedded">
+      {#if modelState.status === 'loading'}
         <span class="badge">加载模型…</span>
       {:else if modelState.status === 'error'}
         <span class="badge err">{modelState.error}</span>
         <button type="button" class="dl-btn" onclick={() => loadModel()}>重试</button>
       {:else if modelState.status === 'ready'}
-        <span class="badge ok">模型就绪</span>
+        <span class="badge ok">MNIST 就绪</span>
       {/if}
       {#if inferring}
-        <span class="badge run">推理中…</span>
+        <span class="badge run">{inferStatus || '推理中…'}</span>
       {/if}
     </div>
-  </header>
+  {/if}
 
   <div class="dl-workspace">
     <DrawingCanvas
       bind:this={drawRef}
+      bind:highAccuracy
       onstrokeend={onStrokeEnd}
       onrecognize={recognize}
       onclear={onClear}
     />
-
     <div class="dl-right">
       <NetworkPanel
         {inference}
@@ -221,8 +255,9 @@
     probabilities={inference?.prediction.probabilities}
     predicted={inference?.prediction.predicted ?? 0}
     confidence={inference?.prediction.confidence ?? 0}
-  />
-</div>
+    variantLabel={inference?.variantLabel}
+    variantSummaries={inference?.variantSummaries}
+  /></div>
 
 <style>
   .digit-lab {
@@ -241,8 +276,31 @@
     gap: 12px;
   }
   .dl-head h1 { margin: 0; font-size: 1.35rem; }
-  .dl-sub { margin: 4px 0 0; font-size: 0.84rem; color: var(--text-secondary); }
+  .dl-sub {
+    margin: 6px 0 0;
+    font-size: 0.84rem;
+    color: var(--text-secondary);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .dl-demo-tag {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: rgb(180 140 255 / 0.18);
+    color: #c4a8ff;
+    border: 1px solid rgb(180 140 255 / 0.28);
+  }
+  .dl-demo-desc {
+    opacity: 0.92;
+  }
   .dl-status { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .dl-status--embedded { justify-content: flex-end; margin-bottom: 4px; }
   .badge {
     font-size: 0.72rem; padding: 4px 10px; border-radius: 999px;
     border: 1px solid var(--border-color); color: var(--text-secondary);

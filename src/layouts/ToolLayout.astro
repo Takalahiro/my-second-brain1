@@ -7,12 +7,15 @@ interface Props {
   description?: string;
   /** 是否全宽铺满（工具页默认 true） */
   fullWidth?: boolean;
+  /** 是否加载 MathJax 3（公式识别页） */
+  mathJax?: boolean;
 }
 
 const {
   title = 'My Second Brain',
   description = '工具',
   fullWidth = true,
+  mathJax = false,
 } = Astro.props;
 ---
 
@@ -27,6 +30,21 @@ const {
     <link rel="apple-touch-icon" href="/logo.png" />
     <link rel="prefetch" href="/" as="document" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
+    {mathJax && (
+      <>
+        <script is:inline>
+          window.MathJax = {
+            tex: {
+              inlineMath: [['$', '$'], ['\\(', '\\)']],
+              displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            },
+            svg: { fontCache: 'global' },
+            startup: { typeset: false },
+          };
+        </script>
+        <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+      </>
+    )}
     <script is:inline>
       const theme = localStorage.getItem('theme');
       if (theme === 'light') {
