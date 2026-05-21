@@ -1,0 +1,103 @@
+---
+import BrandLogo from './BrandLogo.astro';
+import ThemeToggle from './ThemeToggle.svelte';
+import FontSwitcher from './FontSwitcher.svelte';
+import NoteSearch from './NoteSearch.svelte';
+import { SITE_NAV_LINKS, SITE_TOOL_LINKS } from '../lib/site-nav';
+
+interface Props {
+  /** site = 笔记等内容页（含搜索）；tool = 工具页单行导航 */
+  variant?: 'site' | 'tool';
+  /** 当前路径，用于高亮 */
+  currentPath?: string;
+}
+
+const { variant = 'site', currentPath = Astro.url.pathname } = Astro.props;
+
+const notesLink = SITE_NAV_LINKS[0];
+const toolLinks = variant === 'tool' ? SITE_NAV_LINKS : SITE_TOOL_LINKS;
+
+function isActive(href: string) {
+  if (href === '/') return currentPath === '/';
+  return currentPath === href || currentPath.startsWith(href + '/');
+}
+---
+
+<header class="site-header">
+  <nav
+    class="site-nav-shell pixel-card glass-container"
+    class:site-nav-shell-tool={variant === 'tool'}
+    aria-label="站点导航"
+  >
+    <div class="site-nav-primary">
+      <a href="/" class="site-nav-brand" aria-label="返回主界面">
+        <BrandLogo />
+      </a>
+
+      {variant === 'site' && (
+        <a href={notesLink.href} class="site-nav-link site-nav-crumb" class:is-active={isActive(notesLink.href)} aria-label="去往笔记">
+          <span class="site-nav-crumb-icon" aria-hidden="true">{notesLink.icon}</span>
+          <span class="site-nav-crumb-text">{notesLink.label}</span>
+        </a>
+      )}
+
+      {variant === 'tool' && toolLinks.map((item) => (
+        <a
+          href={item.href}
+          class="site-nav-link"
+          class:is-active={isActive(item.href)}
+          title={item.title}
+        >
+          {item.label}
+        </a>
+      ))}
+
+      {variant === 'site' && (
+        <div class="site-nav-search">
+          <NoteSearch client:load />
+        </div>
+      )}
+
+      <div class="site-nav-actions">
+        <FontSwitcher client:load />
+        <ThemeToggle client:load />
+      </div>
+    </div>
+
+    {variant === 'site' && (
+      <div class="site-nav-tools-row">
+        <div class="site-nav-tools" aria-label="工具">
+          {toolLinks.map((item) => (
+            <a
+              href={item.href}
+              class="site-nav-link"
+              class:is-active={isActive(item.href)}
+              title={item.title}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </nav>
+</header>
+
+<style>
+  .site-nav-shell-tool .site-nav-primary {
+    flex-wrap: wrap;
+  }
+  .site-nav-shell-tool .site-nav-actions {
+    margin-left: auto;
+  }
+  @media (min-width: 769px) {
+    .site-nav-shell-tool {
+      flex-direction: row;
+      align-items: center;
+    }
+    .site-nav-shell-tool .site-nav-primary {
+      flex: 1;
+      flex-wrap: nowrap;
+    }
+  }
+</style>

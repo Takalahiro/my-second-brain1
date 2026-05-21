@@ -1,0 +1,67 @@
+---
+import '../styles/globals.css';
+import DesktopIntroSplash from '../components/desktop/DesktopIntroSplash.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** 主界面首次访问启动动画 */
+  introSplash?: boolean;
+}
+
+const {
+  title = 'My Second Brain · 桌面',
+  description = 'macOS 风格桌面',
+  introSplash = false,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN" class="scroll-smooth" data-font="wenkai">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <script is:inline>
+      const theme = localStorage.getItem('theme');
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+      const font = localStorage.getItem('second-brain:font-family');
+      if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {
+        document.documentElement.setAttribute('data-font', font);
+      }
+    </script>
+    {introSplash && (
+      <script is:inline>
+        if (!localStorage.getItem('second-brain:desktop-intro-v1')) {
+          document.documentElement.classList.add('desktop-intro-active');
+        }
+      </script>
+    )}
+  </head>
+  <body class="mac-os-body">
+    {introSplash && <DesktopIntroSplash />}
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  .mac-os-body {
+    margin: 0;
+    overflow: hidden;
+    height: 100dvh;
+    width: 100vw;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body-current), -apple-system, BlinkMacSystemFont, 'PingFang SC', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color var(--motion-base) var(--motion-ease),
+      color var(--motion-base) var(--motion-ease);
+  }
+</style>

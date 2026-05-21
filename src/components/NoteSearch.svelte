@@ -216,19 +216,15 @@
     top: calc(100% + 8px);
     right: 0; left: 0;
     z-index: 50;
-    background: var(--bg-secondary);
+    background: var(--glass-bg-strong);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    box-shadow: 0 18px 40px rgb(0 0 0 / 0.18);
+    box-shadow: var(--shadow-normal);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     max-height: 70vh;
     overflow: auto;
     padding: 6px;
-  }
-  :global(.dark) .ns-panel {
-    background: rgb(24 18 36 / 0.95);
-    border-color: rgb(255 255 255 / 0.1);
   }
   .ns-empty {
     padding: 22px;

@@ -1,7 +1,6 @@
 ---
 import '../styles/globals.css';
-import ThemeToggle from '../components/ThemeToggle.svelte';
-import FontSwitcher from '../components/FontSwitcher.svelte';
+import SiteNavBar from '../components/SiteNavBar.astro';
 
 interface Props {
   title?: string;
@@ -24,9 +23,15 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <link rel="prefetch" href="/" as="document" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" />
     <script is:inline>
       const theme = localStorage.getItem('theme');
-      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       }
       const font = localStorage.getItem('second-brain:font-family');
@@ -34,24 +39,33 @@ const {
         document.documentElement.setAttribute('data-font', font);
       }
     </script>
+    <script is:inline>
+      (function () {
+        var prefetched = false;
+        function prefetchHome() {
+          if (prefetched) return;
+          prefetched = true;
+          var link = document.createElement('link');
+          link.rel = 'prefetch';
+          link.href = '/';
+          link.as = 'document';
+          document.head.appendChild(link);
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+          var brand = document.querySelector('.site-nav-brand');
+          if (brand) {
+            brand.addEventListener('mouseenter', prefetchHome, { once: true });
+            brand.addEventListener('focus', prefetchHome, { once: true });
+          }
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(prefetchHome, { timeout: 4000 });
+          }
+        });
+      })();
+    </script>
   </head>
   <body class="min-h-screen transition-colors tool-body">
-    <header class="sticky top-0 z-20 px-3 pt-3">
-      <nav class="pixel-card glass-container tool-nav max-w-6xl mx-auto px-4 py-3 flex items-center gap-2 flex-wrap">
-        <a href="/" class="nav-brand" aria-label="首页">🧠</a>
-        <div class="tool-links">
-          <a href="/python" class="tool-link">Python</a>
-          <a href="/matlab" class="tool-link">MATLAB</a>
-          <a href="/whiteboard" class="tool-link">白板</a>
-          <a href="/graph" class="tool-link">图谱</a>
-          <a href="/notes" class="tool-link">笔记</a>
-        </div>
-        <div class="flex items-center gap-2 ml-auto text-sm">
-          <FontSwitcher client:load />
-          <ThemeToggle client:load />
-        </div>
-      </nav>
-    </header>
+    <SiteNavBar variant="tool" currentPath={Astro.url.pathname} />
     <main class:list={['tool-main', fullWidth && 'tool-main--full']}>
       <slot />
     </main>
@@ -59,42 +73,28 @@ const {
 </html>
 
 <style>
-  .tool-body { background: var(--bg-primary); }
-  .tool-nav { border-width: 1px; }
-  .nav-brand {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 40px; height: 40px; border-radius: var(--radius-button);
-    text-decoration: none; font-size: 1.2rem;
-    background: var(--bg-secondary); box-shadow: var(--shadow-pixel);
-    border: 1px solid var(--border-color);
-  }
-  .tool-links {
-    display: flex; flex-wrap: wrap; gap: 6px;
-  }
-  .tool-link {
-    text-decoration: none;
-    font-size: 0.8rem;
-    padding: 5px 11px;
-    border-radius: var(--radius-button);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    box-shadow: var(--shadow-pixel);
-    transition: background 0.15s ease, transform 0.15s ease;
-  }
-  .tool-link:hover {
+  .tool-body {
     background: var(--bg-primary);
-    transform: translateY(-1px);
-    border-color: rgba(180, 140, 255, 0.45);
   }
   .tool-main {
     max-width: 72rem;
     margin: 0 auto;
     padding: 1rem 1rem 2rem;
+    animation: site-main-in 0.35s var(--motion-ease) both;
   }
   .tool-main--full {
     max-width: none;
     padding: 0;
     min-height: calc(100vh - 80px);
+  }
+  @keyframes site-main-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>

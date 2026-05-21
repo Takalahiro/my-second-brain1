@@ -130,16 +130,16 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 1px solid rgb(255 255 255 / 0.22);
-    background: rgb(20 16 32 / 0.55);
-    color: #fff;
+    border: 1px solid var(--chrome-border);
+    background: var(--glass-bg-strong);
+    color: var(--text-primary);
     backdrop-filter: blur(14px);
     cursor: pointer;
     font-size: 1.05rem;
-    box-shadow: 0 8px 22px rgb(0 0 0 / 0.3);
+    box-shadow: var(--shadow-normal);
   }
   .notes-tool-btn:hover {
-    background: rgb(40 28 60 / 0.65);
+    background: var(--glass-bg-hover);
   }
   .notes-tool-mask {
     position: fixed;
@@ -157,10 +157,10 @@
     width: min(300px, 88vw);
     z-index: 58;
     padding: 16px 14px;
-    background: rgb(20 16 32 / 0.82);
-    color: #f3ecff;
-    border-left: 1px solid rgb(255 255 255 / 0.16);
-    box-shadow: -14px 0 36px rgb(0 0 0 / 0.38);
+    background: var(--chrome-dropdown-bg);
+    color: var(--chrome-text);
+    border-left: 1px solid var(--chrome-border);
+    box-shadow: var(--chrome-shadow);
     backdrop-filter: blur(16px);
     transform: translateX(100%);
     transition: transform 0.22s ease;
@@ -180,9 +180,9 @@
     font-size: 0.95rem;
   }
   .ntd-x {
-    background: rgb(255 255 255 / 0.08);
+    background: var(--chrome-subtle);
     color: inherit;
-    border: 1px solid rgb(255 255 255 / 0.14);
+    border: 1px solid var(--chrome-border);
     border-radius: 8px;
     width: 28px;
     height: 28px;
@@ -191,7 +191,7 @@
   .ntd-hint {
     margin: 0 0 12px;
     font-size: 0.72rem;
-    color: #c8b9e2;
+    color: var(--chrome-text-muted);
     line-height: 1.4;
   }
   .ntd-list {
@@ -209,8 +209,8 @@
     align-items: center;
     padding: 10px;
     border-radius: 12px;
-    background: rgb(255 255 255 / 0.06);
-    border: 1px solid rgb(255 255 255 / 0.12);
+    background: var(--chrome-subtle);
+    border: 1px solid var(--chrome-border);
     cursor: grab;
     user-select: none;
     touch-action: none;
@@ -231,7 +231,7 @@
   }
   .ntd-desc {
     font-size: 0.68rem;
-    color: #c8b9e2;
+    color: var(--chrome-text-muted);
     margin-top: 2px;
   }
   .switch {

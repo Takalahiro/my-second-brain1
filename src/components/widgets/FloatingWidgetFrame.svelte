@@ -13,6 +13,7 @@
   } from '../../lib/floating-widget-layout';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
+  import WidgetRainGlass from './WidgetRainGlass.svelte';
 
   interface Props {
     layoutKey: string;
@@ -177,6 +178,7 @@
 
 <section
   bind:this={rootEl}
+  data-atmosphere-surface={layoutKey}
   class="floating-widget {tierClass(tier)} {className} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style="{frameStyle}; z-index: {zIndex};"
   aria-label={ariaLabel}
@@ -185,6 +187,7 @@
   onpointerup={onPointerUp}
   onpointercancel={onPointerUp}
 >
+  <WidgetRainGlass />
   <header class="fw-header" onpointerdown={onHeaderPointerDown}>
     <WindowChrome
       onClose={() => onClose?.()}
@@ -238,14 +241,19 @@
     display: flex;
     flex-direction: column;
     border-radius: 18px;
-    background: rgb(20 16 32 / 0.78);
-    border: 1px solid rgb(255 255 255 / 0.16);
-    box-shadow: 0 20px 44px rgb(0 0 0 / 0.42);
+    background: rgb(var(--widget-bg-rgb) / 0.82);
+    border: 1px solid var(--widget-border);
+    box-shadow: var(--widget-shadow);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     overflow: hidden;
-    color: #f3ecff;
+    color: var(--widget-fg);
     touch-action: pan-y pinch-zoom;
+    transition:
+      background-color var(--motion-base) var(--motion-ease),
+      border-color var(--motion-base) var(--motion-ease),
+      color var(--motion-base) var(--motion-ease),
+      box-shadow var(--motion-base) var(--motion-ease);
   }
   .floating-widget.is-maximized {
     left: 24px !important;
@@ -260,9 +268,9 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border-bottom: 1px solid rgb(255 255 255 / 0.08);
+    border-bottom: 1px solid var(--widget-border);
     cursor: grab;
-    background: rgb(0 0 0 / 0.18);
+    background: var(--widget-header-bg);
     flex-shrink: 0;
   }
   .floating-widget.is-active-drag .fw-header {
@@ -271,19 +279,19 @@
   .fw-title {
     font-size: 0.78rem;
     font-weight: 600;
-    color: rgb(255 255 255 / 0.75);
+    color: var(--widget-fg-muted);
     display: inline-flex;
     align-items: center;
     gap: 6px;
   }
   .fw-link {
     margin-left: auto;
-    color: #c2b3df;
+    color: var(--widget-fg-muted);
     text-decoration: none;
     font-size: 0.85rem;
     padding: 2px 8px;
     border-radius: 6px;
-    background: rgb(255 255 255 / 0.08);
+    background: var(--chrome-subtle);
   }
   .fw-body {
     flex: 1;

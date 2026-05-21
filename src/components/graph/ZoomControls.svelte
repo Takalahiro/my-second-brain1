@@ -33,7 +33,7 @@
   .zc-btn {
     background: rgb(255 255 255 / 0.08);
     border: 1px solid rgb(255 255 255 / 0.14);
-    color: #f3ecff;
+    color: var(--graph-panel-text);
     width: 32px; height: 28px;
     border-radius: 8px;
     cursor: pointer;

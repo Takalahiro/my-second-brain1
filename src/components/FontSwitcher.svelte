@@ -40,18 +40,26 @@
   .font-switcher {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    height: 38px;
+    gap: 6px;
+    height: 42px;
     box-sizing: border-box;
-    padding: 0 8px;
-    border: var(--border-thin) solid var(--border-color);
-    border-radius: var(--radius-button);
-    background: var(--glass-bg);
-    box-shadow: var(--shadow-pixel);
+    padding: 0 10px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--neo-surface);
+    box-shadow: var(--neo-raised);
+    transition: box-shadow 0.2s ease, transform 0.18s ease;
+  }
+  .font-switcher:hover {
+    box-shadow: var(--neo-raised-hover);
+  }
+  .font-switcher:active {
+    transform: scale(0.98);
+    box-shadow: var(--neo-pressed);
   }
   .font-switcher-icon {
-    font-family: 'Pixelify Sans', monospace;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    font-weight: 600;
     color: var(--text-secondary);
     user-select: none;
   }
@@ -59,43 +67,26 @@
     border: 0;
     background: transparent;
     color: var(--text-primary);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    font-weight: 500;
     outline: none;
-    min-width: 70px;
+    min-width: 68px;
     cursor: pointer;
   }
-  :global(.dark) .font-switcher {
-    background: #15101e;
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
-      0 4px 10px rgba(0, 0, 0, 0.35);
-  }
-  :global(.dark) .font-switcher-icon {
-    color: #b3a4d4;
-  }
-  :global(.dark) .font-switcher-select {
-    color: #ece4ff;
-  }
-  /* 下拉项在深色模式下保持深底浅字（Edge/Chrome/Firefox 都支持） */
   :global(.dark) .font-switcher-select option {
-    background: #15101e;
-    color: #ece4ff;
+    background: #1e1b26;
+    color: #ece8f4;
   }
   @media (max-width: 768px) {
     .font-switcher {
-      padding: 0 6px;
-      gap: 3px;
-      min-width: 38px;
-    }
-    .font-switcher-icon {
-      font-size: 0.72rem;
+      height: 38px;
+      padding: 0 8px;
+      gap: 4px;
     }
     .font-switcher-select {
       min-width: 2.8rem;
       max-width: 3.6rem;
       font-size: 0.68rem;
-      padding: 0;
     }
   }
 </style>

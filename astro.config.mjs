@@ -27,6 +27,19 @@ export default defineConfig({
   integrations: [mdx(), svelte()],
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/@tensorflow')) return 'tfjs';
+            if (id.includes('node_modules/three')) return 'three';
+            if (id.includes('DigitRecognizer')) return 'digits';
+            if (id.includes('pyodide')) return 'pyodide';
+            if (id.includes('cytoscape') || id.includes('GraphWidget')) return 'graph-viz';
+          },
+        },
+      },
+    },
   },
   markdown: {
     remarkPlugins: [

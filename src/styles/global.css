@@ -332,8 +332,8 @@ body {
   font-size: 0.62rem;
   padding: 1px 7px;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.08);
-  color: rgb(200 210 230 / 0.85);
+  background: var(--chrome-subtle);
+  color: var(--widget-fg-muted);
   font-weight: 600;
   letter-spacing: 0.02em;
 }

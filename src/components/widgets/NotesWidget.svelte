@@ -397,8 +397,8 @@
     display: flex;
     flex-direction: column;
     border-radius: 16px;
-    background: rgb(20 16 32 / var(--w-bg-alpha));
-    color: #f3ecff;
+    background: rgb(var(--widget-bg-rgb) / var(--w-bg-alpha));
+    color: var(--widget-fg);
     border: 1px solid rgb(255 255 255 / 0.16);
     box-shadow: 0 18px 40px rgb(0 0 0 / 0.36);
     backdrop-filter: blur(14px);
@@ -427,7 +427,7 @@
     gap: 10px;
     padding: 8px 12px;
     border-bottom: 1px solid rgb(255 255 255 / 0.08);
-    background: rgb(0 0 0 / 0.18);
+    background: var(--widget-header-bg);
     cursor: grab;
     flex: 0 0 auto;
   }
@@ -459,7 +459,7 @@
     background: rgb(255 255 255 / 0.08);
     border: 1px solid rgb(255 255 255 / 0.16);
     border-radius: 10px;
-    color: #f3ecff;
+    color: var(--widget-fg);
     padding: 4px 10px;
     font-size: 0.78rem;
     width: 140px;
@@ -471,7 +471,7 @@
     width: 24px; height: 24px; border-radius: 7px;
     background: rgb(255 255 255 / 0.08);
     border: 1px solid rgb(255 255 255 / 0.14);
-    color: #f3ecff; cursor: pointer; font-size: 0.78rem;
+    color: var(--widget-fg); cursor: pointer; font-size: 0.78rem;
   }
   .nw-cog:hover { background: rgb(255 255 255 / 0.16); }
 

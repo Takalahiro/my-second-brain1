@@ -2,9 +2,9 @@
 import '../styles/globals.css';
 import ThemeToggle from '../components/ThemeToggle.svelte';
 import FontSwitcher from '../components/FontSwitcher.svelte';
+import SiteNavBar from '../components/SiteNavBar.astro';
 import Mermaid from '../components/Mermaid.svelte';
 import MobileViewModeToggle from '../components/MobileViewModeToggle.svelte';
-import NoteSearch from '../components/NoteSearch.svelte';
 import NotesToolHost from '../components/widgets/NotesToolHost.svelte';
 
 interface Props {
@@ -25,7 +25,8 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title}</title>
-
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
@@ -35,7 +36,9 @@ const {
 
     <script is:inline>
       const theme = localStorage.getItem('theme');
-      if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      if (theme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       }
 
@@ -44,49 +47,18 @@ const {
         document.documentElement.setAttribute('data-font', font);
       }
 
-      // 预水合：把 notes 折叠模式写到 <html> 上，让 client-only 组件初次渲染就用对状态。
       const notesMode = localStorage.getItem('second-brain:notes-display-mode');
       if (notesMode === 'widgets' || notesMode === 'recursive') {
         document.documentElement.setAttribute('data-notes-mode', notesMode);
       }
     </script>
   </head>
-  <body class="min-h-screen transition-colors">
-    <header class="site-header">
-      <nav class="pixel-card glass-container nav-shell max-w-5xl mx-auto" aria-label="站点导航">
-        <div class="nav-primary">
-          <a href="/" class="nav-brand" aria-label="首页">🧠</a>
-          <a href="/notes" class="nav-crumb" aria-label="去往笔记">
-            <span class="nav-crumb-icon" aria-hidden="true">📚</span>
-            <span class="nav-crumb-text">笔记</span>
-          </a>
-          <div class="nav-search">
-            <NoteSearch client:load />
-          </div>
-          <div class="nav-actions">
-            <FontSwitcher client:load />
-            <ThemeToggle client:load />
-          </div>
-        </div>
-        <div class="nav-secondary">
-          <div class="nav-tools" aria-label="工具">
-            <a href="/python" class="pixel-button nav-link" title="Python">Python</a>
-            <a href="/matlab" class="pixel-button nav-link" title="MATLAB">MATLAB</a>
-            <a href="/whiteboard" class="pixel-button nav-link" title="白板">白板</a>
-            <a href="/graph" class="pixel-button nav-link" title="关系图谱">图谱</a>
-          </div>
-        </div>
-      </nav>
-    </header>
-    <main class="max-w-5xl mx-auto px-4 py-8">
+  <body class="min-h-screen transition-colors site-body">
+    <SiteNavBar variant="site" currentPath={Astro.url.pathname} />
+    <main class="site-main max-w-5xl mx-auto px-4 py-8">
       <slot />
     </main>
 
-    <!--
-      client:idle 让浏览器在空闲帧才 hydrate Mermaid，
-      避免首屏 JS 主线程被立即占用（这是「巨卡」的主要来源之一）。
-      Mermaid 渲染本身还有 IntersectionObserver 懒加载，所以延迟挂载完全安全。
-    -->
     <Mermaid client:idle />
     <MobileViewModeToggle client:load />
     <NotesToolHost client:only="svelte" />
@@ -94,214 +66,21 @@ const {
 </html>
 
 <style>
-  .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    padding: max(env(safe-area-inset-top, 0px), 10px) 12px 0;
-  }
-  .nav-shell {
-    --nav-control-h: 38px;
-    border-width: 1px;
-    padding: 12px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .nav-primary {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    min-width: 0;
-  }
-  .nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-shrink: 0;
-    margin-left: auto;
-    padding-left: 10px;
-    border-left: 1px solid var(--border-color);
-  }
-  .nav-secondary {
-    display: flex;
-    min-width: 0;
-    padding-top: 2px;
-  }
-  .nav-brand {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--nav-control-h);
-    height: var(--nav-control-h);
-    border-radius: var(--radius-button);
-    text-decoration: none;
-    font-size: 1.15rem;
-    background: var(--bg-secondary);
-    box-shadow: var(--shadow-pixel);
-    border: 1px solid var(--border-color);
-    flex-shrink: 0;
-  }
-  .nav-link {
-    text-decoration: none;
-    font-size: 0.875rem;
-    padding: 6px 12px;
-  }
-  .nav-search {
-    flex: 1 1 180px;
-    min-width: 0;
-    max-width: 420px;
-  }
-  .nav-search :global(.note-search) {
-    width: 100%;
-    max-width: none;
-  }
-  .nav-actions :global(.font-switcher) {
-    height: var(--nav-control-h);
-    box-sizing: border-box;
-    flex-shrink: 0;
-  }
-  .nav-actions :global(.theme-toggle-btn) {
-    width: var(--nav-control-h);
-    height: var(--nav-control-h);
-    min-width: var(--nav-control-h);
-    padding: 0;
-    flex-shrink: 0;
-    box-sizing: border-box;
-  }
-  .nav-crumb {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-    color: var(--text-primary);
-    font-size: 0.84rem;
-    font-weight: 600;
-    height: var(--nav-control-h);
-    padding: 0 12px;
-    box-sizing: border-box;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-button);
-    box-shadow: var(--shadow-pixel);
-    transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
-    position: relative;
-    flex-shrink: 0;
-  }
-  .nav-crumb::before {
-    content: '/';
-    position: absolute;
-    left: -9px;
-    color: var(--text-secondary);
-    font-weight: 400;
-    pointer-events: none;
-  }
-  .nav-crumb:hover {
+  .site-body {
     background: var(--bg-primary);
-    transform: translateY(-1px);
-    border-color: rgba(180, 140, 255, 0.4);
+    color: var(--text-primary);
   }
-  .nav-crumb-icon { font-size: 0.95rem; }
-
-  .nav-tools {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-    align-items: center;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding: 2px 0 4px;
+  .site-main {
+    animation: site-main-in 0.35s var(--motion-ease) both;
   }
-  .nav-tools::-webkit-scrollbar { display: none; }
-  .nav-tools .nav-link {
-    font-size: 0.75rem;
-    padding: 6px 10px;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  @media (min-width: 769px) {
-    .site-header {
-      padding-left: 16px;
-      padding-right: 16px;
+  @keyframes site-main-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
     }
-    .nav-shell {
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      padding: 12px 16px;
-      gap: 12px 14px;
-    }
-    .nav-primary {
-      flex: 1 1 360px;
-      flex-wrap: nowrap;
-      gap: 12px;
-    }
-    .nav-search {
-      margin: 0 4px;
-    }
-    .nav-secondary {
-      flex: 1 1 auto;
-      justify-content: flex-end;
-      padding-top: 0;
-    }
-    .nav-tools {
-      flex-wrap: wrap;
-      overflow: visible;
-      width: auto;
-      justify-content: flex-end;
-      padding: 0;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .site-header {
-      padding-left: 10px;
-      padding-right: 10px;
-    }
-    .nav-shell {
-      padding: 12px 12px 10px;
-      gap: 10px;
-    }
-    .nav-primary {
-      row-gap: 10px;
-      column-gap: 10px;
-    }
-    .nav-brand { order: 1; }
-    .nav-crumb {
-      order: 2;
-      padding: 0 10px;
-    }
-    .nav-crumb-text { display: none; }
-    .nav-crumb::before { display: none; }
-    .nav-actions {
-      order: 3;
-      margin-left: auto;
-      padding-left: 0;
-      border-left: 0;
-      gap: 8px;
-    }
-    .nav-search {
-      order: 4;
-      flex: 1 1 100%;
-      width: 100%;
-      max-width: none;
-      margin: 0;
-    }
-    .nav-tools .nav-link {
-      padding: 10px 12px;
-      font-size: 0.72rem;
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-    }
-    .nav-brand,
-    .nav-actions :global(.theme-toggle-btn) {
-      min-width: 44px;
-      min-height: 44px;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 </style>

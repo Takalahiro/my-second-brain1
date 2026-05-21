@@ -1,11 +1,18 @@
 <script lang="ts">
   import { evaluate, plotFunction, CALC_HELP, type CalcResult } from '../lib/calc-engine';
+  import MatrixLab from './matrix/MatrixLab.svelte';
+  import CalculusLab from './calculus/CalculusLab.svelte';
+  import DiscreteLab from './discrete/DiscreteLab.svelte';
+  import StatisticsLab from './statistics/StatisticsLab.svelte';
 
   interface Props {
     /** 紧凑模式（小组件） */
     compact?: boolean;
   }
   let { compact = false }: Props = $props();
+
+  type TabId = 'matrix' | 'calculus' | 'discrete' | 'statistics' | 'expr';
+  let tab = $state<TabId>('matrix');
 
   let expr = $state('');
   let plotExpr = $state('sin(x)');
@@ -140,11 +147,37 @@
     <header class="mc-head">
       <div>
         <h1>MATLAB 计算器</h1>
-        <p class="mc-sub">矩阵 · 复数 · 函数可视化</p>
+        <p class="mc-sub">矩阵 · 微积分 · 离散数学 · 统计学 · 表达式</p>
       </div>
+      <nav class="mc-tabs">
+        <button type="button" class:active={tab === 'matrix'} onclick={() => (tab = 'matrix')}>
+          矩阵
+        </button>
+        <button type="button" class:active={tab === 'calculus'} onclick={() => (tab = 'calculus')}>
+          微积分
+        </button>
+        <button type="button" class:active={tab === 'discrete'} onclick={() => (tab = 'discrete')}>
+          离散数学
+        </button>
+        <button type="button" class:active={tab === 'statistics'} onclick={() => (tab = 'statistics')}>
+          统计学
+        </button>
+        <button type="button" class:active={tab === 'expr'} onclick={() => (tab = 'expr')}>
+          表达式
+        </button>
+      </nav>
     </header>
   {/if}
 
+  {#if !compact && tab === 'matrix'}
+    <MatrixLab />
+  {:else if !compact && tab === 'calculus'}
+    <CalculusLab />
+  {:else if !compact && tab === 'discrete'}
+    <DiscreteLab />
+  {:else if !compact && tab === 'statistics'}
+    <StatisticsLab />
+  {:else}
   <div class="mc-body">
     <section class="mc-command">
       <div class="mc-input-row">
@@ -220,6 +253,7 @@
       </section>
     {/if}
   </div>
+  {/if}
 </div>
 
 <style>
@@ -237,6 +271,33 @@
   }
   .mc-head h1 { margin: 0; font-size: 1.35rem; }
   .mc-sub { margin: 4px 0 0; color: var(--text-secondary); font-size: 0.84rem; }
+  .mc-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .mc-tabs button {
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .mc-tabs button.active {
+    background: rgb(180 140 255 / 0.25);
+    border-color: rgb(180 140 255 / 0.45);
+    font-weight: 650;
+  }
+  .mc-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 0 16px;
+  }
 
   .mc-body {
     flex: 1; min-height: 0;
@@ -273,12 +334,11 @@
     padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    background: rgb(12 8 22 / 0.5);
-    color: #f3ecff;
+    background: var(--code-bg);
+    color: var(--code-fg);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.88rem;
   }
-  :global(:not(.dark)) .mc-input { background: var(--bg-primary); color: var(--text-primary); }
   .mc-run {
     padding: 8px 16px;
     border-radius: 8px;
@@ -334,8 +394,8 @@
     cursor: pointer; font-size: 0.74rem;
     border-radius: 6px;
   }
-  .mc-hitem:hover { background: rgb(255 255 255 / 0.06); }
-  .mc-hitem code { color: #d6cae6; }
+  .mc-hitem:hover { background: var(--chrome-hover); }
+  .mc-hitem code { color: var(--code-fg); }
   .mc-hitem .ok { color: #7fe6c4; }
   .mc-hitem .bad { color: #ff9d9d; }
 
@@ -348,8 +408,8 @@
     padding: 5px 10px;
     border-radius: 6px;
     border: 1px solid var(--border-color);
-    background: rgb(12 8 22 / 0.5);
-    color: #f3ecff;
+    background: var(--code-bg);
+    color: var(--code-fg);
     font-family: monospace;
   }
   .mc-range {

@@ -244,26 +244,26 @@
     color: var(--text-secondary);
   }
 
-  /* 折叠树：固定深色毛玻璃面板，与 localhost / 线上表现一致 */
+  /* 折叠树：随主题切换的毛玻璃面板 */
   .recursive-wrap.notes-recursive-panel {
     border-width: var(--border-thin);
     padding: 0.7rem 0.85rem;
     margin-bottom: 0.85rem;
-    background: rgb(26 20 38 / 0.82) !important;
-    border-color: rgb(255 255 255 / 0.14) !important;
+    background: var(--tree-panel-bg) !important;
+    border-color: var(--tree-panel-border) !important;
     backdrop-filter: blur(14px) saturate(120%);
     -webkit-backdrop-filter: blur(14px) saturate(120%);
-    color: #f3ecff;
+    color: var(--text-primary);
     box-shadow: var(--shadow-normal);
   }
   .notes-recursive-panel :global(.root-title) {
-    color: #f3ecff;
+    color: var(--text-primary);
   }
   .notes-recursive-panel :global(.root-meta) {
-    color: #c8b9e2;
+    color: var(--text-secondary);
   }
   .notes-recursive-panel :global(.empty-folder) {
-    color: #a89bc4;
+    color: var(--text-secondary);
   }
 
   .tree-actions-bar {

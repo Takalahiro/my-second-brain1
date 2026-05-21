@@ -33,7 +33,9 @@ scripts/sweep-report.html
 # auto-sync-vault 的日志和锁文件（仅本地）
 logs/
 
+# MNIST 训练中间产物（权重 JSON）
+scripts/.cache/
+
 # 本地 Ghostscript（compress-public-assets 可选）
 tools/ghostscript/
-
 

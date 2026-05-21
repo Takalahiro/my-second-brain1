@@ -3,80 +3,244 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=DotGothic16&display=swap');
 @import './global.css';
 @import './pixel.css';
+@import './site-nav.css';
+@import './step-viz.css';
 
 :root {
-  /* 浅色模式 */
-  --bg-primary: #fff8f0;
-  --bg-secondary: #fff0e5;
+  /* 浅色 · 简约中性 */
+  --bg-primary: #f4f5f7;
+  --bg-secondary: #eceef2;
   --accent-pink: #ffd6e0;
   --accent-mint: #d4f0e0;
   --accent-lavender: #e0d6ff;
   --accent-peach: #ffe4d6;
-  --text-primary: #3d3d3d;
-  --text-secondary: #7a7a7a;
-  --border-color: #e0e0e0;
+  --text-primary: #2b2b30;
+  --text-secondary: #6b6b76;
+  --border-color: rgb(0 0 0 / 0.08);
 
-  /* 阴影 */
-  --shadow-soft: 0 8px 24px rgb(0 0 0 / 0.08);
-  --shadow-pixel: 2px 2px 0 rgb(0 0 0 / 0.1);
-  --shadow-normal: 0 8px 24px rgb(0 0 0 / 0.08), 2px 2px 0 rgb(0 0 0 / 0.1);
-  --shadow-hover: 0 12px 32px rgb(0 0 0 / 0.12), 4px 4px 0 rgb(0 0 0 / 0.15);
-  --shadow-active: 0 4px 12px rgb(0 0 0 / 0.08), 1px 1px 0 rgb(0 0 0 / 0.1);
+  /* 拟物 / 柔和阴影 */
+  --shadow-soft: 0 10px 28px rgb(0 0 0 / 0.06);
+  --shadow-pixel: 0 1px 0 rgb(255 255 255 / 0.65) inset;
+  --shadow-normal: 0 8px 24px rgb(0 0 0 / 0.06), 0 1px 0 rgb(255 255 255 / 0.7) inset;
+  --shadow-hover: 0 14px 32px rgb(0 0 0 / 0.09), 0 1px 0 rgb(255 255 255 / 0.75) inset;
+  --shadow-active: 0 4px 12px rgb(0 0 0 / 0.05), 0 1px 0 rgb(255 255 255 / 0.55) inset;
 
-  /* 边框厚度（统一两档） */
+  --neo-surface: #eef0f4;
+  --neo-track: #34343a;
+  --neo-thumb: #ffffff;
+  --neo-raised:
+    6px 6px 14px rgb(0 0 0 / 0.08),
+    -4px -4px 12px rgb(255 255 255 / 0.92);
+  --neo-raised-hover:
+    8px 8px 18px rgb(0 0 0 / 0.1),
+    -5px -5px 14px rgb(255 255 255 / 0.95);
+  --neo-pressed:
+    inset 4px 4px 10px rgb(0 0 0 / 0.1),
+    inset -3px -3px 8px rgb(255 255 255 / 0.75);
+  --neo-inset:
+    inset 3px 3px 7px rgb(0 0 0 / 0.35),
+    inset -2px -2px 5px rgb(255 255 255 / 0.06);
+
   --border-thin: 1px;
-  --border-thick: 2px;
+  --border-thick: 1px;
 
-  /* 动效节奏 */
-  --motion-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --motion-fast: 0.2s;
-  --motion-base: 0.3s;
+  --motion-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-spring: cubic-bezier(0.34, 1.12, 0.64, 1);
+  --motion-fast: 0.18s;
+  --motion-base: 0.28s;
 
-  /* 玻璃透明度曲线（浅色） */
-  --glass-bg: rgb(255 255 255 / 0.62);
-  --glass-bg-hover: rgb(255 255 255 / 0.74);
-  --glass-bg-strong: rgb(255 255 255 / 0.68);
-  --glass-border: rgb(255 255 255 / 0.34);
+  --glass-bg: rgb(255 255 255 / 0.72);
+  --glass-bg-hover: rgb(255 255 255 / 0.86);
+  --glass-bg-strong: rgb(255 255 255 / 0.8);
+  --glass-border: rgb(255 255 255 / 0.55);
 
-  /* 圆角 */
-  --radius-card: 16px;
+  --radius-card: 18px;
   --radius-button: 12px;
-  --radius-small: 8px;
+  --radius-small: 10px;
 
-  /* 全局字体方案（默认：温楷） */
   --font-body-current: 'LXGW WenKai', 'Inter', sans-serif;
-  --font-heading-current: 'Pixelify Sans', 'LXGW WenKai', sans-serif;
+  --font-heading-current: 'Inter', 'LXGW WenKai', sans-serif;
+
+  /* 顶栏 / 控制中心 / 抽屉 */
+  --chrome-bg-top: rgb(255 255 255 / 0.94);
+  --chrome-bg-bottom: rgb(244 245 247 / 0.88);
+  --chrome-text: var(--text-primary);
+  --chrome-text-muted: var(--text-secondary);
+  --chrome-hover: rgb(0 0 0 / 0.06);
+  --chrome-active: rgb(0 0 0 / 0.1);
+  --chrome-border: rgb(0 0 0 / 0.08);
+  --chrome-dropdown-bg: rgb(255 255 255 / 0.97);
+  --chrome-shadow: 0 12px 36px rgb(0 0 0 / 0.1), inset 0 1px 0 rgb(255 255 255 / 0.65);
+  --chrome-subtle: rgb(0 0 0 / 0.04);
+
+  /* 桌面小组件 */
+  --widget-bg-rgb: 255 255 255;
+  --widget-fg: var(--text-primary);
+  --widget-fg-muted: var(--text-secondary);
+  --widget-border: var(--border-color);
+  --widget-header-bg: rgb(0 0 0 / 0.04);
+  --widget-shadow: 0 20px 44px rgb(0 0 0 / 0.1);
+
+  /* 笔记树 / 列表面板 */
+  --tree-panel-bg: var(--glass-bg);
+  --tree-panel-border: var(--glass-border);
+  --tree-row-bg: var(--neo-surface);
+  --tree-row-hover-bg: var(--glass-bg-hover);
+  --tree-row-border: var(--border-color);
+  --tree-row-text: var(--text-primary);
+
+  /* 代码 / 终端区 */
+  --code-bg: var(--bg-secondary);
+  --code-fg: var(--text-primary);
+  --code-output-bg: rgb(236 238 242 / 0.92);
+  --code-output-fg: var(--text-primary);
+
+  /* 图谱画布 */
+  --graph-canvas-bg: linear-gradient(180deg, #eef0f6, #e4e7ef);
+  --graph-canvas-border: var(--border-color);
+  --graph-panel-bg: var(--glass-bg-strong);
+  --graph-panel-text: var(--text-primary);
+  --graph-panel-muted: var(--text-secondary);
 }
 
-/* 按你要求保留 data-theme 入口；同时兼容现有 .dark 切换逻辑 */
 [data-theme='dark'],
 :root.dark,
 .dark {
-  --bg-primary: #1a1625;
-  --bg-secondary: #2d2438;
+  --bg-primary: #14121a;
+  --bg-secondary: #1e1b26;
   --accent-neon-pink: #ff6b9d;
   --accent-neon-cyan: #6bffe0;
   --accent-neon-purple: #b66bff;
-  --text-primary: #f0e8ff;
-  --text-secondary: #a8a0c0;
-  --border-color: #4a4458;
+  --text-primary: #ece8f4;
+  --text-secondary: #9a92ae;
+  --border-color: rgb(255 255 255 / 0.1);
 
-  /* 玻璃透明度曲线（深色，整体更深） */
-  --glass-bg: rgb(37 30 50 / 0.68);
-  --glass-bg-hover: rgb(48 38 66 / 0.78);
-  --glass-bg-strong: rgb(33 27 46 / 0.74);
-  --glass-border: rgb(255 255 255 / 0.12);
+  --glass-bg: rgb(32 28 42 / 0.72);
+  --glass-bg-hover: rgb(42 36 56 / 0.84);
+  --glass-bg-strong: rgb(28 24 38 / 0.82);
+  --glass-border: rgb(255 255 255 / 0.1);
 
-  /* 深色下阴影略收敛，避免发灰 */
-  --shadow-normal: 0 8px 24px rgb(0 0 0 / 0.32), 2px 2px 0 rgb(0 0 0 / 0.26);
-  --shadow-hover: 0 12px 30px rgb(0 0 0 / 0.42), 4px 4px 0 rgb(0 0 0 / 0.3);
-  --shadow-active: 0 4px 12px rgb(0 0 0 / 0.24), 1px 1px 0 rgb(0 0 0 / 0.2);
+  --shadow-normal: 0 10px 28px rgb(0 0 0 / 0.32);
+  --shadow-hover: 0 14px 34px rgb(0 0 0 / 0.4);
+  --shadow-active: 0 6px 16px rgb(0 0 0 / 0.28);
+
+  --neo-surface: #2a2634;
+  --neo-track: #101018;
+  --neo-thumb: #ece8f4;
+  --neo-raised:
+    6px 6px 16px rgb(0 0 0 / 0.42),
+    -3px -3px 10px rgb(255 255 255 / 0.04);
+  --neo-raised-hover:
+    8px 8px 20px rgb(0 0 0 / 0.48),
+    -4px -4px 12px rgb(255 255 255 / 0.05);
+  --neo-pressed:
+    inset 4px 4px 10px rgb(0 0 0 / 0.45),
+    inset -2px -2px 6px rgb(255 255 255 / 0.03);
+  --neo-inset:
+    inset 3px 3px 8px rgb(0 0 0 / 0.55),
+    inset -1px -1px 4px rgb(255 255 255 / 0.04);
+
+  --chrome-bg-top: rgb(32 26 48 / 0.92);
+  --chrome-bg-bottom: rgb(22 18 36 / 0.88);
+  --chrome-text: rgb(255 255 255 / 0.92);
+  --chrome-text-muted: rgb(255 255 255 / 0.55);
+  --chrome-hover: rgb(255 255 255 / 0.14);
+  --chrome-active: rgb(255 255 255 / 0.22);
+  --chrome-border: rgb(255 255 255 / 0.16);
+  --chrome-dropdown-bg: rgb(36 30 50 / 0.96);
+  --chrome-shadow: 0 12px 36px rgb(0 0 0 / 0.35), inset 0 1px 0 rgb(255 255 255 / 0.12);
+  --chrome-subtle: rgb(255 255 255 / 0.08);
+
+  --widget-bg-rgb: 20 16 32;
+  --widget-fg: #f3ecff;
+  --widget-fg-muted: #c8b9e2;
+  --widget-border: rgb(255 255 255 / 0.16);
+  --widget-header-bg: rgb(0 0 0 / 0.18);
+  --widget-shadow: 0 20px 44px rgb(0 0 0 / 0.42);
+
+  --tree-panel-bg: rgb(26 20 38 / 0.82);
+  --tree-panel-border: rgb(255 255 255 / 0.14);
+  --tree-row-bg: linear-gradient(180deg, rgb(36 31 53 / 0.88), rgb(29 25 43 / 0.88));
+  --tree-row-hover-bg: linear-gradient(180deg, rgb(42 36 62 / 0.94), rgb(33 28 50 / 0.94));
+  --tree-row-border: rgb(126 116 158 / 0.36);
+  --tree-row-text: #f3ecff;
+
+  --code-bg: #0e0816;
+  --code-fg: #e8e0ff;
+  --code-output-bg: rgb(8 6 14 / 0.5);
+  --code-output-fg: #d6cae6;
+
+  --graph-canvas-bg: linear-gradient(180deg, #110926, #06030f);
+  --graph-canvas-border: rgb(255 255 255 / 0.08);
+  --graph-panel-bg: rgb(12 8 22 / 0.88);
+  --graph-panel-text: #f3ecff;
+  --graph-panel-muted: #b6a8d3;
 }
 
 body {
   font-family: var(--font-body-current);
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  transition: background-color var(--motion-base) var(--motion-ease),
+    color var(--motion-base) var(--motion-ease);
+}
+
+/* 浅色模式：覆写仍硬编码深色的桌面小组件 */
+:root:not(.dark) :is(
+  .floating-widget,
+  .calendar-widget,
+  .weather-widget,
+  .stats-widget,
+  .network-widget,
+  .notes-widget,
+  .todo-widget,
+  .graph-widget,
+  .pomodoro-widget,
+  .white-noise-widget,
+  .world-clock-widget,
+  .music-player,
+  .pixel-clock
+) {
+  background: rgb(var(--widget-bg-rgb) / var(--w-bg-alpha, 0.82)) !important;
+  color: var(--widget-fg) !important;
+  border-color: var(--widget-border) !important;
+  box-shadow: var(--widget-shadow) !important;
+}
+
+:root:not(.dark) :is(
+  .calendar-widget,
+  .weather-widget,
+  .stats-widget,
+  .network-widget,
+  .notes-widget,
+  .todo-widget,
+  .graph-widget,
+  .pomodoro-widget,
+  .white-noise-widget,
+  .world-clock-widget,
+  .music-player,
+  .pixel-clock
+) :is([class*='-header'], [class*='-bar'], .fw-header) {
+  background: var(--widget-header-bg) !important;
+  border-color: var(--widget-border) !important;
+  color: var(--widget-fg-muted) !important;
+}
+
+:root:not(.dark) :is(
+  .calendar-widget,
+  .weather-widget,
+  .stats-widget,
+  .network-widget,
+  .notes-widget,
+  .todo-widget,
+  .graph-widget,
+  .pomodoro-widget,
+  .white-noise-widget,
+  .world-clock-widget,
+  .music-player,
+  .pixel-clock
+) :is(button, .ww-day-name, .cal-day, .sw-label, .nw-title, .td-text, .mp-title) {
+  color: var(--widget-fg) !important;
 }
 
 h1,
@@ -86,26 +250,27 @@ h4,
 h5,
 h6 {
   font-family: var(--font-heading-current);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-/* 字体切换方案 */
 html[data-font='wenkai'] {
   --font-body-current: 'LXGW WenKai', 'Inter', sans-serif;
-  --font-heading-current: 'Pixelify Sans', 'LXGW WenKai', sans-serif;
+  --font-heading-current: 'LXGW WenKai', 'Inter', sans-serif;
 }
 html[data-font='inter'] {
   --font-body-current: 'Inter', 'LXGW WenKai', sans-serif;
-  --font-heading-current: 'Inter', 'Pixelify Sans', 'LXGW WenKai', sans-serif;
+  --font-heading-current: 'Inter', 'LXGW WenKai', sans-serif;
 }
 html[data-font='serif'] {
   --font-body-current: 'Noto Serif SC', 'LXGW WenKai', serif;
-  --font-heading-current: 'Noto Serif SC', 'Pixelify Sans', serif;
+  --font-heading-current: 'Noto Serif SC', 'Inter', serif;
 }
 html[data-font='plex'] {
   --font-body-current: 'IBM Plex Sans', 'LXGW WenKai', sans-serif;
-  --font-heading-current: 'IBM Plex Sans', 'Pixelify Sans', sans-serif;
+  --font-heading-current: 'IBM Plex Sans', 'Inter', sans-serif;
 }
 html[data-font='jp-pixel'] {
   --font-body-current: 'DotGothic16', 'LXGW WenKai', 'Inter', sans-serif;
-  --font-heading-current: 'DotGothic16', 'Pixelify Sans', 'LXGW WenKai', sans-serif;
+  --font-heading-current: 'DotGothic16', 'Inter', sans-serif;
 }

@@ -121,7 +121,7 @@
     background: rgb(255 255 255 / 0.06);
     border: 1px solid rgb(255 255 255 / 0.14);
     border-radius: 10px;
-    color: #f3ecff;
+    color: var(--graph-panel-text);
     padding: 6px 12px;
     font-size: 0.84rem;
   }
@@ -170,7 +170,7 @@
     background: rgb(255 255 255 / 0.05);
     border: 1px solid rgb(255 255 255 / 0.1);
     border-radius: 12px;
-    color: #f3ecff;
+    color: var(--graph-panel-text);
     text-decoration: none;
     transition: transform 0.14s ease, background 0.18s ease, border-color 0.18s ease;
     min-height: 80px;

@@ -118,7 +118,7 @@
     overflow: auto;
     padding: 20px 24px;
     background: linear-gradient(180deg, #110926, #06030f);
-    color: #f3ecff;
+    color: var(--graph-panel-text);
     display: flex; flex-direction: column;
     gap: 18px;
   }
@@ -131,7 +131,7 @@
   .sp-reset {
     background: rgb(255 255 255 / 0.08);
     border: 1px solid rgb(255 255 255 / 0.16);
-    color: #f3ecff;
+    color: var(--graph-panel-text);
     border-radius: 8px;
     padding: 5px 12px;
     cursor: pointer;

@@ -1,38 +1,35 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount, setContext } from 'svelte';
+  import { DESKTOP_ATMOSPHERE_KEY, type DesktopAtmosphereState } from '../../lib/desktop-atmosphere';
   import { media } from '../../lib/media';
-  import BackgroundLayer from './BackgroundLayer.svelte';
-  import PixelClock from './PixelClock.svelte';
-  import MusicPlayer from './MusicPlayer.svelte';
-  import NotesWidget from './NotesWidget.svelte';
-  import TodoWidget from './TodoWidget.svelte';
-  import CalendarWidget from './CalendarWidget.svelte';
-  import PomodoroWidget from './PomodoroWidget.svelte';
-  import WeatherWidget from './WeatherWidget.svelte';
-  import StatsWidget from './StatsWidget.svelte';
-  import WorldClockWidget from './WorldClockWidget.svelte';
-  import GraphWidget from './GraphWidget.svelte';
-  import TerritoryMapWidget from './TerritoryMapWidget.svelte';
-  import CalculatorWidget from './CalculatorWidget.svelte';
-  import PythonWidget from './PythonWidget.svelte';
-  import WhiteboardWidget from './WhiteboardWidget.svelte';
-  import WhiteNoiseWidget from './WhiteNoiseWidget.svelte';
+  import LazyWidget from './LazyWidget.svelte';
+  import { widgetLoaders } from './widgetLoaders';
   import WidgetDrawer from './WidgetDrawer.svelte';
+  import MacMenuBar from '../desktop/MacMenuBar.svelte';
   import { readGlobalMuted, writeGlobalMuted } from '../../lib/global-audio-mute';
+  import {
+    computeLinkedRainDrops,
+    readCachedWeatherCode,
+  } from '../../lib/weather-rain';
 
   interface Props {
     backgroundDefault?: boolean;
+    desktopMode?: boolean;
   }
-  let { backgroundDefault = false }: Props = $props();
+  let { backgroundDefault = false, desktopMode = false }: Props = $props();
 
   const STORAGE_KEY = 'second-brain:widgets';
 
-  type WidgetKey = 'background' | 'clock' | 'music' | 'notes' | 'todo' | 'calendar' | 'pomodoro' | 'weather' | 'stats' | 'world' | 'graph' | 'territory' | 'calculator' | 'python' | 'whiteboard' | 'whitenoise';
+  type WidgetKey = 'background' | 'clock' | 'music' | 'notes' | 'todo' | 'calendar' | 'pomodoro' | 'weather' | 'stats' | 'world' | 'graph' | 'territory' | 'calculator' | 'python' | 'whiteboard' | 'whitenoise' | 'network';
   type Enabled = Record<WidgetKey, boolean>;
   type BgState = {
     sceneId: string;
     useVideo: boolean;
     rain: boolean;
+    rainDrops: boolean;
+    /** true 时雨滴随天气 / 雨天视频自动开关 */
+    rainDropsLinked: boolean;
+    sakura: boolean;
     brightness: number;
     speed: number;
     mobileIndex: number;
@@ -56,19 +53,52 @@
     python: false,
     whiteboard: false,
     whitenoise: false,
+    network: false,
   });
   /** 壁纸层一键静音（音乐 + 白噪音） */
   let globalMuted = $state(false);
   /** 一键清屏前的快照；非 null 时显示"恢复"按钮 */
   let snapshot = $state<Enabled | null>(null);
   let isMobile = $state(false);
+  let controlCenterOpen = $state(false);
+  let spotlightToken = $state(0);
   let bg = $state<BgState>({
     sceneId: media.scenes[0]?.id ?? 'usyd',
     useVideo: true,
     rain: false,
+    rainDrops: false,
+    rainDropsLinked: true,
+    sakura: false,
     brightness: 1,
     speed: 1,
     mobileIndex: 0,
+  });
+
+  let lastWeatherCode = $state<number | null>(null);
+
+  function sceneHasRain(sceneId = bg.sceneId) {
+    return !!media.scenes.find((s) => s.id === sceneId)?.hasRain;
+  }
+
+  function syncLinkedRainDrops(weatherCode: number | null = lastWeatherCode) {
+    if (!bg.rainDropsLinked) return;
+    const next = computeLinkedRainDrops(weatherCode, bg.rain, sceneHasRain());
+    if (next !== bg.rainDrops) bg = { ...bg, rainDrops: next };
+  }
+
+  function onWeatherSync(e: Event) {
+    const ev = e as CustomEvent<{ weatherCode?: number }>;
+    const code = ev.detail?.weatherCode;
+    if (typeof code !== 'number') return;
+    lastWeatherCode = code;
+    syncLinkedRainDrops(code);
+    persist();
+  }
+
+  const desktopAtmosphere = $state<DesktopAtmosphereState>({ rainDrops: false });
+  setContext(DESKTOP_ATMOSPHERE_KEY, desktopAtmosphere);
+  $effect(() => {
+    desktopAtmosphere.rainDrops = desktopMode && bg.rainDrops;
   });
 
   onMount(() => {
@@ -82,6 +112,9 @@
             sceneId: typeof s.bg.sceneId === 'string' ? s.bg.sceneId : bg.sceneId,
             useVideo: s.bg.useVideo !== false,
             rain: !!s.bg.rain,
+            rainDrops: !!s.bg.rainDrops,
+            rainDropsLinked: s.bg.rainDropsLinked !== false,
+            sakura: s.bg.sceneId === 'kyoto' ? !!s.bg.sakura : false,
             brightness: typeof s.bg.brightness === 'number' ? s.bg.brightness : 1,
             speed: typeof s.bg.speed === 'number' ? s.bg.speed : 1,
             mobileIndex: typeof s.bg.mobileIndex === 'number' ? s.bg.mobileIndex : 0,
@@ -89,6 +122,9 @@
         }
       }
     } catch {}
+    lastWeatherCode = readCachedWeatherCode();
+    syncLinkedRainDrops(lastWeatherCode);
+    window.addEventListener('weather:sync', onWeatherSync);
     // 每次打开主界面：壁纸始终保留（若页面默认开启），其余小组件清空
     enabled = {
       background: backgroundDefault,
@@ -107,6 +143,7 @@
       python: false,
       whiteboard: false,
       whitenoise: false,
+      network: false,
     };
     snapshot = null;
     // 监听移动端断点 —— 时钟在此条件下永远不 pin
@@ -119,6 +156,7 @@
     } catch {}
     ready = true;
     persist();
+    return () => window.removeEventListener('weather:sync', onWeatherSync);
   });
 
   /** 时钟仅在「桌面 + 启用了背景 + 使用视频」时锁定在右下角 */
@@ -290,6 +328,17 @@
         } catch { return ''; }
       },
     },
+    network: {
+      key: 'second-brain:network-layout',
+      serialize: ({ x, y }) => {
+        try {
+          const cur = JSON.parse(localStorage.getItem('second-brain:network-layout') || '{}');
+          const w = typeof cur.w === 'number' ? cur.w : 400;
+          const h = typeof cur.h === 'number' ? cur.h : 460;
+          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h, r: cur.r ?? 0 });
+        } catch { return ''; }
+      },
+    },
   };
 
   function toggleEnabled(key: WidgetKey, drop?: { x: number; y: number }) {
@@ -308,7 +357,28 @@
     if (next && snapshot) snapshot = null;
     persist();
   }
-  function patchBg(p: Partial<BgState>) { bg = { ...bg, ...p }; persist(); }
+  function patchBg(p: Partial<BgState>) {
+    const next = { ...bg, ...p };
+    if (p.sceneId && p.sceneId !== 'kyoto') next.sakura = false;
+    if (p.rainDrops !== undefined && p.rainDropsLinked === undefined) {
+      next.rainDropsLinked = false;
+    }
+    if (p.rainDropsLinked === true) {
+      next.rainDrops = computeLinkedRainDrops(
+        lastWeatherCode,
+        next.rain,
+        sceneHasRain(next.sceneId),
+      );
+    } else if (p.rain !== undefined && next.rainDropsLinked) {
+      next.rainDrops = computeLinkedRainDrops(
+        lastWeatherCode,
+        next.rain,
+        sceneHasRain(next.sceneId),
+      );
+    }
+    bg = next;
+    persist();
+  }
   function setMobileIndex(idx: number) { bg = { ...bg, mobileIndex: idx }; persist(); }
 
   /** 一键清屏：除「背景」外全部关闭，并保存当前状态为快照 */
@@ -334,6 +404,7 @@
       python: false,
       whiteboard: false,
       whitenoise: false,
+      network: false,
     };
     persist();
   }
@@ -349,94 +420,278 @@
     Object.entries(enabled).filter(([k]) => k !== 'background').every(([, v]) => !v)
   );
 
-  const scenes = media.scenes.map((s) => ({ id: s.id, label: s.label, hasRain: s.hasRain }));
+  function toggleControlCenter() {
+    controlCenterOpen = !controlCenterOpen;
+  }
+
+  function openSpotlight() {
+    controlCenterOpen = true;
+    spotlightToken += 1;
+  }
+
+  function toggleManualFromDesktop() {
+    window.dispatchEvent(new CustomEvent('second-brain:toggle-manual'));
+  }
+
+  const scenes = media.scenes.map((s) => ({
+    id: s.id,
+    label: s.label,
+    hasRain: s.hasRain,
+    poster: s.poster,
+    hasSakura: s.id === 'kyoto',
+  }));
 </script>
 
-{#if enabled.background}
-  <BackgroundLayer
-    sceneId={bg.sceneId}
-    useVideo={bg.useVideo}
-    rain={bg.rain}
-    brightness={bg.brightness}
-    speed={bg.speed}
-    mobileIndex={bg.mobileIndex}
-    onMobileIndexChange={setMobileIndex}
-  />
+{#if desktopMode}
+  <div class="mac-desktop" aria-label="桌面">
+    {#if ready}
+      <MacMenuBar
+        controlCenterOpen={controlCenterOpen}
+        globalMuted={globalMuted}
+        hasSnapshot={!!snapshot}
+        {isCleared}
+        rainDrops={bg.rainDrops}
+        onToggleControlCenter={toggleControlCenter}
+        onToggleMute={toggleGlobalMute}
+        onClearAll={clearAll}
+        onRestore={restoreAll}
+        onToggleManual={toggleManualFromDesktop}
+        onOpenSpotlight={openSpotlight}
+      />
+    {/if}
+
+    <div class="mac-desktop-stage">
+      {#if enabled.background}
+        <LazyWidget
+          show={true}
+          loader={widgetLoaders.background}
+          props={{
+            sceneId: bg.sceneId,
+            useVideo: bg.useVideo,
+            rain: bg.rain,
+            brightness: bg.brightness,
+            speed: bg.speed,
+            mobileIndex: bg.mobileIndex,
+            onMobileIndexChange: setMobileIndex,
+          }}
+        />
+        <LazyWidget
+          show={true}
+          loader={widgetLoaders.atmosphere}
+          props={{
+            rainDrops: bg.rainDrops,
+            sakura: bg.sakura,
+            sceneId: bg.sceneId,
+            active: true,
+          }}
+        />
+      {/if}
+
+      {#if ready && enabled.clock}
+        <LazyWidget
+          show={true}
+          loader={widgetLoaders.clock}
+          props={{ onClose: () => toggleEnabled('clock'), pinned: clockPinned }}
+        />
+      {/if}
+      {#if ready && enabled.music}
+        <LazyWidget
+          show={true}
+          loader={widgetLoaders.music}
+          props={{ onClose: () => toggleEnabled('music'), globalMuted }}
+        />
+      {/if}
+      {#if ready && enabled.notes}
+        <LazyWidget show={true} loader={widgetLoaders.notes} props={{ onClose: () => toggleEnabled('notes') }} />
+      {/if}
+      {#if ready && enabled.todo}
+        <LazyWidget show={true} loader={widgetLoaders.todo} props={{ onClose: () => toggleEnabled('todo') }} />
+      {/if}
+      {#if ready && enabled.calendar}
+        <LazyWidget show={true} loader={widgetLoaders.calendar} props={{ onClose: () => toggleEnabled('calendar') }} />
+      {/if}
+      {#if ready && enabled.pomodoro}
+        <LazyWidget show={true} loader={widgetLoaders.pomodoro} props={{ onClose: () => toggleEnabled('pomodoro') }} />
+      {/if}
+      {#if ready && enabled.weather}
+        <LazyWidget show={true} loader={widgetLoaders.weather} props={{ onClose: () => toggleEnabled('weather') }} />
+      {/if}
+      {#if ready && enabled.stats}
+        <LazyWidget show={true} loader={widgetLoaders.stats} props={{ onClose: () => toggleEnabled('stats') }} />
+      {/if}
+      {#if ready && enabled.world}
+        <LazyWidget show={true} loader={widgetLoaders.world} props={{ onClose: () => toggleEnabled('world') }} />
+      {/if}
+      {#if ready && enabled.graph}
+        <LazyWidget show={true} loader={widgetLoaders.graph} props={{ onClose: () => toggleEnabled('graph') }} />
+      {/if}
+      {#if ready && enabled.territory}
+        <LazyWidget show={true} loader={widgetLoaders.territory} props={{ onClose: () => toggleEnabled('territory') }} />
+      {/if}
+      {#if ready && enabled.calculator}
+        <LazyWidget show={true} loader={widgetLoaders.calculator} props={{ onClose: () => toggleEnabled('calculator') }} />
+      {/if}
+      {#if ready && enabled.python}
+        <LazyWidget show={true} loader={widgetLoaders.python} props={{ onClose: () => toggleEnabled('python') }} />
+      {/if}
+      {#if ready && enabled.whiteboard}
+        <LazyWidget show={true} loader={widgetLoaders.whiteboard} props={{ onClose: () => toggleEnabled('whiteboard') }} />
+      {/if}
+      {#if ready && enabled.whitenoise}
+        <LazyWidget
+          show={true}
+          loader={widgetLoaders.whitenoise}
+          props={{ onClose: () => toggleEnabled('whitenoise'), globalMuted }}
+        />
+      {/if}
+      {#if ready && enabled.network}
+        <LazyWidget show={true} loader={widgetLoaders.network} props={{ onClose: () => toggleEnabled('network') }} />
+      {/if}
+    </div>
+
+    {#if ready}
+      <WidgetDrawer
+        bind:open={controlCenterOpen}
+        {spotlightToken}
+        {enabled}
+        {bg}
+        {scenes}
+        hasSnapshot={!!snapshot}
+        {isCleared}
+        onToggle={(key, drop) => toggleEnabled(key, drop)}
+        onPatchBg={patchBg}
+        onClearAll={clearAll}
+        onRestore={restoreAll}
+      />
+    {/if}
+  </div>
+{:else}
+  {#if enabled.background}
+    <LazyWidget
+      show={true}
+      loader={widgetLoaders.background}
+      props={{
+        sceneId: bg.sceneId,
+        useVideo: bg.useVideo,
+        rain: bg.rain,
+        brightness: bg.brightness,
+        speed: bg.speed,
+        mobileIndex: bg.mobileIndex,
+        onMobileIndexChange: setMobileIndex,
+      }}
+    />
+    <LazyWidget
+      show={true}
+      loader={widgetLoaders.atmosphere}
+      props={{
+        rainDrops: bg.rainDrops,
+        sakura: bg.sakura,
+        sceneId: bg.sceneId,
+        active: true,
+      }}
+    />
+    {#if ready}
+      <button
+        type="button"
+        class="wallpaper-mute-btn"
+        class:is-muted={globalMuted}
+        aria-label={globalMuted ? '取消静音' : '一键静音'}
+        title={globalMuted ? '取消静音' : '一键静音（音乐 + 白噪音）'}
+        onclick={toggleGlobalMute}
+      >
+        {globalMuted ? '🔇' : '🔊'}
+      </button>
+    {/if}
+  {/if}
+
+  {#if ready && enabled.clock}
+    <LazyWidget
+      show={true}
+      loader={widgetLoaders.clock}
+      props={{ onClose: () => toggleEnabled('clock'), pinned: clockPinned }}
+    />
+  {/if}
+  {#if ready && enabled.music}
+    <LazyWidget
+      show={true}
+      loader={widgetLoaders.music}
+      props={{ onClose: () => toggleEnabled('music'), globalMuted }}
+    />
+  {/if}
+  {#if ready && enabled.notes}
+    <LazyWidget show={true} loader={widgetLoaders.notes} props={{ onClose: () => toggleEnabled('notes') }} />
+  {/if}
+  {#if ready && enabled.todo}
+    <LazyWidget show={true} loader={widgetLoaders.todo} props={{ onClose: () => toggleEnabled('todo') }} />
+  {/if}
+  {#if ready && enabled.calendar}
+    <LazyWidget show={true} loader={widgetLoaders.calendar} props={{ onClose: () => toggleEnabled('calendar') }} />
+  {/if}
+  {#if ready && enabled.pomodoro}
+    <LazyWidget show={true} loader={widgetLoaders.pomodoro} props={{ onClose: () => toggleEnabled('pomodoro') }} />
+  {/if}
+  {#if ready && enabled.weather}
+    <LazyWidget show={true} loader={widgetLoaders.weather} props={{ onClose: () => toggleEnabled('weather') }} />
+  {/if}
+  {#if ready && enabled.stats}
+    <LazyWidget show={true} loader={widgetLoaders.stats} props={{ onClose: () => toggleEnabled('stats') }} />
+  {/if}
+  {#if ready && enabled.world}
+    <LazyWidget show={true} loader={widgetLoaders.world} props={{ onClose: () => toggleEnabled('world') }} />
+  {/if}
+  {#if ready && enabled.graph}
+    <LazyWidget show={true} loader={widgetLoaders.graph} props={{ onClose: () => toggleEnabled('graph') }} />
+  {/if}
+  {#if ready && enabled.territory}
+    <LazyWidget show={true} loader={widgetLoaders.territory} props={{ onClose: () => toggleEnabled('territory') }} />
+  {/if}
+  {#if ready && enabled.calculator}
+    <LazyWidget show={true} loader={widgetLoaders.calculator} props={{ onClose: () => toggleEnabled('calculator') }} />
+  {/if}
+  {#if ready && enabled.python}
+    <LazyWidget show={true} loader={widgetLoaders.python} props={{ onClose: () => toggleEnabled('python') }} />
+  {/if}
+  {#if ready && enabled.whiteboard}
+    <LazyWidget show={true} loader={widgetLoaders.whiteboard} props={{ onClose: () => toggleEnabled('whiteboard') }} />
+  {/if}
+  {#if ready && enabled.whitenoise}
+    <LazyWidget
+      show={true}
+      loader={widgetLoaders.whitenoise}
+      props={{ onClose: () => toggleEnabled('whitenoise'), globalMuted }}
+    />
+  {/if}
+  {#if ready && enabled.network}
+    <LazyWidget show={true} loader={widgetLoaders.network} props={{ onClose: () => toggleEnabled('network') }} />
+  {/if}
+
   {#if ready}
-    <button
-      type="button"
-      class="wallpaper-mute-btn"
-      class:is-muted={globalMuted}
-      aria-label={globalMuted ? '取消静音' : '一键静音'}
-      title={globalMuted ? '取消静音' : '一键静音（音乐 + 白噪音）'}
-      onclick={toggleGlobalMute}
-    >
-      {globalMuted ? '🔇' : '🔊'}
-    </button>
+    <WidgetDrawer
+      {enabled}
+      {bg}
+      {scenes}
+      hasSnapshot={!!snapshot}
+      {isCleared}
+      onToggle={(key, drop) => toggleEnabled(key, drop)}
+      onPatchBg={patchBg}
+      onClearAll={clearAll}
+      onRestore={restoreAll}
+    />
   {/if}
 {/if}
 
-{#if ready && enabled.clock}
-  <PixelClock onClose={() => toggleEnabled('clock')} pinned={clockPinned} />
-{/if}
-{#if ready && enabled.music}
-  <MusicPlayer onClose={() => toggleEnabled('music')} {globalMuted} />
-{/if}
-{#if ready && enabled.notes}
-  <NotesWidget onClose={() => toggleEnabled('notes')} />
-{/if}
-{#if ready && enabled.todo}
-  <TodoWidget onClose={() => toggleEnabled('todo')} />
-{/if}
-{#if ready && enabled.calendar}
-  <CalendarWidget onClose={() => toggleEnabled('calendar')} />
-{/if}
-{#if ready && enabled.pomodoro}
-  <PomodoroWidget onClose={() => toggleEnabled('pomodoro')} />
-{/if}
-{#if ready && enabled.weather}
-  <WeatherWidget onClose={() => toggleEnabled('weather')} />
-{/if}
-{#if ready && enabled.stats}
-  <StatsWidget onClose={() => toggleEnabled('stats')} />
-{/if}
-{#if ready && enabled.world}
-  <WorldClockWidget onClose={() => toggleEnabled('world')} />
-{/if}
-{#if ready && enabled.graph}
-  <GraphWidget onClose={() => toggleEnabled('graph')} />
-{/if}
-{#if ready && enabled.territory}
-  <TerritoryMapWidget onClose={() => toggleEnabled('territory')} />
-{/if}
-{#if ready && enabled.calculator}
-  <CalculatorWidget onClose={() => toggleEnabled('calculator')} />
-{/if}
-{#if ready && enabled.python}
-  <PythonWidget onClose={() => toggleEnabled('python')} />
-{/if}
-{#if ready && enabled.whiteboard}
-  <WhiteboardWidget onClose={() => toggleEnabled('whiteboard')} />
-{/if}
-{#if ready && enabled.whitenoise}
-  <WhiteNoiseWidget onClose={() => toggleEnabled('whitenoise')} {globalMuted} />
-{/if}
-
-{#if ready}
-  <WidgetDrawer
-    enabled={enabled}
-    bg={bg}
-    scenes={scenes}
-    hasSnapshot={!!snapshot}
-    isCleared={isCleared}
-    onToggle={(key, drop) => toggleEnabled(key, drop)}
-    onPatchBg={patchBg}
-    onClearAll={clearAll}
-    onRestore={restoreAll}
-  />
-{/if}
-
 <style>
+  .mac-desktop {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .mac-desktop-stage {
+    position: absolute;
+    inset: 58px 0 16px;
+  }
+
   .wallpaper-mute-btn {
     position: fixed;
     z-index: 12;

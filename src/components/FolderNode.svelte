@@ -157,27 +157,27 @@
     padding: 9px 12px;
     text-align: left;
     cursor: pointer;
-    border: 1px solid rgb(126 116 158 / 0.36);
+    border: 1px solid var(--tree-row-border);
     font-weight: 600;
-    color: #f3ecff;
+    color: var(--tree-row-text);
     margin: 5px 0;
     box-sizing: border-box;
     appearance: none;
     -webkit-appearance: none;
-    background: linear-gradient(180deg, rgb(36 31 53 / 0.88), rgb(29 25 43 / 0.88));
-    box-shadow: 0 8px 18px rgb(0 0 0 / 0.2), inset 0 1px 0 rgb(255 255 255 / 0.04);
+    background: var(--tree-row-bg);
+    box-shadow: var(--neo-raised);
     border-radius: 14px;
     transition: background-color var(--motion-fast) var(--motion-ease),
       box-shadow var(--motion-fast) var(--motion-ease),
       border-color var(--motion-fast) var(--motion-ease);
   }
   .folder-row:hover {
-    border-color: rgb(156 142 202 / 0.5);
-    background: linear-gradient(180deg, rgb(42 36 62 / 0.94), rgb(33 28 50 / 0.94));
-    box-shadow: 0 10px 22px rgb(0 0 0 / 0.24), inset 0 1px 0 rgb(255 255 255 / 0.05);
+    border-color: rgb(180 140 255 / 0.35);
+    background: var(--tree-row-hover-bg);
+    box-shadow: var(--neo-raised-hover);
   }
   .folder-row:active {
-    box-shadow: 0 5px 12px rgb(0 0 0 / 0.2), inset 0 1px 0 rgb(255 255 255 / 0.04);
+    box-shadow: var(--neo-pressed);
   }
 
   .folder-block.depth-1 > .folder-row {
@@ -196,7 +196,7 @@
   .folder-caret {
     width: 0.86em;
     height: 0.86em;
-    color: #d4c9ee;
+    color: var(--text-secondary);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -229,20 +229,13 @@
     flex: 0 0 auto;
     font-size: 0.66rem;
     line-height: 1;
-    color: #e9e1fc;
-    background: rgb(20 18 30 / 0.95);
+    color: var(--text-secondary);
+    background: var(--bg-primary);
     padding: 2px 7px;
     border-radius: 999px;
-    border: 1px solid rgb(108 97 141 / 0.42);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
+    border: 1px solid var(--border-color);
     font-weight: 600;
     letter-spacing: 0;
-  }
-  :global(.dark) .folder-count {
-    color: #f1e9ff;
-    background: rgb(14 12 21 / 0.98);
-    border-color: rgb(85 74 116 / 0.52);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05);
   }
 
   .notes-list {
@@ -257,24 +250,24 @@
     gap: 8px;
     padding: 8px 12px;
     border-radius: 12px;
-    color: #ece4ff;
-    border: 1px solid rgb(118 108 150 / 0.28);
+    color: var(--tree-row-text);
+    border: 1px solid var(--tree-row-border);
     text-decoration: none;
     font-size: 0.9rem;
     margin: 5px 0;
-    background: linear-gradient(180deg, rgb(34 30 50 / 0.78), rgb(27 24 40 / 0.78));
-    box-shadow: 0 6px 14px rgb(0 0 0 / 0.18), inset 0 1px 0 rgb(255 255 255 / 0.03);
+    background: var(--tree-row-bg);
+    box-shadow: var(--neo-raised);
     transition: background-color var(--motion-fast) var(--motion-ease),
       box-shadow var(--motion-fast) var(--motion-ease),
       border-color var(--motion-fast) var(--motion-ease);
   }
   .note-link:hover {
-    border-color: rgb(148 137 188 / 0.48);
-    background: linear-gradient(180deg, rgb(40 35 58 / 0.86), rgb(32 28 47 / 0.86));
-    box-shadow: 0 9px 18px rgb(0 0 0 / 0.22), inset 0 1px 0 rgb(255 255 255 / 0.04);
+    border-color: rgb(180 140 255 / 0.35);
+    background: var(--tree-row-hover-bg);
+    box-shadow: var(--neo-raised-hover);
   }
   .note-link:active {
-    box-shadow: 0 4px 10px rgb(0 0 0 / 0.16), inset 0 1px 0 rgb(255 255 255 / 0.03);
+    box-shadow: var(--neo-pressed);
   }
   .note-icon {
     flex: 0 0 auto;

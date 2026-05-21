@@ -9,25 +9,50 @@
 
   interface Props {
     syncInfo?: SyncInfo;
+    desktopMode?: boolean;
   }
-  let { syncInfo }: Props = $props();
+  let { syncInfo, desktopMode = false }: Props = $props();
 
   const HERO_KEY = 'second-brain:hero-closed';
   const MANUAL_KEY = 'second-brain:manual-closed';
+  const DESKTOP_MANUAL_KEY = 'second-brain:desktop-manual-v1';
+  const INTRO_KEY = 'second-brain:desktop-intro-v1';
 
   let heroClosed = $state(false);
   let manualClosed = $state(true);
   let mounted = $state(false);
+  let isFirstDesktopManual = $state(false);
 
-  const showWelcome = $derived(mounted && !heroClosed && !showManual);
   const showManual = $derived(mounted && !manualClosed);
+  const showWelcome = $derived(mounted && !heroClosed && !showManual && !isFirstDesktopManual);
 
   onMount(() => {
     try {
       heroClosed = localStorage.getItem(HERO_KEY) === '1';
       manualClosed = localStorage.getItem(MANUAL_KEY) === '1';
+
+      if (desktopMode && localStorage.getItem(DESKTOP_MANUAL_KEY) !== '1') {
+        isFirstDesktopManual = true;
+        heroClosed = true;
+        manualClosed = true;
+
+        const openFirstManual = () => {
+          manualClosed = false;
+        };
+
+        if (localStorage.getItem(INTRO_KEY)) {
+          queueMicrotask(openFirstManual);
+        } else {
+          window.addEventListener('second-brain:desktop-intro-done', openFirstManual, { once: true });
+        }
+      }
     } catch {}
+
     mounted = true;
+
+    const onToggleManual = () => toggleHome();
+    window.addEventListener('second-brain:toggle-manual', onToggleManual);
+    return () => window.removeEventListener('second-brain:toggle-manual', onToggleManual);
   });
 
   function closeHero() {
@@ -40,7 +65,13 @@
   }
   function closeManual() {
     manualClosed = true;
-    try { localStorage.setItem(MANUAL_KEY, '1'); } catch {}
+    try {
+      localStorage.setItem(MANUAL_KEY, '1');
+      if (desktopMode && isFirstDesktopManual) {
+        localStorage.setItem(DESKTOP_MANUAL_KEY, '1');
+        isFirstDesktopManual = false;
+      }
+    } catch {}
   }
   function reopenHero() {
     heroClosed = false;
@@ -60,7 +91,7 @@
 </script>
 
 {#if showWelcome}
-  <section class="home-hero" aria-label="欢迎">
+  <section class="home-hero" class:desktop-overlay={desktopMode} aria-label="欢迎">
     <div class="hero-card pixel-card glass-container">
       <button
         type="button"
@@ -70,7 +101,7 @@
         onclick={closeHero}
       >×</button>
       <h1 class="hero-title">My Second Brain</h1>
-      <p class="hero-sub">日系像素 · 毛玻璃 · 任你切换</p>
+      <p class="hero-sub">简约桌面 · 毛玻璃 · 任你切换</p>
       <div class="hero-actions">
         <a class="pixel-button hero-btn" href="/notes">进入笔记</a>
         <a class="pixel-button hero-btn ghost" href="/tags">浏览标签</a>
@@ -81,8 +112,17 @@
 {/if}
 
 {#if showManual}
-  <section class="home-hero" aria-label="使用说明">
-    <div class="manual-card pixel-card glass-container">
+  {#if desktopMode}
+    <button
+      type="button"
+      class="desktop-manual-backdrop"
+      class:is-first={isFirstDesktopManual}
+      aria-label="关闭使用说明"
+      onclick={closeManual}
+    ></button>
+  {/if}
+  <section class="home-hero" class:desktop-overlay={desktopMode} class:is-first-manual={isFirstDesktopManual} aria-label="使用说明">
+    <div class="manual-card pixel-card glass-container" class:is-first-manual={isFirstDesktopManual}>
       <button
         type="button"
         class="card-close"
@@ -98,11 +138,15 @@
 
       <div class="manual-body">
         <section>
-          <h3>首页小组件</h3>
-          <p>点右上角 <strong>⚙</strong> 打开组件抽屉，拖到画面即可添加。支持拖动标题栏移动、边缘拉伸、右下角 <strong>↻</strong> 旋转。</p>
+          <h3>桌面与组件</h3>
+          <p>顶栏 <strong>⚙</strong> 控制中心 · <strong>🧹</strong> 清屏；菜单栏可直达 <strong>笔记 / Python / MATLAB / 白板 / 图谱</strong>。</p>
           <ul>
-            <li>移动端：<strong>双指旋转</strong>、<strong>三指缩放</strong></li>
-            <li><strong>🧹</strong> 一键清屏，<strong>↩</strong> 可恢复布局</li>
+            <li>主界面菜单栏与内容页顶栏导航样式统一</li>
+            <li>雨滴默认跟随天气；控制中心 → 墙纸可改「跟随天气」</li>
+            <li>樱花仅在控制中心 → 墙纸，且 <strong>Kyoto</strong> 场景可用</li>
+            <li>控制中心 → 墙纸：圆角预览图点击切换场景</li>
+            <li>窗口三圆点：<strong>红</strong>关闭 · <strong>黄</strong>最小化 · <strong>绿</strong>展开</li>
+            <li>移动端：双指旋转 · 三指缩放组件窗口</li>
           </ul>
         </section>
 
@@ -111,7 +155,7 @@
           <ul>
             <li><a href="/notes">笔记</a>：小组件 / 折叠树；文末显示 Git 最后更新时间</li>
             <li>阅读笔记时点 <strong>🛠</strong>：浮窗打开 Python / MATLAB / 白板</li>
-            <li>顶栏：<a href="/python">Python</a> · <a href="/matlab">MATLAB</a> · <a href="/whiteboard">白板</a> · <a href="/graph">图谱</a></li>
+            <li>顶栏 Logo 菜单：<a href="/python">Python</a> · <a href="/matlab">MATLAB</a> · <a href="/whiteboard">白板</a> · <a href="/graph">图谱</a></li>
           </ul>
         </section>
 
@@ -138,16 +182,20 @@
       </div>
 
       <footer class="manual-card-foot">
-        {#if heroClosed}
+        {#if heroClosed && !isFirstDesktopManual}
           <button type="button" class="pixel-button hero-btn ghost" onclick={reopenHero}>显示欢迎卡片</button>
         {/if}
-        <a class="pixel-button hero-btn" href="/notes">进入笔记</a>
+        {#if isFirstDesktopManual}
+          <button type="button" class="pixel-button hero-btn" onclick={closeManual}>开始使用</button>
+        {:else}
+          <a class="pixel-button hero-btn" href="/notes">进入笔记</a>
+        {/if}
       </footer>
     </div>
   </section>
 {/if}
 
-{#if mounted}
+{#if mounted && !desktopMode}
   <button
     type="button"
     class="home-fab"
@@ -166,6 +214,59 @@
     justify-content: center;
     padding: 24px 12px;
     pointer-events: none;
+  }
+  :global(.mac-os-body) .home-hero.desktop-overlay {
+    position: fixed;
+    inset: 58px 0 16px;
+    z-index: 118;
+    min-height: 0;
+    padding: 20px 16px;
+  }
+  :global(.mac-os-body) .home-hero.desktop-overlay.is-first-manual {
+    z-index: 125;
+    animation: manual-rise-in 0.55s cubic-bezier(0.34, 1.1, 0.64, 1) both;
+  }
+
+  @keyframes manual-rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .desktop-manual-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 117;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: default;
+    background: rgb(8 6 14 / 0.22);
+    backdrop-filter: blur(6px) saturate(120%);
+    -webkit-backdrop-filter: blur(6px) saturate(120%);
+    animation: backdrop-in 0.45s ease both;
+  }
+  .desktop-manual-backdrop.is-first {
+    z-index: 124;
+    background: rgb(8 6 14 / 0.28);
+    backdrop-filter: blur(10px) saturate(130%);
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+  }
+  :global(:not(.dark)) .desktop-manual-backdrop {
+    background: rgb(244 245 247 / 0.35);
+  }
+  :global(:not(.dark)) .desktop-manual-backdrop.is-first {
+    background: rgb(244 245 247 / 0.42);
+  }
+
+  @keyframes backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
   .home-hero > * {
     pointer-events: auto;
@@ -188,7 +289,7 @@
     border-color: rgb(255 255 255 / 0.14);
   }
 
-  /* 使用说明卡片：更低透明度毛玻璃 */
+  /* 使用说明卡片：毛玻璃文档 */
   .manual-card {
     position: relative;
     width: 100%;
@@ -197,19 +298,39 @@
     display: flex;
     flex-direction: column;
     padding: 0;
-    border-radius: 20px;
+    border-radius: 22px;
     text-align: left;
     color: var(--text-primary);
-    background: rgb(255 255 255 / 0.28);
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
-    box-shadow: 0 16px 40px rgb(0 0 0 / 0.12);
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    box-shadow:
+      var(--shadow-normal),
+      inset 0 1px 0 rgb(255 255 255 / 0.45);
+  }
+  .manual-card.is-first-manual {
+    max-width: min(580px, calc(100vw - 32px));
+    border-color: rgb(180 140 255 / 0.28);
+    box-shadow:
+      0 24px 56px rgb(0 0 0 / 0.18),
+      inset 0 1px 0 rgb(255 255 255 / 0.5),
+      0 0 0 1px rgb(180 140 255 / 0.12);
   }
   :global(.dark) .manual-card {
-    background: rgb(18 14 30 / 0.32);
-    color: #f0e8ff;
-    border-color: rgb(255 255 255 / 0.1);
-    box-shadow: 0 16px 40px rgb(0 0 0 / 0.35);
+    background: var(--glass-bg-strong);
+    color: var(--text-primary);
+    border-color: var(--glass-border);
+    box-shadow:
+      var(--shadow-normal),
+      inset 0 1px 0 rgb(255 255 255 / 0.08);
+  }
+  :global(.dark) .manual-card.is-first-manual {
+    border-color: rgb(180 140 255 / 0.22);
+    box-shadow:
+      0 24px 56px rgb(0 0 0 / 0.42),
+      inset 0 1px 0 rgb(255 255 255 / 0.1),
+      0 0 48px rgb(180 140 255 / 0.08);
   }
 
   .card-close {
@@ -265,10 +386,12 @@
     padding: 24px 28px 12px;
     text-align: center;
     flex-shrink: 0;
-    border-bottom: 1px solid rgb(0 0 0 / 0.05);
+    border-bottom: 1px solid var(--border-color);
+    background: rgb(255 255 255 / 0.12);
   }
   :global(.dark) .manual-card-head {
-    border-bottom-color: rgb(255 255 255 / 0.06);
+    border-bottom-color: var(--border-color);
+    background: rgb(255 255 255 / 0.04);
   }
   .manual-emoji {
     font-size: 1.6rem;
@@ -294,7 +417,6 @@
     padding: 14px 24px 8px;
     font-size: 0.8rem;
     line-height: 1.55;
-    opacity: 0.9;
   }
   .manual-body section {
     margin-bottom: 14px;
@@ -339,12 +461,10 @@
     margin: 10px 0;
     padding: 10px 12px;
     border-radius: 10px;
-    background: rgb(0 0 0 / 0.04);
+    background: var(--chrome-subtle);
+    border: 1px solid var(--border-color);
     display: grid;
     gap: 6px;
-  }
-  :global(.dark) .sync-status {
-    background: rgb(255 255 255 / 0.05);
   }
   .sync-status div {
     display: flex;
@@ -369,10 +489,12 @@
   .manual-card-foot {
     flex-shrink: 0;
     padding: 12px 24px 20px;
-    border-top: 1px solid rgb(0 0 0 / 0.05);
+    border-top: 1px solid var(--border-color);
+    background: rgb(255 255 255 / 0.08);
   }
   :global(.dark) .manual-card-foot {
-    border-top-color: rgb(255 255 255 / 0.06);
+    border-top-color: var(--border-color);
+    background: rgb(255 255 255 / 0.03);
   }
 
   .home-fab {
@@ -382,21 +504,21 @@
     z-index: 34;
     padding: 8px 14px;
     border-radius: 999px;
-    border: 1px solid rgb(255 255 255 / 0.18);
-    background: rgb(20 16 32 / 0.38);
-    color: rgb(245 237 255 / 0.88);
+    border: 1px solid var(--chrome-border);
+    background: var(--glass-bg-strong);
+    color: var(--text-primary);
     backdrop-filter: blur(16px) saturate(120%);
     -webkit-backdrop-filter: blur(16px) saturate(120%);
-    box-shadow: 0 10px 24px rgb(0 0 0 / 0.22);
+    box-shadow: var(--shadow-normal);
     cursor: pointer;
     font-size: 0.82rem;
     transition: background 0.15s ease, border-color 0.15s ease;
   }
   .home-fab:hover,
   .home-fab.is-active {
-    background: rgb(40 28 60 / 0.52);
+    background: var(--glass-bg-hover);
     border-color: rgb(180 140 255 / 0.45);
-    color: #fff;
+    color: var(--text-primary);
   }
 
   @media (max-width: 640px) {

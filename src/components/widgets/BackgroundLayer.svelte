@@ -24,6 +24,8 @@
 
   let isMobile = $state(false);
   let lowPerf = $state(false);
+  /** 首屏先展示 poster，空闲后再加载视频，减轻从工具页返回时的主线程压力 */
+  let videoReady = $state(false);
 
   /* ---- 双层 crossfade ---- */
   type Layer = {
@@ -78,6 +80,17 @@
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const lowCpu = (navigator.hardwareConcurrency ?? 8) <= 4;
     lowPerf = reduced || lowCpu;
+
+    const enableVideo = () => {
+      videoReady = true;
+    };
+    if (lowPerf) {
+      videoReady = false;
+    } else if ('requestIdleCallback' in window) {
+      requestIdleCallback(enableVideo, { timeout: 1800 });
+    } else {
+      setTimeout(enableVideo, 400);
+    }
 
     document.addEventListener('touchstart', onDocTouchStart, { passive: true });
     document.addEventListener('touchend', onDocTouchEnd, { passive: true });
@@ -238,7 +251,7 @@
 
   const SWIPE_MIN = 48;
   const SWIPE_SKIP =
-    'button, a, input, select, textarea, label, [role="button"], header, nav, .widget-drawer, .gear-btn, .clear-btn, .widget-fab-stack, .home-fab, .wallpaper-mute-btn, .mobile-mode-toggle, .note-search, .wd-tile, .bg-mobile-controls';
+    'button, a, input, select, textarea, label, [role="button"], header, nav, .widget-drawer, .mac-menu-bar, .home-fab, .wallpaper-mute-btn, .mobile-mode-toggle, .note-search, .wd-tile, .bg-mobile-controls';
 
   let swipeStartX = 0;
   let swipeStartY = 0;

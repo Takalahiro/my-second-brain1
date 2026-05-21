@@ -1,0 +1,36 @@
+---
+interface Props {
+  size?: number;
+  class?: string;
+}
+
+const { size = 22, class: className = '' } = Astro.props;
+---
+
+<img
+  src="/logo.png"
+  alt=""
+  class:list={['brand-logo', className]}
+  width={size}
+  height={size}
+  decoding="async"
+  draggable="false"
+/>
+
+<style>
+  .brand-logo {
+    display: block;
+    width: auto;
+    height: 1.15rem;
+    max-width: 1.55rem;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+  a:hover .brand-logo,
+  button:hover .brand-logo {
+    transform: scale(1.04);
+  }
+</style>

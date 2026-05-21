@@ -229,8 +229,7 @@
     cursor: pointer;
     transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
   }
-  .gp-tab:hover { background: rgb(255 255 255 / 0.06); transform: translateY(-1px); }
-  :global(.dark) .gp-tab:hover { background: rgb(255 255 255 / 0.06); }
+  .gp-tab:hover { background: var(--chrome-hover); transform: translateY(-1px); }
   .gp-tab.is-active {
     background: linear-gradient(135deg, rgba(255, 141, 232, 0.22), rgba(180, 140, 255, 0.22));
     border-color: rgba(180, 140, 255, 0.5);
@@ -296,8 +295,8 @@
   }
 
   .gp-canvas {
-    background: linear-gradient(180deg, #110926, #06030f);
-    border: 1px solid rgb(255 255 255 / 0.08);
+    background: var(--graph-canvas-bg);
+    border: 1px solid var(--graph-canvas-border);
     border-radius: 18px;
     overflow: hidden;
     aspect-ratio: 16 / 10;
@@ -316,14 +315,14 @@
     width: min(320px, 80%);
     max-height: calc(100% - 28px);
     overflow: auto;
-    background: rgb(12 8 22 / 0.88);
-    color: #f3ecff;
-    border: 1px solid rgb(255 255 255 / 0.16);
+    background: var(--graph-panel-bg);
+    color: var(--graph-panel-text);
+    border: 1px solid var(--chrome-border);
     border-radius: 14px;
     padding: 12px 14px;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 18px 36px rgb(0 0 0 / 0.45);
+    box-shadow: var(--chrome-shadow);
   }
   .det-head {
     display: flex; align-items: center; gap: 8px;
@@ -332,24 +331,24 @@
   .det-head h3 { margin: 0; font-size: 0.96rem; flex: 1; }
   .det-x {
     width: 26px; height: 26px; border-radius: 999px;
-    background: rgb(255 255 255 / 0.08);
-    border: 1px solid rgb(255 255 255 / 0.14);
-    color: #f3ecff; cursor: pointer;
+    background: var(--chrome-subtle);
+    border: 1px solid var(--chrome-border);
+    color: var(--graph-panel-text); cursor: pointer;
   }
-  .det-sub { font-size: 0.72rem; color: #b6a8d3; margin: 2px 0 8px; }
-  .det-section { font-size: 0.74rem; color: #c2b3df; margin: 6px 0 4px; }
-  .det-empty { font-size: 0.78rem; color: #b6a8d3; padding: 6px 0; }
+  .det-sub { font-size: 0.72rem; color: var(--graph-panel-muted); margin: 2px 0 8px; }
+  .det-section { font-size: 0.74rem; color: var(--graph-panel-muted); margin: 6px 0 4px; }
+  .det-empty { font-size: 0.78rem; color: var(--graph-panel-muted); padding: 6px 0; }
   .det-list { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow: auto; }
   .det-list li {
     display: flex; align-items: center; gap: 6px;
     padding: 3px 0; font-size: 0.78rem;
   }
   .det-nb {
-    background: transparent; border: 0; color: #ece4ff; cursor: pointer;
+    background: transparent; border: 0; color: var(--graph-panel-text); cursor: pointer;
     padding: 0; text-align: left; flex: 1;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
-  .det-nb:hover { color: #fff; text-decoration: underline; }
+  .det-nb:hover { color: var(--text-primary); text-decoration: underline; }
   .dir { color: #b48cff; font-weight: 700; min-width: 14px; text-align: center; }
   .dir.in { color: #ff9ed4; }
   .nb-folder {
@@ -359,9 +358,9 @@
   }
   .det-actions { display: flex; gap: 6px; margin-top: 8px; }
   .det-btn {
-    background: rgb(255 255 255 / 0.08);
-    border: 1px solid rgb(255 255 255 / 0.14);
-    color: #f3ecff; cursor: pointer;
+    background: var(--chrome-subtle);
+    border: 1px solid var(--chrome-border);
+    color: var(--graph-panel-text); cursor: pointer;
     padding: 4px 12px; border-radius: 8px;
     font-size: 0.76rem;
     text-decoration: none;

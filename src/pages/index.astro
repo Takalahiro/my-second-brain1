@@ -1,5 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import DesktopLayout from '../layouts/DesktopLayout.astro';
 import HomeHero from '../components/HomeHero.svelte';
 import WidgetHost from '../components/widgets/WidgetHost.svelte';
 import notesMtime from '../lib/notes-mtime.json';
@@ -27,9 +27,9 @@ const syncInfo = {
 };
 ---
 
-<BaseLayout title="My Second Brain">
-  <HomeHero client:only="svelte" {syncInfo} />
-
-  <!-- 小组件 + 背景：仅首页加载 -->
-  <WidgetHost client:idle backgroundDefault={true} />
-</BaseLayout>
+<DesktopLayout title="My Second Brain" introSplash>
+  <div class="desktop-intro-hide">
+    <WidgetHost client:idle backgroundDefault={true} desktopMode={true} />
+    <HomeHero client:idle {syncInfo} desktopMode={true} />
+  </div>
+</DesktopLayout>

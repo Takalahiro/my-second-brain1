@@ -9,3 +9,5 @@ allowBuilds:
   esbuild: true
   sharp: true
   "@parcel/watcher": true
+  core-js: set this to true or false
+  '@tensorflow/tfjs-node': set this to true or false

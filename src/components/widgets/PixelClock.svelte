@@ -9,7 +9,7 @@
 
   interface Props {
     onClose?: () => void;
-    /** true 时锁定在右下角（视频背景+桌面端）；false 时可拖/可缩 */
+    /** true ????????????????????????????+????????false ???????/?? */
     pinned?: boolean;
   }
   let { onClose, pinned = false }: Props = $props();
@@ -25,11 +25,11 @@
   let sizeScale = $state(1);
   let showSettings = $state(false);
   let bgAlpha = $state(0.5);
-  /** 外部时区联动（来自世界时钟）。null = 跟随本机时区 */
+  /** ??????????????????????????????????????null = ????????????????? */
   let externalTz = $state<string | null>(null);
   let externalLabel = $state<string | null>(null);
 
-  // 非 pinned 模式下生效
+  // ?? pinned ??????????
   let posX = $state(-1);
   let posY = $state(-1);
   let width = $state(620);
@@ -48,7 +48,7 @@
         const s = JSON.parse(raw);
         if (typeof s.hour24 === 'boolean') hour24 = s.hour24;
         if (typeof s.showSeconds === 'boolean') showSeconds = s.showSeconds;
-        // 兼容旧值 glow → nixie
+        // ?????????? glow ??? nixie
         const st = s.style === 'glow' ? 'nixie' : s.style;
         if (st === 'pixel' || st === 'neon' || st === 'nixie' || st === 'code') style = st;
         if (typeof s.sizeScale === 'number') sizeScale = clamp(s.sizeScale, 0.6, 2.4);
@@ -67,7 +67,7 @@
       }
     } catch {}
 
-    // 恢复外部时区（保持跨刷新一致）
+    // ?????????????????????????????????
     try {
       const raw = localStorage.getItem(STORAGE_KEY + ':tz');
       if (raw) {
@@ -81,7 +81,7 @@
     const onResize = () => clampPos();
     window.addEventListener('resize', onResize);
 
-    /** 监听世界时钟选择 → 切换时区显示 */
+    /** ????????????????????? ??? ?????????????? */
     const onSetTz = (e: Event) => {
       const ev = e as CustomEvent<{ tz: string; label?: string }>;
       const d = ev.detail;
@@ -105,7 +105,7 @@
     try { localStorage.removeItem(STORAGE_KEY + ':tz'); } catch {}
   }
 
-  // 当切换到非 pinned 模式时，给一个合理默认位置
+  // ??????????? pinned ?????????????????????
   $effect(() => {
     if (pinned) return;
     if (typeof window === 'undefined') return;
@@ -140,7 +140,7 @@
   }
 
   function format2(n: number) { return n < 10 ? '0' + n : '' + n; }
-  /** 获取目标时区下的 H/M/S/dayOfWeek/Month/Day */
+  /** ????????????????????? H/M/S/dayOfWeek/Month/Day */
   function tzParts(d: Date, tz: string | null) {
     if (!tz) {
       return { h: d.getHours(), m: d.getMinutes(), s: d.getSeconds(), dow: d.getDay(), mo: d.getMonth() + 1, da: d.getDate() };
@@ -175,8 +175,8 @@
   const timeChars = $derived(timeText.split(''));
   const ampm = $derived(tzNow.h >= 12 ? 'PM' : 'AM');
   const dateText = $derived.by(() => {
-    const week = ['日', '一', '二', '三', '四', '五', '六'][tzNow.dow] ?? '';
-    return `${tzNow.mo}/${tzNow.da} · 周${week}`;
+    const week = ['???', '??', '??', '??', '???', '??', '???'][tzNow.dow] ?? '';
+    return `${tzNow.mo}/${tzNow.da} ? ???${week}`;
   });
 
   function setStyle(s: Style) { style = s; persist(); }
@@ -188,7 +188,7 @@
   const timeFontRem = $derived(4.35 * sizeScale);
   const metaFontRem = $derived(0.95 * sizeScale);
 
-  /* ---- 拖动 / 缩放（仅非 pinned） ---- */
+  /* ---- ?????? / ?????????? pinned?? ---- */
   function onHeaderPointerDown(e: PointerEvent) {
     if (pinned) return;
     const t = e.target as HTMLElement;
@@ -237,7 +237,7 @@
   bind:this={rootEl}
   class="pixel-clock style-{style} {pinned ? 'is-pinned' : 'is-free'} {dragging ? 'is-active-drag' : ''}"
   style={rotationStyle(rotation, (pinned ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${height}px;`) + ` --w-bg-alpha: ${bgAlpha};`)}
-  aria-label="像素时钟"
+  aria-label="??????????"
   use:widgetTouchGestures={touchOpts}
   onpointermove={onPointerMove}
   onpointerup={onPointerUp}
@@ -250,10 +250,10 @@
       type="button"
       class="settings-btn {showSettings ? 'is-open' : ''}"
       onclick={toggleSettings}
-      aria-label="时钟设置"
+      aria-label="????????"
       aria-pressed={showSettings}
-      title="时钟设置"
-    >⚙</button>
+      title="????????"
+    >???</button>
   </header>
 
   <div class="clock-body">
@@ -283,7 +283,7 @@
     <div class="clock-meta" style={`font-size: ${metaFontRem}rem;`}>
       <button type="button" class="clock-mode" onclick={toggle24}>{hour24 ? '24H' : ampm}</button>
       {#if externalTz}
-        <button type="button" class="clock-tz" onclick={resetTimezone} title="点击恢复本机时区">{externalLabel ?? externalTz}</button>
+        <button type="button" class="clock-tz" onclick={resetTimezone} title="????????????????????">{externalLabel ?? externalTz}</button>
       {/if}
       <span class="clock-date">{dateText}</span>
     </div>
@@ -291,26 +291,26 @@
     {#if showSettings}
       <div class="clock-settings">
         <div class="cs-row">
-          <span class="cs-label">风格</span>
+          <span class="cs-label">???</span>
           <div class="cs-styles">
-            <button type="button" class:active={style === 'pixel'} onclick={() => setStyle('pixel')}>像素</button>
-            <button type="button" class:active={style === 'neon'}  onclick={() => setStyle('neon')}>霓虹灯</button>
-            <button type="button" class:active={style === 'nixie'} onclick={() => setStyle('nixie')}>辉光管</button>
+            <button type="button" class:active={style === 'pixel'} onclick={() => setStyle('pixel')}>????</button>
+            <button type="button" class:active={style === 'neon'}  onclick={() => setStyle('neon')}>???????</button>
+            <button type="button" class:active={style === 'nixie'} onclick={() => setStyle('nixie')}>??????</button>
             <button type="button" class:active={style === 'code'}  onclick={() => setStyle('code')}>Code</button>
           </div>
         </div>
         <div class="cs-row">
-          <span class="cs-label">时制</span>
-          <button type="button" class="cs-toggle" onclick={toggle24}>{hour24 ? '24 小时' : '12 小时'}</button>
-          <button type="button" class="cs-toggle" onclick={toggleSec}>秒 {showSeconds ? '开' : '关'}</button>
+          <span class="cs-label">??????</span>
+          <button type="button" class="cs-toggle" onclick={toggle24}>{hour24 ? '24 ????' : '12 ????'}</button>
+          <button type="button" class="cs-toggle" onclick={toggleSec}>?? {showSeconds ? '??' : '???'}</button>
         </div>
         <div class="cs-row">
-          <span class="cs-label">大小</span>
+          <span class="cs-label">??</span>
           <input type="range" min="0.6" max="2.4" step="0.05" value={sizeScale} oninput={(e) => setSize(Number((e.currentTarget as HTMLInputElement).value))} />
-          <span class="cs-val">{sizeScale.toFixed(2)}×</span>
+          <span class="cs-val">{sizeScale.toFixed(2)}??</span>
         </div>
         <div class="cs-row">
-          <span class="cs-label">毛玻璃</span>
+          <span class="cs-label">????????</span>
           <input type="range" min="0.05" max="0.95" step="0.05" value={bgAlpha}
                  oninput={(e) => { bgAlpha = clamp(Number((e.currentTarget as HTMLInputElement).value), 0.05, 0.95); persist(); }} />
           <span class="cs-val">{Math.round(bgAlpha * 100)}%</span>
@@ -344,7 +344,7 @@
     border-radius: 18px;
     border: 1px solid rgb(255 255 255 / 0.18);
     overflow: hidden;
-    background: rgb(20 16 32 / var(--w-bg-alpha));
+    background: rgb(var(--widget-bg-rgb) / var(--w-bg-alpha));
     color: #f5edff;
     box-shadow: 0 14px 36px rgb(0 0 0 / 0.32), inset 0 1px 0 rgb(255 255 255 / 0.06);
     backdrop-filter: blur(16px) saturate(120%);
@@ -354,14 +354,14 @@
   }
   :global(.dark) .pixel-clock { border-color: rgb(255 255 255 / 0.12); }
 
-  /* pinned：固定在右下角，整块不可拖、不可缩 */
+  /* pinned????????????????????????????????? */
   .pixel-clock.is-pinned {
     right: max(env(safe-area-inset-right, 0px), 20px);
     bottom: max(env(safe-area-inset-bottom, 0px), 20px);
     min-width: 600px;
     max-width: 760px;
   }
-  /* free：左/上由 inline style 设定；宽度由 width 状态控制 */
+  /* free???/????? inline style ?????????? width ???????????? */
   .pixel-clock.is-free { min-width: 360px; max-width: 1100px; }
   .pixel-clock.is-active-drag { user-select: none; box-shadow: 0 20px 44px rgb(0 0 0 / 0.5); }
 
@@ -370,7 +370,7 @@
     align-items: center;
     gap: 12px;
     padding: 8px 14px;
-    background: rgb(0 0 0 / 0.18);
+    background: var(--widget-header-bg);
     border-bottom: 1px solid rgb(255 255 255 / 0.08);
     cursor: default;
   }
@@ -381,7 +381,7 @@
     width: 28px; height: 28px; border-radius: 8px;
     background: rgb(255 255 255 / 0.08);
     border: 1px solid rgb(255 255 255 / 0.14);
-    color: #f3ecff; cursor: pointer; font-size: 0.95rem;
+    color: var(--widget-fg); cursor: pointer; font-size: 0.95rem;
     display: inline-flex; align-items: center; justify-content: center;
     transition: background 0.15s ease, transform 0.15s ease;
   }
@@ -421,10 +421,10 @@
     50%      { box-shadow: 0 18px 44px rgb(0 0 0 / 0.4), inset 0 1px 0 rgb(255 255 255 / 0.08); }
   }
 
-  /* ============ 像素：基础发光 ============ */
+  /* ============ ???????????????? ============ */
   .style-pixel .clock-time { color: #fff5ff; text-shadow: 0 0 8px rgb(255 220 245 / 0.25); }
 
-  /* ============ 霓虹灯：空心描边 + 多层霓虹光晕 + 闪烁 ============ */
+  /* ============ ?????????????? + ???????????????? + ?????? ============ */
   .style-neon { background: #050410; border-color: rgb(255 92 220 / 0.4); }
   .style-neon .clock-bar { background: rgb(20 4 30 / 0.55); border-bottom-color: rgb(255 92 220 / 0.18); }
   .style-neon .clock-title { color: #ff8de8; letter-spacing: 4px; }
@@ -448,7 +448,7 @@
     animation: neon-flicker 6.5s infinite steps(40, end);
     display: inline-block;
   }
-  /* "玻璃管" 反光：用伪元素叠一条柔光 */
+  /* "???????" ???????????????????????? */
   .neon-time::before {
     content: '';
     position: absolute;
@@ -469,7 +469,7 @@
   }
   .style-neon .clock-meta { color: #ffb1e0; }
 
-  /* ============ 辉光管 Nixie：每个数字一个橙色玻璃管 ============ */
+  /* ============ ?????? Nixie???????????????????????? ============ */
   .style-nixie { background: #0c0905; border-color: rgb(255 138 50 / 0.4); }
   .style-nixie .clock-bar { background: rgb(20 12 6 / 0.6); border-bottom-color: rgb(255 138 50 / 0.18); }
   .style-nixie .clock-title { color: #ffb874; letter-spacing: 4px; }
@@ -500,7 +500,7 @@
     overflow: hidden;
     font-variant-numeric: tabular-nums;
   }
-  /* 玻璃管反光：左上斜带 + 顶弧 */
+  /* ???????????????????? + ?? */
   .nixie-cell::before {
     content: '';
     position: absolute;
@@ -511,7 +511,7 @@
     pointer-events: none;
     border-radius: inherit;
   }
-  /* "8" 阴影位 —— 模拟辉光管里其他段暗灯丝 */
+  /* "8" ????? ?????? ???????????????????????? */
   .nixie-bg {
     position: absolute;
     inset: 0;
@@ -564,7 +564,7 @@
   }
   .style-nixie .clock-meta { color: #ffc99c; }
 
-  /* ============ Code 风格 ============ */
+  /* ============ Code ??? ============ */
   .style-code { background: rgb(8 14 12 / 0.85); border-color: rgb(80 200 130 / 0.3); }
   .style-code .clock-time {
     color: #5ef7a1;
@@ -576,7 +576,7 @@
   .style-code .clock-mode { background: rgb(80 200 130 / 0.16); border-color: rgb(80 200 130 / 0.4); color: #b8ffd2; }
   .style-code .clock-title { color: #6bdf91; }
 
-  /* ============ 设置面板 ============ */
+  /* ============ ???? ============ */
   .clock-settings {
     margin-top: 16px; padding-top: 14px;
     border-top: 1px dashed rgb(255 255 255 / 0.12);
@@ -615,7 +615,7 @@
 
   @media (max-width: 768px) {
     .pixel-clock.is-pinned {
-      /* 移动端逻辑上不会 pinned，但兜底防呆 */
+      /* ??????????????? pinned??????????????? */
       left: max(env(safe-area-inset-left, 0px), 10px);
       right: max(env(safe-area-inset-right, 0px), 10px);
       bottom: max(env(safe-area-inset-bottom, 0px), 12px);

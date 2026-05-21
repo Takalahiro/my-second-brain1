@@ -16,15 +16,19 @@
     "vault:pull": "node scripts/pull-vault.mjs",
     "vault:auto": "node scripts/auto-sync-vault.mjs",
     "vault:audit": "node scripts/audit-vault.mjs",
-    "vault:diagnose": "node scripts/diagnose-notes.mjs"
+    "vault:diagnose": "node scripts/diagnose-notes.mjs",
+    "model:export-mnist": "python scripts/export-mnist-model.py && node scripts/bundle-mnist-model.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.6",
     "@astrojs/svelte": "^8.1.1",
     "@tailwindcss/vite": "^4.3.0",
+    "@tensorflow/tfjs": "^4.22.0",
     "astro": "^6.3.5",
+    "fraction.js": "^5.3.4",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
+    "katex": "^0.16.47",
     "mathjs": "^15.2.0",
     "mermaid": "^11.15.0",
     "rehype-autolink-headings": "^7.1.0",
@@ -36,16 +40,20 @@
     "remark-wiki-link": "^2.0.1",
     "svelte": "^5.55.8",
     "tailwindcss": "^4.3.0",
+    "three": "^0.184.0",
     "typescript": "^6.0.3",
     "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
+    "@tensorflow/tfjs-node": "^4.22.0",
     "@types/katex": "^0.16.8",
     "@types/mdast": "^4.0.4",
+    "@types/three": "^0.184.1",
     "mdast-util-from-markdown": "^2.0.3",
     "mdast-util-gfm": "^3.1.0",
     "mdast-util-math": "^3.0.0",
     "micromark-extension-gfm": "^3.0.0",
-    "micromark-extension-math": "^3.1.0"
+    "micromark-extension-math": "^3.1.0",
+    "pngjs": "^7.0.0"
   }
 }
