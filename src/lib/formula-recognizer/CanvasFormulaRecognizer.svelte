@@ -13,6 +13,8 @@
     height?: number;
     embedded?: boolean;
     answerLabel?: string;
+    /** 嵌入 Tab 切换时为 false；重新显示时会重置画布 */
+    active?: boolean;
   }
 
   let {
@@ -20,6 +22,7 @@
     height = FORMULA_INPUT_SIZE,
     embedded = false,
     answerLabel = '识别答案',
+    active = true,
   }: Props = $props();
 
   let canvas: HTMLCanvasElement | null = null;
@@ -43,6 +46,7 @@
   let accelerator = $state(formulaModelLoader.accelerator);
 
   let canvasReady = false;
+  let initSeq = 0;
 
   onMount(() => {
     const unsub = formulaModelLoader.subscribe((phase) => {
@@ -53,13 +57,20 @@
     return () => {
       unsub();
       clearDebounce();
+      canvasReady = false;
+      initSeq += 1;
     };
   });
 
   $effect(() => {
-    if (!canvas || canvasReady) return;
-    canvasReady = true;
-    void tick().then(() => initCanvas());
+    if (!active || !canvas) return;
+    const seq = ++initSeq;
+    canvasReady = false;
+    void tick().then(() => {
+      if (seq !== initSeq || !canvas || !active) return;
+      initCanvas();
+      canvasReady = true;
+    });
   });
 
   $effect(() => {

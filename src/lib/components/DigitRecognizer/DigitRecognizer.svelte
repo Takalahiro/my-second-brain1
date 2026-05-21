@@ -11,9 +11,11 @@
 
   interface Props {
     embedded?: boolean;
+    /** Tab 隐藏时释放 TF.js GPU，避免与公式 OCR 争抢 */
+    paused?: boolean;
   }
 
-  let { embedded = false }: Props = $props();
+  let { embedded = false, paused = false }: Props = $props();
 
   let modelState = $state<ModelState>({
     status: 'idle',
@@ -42,13 +44,23 @@
   }
 
   onMount(() => {
-    void loadModel();
+    if (!paused) void loadModel();
     const onPageHide = () => teardown();
     window.addEventListener('pagehide', onPageHide);
     return () => {
       window.removeEventListener('pagehide', onPageHide);
       teardown();
     };
+  });
+
+  $effect(() => {
+    if (paused) {
+      if (modelState.model || modelState.vizModel) teardown();
+      return;
+    }
+    if (modelState.status === 'idle' && !modelState.model) {
+      void loadModel();
+    }
   });
 
   async function loadModel() {

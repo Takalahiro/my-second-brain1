@@ -1,22 +1,36 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { NEURAL_LAB, type NeuralLabDemoId } from '../../neural-lab-meta';
-  import { disposeFormulaModel } from '../../formula-recognizer/model-loader';
+  import {
+    disposeFormulaModel,
+    scheduleFormulaModelPreload,
+  } from '../../formula-recognizer/model-loader';
   import DigitRecognizer from '../DigitRecognizer/DigitRecognizer.svelte';
   import CanvasFormulaRecognizer from '../../formula-recognizer/CanvasFormulaRecognizer.svelte';
 
   let activeDemo = $state<NeuralLabDemoId>(NEURAL_LAB.demoMnist.id);
+  /** 首次打开公式 Tab 后保持挂载，避免反复销毁 canvas / worker */
+  let formulaMounted = $state(false);
 
   const activeMeta = $derived(
     activeDemo === NEURAL_LAB.demoFormula.id ? NEURAL_LAB.demoFormula : NEURAL_LAB.demoMnist
   );
+  const isMnist = $derived(activeDemo === NEURAL_LAB.demoMnist.id);
+  const isFormula = $derived(activeDemo === NEURAL_LAB.demoFormula.id);
+
+  $effect(() => {
+    if (isFormula) formulaMounted = true;
+  });
 
   onMount(() => {
     const params = new URLSearchParams(window.location.search);
     const demo = params.get('demo');
     if (demo === NEURAL_LAB.demoFormula.id || demo === NEURAL_LAB.demoMnist.id) {
       activeDemo = demo;
+      if (demo === NEURAL_LAB.demoFormula.id) formulaMounted = true;
     }
+
+    scheduleFormulaModelPreload();
 
     const onPageHide = () => disposeFormulaModel();
     window.addEventListener('pagehide', onPageHide);
@@ -67,13 +81,18 @@
   </header>
 
   <div class="nl-body">
-    {#key activeDemo}
-      {#if activeDemo === NEURAL_LAB.demoMnist.id}
-        <DigitRecognizer embedded />
-      {:else}
-        <CanvasFormulaRecognizer embedded answerLabel={NEURAL_LAB.demoFormula.answerLabel} />
-      {/if}
-    {/key}
+    <div class="nl-panel" class:is-active={isMnist}>
+      <DigitRecognizer embedded paused={!isMnist} />
+    </div>
+    {#if formulaMounted}
+      <div class="nl-panel" class:is-active={isFormula}>
+        <CanvasFormulaRecognizer
+          embedded
+          active={isFormula}
+          answerLabel={NEURAL_LAB.demoFormula.answerLabel}
+        />
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -160,6 +179,19 @@
   .nl-body {
     flex: 1;
     min-height: 0;
+    position: relative;
+  }
+
+  .nl-panel {
+    min-height: 0;
+  }
+
+  .nl-panel:not(.is-active) {
+    display: none;
+  }
+
+  .nl-panel.is-active {
+    display: block;
   }
 
   .nl-body :global(.digit-lab),

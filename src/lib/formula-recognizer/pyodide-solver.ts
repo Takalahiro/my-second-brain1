@@ -2,7 +2,7 @@ import solverScript from './formula-solver.py?raw';
 import type { SolveResult, SolverPhase } from './solver-types';
 
 /** Bump when formula-solver.py changes — helps detect stale bundles */
-export const FORMULA_SOLVER_VERSION = 'v2';
+export const FORMULA_SOLVER_VERSION = 'v3';
 
 const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
 
@@ -15,7 +15,7 @@ type PyodideApi = {
 export function formatSolverError(err: unknown): string {
   const msg = err instanceof Error ? err.message : String(err);
   if (msg.includes("cannot import name 'Var'")) {
-    return 'SymPy 脚本版本过旧（仍含 Var 导入）。请硬刷新页面：Ctrl+Shift+R';
+    return 'SymPy 包版本不兼容（Var 导入失败），请刷新页面后重试';
   }
   const importMatch = msg.match(/ImportError:\s*(.+?)(?:\n|$)/);
   if (importMatch) {
@@ -101,11 +101,8 @@ class FormulaSolverEngine {
       const loadPyodide = window.loadPyodide as (cfg: { indexURL: string }) => Promise<PyodideApi>;
       this.pyodide = await loadPyodide({ indexURL: PYODIDE_URL });
       await this.pyodide.loadPackage('sympy');
-      if (!solverScript.includes('formula-solver v2')) {
+      if (!solverScript.includes('formula-solver v3')) {
         throw new Error('SymPy 求解脚本未正确加载，请刷新页面');
-      }
-      if (/from sympy import[\s\S]*?\bVar\b/.test(solverScript)) {
-        throw new Error('SymPy 求解脚本版本过旧，请硬刷新 Ctrl+Shift+R');
       }
       await this.pyodide.runPythonAsync(solverScript);
       this.loadedVersion = FORMULA_SOLVER_VERSION;

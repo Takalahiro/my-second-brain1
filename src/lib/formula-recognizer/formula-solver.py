@@ -1,4 +1,4 @@
-# formula-solver v2 — loaded by Pyodide (no Var import; use sympy.stats.variance)
+# formula-solver v3 — Pyodide SymPy (variance from sympy.stats, not sympy.Var)
 import json
 import re
 import sympy as sp
@@ -65,7 +65,7 @@ def _normal_task(latex_str, steps):
         sig2 = _to_expr(m2.group(2))
         rv = Normal('X', mu_v, sqrt(sig2))
         steps.append(_step('识别正态分布', sp_latex(rv)))
-        if 'Var' in s or 'D(' in s or 'mathrm{Var}' in s or 'operatorname{Var}' in s:
+        if 'operatorname{Var}' in s or 'mathrm{Var}' in s or 'D(' in s or '\\Var' in s:
             ans = variance(rv)
             steps.append(_step('计算方差', sp_latex(ans)))
             return {'ok': True, 'task': 'normal', 'answerLatex': sp_latex(ans), 'steps': steps}
