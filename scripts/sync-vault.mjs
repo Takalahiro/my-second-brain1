@@ -107,7 +107,7 @@ if (parentDirty) {
   run('git add obsidian-vault src/lib/notes-mtime.json src/lib/vault-sync-meta.json', ROOT);
   run(`git commit -m "${parentMsg.replace(/"/g, '\\"')}"`, ROOT);
   const parentBranch = runQuiet('git rev-parse --abbrev-ref HEAD', ROOT) || 'main';
-  run(`git pull --rebase origin ${parentBranch}`, ROOT);
+  run(`git pull --rebase --autostash origin ${parentBranch}`, ROOT);
   run(`git push origin ${parentBranch}`, ROOT);
 } else {
   console.log('\n▌ Step 4: 父仓库 submodule pointer 已是最新');
