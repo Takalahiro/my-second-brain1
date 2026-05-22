@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-22T05:22:36.898Z",
+  "generatedAt": "2026-05-22T05:32:51.642Z",
   "totalNotes": 126,
-  "totalWords": 238289,
+  "totalWords": 246936,
   "byFolder": [
     {
       "name": "计算机",
@@ -21,7 +21,7 @@
     {
       "name": "MATH",
       "count": 4,
-      "words": 7291
+      "words": 15938
     },
     {
       "name": "INFO1111",
@@ -424,7 +424,7 @@
     },
     {
       "date": "2026-05-20",
-      "count": 123
+      "count": 122
     },
     {
       "date": "2026-05-21",
@@ -432,7 +432,7 @@
     },
     {
       "date": "2026-05-22",
-      "count": 1
+      "count": 2
     }
   ]
 }

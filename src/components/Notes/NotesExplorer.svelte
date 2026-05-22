@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { FolderNode as TreeNode } from '../../lib/folder-tree';
   import type { PixelIconName } from '../../lib/pixel-icons';
+  import { formatNextSyncLabel } from '../../lib/vault-sync';
   import FolderNode from '../FolderNode.svelte';
   import NoteGrid from './NoteGrid.svelte';
   import PixelIcon from '../PixelIcon.svelte';
@@ -28,12 +29,18 @@
     folders?: FolderCard[];
     notes: Note[];
   }
+  interface SyncMeta {
+    lastSyncedAt: string;
+    vaultCommit?: string | null;
+    syncIntervalMinutes: number;
+  }
   interface Props {
     categories: Category[];
     tree: TreeNode;
+    syncMeta?: SyncMeta;
   }
 
-  let { categories, tree }: Props = $props();
+  let { categories, tree, syncMeta }: Props = $props();
   let searchQuery = $state('');
   let forceTick = $state(0);
   let forceAction = $state<'expand-all' | 'collapse-all' | null>(null);
@@ -78,6 +85,12 @@
     forceTick++;
   }
 
+  const nextSyncLabel = $derived(
+    syncMeta
+      ? formatNextSyncLabel(syncMeta.lastSyncedAt, syncMeta.syncIntervalMinutes)
+      : null
+  );
+
   const filtered = $derived.by(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return categories;
@@ -112,7 +125,12 @@
 <section class="notes-toolbar pixel-card glass-container">
   <div class="notes-toolbar-title">
     <span class="notes-toolbar-icon"><PixelIcon name="cup" size={18} /></span>
-    <h1 class="notes-toolbar-text">Notes</h1>
+    <div class="notes-toolbar-heading">
+      <h1 class="notes-toolbar-text">Notes</h1>
+      {#if nextSyncLabel}
+        <p class="notes-sync-hint">{nextSyncLabel}</p>
+      {/if}
+    </div>
   </div>
 
   <div class="notes-toolbar-actions">
@@ -194,6 +212,18 @@
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
+  }
+  .notes-toolbar-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .notes-sync-hint {
+    margin: 0;
+    font-size: 0.72rem;
+    line-height: 1.2;
+    color: var(--text-secondary);
+    font-weight: 400;
   }
   .notes-toolbar-icon {
     display: inline-flex;

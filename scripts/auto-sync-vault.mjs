@@ -130,22 +130,28 @@ try {
     }
   }
 
-  // 3. vault 有变动就重生 mtime manifest（没变动也 OK，保证和当前 state 一致）
+  // 3. vault 有变动就重生 mtime + sync-meta
   if (summary.upPushed || summary.downPulled) {
-    const r = spawnSync('node', [path.join(ROOT, 'scripts', 'build-mtime-manifest.mjs')], {
-      cwd: ROOT,
-      stdio: VERBOSE ? 'inherit' : 'pipe',
-    });
-    if (r.status !== 0) {
-      log('WARN', 'mtime manifest generation failed');
-    } else {
-      log('info', 'mtime manifest regenerated');
+    for (const script of ['build-mtime-manifest.mjs', 'build-vault-sync-meta.mjs']) {
+      const r = spawnSync('node', [path.join(ROOT, 'scripts', script)], {
+        cwd: ROOT,
+        stdio: VERBOSE ? 'inherit' : 'pipe',
+      });
+      if (r.status !== 0) {
+        log('WARN', `${script} generation failed`);
+      } else {
+        log('info', `${script} regenerated`);
+      }
     }
   }
 
   // 4. 父仓库 — 只 stage 白名单两个 path，push 前先 rebase
   // 先看 whitelist path 有没有真的 dirty
-  const parentDirtyPaths = git(['status', '--porcelain', 'obsidian-vault', 'src/lib/notes-mtime.json'], ROOT, true);
+  const parentDirtyPaths = git(
+    ['status', '--porcelain', 'obsidian-vault', 'src/lib/notes-mtime.json', 'src/lib/vault-sync-meta.json'],
+    ROOT,
+    true
+  );
   if (parentDirtyPaths) {
     log('info', `parent has whitelisted dirty paths:\n${parentDirtyPaths}`);
     // fetch 一下，别 push 撞 remote
@@ -157,7 +163,7 @@ try {
     }
 
     // 绝对不要 git add -A，只 add 这两个
-    gitRun(['add', '--', 'obsidian-vault', 'src/lib/notes-mtime.json'], ROOT);
+    gitRun(['add', '--', 'obsidian-vault', 'src/lib/notes-mtime.json', 'src/lib/vault-sync-meta.json'], ROOT);
 
     // staged 里还有 diff 才 commit
     const cached = git(['diff', '--cached', '--name-only'], ROOT, true);

@@ -58,14 +58,16 @@ jobs:
 
       - name: Rebuild notes-mtime manifest
         if: steps.update.outputs.changed == 'true'
-        run: node scripts/build-mtime-manifest.mjs
+        run: |
+          node scripts/build-mtime-manifest.mjs
+          node scripts/build-vault-sync-meta.mjs
 
       - name: Commit & push if updated
         if: steps.update.outputs.changed == 'true'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add obsidian-vault src/lib/notes-mtime.json
+          git add obsidian-vault src/lib/notes-mtime.json src/lib/vault-sync-meta.json
           git commit -m "chore(vault): auto-sync submodule ${{ steps.update.outputs.new_sha }}"
           git push
 

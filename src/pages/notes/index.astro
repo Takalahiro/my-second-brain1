@@ -5,6 +5,7 @@ import NotesExplorer from '../../components/Notes/NotesExplorer.svelte';
 import { buildFolderTree, countNotes } from '../../lib/folder-tree';
 import { maxMtimeForFolder, enrichFolderTreeMtime } from '../../lib/note-mtime-helpers';
 import { DEFAULT_FOLDER_ICON, folderEmojiToIcon, type PixelIconName } from '../../lib/pixel-icons';
+import vaultSyncMeta from '../../lib/vault-sync-meta.json';
 
 const notes = await getCollection('notes', ({ data }) => !data.draft);
 const tree = buildFolderTree(notes);
@@ -74,5 +75,10 @@ const categories = topFolders.map((folder) => ({
     与 BaseLayout 的预水合脚本（写 <html data-notes-mode>）配合，
     可保证首屏渲染就用对的折叠模式，避免线上反复闪烁。
   -->
-  <NotesExplorer categories={categories} tree={tree} client:only="svelte" />
+  <NotesExplorer
+    categories={categories}
+    tree={tree}
+    syncMeta={vaultSyncMeta}
+    client:only="svelte"
+  />
 </BaseLayout>

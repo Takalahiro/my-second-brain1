@@ -63,6 +63,9 @@ runRequired('node', [path.join(SCRIPTS, 'sync-assets.mjs')]);
 // Step 4 — notes-mtime.json（git log + fs.stat 双保险）
 runRequired('node', [path.join(SCRIPTS, 'build-mtime-manifest.mjs')]);
 
+// Step 4b — vault-sync-meta.json（笔记页「下次同步」小字）
+runRequired('node', [path.join(SCRIPTS, 'build-vault-sync-meta.mjs')]);
+
 // Step 5 — public/video|picture|music → media-manifest.json（背景 + 播放器用）
 runRequired('node', [path.join(SCRIPTS, 'build-media-manifest.mjs')]);
 

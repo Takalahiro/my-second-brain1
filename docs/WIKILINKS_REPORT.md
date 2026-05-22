@@ -1,6 +1,6 @@
 # 双链 (Wikilinks) 检查报告
 
-> 生成时间：2026-05-22T05:22:37.012Z
+> 生成时间：2026-05-22T05:32:51.755Z
 
 ## 概览
 
@@ -148,7 +148,7 @@
 - `DATA1001/Structure/REPORT`
 - `INFO1110/foundition/Codereview`
 - `INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）`
-- `MATH/Algebra 代数/Algebra`
+- `MATH/Algebra 代数/Algebra 复习`
 - `MATH/Calculus 微积分/Calculus复习`
 - `MATH/Discrete 离散数学/Discrete`
 - `MATH/Statistics 统计学/Statistics`
