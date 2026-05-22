@@ -7,6 +7,8 @@
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
+  import PixelIcon from '../PixelIcon.svelte';
+  import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
 
   interface Props {
     onClose?: () => void;
@@ -302,7 +304,7 @@
       maximized={maximized}
     />
     <div class="nw-title">
-      <span aria-hidden="true">📖</span>
+      <span aria-hidden="true"><PixelIcon name={WIDGET_ICON_MAP.notes} size={14} /></span>
       <span>笔记 {tier !== 'compact' && selected ? `· ${selected.title}` : ''}</span>
       <span class="nw-tier">{TIER_LABEL[tier]}</span>
     </div>

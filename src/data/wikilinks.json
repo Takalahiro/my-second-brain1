@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-21T18:12:51.004Z",
+  "generatedAt": "2026-05-22T05:22:37.012Z",
   "stats": {
     "totalFiles": 126,
     "totalLinks": 188,
@@ -87,8 +87,8 @@
       "inDegree": 0
     },
     {
-      "id": "MATH/Calculus 微积分/Calculus",
-      "title": "Calculus",
+      "id": "MATH/Calculus 微积分/Calculus复习",
+      "title": "Calculus复习",
       "folder": "MATH",
       "outDegree": 0,
       "inDegree": 0
@@ -1842,7 +1842,7 @@
     "INFO1110/foundition/Codereview",
     "INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）",
     "MATH/Algebra 代数/Algebra",
-    "MATH/Calculus 微积分/Calculus",
+    "MATH/Calculus 微积分/Calculus复习",
     "MATH/Discrete 离散数学/Discrete",
     "MATH/Statistics 统计学/Statistics",
     "_Inbox 入口/笔记",

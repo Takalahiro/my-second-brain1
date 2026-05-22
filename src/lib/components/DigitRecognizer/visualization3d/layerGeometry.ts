@@ -247,7 +247,7 @@ export function buildNetwork3D(inference: InferenceResult): Network3DBuild {
   return { root, layerNodes, flowTubes, layerSpacing };
 }
 
-/** 数据流渐进揭示：已到达层显示真实激活，未到达层为占位幽灵 */
+// 数据流渐进揭示：到了的层显示真激活，没到的先占位幽灵
 export function setLayerFlowState(
   layerNodes: Layer3DNode[],
   activeIndex: number,

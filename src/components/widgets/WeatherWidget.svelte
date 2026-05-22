@@ -7,6 +7,8 @@
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
+  import PixelIcon from '../PixelIcon.svelte';
+  import { weatherIconName, WIDGET_ICON_MAP, type PixelIconName } from '../../lib/pixel-icons';
 
   interface Props {
     onClose?: () => void;
@@ -91,7 +93,7 @@
     const onResize = () => clampPos();
     window.addEventListener('resize', onResize);
 
-    /** 监听世界时钟选中城市 → 同步切换天气 */
+    // 听 world clock 选城市 → 天气跟着切
     const onSet = (e: Event) => {
       const ev = e as CustomEvent<{ name: string; lat: number; lon: number }>;
       const d = ev.detail;
@@ -210,19 +212,19 @@
   }
 
   // WMO Weather Code → 图标 + 中文
-  function codeInfo(code: number, isDay = 1): { icon: string; label: string } {
-    if (code === 0) return { icon: isDay ? '☀️' : '🌙', label: '晴' };
-    if (code === 1 || code === 2) return { icon: isDay ? '🌤️' : '🌙', label: '少云' };
-    if (code === 3) return { icon: '☁️', label: '多云' };
-    if (code >= 45 && code <= 48) return { icon: '🌫️', label: '雾' };
-    if (code >= 51 && code <= 57) return { icon: '🌦️', label: '毛毛雨' };
-    if (code >= 61 && code <= 67) return { icon: '🌧️', label: '雨' };
-    if (code >= 71 && code <= 77) return { icon: '🌨️', label: '雪' };
-    if (code >= 80 && code <= 82) return { icon: '🌧️', label: '阵雨' };
-    if (code === 85 || code === 86) return { icon: '🌨️', label: '阵雪' };
-    if (code === 95) return { icon: '⛈️', label: '雷阵雨' };
-    if (code === 96 || code === 99) return { icon: '⛈️', label: '雷暴冰雹' };
-    return { icon: '🌡️', label: `代码 ${code}` };
+  function codeInfo(code: number, isDay = 1): { icon: PixelIconName; label: string } {
+    if (code === 0) return { icon: weatherIconName(code, isDay), label: '晴' };
+    if (code === 1 || code === 2) return { icon: weatherIconName(code, isDay), label: '少云' };
+    if (code === 3) return { icon: weatherIconName(code, isDay), label: '多云' };
+    if (code >= 45 && code <= 48) return { icon: weatherIconName(code, isDay), label: '雾' };
+    if (code >= 51 && code <= 57) return { icon: weatherIconName(code, isDay), label: '毛毛雨' };
+    if (code >= 61 && code <= 67) return { icon: weatherIconName(code, isDay), label: '雨' };
+    if (code >= 71 && code <= 77) return { icon: weatherIconName(code, isDay), label: '雪' };
+    if (code >= 80 && code <= 82) return { icon: weatherIconName(code, isDay), label: '阵雨' };
+    if (code === 85 || code === 86) return { icon: weatherIconName(code, isDay), label: '阵雪' };
+    if (code === 95) return { icon: weatherIconName(code, isDay), label: '雷阵雨' };
+    if (code === 96 || code === 99) return { icon: weatherIconName(code, isDay), label: '雷暴冰雹' };
+    return { icon: weatherIconName(code, isDay), label: `代码 ${code}` };
   }
   function weekday(dateStr: string) {
     const d = new Date(dateStr);
@@ -301,7 +303,7 @@
   <header class="ww-header" onpointerdown={onHeaderPointerDown}>
     <WindowChrome onClose={() => onClose?.()} onMinimize={doMinimize} onMaximize={doMaximize} maximized={maximized} />
     <div class="ww-title">
-      <span aria-hidden="true">☁️</span>
+      <span aria-hidden="true"><PixelIcon name={WIDGET_ICON_MAP.weather} size={14} /></span>
       <span>天气</span>
       <span class="ww-tier">{TIER_LABEL[tier]}</span>
     </div>
@@ -364,7 +366,7 @@
               <span class="ww-cur-wind">风 {forecast.current.windSpeed.toFixed(1)} km/h</span>
             </div>
           </div>
-          <div class="ww-cur-icon">{ci.icon}</div>
+          <div class="ww-cur-icon"><PixelIcon name={ci.icon} size={28} /></div>
         </div>
 
         <ul class="ww-daily">
@@ -373,7 +375,7 @@
             <li>
               <span class="ww-day-name">{i === 0 ? '今天' : `周${weekday(d.date)}`}</span>
               <span class="ww-day-date">{shortDate(d.date)}</span>
-              <span class="ww-day-icon">{di.icon}</span>
+              <span class="ww-day-icon"><PixelIcon name={di.icon} size={18} /></span>
               <span class="ww-day-temp"><strong>{d.tMax.toFixed(0)}°</strong> / {d.tMin.toFixed(0)}°</span>
             </li>
           {/each}
@@ -548,8 +550,9 @@
     color: #fff;
   }
   .ww-cur-icon {
-    font-size: 3.8rem;
-    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     filter: drop-shadow(0 6px 18px rgb(255 200 240 / 0.4));
   }
 
@@ -570,7 +573,11 @@
   }
   .ww-day-name { color: #ece4ff; font-weight: 600; }
   .ww-day-date { color: #b6a8d3; font-size: 0.74rem; }
-  .ww-day-icon { font-size: 1.15rem; text-align: center; }
+  .ww-day-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
   .ww-day-temp { text-align: right; color: #d6c7ee; font-variant-numeric: tabular-nums; }
   .ww-day-temp strong { color: #fff5ff; font-weight: 700; margin-right: 4px; }
 

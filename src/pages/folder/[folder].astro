@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { noteIdToSlug } from '../../lib/backlinks';
+import PixelIcon from '../../components/PixelIcon.astro';
 
 export async function getStaticPaths() {
   const notes = await getCollection('notes', ({ data }) => !data.draft);
@@ -33,14 +34,14 @@ notes.sort((a, b) => {
 });
 ---
 
-<BaseLayout title={`📁 ${folder}`}>
+<BaseLayout title={folder}>
   <nav class="text-sm text-gray-500 mb-4">
     <a href="/" class="hover:underline">首页</a>
     <span class="mx-2">/</span>
-    <span>📁 {folder}</span>
+    <span class="inline-flex items-center gap-1"><PixelIcon name="folder" size={14} /> {folder}</span>
   </nav>
 
-  <h1 class="text-3xl font-bold mb-3">📁 {folder}</h1>
+  <h1 class="text-3xl font-bold mb-3 inline-flex items-center gap-2"><PixelIcon name="folder" size={24} /> {folder}</h1>
   <p class="text-gray-500 mb-6">{notes.length} 篇笔记</p>
 
   <ul class="space-y-3">

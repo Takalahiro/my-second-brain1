@@ -2,19 +2,25 @@
   import { onMount } from 'svelte';
   import ControlCenterClock from './ControlCenterClock.svelte';
   import ControlCenterSlot from './ControlCenterSlot.svelte';
+  import PixelIcon from '../PixelIcon.svelte';
   import {
     loadSlotWidget,
     saveSlotWidget,
     type SlotWidgetKey,
   } from '../../lib/control-center-slot';
+  import {
+    DRAWER_CATEGORY_ICONS,
+    WIDGET_ICON_MAP,
+    type PixelIconName,
+    type WidgetIconKey,
+  } from '../../lib/pixel-icons';
 
-  type WidgetKey = 'background' | 'clock' | 'music' | 'notes' | 'todo' | 'calendar' | 'pomodoro' | 'weather' | 'stats' | 'world' | 'graph' | 'territory' | 'calculator' | 'python' | 'whiteboard' | 'whitenoise' | 'network';
+  type WidgetKey = WidgetIconKey;
   type PaneId = 'home' | 'widgets' | 'wallpaper' | 'desktop';
 
   interface Widget {
     id: WidgetKey;
     name: string;
-    icon: string;
     desc: string;
     pinned?: boolean;
     keywords?: string[];
@@ -82,10 +88,10 @@
   };
   let suppressTileClick = false;
 
-  const categories: Array<{ id: PaneId; name: string; icon: string; desc: string }> = [
-    { id: 'widgets', name: '组件', icon: '🧩', desc: '添加与管理桌面小组件' },
-    { id: 'wallpaper', name: '墙纸', icon: '🖼️', desc: '场景、视频与氛围' },
-    { id: 'desktop', name: '桌面', icon: '🖥️', desc: '清屏与布局恢复' },
+  const categories: Array<{ id: Exclude<PaneId, 'home'>; name: string; icon: PixelIconName; desc: string }> = [
+    { id: 'widgets', name: '组件', icon: DRAWER_CATEGORY_ICONS.widgets, desc: '添加与管理桌面小组件' },
+    { id: 'wallpaper', name: '墙纸', icon: DRAWER_CATEGORY_ICONS.wallpaper, desc: '场景、视频与氛围' },
+    { id: 'desktop', name: '桌面', icon: DRAWER_CATEGORY_ICONS.desktop, desc: '清屏与布局恢复' },
   ];
 
   const widgetGroups: Array<{ title: string; ids: WidgetKey[] }> = [
@@ -98,23 +104,23 @@
   ];
 
   const items: Widget[] = [
-    { id: 'background', name: '背景', icon: '🌄', desc: '响应式视频/图片背景', pinned: true, keywords: ['壁纸', '墙纸', '视频'] },
-    { id: 'clock', name: '时钟', icon: '🕒', desc: '视频背景时锁定右下角', pinned: true, keywords: ['时间'] },
-    { id: 'music', name: '音乐播放器', icon: '🎵', desc: '可拖拽缩放', keywords: ['音频', '播放'] },
-    { id: 'notes', name: '笔记', icon: '📖', desc: '内嵌渲染笔记正文', keywords: ['阅读'] },
-    { id: 'todo', name: '待办清单', icon: '✅', desc: '勾选完成 / 划掉取消', keywords: ['任务'] },
-    { id: 'calendar', name: '日历', icon: '📅', desc: 'iCal URL 同步事件', keywords: ['日程'] },
-    { id: 'pomodoro', name: '番茄钟', icon: '🍅', desc: '专注 / 小憩 / 长休', keywords: ['专注'] },
-    { id: 'weather', name: '天气', icon: '☁️', desc: 'Open-Meteo · 5 天预报', keywords: ['气温'] },
-    { id: 'world', name: '世界时钟', icon: '🌍', desc: '地图切城市/天气', keywords: ['时区'] },
-    { id: 'stats', name: '学习统计', icon: '📊', desc: '笔记 / 字数统计', keywords: ['数据'] },
-    { id: 'network', name: '网络流量', icon: '📡', desc: '会话下载 · 实时速率', keywords: ['带宽', '流量', '网络'] },
-    { id: 'graph', name: '关系图谱', icon: '🕸️', desc: '力导向双链网络', keywords: ['双链', '图谱'] },
-    { id: 'territory', name: '文件夹地图', icon: '🗺️', desc: '缩放切块 · 双链弧线', keywords: ['地图'] },
-    { id: 'calculator', name: 'MATLAB 计算器', icon: '🧮', desc: '表达式 / 绘图', keywords: ['matlab', '计算'] },
-    { id: 'python', name: 'Python', icon: '🐍', desc: 'Pyodide 在线运行', keywords: ['代码'] },
-    { id: 'whiteboard', name: '白板', icon: '✏️', desc: 'Excalidraw 手绘', keywords: ['画板'] },
-    { id: 'whitenoise', name: '白噪音', icon: '🌧️', desc: '多轨混音 · 可调混响', keywords: ['雨声', '环境音'] },
+    { id: 'background', name: '背景', desc: '响应式视频/图片背景', pinned: true, keywords: ['壁纸', '墙纸', '视频'] },
+    { id: 'clock', name: '时钟', desc: '视频背景时锁定右下角', pinned: true, keywords: ['时间'] },
+    { id: 'music', name: '音乐播放器', desc: '可拖拽缩放', keywords: ['音频', '播放'] },
+    { id: 'notes', name: '笔记', desc: '内嵌渲染笔记正文', keywords: ['阅读'] },
+    { id: 'todo', name: '待办清单', desc: '勾选完成 / 划掉取消', keywords: ['任务'] },
+    { id: 'calendar', name: '日历', desc: 'iCal URL 同步事件', keywords: ['日程'] },
+    { id: 'pomodoro', name: '番茄钟', desc: '专注 / 小憩 / 长休', keywords: ['专注'] },
+    { id: 'weather', name: '天气', desc: 'Open-Meteo · 5 天预报', keywords: ['气温'] },
+    { id: 'world', name: '世界时钟', desc: '地图切城市/天气', keywords: ['时区'] },
+    { id: 'stats', name: '学习统计', desc: '笔记 / 字数统计', keywords: ['数据'] },
+    { id: 'network', name: '网络流量', desc: '会话下载 · 实时速率', keywords: ['带宽', '流量', '网络'] },
+    { id: 'graph', name: '关系图谱', desc: '力导向双链网络', keywords: ['双链', '图谱'] },
+    { id: 'territory', name: '文件夹地图', desc: '缩放切块 · 双链弧线', keywords: ['地图'] },
+    { id: 'calculator', name: 'MATLAB 计算器', desc: '表达式 / 绘图', keywords: ['matlab', '计算'] },
+    { id: 'python', name: 'Python', desc: 'Pyodide 在线运行', keywords: ['代码'] },
+    { id: 'whiteboard', name: '白板', desc: 'Excalidraw 手绘', keywords: ['画板'] },
+    { id: 'whitenoise', name: '白噪音', desc: '多轨混音 · 可调混响', keywords: ['雨声', '环境音'] },
   ];
 
   const itemMap = $derived(Object.fromEntries(items.map((w) => [w.id, w])) as Record<WidgetKey, Widget>);
@@ -278,7 +284,7 @@
       const w = items.find((i) => i.id === drag.key);
       if (!w) return;
       drag = { ...drag, dragging: true, moved: true };
-      ensureGhost(`${w.icon} ${w.name}`);
+      ensureGhost(w.name);
       moveGhost(e.clientX, e.clientY);
       (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
       e.preventDefault();
@@ -438,7 +444,7 @@
                         onpointermove={onTilePointerMove}
                         onpointerup={(e) => onTilePointerUp(e, w)}
                       >
-                        <span class="mac-spotlight-row-icon">{w.icon}</span>
+                        <span class="mac-spotlight-row-icon"><PixelIcon name={WIDGET_ICON_MAP[w.id]} size={18} /></span>
                         <div class="mac-spotlight-row-text">
                           <span class="mac-spotlight-row-title">{w.name}</span>
                           <span class="mac-spotlight-row-sub">{w.desc}</span>
@@ -493,7 +499,7 @@
             <div class="mac-category-grid">
               {#each categories as cat (cat.id)}
                 <button type="button" class="mac-category-tile" onclick={() => goPane(cat.id)}>
-                  <span class="mac-category-icon">{cat.icon}</span>
+                  <span class="mac-category-icon"><PixelIcon name={cat.icon} size={22} /></span>
                   <span class="mac-category-name">{cat.name}</span>
                   <span class="mac-category-desc">{cat.desc}</span>
                 </button>
@@ -511,7 +517,7 @@
                     disabled={isCleared}
                     onclick={() => { if (!isCleared) onClearAll?.(); }}
                   >
-                    <span class="mac-row-icon">🧹</span>
+                    <span class="mac-row-icon"><PixelIcon name="clear" size={18} /></span>
                     <span class="mac-row-title">一键清屏</span>
                     <span class="mac-row-value">{isCleared ? '已清屏' : '保留背景'}</span>
                   </button>
@@ -554,7 +560,7 @@
                     }}
                     title={w.pinned ? '点击切换' : '点击切换；桌面端可拖到主界面'}
                   >
-                    <span class="mac-row-icon">{w.icon}</span>
+                    <span class="mac-row-icon"><PixelIcon name={WIDGET_ICON_MAP[w.id]} size={18} /></span>
                     <div class="mac-row-text">
                       <span class="mac-row-title">{w.name}</span>
                       <span class="mac-row-sub">{w.desc}</span>
@@ -595,7 +601,7 @@
                 {#if s.poster}
                   <img class="mac-wall-thumb" src={s.poster} alt="" loading="lazy" />
                 {:else}
-                  <span class="mac-wall-fallback" aria-hidden="true">🖼️</span>
+                  <span class="mac-wall-fallback" aria-hidden="true"><PixelIcon name="frame" size={24} /></span>
                 {/if}
                 <span class="mac-wall-label">{s.label}</span>
               </button>
@@ -752,7 +758,7 @@
                 disabled={isCleared}
                 onclick={() => { if (!isCleared) onClearAll?.(); }}
               >
-                <span class="mac-row-icon">🧹</span>
+                <span class="mac-row-icon"><PixelIcon name="clear" size={18} /></span>
                 <div class="mac-row-text">
                   <span class="mac-row-title">一键清屏</span>
                   <span class="mac-row-sub">关闭全部组件，仅保留背景</span>
@@ -1228,7 +1234,13 @@
   }
   .mac-spotlight-row:hover { background: rgb(255 255 255 / 0.06); }
   .mac-spotlight-row.is-on { background: rgb(180 140 255 / 0.1); }
-  .mac-spotlight-row-icon { font-size: 1.25rem; width: 28px; text-align: center; }
+  .mac-spotlight-row-icon {
+    width: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
   .mac-spotlight-row-text {
     flex: 1;
     min-width: 0;
@@ -1308,7 +1320,6 @@
   }
   .mac-category-tile:active { transform: scale(0.98); }
   .mac-category-icon {
-    font-size: 1.65rem;
     width: 48px;
     height: 48px;
     display: flex;
@@ -1384,9 +1395,10 @@
   .mac-action-row.is-accent { background: rgb(180 140 255 / 0.1); }
 
   .mac-row-icon {
-    font-size: 1.25rem;
     width: 28px;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
   }
   .mac-row-text {

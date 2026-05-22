@@ -1,4 +1,4 @@
-/** 离散数学：逻辑、集合、组合、图 */
+// 离散数学：逻辑、集合、组合、图
 
 export type TruthRow = { inputs: Record<string, boolean>; result: boolean };
 
@@ -25,7 +25,7 @@ function evalBoolToken(s: string): boolean {
   return false;
 }
 
-/** 简易布尔表达式：! && || ( ) */
+// 简易布尔表达式：! && || ( )
 export function evalLogic(expr: string, vars: Record<string, boolean>): boolean {
   let s = normalizeLogic(expr);
   for (const [name, val] of Object.entries(vars)) {
@@ -189,7 +189,7 @@ export function parseEdges(text: string, n: number): GraphEdge[] {
   return edges;
 }
 
-/** 节点圆形布局 */
+// 节点围一圈摆
 export function circleLayout(n: number, cx: number, cy: number, r: number) {
   return Array.from({ length: n }, (_, i) => {
     const ang = (2 * Math.PI * i) / n - Math.PI / 2;

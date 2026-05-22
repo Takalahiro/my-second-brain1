@@ -56,7 +56,7 @@ function readNumber(code: string, start: number): number {
   return i;
 }
 
-/** 将 Python 源码转为带 span 的 HTML，供编辑器高亮层使用 */
+// Python 源码 → 带 span 的 HTML，编辑器高亮层用
 export function highlightPython(code: string): string {
   const parts: string[] = [];
   let i = 0;
@@ -115,7 +115,7 @@ export function highlightPython(code: string): string {
 
 export const PYTHON_INDENT = '    ';
 
-/** Tab / Shift+Tab 缩进处理 */
+// Tab / Shift+Tab 缩进
 export function applyIndent(
   code: string,
   start: number,

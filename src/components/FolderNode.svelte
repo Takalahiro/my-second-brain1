@@ -2,18 +2,20 @@
   import { untrack, onMount } from 'svelte';
   import type { FolderNode } from '../lib/folder-tree';
   import { countNotes } from '../lib/folder-tree';
+  import PixelIcon from './PixelIcon.svelte';
+  import { DEFAULT_NOTE_ICON, folderIconName } from '../lib/pixel-icons';
   import Self from './FolderNode.svelte';
 
   interface Props {
     node: FolderNode;
     depth?: number;
-    /** 默认展开层级深度（含），更深的默认折叠 */
+    // 默认展开到第几层（含），更深的先折叠
     defaultExpandDepth?: number;
-    /** localStorage key 前缀，用于持久化折叠状态；不传则不持久化 */
+    // localStorage 前缀，用来记折叠状态；不传就不持久化
     storagePrefix?: string;
-    /** 总线版本：每次 +1 都会强制读对应 force action（'expand-all'/'collapse-all'） */
+    // 总线版本号，+1 时会强制 expand-all / collapse-all
     forceTick?: number;
-    /** 来自父级的强制动作 */
+    // 父级下发的强制动作
     forceAction?: 'expand-all' | 'collapse-all' | null;
   }
 
@@ -72,12 +74,18 @@
 
 <div class="folder-block depth-{depth}">
   {#if depth === 0}
-    <h1 class="root-title">{node.name === '根目录' ? '📚 全部笔记' : node.name}</h1>
+    <h1 class="root-title">
+      {#if node.name === '根目录'}
+        <PixelIcon name="notes" size={22} /> 全部笔记
+      {:else}
+        {node.name}
+      {/if}
+    </h1>
     <p class="root-meta">共 {total} 篇</p>
   {:else}
     <button type="button" class="folder-row" onclick={toggle} aria-expanded={!collapsed}>
       <span class="folder-caret {collapsed ? 'collapsed' : ''}" aria-hidden="true">›</span>
-      <span class="folder-icon">{collapsed ? '📁' : '📂'}</span>
+      <span class="folder-icon"><PixelIcon name={folderIconName(collapsed)} size={16} /></span>
       <span class="folder-name">{node.name}</span>
       <span class="folder-count">{total}</span>
     </button>
@@ -90,7 +98,7 @@
           {#each node.notes as n (n.slug)}
             <li>
               <a href={'/notes/' + n.slug} class="note-link">
-                <span class="note-icon">📄</span>
+                <span class="note-icon"><PixelIcon name={DEFAULT_NOTE_ICON} size={14} /></span>
                 <span class="note-title">{n.title}</span>
                 {#if n.lastUpdated}
                   <time class="note-date pixel-digits" title="最后更新">{n.lastUpdated}</time>
@@ -142,6 +150,9 @@
     font-size: 1.875rem;
     font-weight: 700;
     margin: 0 0 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
   }
   .root-meta {
     font-size: 0.875rem;
@@ -211,7 +222,8 @@
   }
   .folder-icon {
     flex: 0 0 auto;
-    font-size: 0.92rem;
+    display: inline-flex;
+    align-items: center;
   }
   .folder-name {
     flex: 1;
@@ -271,7 +283,8 @@
   }
   .note-icon {
     flex: 0 0 auto;
-    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
     opacity: 0.7;
   }
   .note-title {

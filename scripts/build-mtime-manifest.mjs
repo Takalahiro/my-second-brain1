@@ -1,15 +1,9 @@
 #!/usr/bin/env node
 /**
- * 扫描 obsidian-vault 内所有 .md，输出 `src/lib/notes-mtime.json`。
+ * 扫 vault 里所有 .md，生成 src/lib/notes-mtime.json（path → ISO 时间戳）。
  *
- *   { "path/to/foo.md": "2026-05-20T14:30:46+08:00", ... }
- *
- * 取数策略（依次尝试）：
- *   1. `git log -1 --follow --format=%cI -- <path>`（最准确，能跨越重命名）
- *   2. 文件系统 mtime（fresh checkout 时是 clone 时间；本地是真实编辑时间）
- *
- * 该 manifest 会被 `src/lib/git-mtime.ts` 在 SSR 阶段直接读取，
- * 这样即便部署环境是浅克隆（拿不到完整 git log），最后更新时间也至少不会全部相同。
+ * 时间从哪来：优先 git log --follow（rename 也能跟），拿不到就用 fs mtime 兜底。
+ * SSR 时 git-mtime.ts 直接读这个文件 — 浅 clone 环境下至少不会所有笔记显示同一个时间。
  */
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';

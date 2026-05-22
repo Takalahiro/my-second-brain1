@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * 将 public/music 下过大的音频压缩为 OGG Opus（单文件 ≤ maxMiB）。
- * 默认只处理超过 25 MiB 的文件；--all-flac 可转换全部 .flac。
+ * public/music 里太大的音频压成 OGG Opus，单文件 ≤ maxMiB。
+ * 默认只碰 >25 MiB 的；--all-flac 会把所有 .flac 都转一遍。
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, unlinkSync, renameSync, statSync } from 'node:fs';
@@ -48,7 +48,7 @@ function encodeOne(inputName) {
 
   if (existsSync(tmp)) unlinkSync(tmp);
 
-  // Opus VBR，音质与体积平衡；一般 4–5 分钟流行歌约 4–8 MiB
+  // Opus VBR，音质/体积折中 — 一般 4–5 分钟流行歌大概 4–8 MiB
   const args = [
     '-y',
     '-i',

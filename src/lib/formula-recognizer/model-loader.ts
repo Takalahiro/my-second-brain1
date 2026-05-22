@@ -48,7 +48,7 @@ class FormulaModelLoader {
     for (const listener of this.listeners) listener(phase);
   }
 
-  /** 浏览器空闲时预加载（不阻塞首屏；移动端跳过以节省内存） */
+  // 浏览器闲了预加载，不挡首屏；移动端跳过省内存
   scheduleIdlePreload() {
     if (!getFormulaDeviceProfile().preloadModel) return;
     if (this.idleScheduled || this.phase === 'ready' || this.phase === 'loading') return;
@@ -67,7 +67,7 @@ class FormulaModelLoader {
     }
   }
 
-  /** 首次 recognize 时懒加载；也可由 idle 预加载触发 */
+  // 第一次 recognize 才懒加载；idle 预加载也能触发
   async recognize(
     image: Blob,
     onProgress?: ProgressCallback,
@@ -274,7 +274,7 @@ class FormulaModelLoader {
   }
 }
 
-/** 单例：Texo (FormulaNet) 公式识别加载器 */
+// 单例，Texo (FormulaNet) 公式识别加载器
 export const formulaModelLoader = new FormulaModelLoader();
 
 export function scheduleFormulaModelPreload() {

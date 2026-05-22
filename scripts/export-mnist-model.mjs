@@ -1,6 +1,6 @@
 /**
- * Train a LeNet-style MNIST CNN and export to public/models/mnist/
- * Run: node scripts/export-mnist-model.mjs
+ * 训一个 LeNet-style MNIST CNN，export 到 public/models/mnist/ 给 digits demo 用。
+ * node scripts/export-mnist-model.mjs
  */
 import * as tf from '@tensorflow/tfjs';
 import { mkdir, writeFile } from 'node:fs/promises';
@@ -29,7 +29,7 @@ async function loadMnist() {
   if (!labelResponse.ok) throw new Error(`Failed to fetch labels: ${labelResponse.status}`);
 
   const png = PNG.sync.read(Buffer.from(await imgResponse.arrayBuffer()));
-  // Sprite layout: each row is one flattened 28×28 digit (784 px wide × 65000 rows)
+  // sprite sheet 布局：每行一个 28×28 digit，宽 784 × 高 65000
   if (png.width !== IMAGE_SIZE) {
     throw new Error(`Unexpected sprite width ${png.width}, expected ${IMAGE_SIZE}`);
   }

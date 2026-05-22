@@ -1,10 +1,12 @@
 <script lang="ts">
   import NoteCard from './NoteCard.svelte';
+  import PixelIcon from '../PixelIcon.svelte';
+  import { DEFAULT_FOLDER_ICON, type PixelIconName } from '../../lib/pixel-icons';
 
   interface Note {
     id: string;
     title: string;
-    emoji?: string;
+    icon?: PixelIconName;
     count?: number;
     lastUpdated?: string;
     slug: string;
@@ -12,7 +14,7 @@
   interface FolderCard {
     id: string;
     title: string;
-    emoji?: string;
+    icon?: PixelIconName;
     count?: number;
     lastUpdated?: string;
     href: string;
@@ -23,17 +25,23 @@
     title: string;
     folders?: FolderCard[];
     notes: Note[];
-    folderEmoji?: string;
+    folderIcon?: PixelIconName;
     viewMode?: 'grid' | 'list';
   }
 
-  let { title, folders = [], notes, folderEmoji = '📁', viewMode = 'grid' }: Props = $props();
+  let {
+    title,
+    folders = [],
+    notes,
+    folderIcon = DEFAULT_FOLDER_ICON,
+    viewMode = 'grid',
+  }: Props = $props();
 </script>
 
 <section class="mb-10">
   {#if title}
     <div class="grid-title-wrap">
-      <span class="grid-title-emoji">{folderEmoji}</span>
+      <span class="grid-title-icon"><PixelIcon name={folderIcon} size={22} /></span>
       <h2 class="grid-title">{title}</h2>
       <div class="grid-divider"></div>
     </div>
@@ -47,7 +55,7 @@
           <NoteCard
             id={folder.id}
             title={folder.title}
-            emoji={folder.emoji ?? '📁'}
+            icon={folder.icon ?? DEFAULT_FOLDER_ICON}
             count={folder.count}
             lastUpdated={folder.lastUpdated}
             href={folder.href}
@@ -65,7 +73,7 @@
         <NoteCard
           id={note.id}
           title={note.title}
-          emoji={note.emoji}
+          icon={note.icon}
           count={note.count}
           lastUpdated={note.lastUpdated}
           href={`/notes/${note.slug}`}
@@ -83,9 +91,15 @@
     gap: 0.6rem;
     margin-bottom: 1rem;
   }
-  .grid-title-emoji {
-    font-size: 1.8rem;
-    line-height: 1;
+  .grid-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgb(180 140 255 / 0.1);
+    color: rgb(140 100 220);
   }
   .grid-title {
     margin: 0;
@@ -98,41 +112,29 @@
     background: linear-gradient(to right, rgb(255 214 224 / 0.7), transparent);
   }
   .sub-title {
-    margin: 0.5rem 0 0.7rem;
-    font-size: 0.95rem;
-    color: var(--text-secondary);
+    margin: 0 0 0.75rem;
+    font-size: 0.82rem;
     font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
   }
   .folders-stack {
-    display: grid;
-    gap: 0.55rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
   }
   .folder-item {
-    padding-left: calc(var(--depth) * 14px);
+    padding-left: calc(var(--depth, 0) * 1rem);
   }
-
   .notes-grid {
     display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 0.85rem;
   }
-  @media (min-width: 640px) {
-    .notes-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 1024px) {
-    .notes-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-  @media (min-width: 1280px) {
-    .notes-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-  }
-
   .notes-grid.is-list {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
   }
 </style>

@@ -1,0 +1,90 @@
+---
+import { getPixelIconRects, type PixelIconName } from '../lib/pixel-icons';
+import { getUiIconNodes, uiIconNodeProps } from '../lib/ui-icons';
+
+interface Props {
+  name: PixelIconName;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 16, class: className = '' }: Props = Astro.props;
+const rects = getPixelIconRects(name);
+const uiNodes = getUiIconNodes(name);
+---
+
+<span class:list={['app-icon', className]} style={`width:${size}px;height:${size}px`} aria-hidden="true">
+  <svg
+    class="app-icon-stroke"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+  >
+    {uiNodes.map((node) => {
+      const { tag, attrs } = uiIconNodeProps(node);
+      if (tag === 'path') return <path d={String(attrs.d ?? '')} />;
+      if (tag === 'circle') return <circle cx={attrs.cx} cy={attrs.cy} r={attrs.r} />;
+      if (tag === 'rect')
+        return (
+          <rect
+            x={attrs.x}
+            y={attrs.y}
+            width={attrs.width}
+            height={attrs.height}
+            rx={attrs.rx}
+            ry={attrs.ry}
+          />
+        );
+      if (tag === 'line') return <line x1={attrs.x1} y1={attrs.y1} x2={attrs.x2} y2={attrs.y2} />;
+      if (tag === 'polyline') return <polyline points={String(attrs.points ?? '')} />;
+      if (tag === 'polygon') return <polygon points={String(attrs.points ?? '')} />;
+      if (tag === 'ellipse') return <ellipse cx={attrs.cx} cy={attrs.cy} rx={attrs.rx} ry={attrs.ry} />;
+      return null;
+    })}
+  </svg>
+
+  <svg
+    class="app-icon-pixel px-icon"
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    shape-rendering="crispEdges"
+  >
+    {rects.map(([x, y, w, h]) => (
+      <rect x={x} y={y} width={w} height={h} fill="currentColor" />
+    ))}
+  </svg>
+</span>
+
+<style>
+  .app-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: -0.15em;
+    flex-shrink: 0;
+    color: inherit;
+    line-height: 0;
+  }
+
+  .app-icon-stroke,
+  .app-icon-pixel {
+    display: block;
+  }
+
+  :global(html:not([data-font='jp-pixel'])) .app-icon-pixel {
+    display: none;
+  }
+
+  :global(html[data-font='jp-pixel']) .app-icon-stroke {
+    display: none;
+  }
+
+  .app-icon-stroke {
+    stroke-width: var(--app-icon-stroke-width, 2);
+    stroke-linecap: var(--app-icon-stroke-linecap, round);
+    stroke-linejoin: var(--app-icon-stroke-linejoin, round);
+  }
+</style>

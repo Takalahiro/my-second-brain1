@@ -28,7 +28,7 @@
     useVideo: boolean;
     rain: boolean;
     rainDrops: boolean;
-    /** true 时雨滴随天气 / 雨天视频自动开关 */
+    // true 时雨滴跟着天气 / 雨天视频自动开
     rainDropsLinked: boolean;
     sakura: boolean;
     brightness: number;
@@ -56,9 +56,9 @@
     whitenoise: false,
     network: false,
   });
-  /** 壁纸层一键静音（音乐 + 白噪音） */
+  // 壁纸层一键静音（音乐 + 白噪音）
   let globalMuted = $state(false);
-  /** 一键清屏前的快照；非 null 时显示"恢复"按钮 */
+  // 清屏前的快照；有值就显示「恢复」按钮
   let snapshot = $state<Enabled | null>(null);
   let isMobile = $state(false);
   let controlCenterOpen = $state(false);
@@ -160,7 +160,7 @@
     return () => window.removeEventListener('weather:sync', onWeatherSync);
   });
 
-  /** 时钟仅在「桌面 + 启用了背景 + 使用视频」时锁定在右下角 */
+  // 桌面 + 开了背景 + 用视频时，时钟钉右下角
   const clockPinned = $derived(!isMobile && enabled.background && bg.useVideo);
 
   function persist() {
@@ -173,7 +173,7 @@
     writeGlobalMuted(globalMuted);
   }
 
-  /** 拖入主界面时，给每个组件落点提示初始化位置 */
+  // 拖进桌面时，给各组件写初始落点
   const dropMap: Partial<Record<WidgetKey, { key: string; serialize: (drop: { x: number; y: number }) => string }>> = {
     music: {
       key: 'second-brain:music-layout',
@@ -382,7 +382,7 @@
   }
   function setMobileIndex(idx: number) { bg = { ...bg, mobileIndex: idx }; persist(); }
 
-  /** 一键清屏：除「背景」外全部关闭，并保存当前状态为快照 */
+  // 一键清屏：背景留着，其它全关，当前状态存快照
   function clearAll() {
     // 如果当前已经是「除背景外全关」的状态，就忽略（避免清空之前的快照）
     const others = Object.entries(enabled).filter(([k]) => k !== 'background').some(([, v]) => v);
@@ -409,14 +409,14 @@
     };
     persist();
   }
-  /** 恢复清屏前的全部组件 */
+  // 恢复快照里的全部组件
   function restoreAll() {
     if (!snapshot) return;
     enabled = { ...snapshot };
     snapshot = null;
     persist();
   }
-  /** 当前是否处于「只剩背景」的清屏态 */
+  // 是不是「只剩背景」的清屏态
   const isCleared = $derived(
     Object.entries(enabled).filter(([k]) => k !== 'background').every(([, v]) => !v)
   );

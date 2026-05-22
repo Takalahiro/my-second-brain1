@@ -14,12 +14,14 @@
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
   import WidgetRainGlass from './WidgetRainGlass.svelte';
+  import PixelIcon from '../PixelIcon.svelte';
+  import type { PixelIconName } from '../../lib/pixel-icons';
 
   interface Props {
     layoutKey: string;
     ariaLabel: string;
     title: string;
-    icon?: string;
+    icon?: PixelIconName;
     href?: string;
     className?: string;
     zIndex?: number;
@@ -33,7 +35,7 @@
     defaultOffsetY?: number;
     aspectLock?: boolean;
     onClose?: () => void;
-    /** 窗口状态（最小化/最大化等）由父组件持久化时可传入 */
+    // 最小化/最大化状态可由父组件持久化
     minimized?: boolean;
     maximized?: boolean;
     onMinimize?: () => void;
@@ -46,7 +48,6 @@
     layoutKey,
     ariaLabel,
     title,
-    icon = '',
     href,
     className = '',
     zIndex = 38,
@@ -196,7 +197,7 @@
       maximized={maximized}
     />
     <span class="fw-title">
-      {#if icon}<span aria-hidden="true">{icon}</span>{/if}
+      {#if icon}<PixelIcon name={icon} size={14} />{/if}
       {title}
     </span>
     {#if headerExtra}

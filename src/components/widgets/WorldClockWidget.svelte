@@ -6,6 +6,8 @@
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
+  import PixelIcon from '../PixelIcon.svelte';
+  import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
 
   interface Props {
     onClose?: () => void;
@@ -23,10 +25,8 @@
     y: number;        // 0..50  viewBox 纬度位置
   };
 
-  /** 主要城市 —— 在简化世界地图上的分散坐标 (viewBox 0 0 100 50)
-   *   x 用等距经度投影  (lon + 180) / 360 * 100
-   *   y 用 Mercator-ish 投影 0..50，已做手动调整避免重叠
-   */
+  // 主要城市在简化地图上的坐标 (viewBox 0 0 100 50)
+  // x = (lon + 180) / 360 * 100；y 用类 Mercator 投影到 0..50，手调过避免重叠
   const cities: City[] = [
     { id: 'la',  name: '洛杉矶',    code: 'LAX', tz: 'America/Los_Angeles', lat: 34.05, lon: -118.24, x: 15, y: 22 },
     { id: 'ny',  name: '纽约',      code: 'NYC', tz: 'America/New_York',    lat: 40.71, lon: -74.00,  x: 27, y: 19 },
@@ -232,7 +232,7 @@
   <header class="ww-header" onpointerdown={onHeaderPointerDown}>
     <WindowChrome onClose={() => onClose?.()} onMinimize={doMinimize} onMaximize={doMaximize} maximized={maximized} />
     <div class="ww-title">
-      <span aria-hidden="true">🌍</span>
+      <span aria-hidden="true"><PixelIcon name={WIDGET_ICON_MAP.world} size={14} /></span>
       <span>世界时钟</span>
     </div>
     <span class="ww-sub" data-no-drag>{cities.length} 个时区 · 点击地图切换</span>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { SITE_NAV_LINKS } from '../../lib/site-nav';
+  import PixelIcon from '../PixelIcon.svelte';
 
   interface Props {
     controlCenterOpen?: boolean;
@@ -36,7 +37,9 @@
     <div class="dock-inner glass-container">
       {#each dockLinks as item (item.href)}
         <a href={item.href} class="dock-link" title={item.title}>
-          <span class="dock-icon" aria-hidden="true">{item.icon ?? '·'}</span>
+          <span class="dock-icon" aria-hidden="true">
+            {#if item.icon}<PixelIcon name={item.icon} size={18} />{:else}·{/if}
+          </span>
           <span class="dock-label">{item.label}</span>
         </a>
       {/each}
@@ -47,7 +50,7 @@
         aria-label="使用说明"
         onclick={() => onOpenManual?.()}
       >
-        <span class="dock-icon" aria-hidden="true">📖</span>
+        <span class="dock-icon" aria-hidden="true"><PixelIcon name="book" size={18} /></span>
         <span class="dock-label">说明</span>
       </button>
       <button
@@ -59,7 +62,7 @@
         aria-pressed={controlCenterOpen}
         onclick={() => onOpenControlCenter?.()}
       >
-        <span class="dock-icon" aria-hidden="true">⚙</span>
+        <span class="dock-icon" aria-hidden="true"><PixelIcon name="gear" size={18} /></span>
         <span class="dock-label">组件</span>
       </button>
     </div>
@@ -123,7 +126,9 @@
   }
 
   .dock-icon {
-    font-size: 1.05rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
   }
 

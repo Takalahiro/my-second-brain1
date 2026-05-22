@@ -1,11 +1,8 @@
 import { readdirSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
 
-/**
- * 必须与 src/lib/slugify.ts 的 slugify() 保持一致，
- * 也必须与 Astro 6 glob loader 的 id 归一化一致：
- * 小写、去括号、空格变 -。
- */
+// 跟 src/lib/slugify.ts 的 slugify() 保持一致
+// 也跟 Astro 6 glob loader 的 id 归一化一致：小写、去括号、空格变 -
 function slugify(name) {
   return name
     .toLowerCase()
@@ -13,9 +10,7 @@ function slugify(name) {
     .replace(/\s/g, '-');
 }
 
-/**
- * 同步扫描 vault，生成所有笔记的 slug 列表，供 remark-wiki-link 的 permalinks 使用。
- */
+// 同步扫 vault，生成所有笔记 slug，给 remark-wiki-link 的 permalinks 用
 export function getPermalinks(dir = './obsidian-vault') {
   const result = [];
   function walk(d) {

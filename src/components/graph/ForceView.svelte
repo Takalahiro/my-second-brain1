@@ -1,8 +1,5 @@
 <script lang="ts">
-  /**
-   * 力导向（页面级），包含孤岛节点。
-   * 孤岛被放在外围用同一物理仿真，但不参与弹簧（无边）。
-   */
+  // 力导向图（页面级），孤岛也参与仿真但不吃弹簧力
   import { onMount } from 'svelte';
   import type { RawNode, RawLink, WikiData, GraphSettings } from './graph-data';
   import { folderColor, noteHref } from './graph-data';
@@ -47,7 +44,7 @@
   let panning = false;
   let panStart = { x: 0, y: 0, px: 0, py: 0 };
   let dragNodeId: string | null = null;
-  /** 每帧递增，驱动 Svelte 5 重绘节点坐标 */
+  // 每帧 +1，逼 Svelte 5 重画节点位置
   let simFrame = $state(0);
 
   onMount(() => {
@@ -172,7 +169,7 @@
     e.preventDefault();
     setZoomCentered(e.deltaY < 0 ? 1.15 : 1 / 1.15, e.clientX, e.clientY);
   }
-  /** 以指定 client 坐标为中心进行缩放 */
+  // 以鼠标/触控点为中心缩放
   function setZoomCentered(factor: number, clientX: number, clientY: number) {
     if (!svgEl) { zoom = clamp(zoom * factor, ZP_MIN, ZP_MAX); return; }
     const box = svgEl.getBoundingClientRect();

@@ -98,6 +98,22 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 全站图标（PixelIcon — 描边 / 像素双模式） */
+:global(.app-icon) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: -0.15em;
+  flex-shrink: 0;
+  color: inherit;
+  line-height: 0;
+}
+
+:global(.px-icon),
+:global(.app-icon-pixel) {
+  shape-rendering: crispEdges;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pixel-card,
   .pixel-button,

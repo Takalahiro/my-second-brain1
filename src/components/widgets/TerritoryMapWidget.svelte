@@ -9,6 +9,8 @@
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
+  import PixelIcon from '../PixelIcon.svelte';
+  import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
 
   interface Props {
     onClose?: () => void;
@@ -170,7 +172,7 @@
   <header class="tw-header" onpointerdown={onHeaderPointerDown}>
     <WindowChrome onClose={() => onClose?.()} onMinimize={doMinimize} onMaximize={doMaximize} maximized={maximized} />
     <div class="tw-title">
-      <span aria-hidden="true">🗺️</span>
+      <span aria-hidden="true"><PixelIcon name={WIDGET_ICON_MAP.territory} size={14} /></span>
       <span>文件夹地图</span>
     </div>
     <span class="tw-sub" data-no-drag>{TIER_LABEL[tier]} · 国家 · 州 · 城市 · 孤岛</span>

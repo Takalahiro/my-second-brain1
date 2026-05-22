@@ -32,7 +32,7 @@
   layoutKey="second-brain:python-layout"
   ariaLabel="Python 编译器"
   title="Python"
-  icon="🐍"
+  icon="python"
   href="/python"
   className="python-widget"
   defaultWidth={520}

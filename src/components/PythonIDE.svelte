@@ -2,6 +2,8 @@
   import { onMount, tick } from 'svelte';
   import PythonStepPanel from './python/PythonStepPanel.svelte';
   import PythonCodeEditor from './python/PythonCodeEditor.svelte';
+  import PythonAnnotatedSource from './python/PythonAnnotatedSource.svelte';
+  import PythonModuleFlow from './python/PythonModuleFlow.svelte';
   import {
     PY_TRACER_SETUP,
     SAMPLE_CODE,
@@ -19,6 +21,8 @@
     setStdout: (o: { batched: (t: string) => void }) => void;
   };
 
+  type CodeView = 'edit' | 'trace' | 'modules';
+
   let pyodideReady = $state(false);
   let tracerReady = $state(false);
   let loading = $state(true);
@@ -28,14 +32,8 @@
   let running = $state(false);
   let trace = $state<PythonTraceResult | null>(null);
   let activeStep = $state(0);
+  let codeView = $state<CodeView>('edit');
   let pyodide: PyodideApi | null = null;
-
-  let editorRef = $state<PythonCodeEditor | null>(null);
-  let gutterEl: HTMLDivElement | null = null;
-
-  const lines = $derived(code.split('\n'));
-  const activeLine = $derived(trace?.steps[activeStep]?.line ?? 0);
-  const executedLines = $derived(new Set(trace?.steps.map((s) => s.line) ?? []));
 
   onMount(() => {
     void initPyodide();
@@ -90,7 +88,10 @@ json.dumps(run_traced(${payload}))
       trace = parsed;
       stdout = parsed.stdout;
       if (parsed.error) stdout += (stdout ? '\n' : '') + parsed.error;
-      if (parsed.steps.length > 0) activeStep = 0;
+      if (parsed.steps.length > 0) {
+        activeStep = 0;
+        codeView = codeView === 'edit' ? 'trace' : codeView;
+      }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       stdout = msg;
@@ -98,7 +99,6 @@ json.dumps(run_traced(${payload}))
     } finally {
       running = false;
       await tick();
-      scrollToActiveLine();
     }
   }
 
@@ -106,25 +106,15 @@ json.dumps(run_traced(${payload}))
     stdout = '';
     trace = null;
     activeStep = 0;
+    codeView = 'edit';
   }
 
-  function syncGutterScroll() {
-    const ta = editorRef?.getTextarea();
-    if (ta && gutterEl) gutterEl.scrollTop = ta.scrollTop;
+  function switchToEdit() {
+    codeView = 'edit';
   }
-
-  function scrollToActiveLine() {
-    editorRef?.scrollToLine(activeLine);
-    syncGutterScroll();
-  }
-
-  $effect(() => {
-    void activeLine;
-    void tick().then(scrollToActiveLine);
-  });
 
   const PRESETS: Array<{ label: string; code: string }> = [
-    { label: '入门', code: SAMPLE_CODE },
+    { label: 'OOP', code: SAMPLE_CODE },
     {
       label: '循环',
       code: `total = 0
@@ -150,7 +140,7 @@ else:
     {#if !compact}
       <div>
         <h1>Python 在线编译器</h1>
-        <p class="py-sub">Pyodide 运行 · 逐步解释每一行在做什么</p>
+        <p class="py-sub">Pyodide 运行 · 源码追踪 / 模块分栏 / 调用栈，可切换</p>
       </div>
     {:else}
       <span class="py-compact-title">Python · 逐步追踪</span>
@@ -177,7 +167,7 @@ else:
   {#if !compact}
     <div class="py-presets">
       {#each PRESETS as p}
-        <button type="button" onclick={() => { code = p.code; trace = null; }}>{p.label}示例</button>
+        <button type="button" onclick={() => { code = p.code; trace = null; codeView = 'edit'; }}>{p.label}示例</button>
       {/each}
     </div>
   {/if}
@@ -185,30 +175,48 @@ else:
   <div class="py-workspace">
     <section class="py-editor-pane">
       <div class="py-pane-head">
-        <span class="py-lbl">代码</span>
-        {#if activeLine}
-          <span class="py-line-badge viz-pulse-soft">当前第 {activeLine} 行</span>
+        <div class="py-pane-tabs">
+          <button type="button" class:active={codeView === 'edit'} onclick={switchToEdit}>编辑</button>
+          <button
+            type="button"
+            class:active={codeView === 'trace'}
+            disabled={!trace?.steps.length}
+            onclick={() => { codeView = 'trace'; }}
+          >
+            源码追踪
+          </button>
+          <button
+            type="button"
+            class:active={codeView === 'modules'}
+            disabled={!trace?.steps.length}
+            onclick={() => { codeView = 'modules'; }}
+          >
+            模块视图
+          </button>
+        </div>
+        {#if codeView !== 'edit' && trace?.steps.length}
+          <span class="py-line-badge">步骤 {activeStep + 1}/{trace.steps.length}</span>
         {/if}
       </div>
-      <div class="py-code-wrap">
-        <div class="py-gutter" bind:this={gutterEl} aria-hidden="true">
-          {#each lines as _, i}
-            {@const ln = i + 1}
-            <span
-              class="py-gutter-line"
-              class:active={ln === activeLine}
-              class:hit={executedLines.has(ln)}
-            >{ln}</span>
-          {/each}
-        </div>
-        <PythonCodeEditor
-          bind:this={editorRef}
-          bind:code
-          disabled={!pyodideReady}
-          onscroll={syncGutterScroll}
-        />
-        {#if activeLine && lines[activeLine - 1] !== undefined}
-          <div class="py-line-highlight" style="--line: {activeLine - 1}"></div>
+
+      <div class="py-code-body">
+        {#if codeView === 'edit'}
+          <PythonCodeEditor bind:code disabled={!pyodideReady} />
+        {:else if trace}
+          {#if codeView === 'trace'}
+            <PythonAnnotatedSource
+              {code}
+              steps={trace.steps}
+              {activeStep}
+              onStepPick={(i) => { activeStep = i; }}
+            />
+          {:else}
+            <PythonModuleFlow
+              steps={trace.steps}
+              {activeStep}
+              onStepPick={(i) => { activeStep = i; }}
+            />
+          {/if}
         {/if}
       </div>
     </section>
@@ -261,7 +269,6 @@ else:
   .py-btn {
     padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border-color);
     background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; font-size: 0.84rem;
-    transition: opacity var(--motion-step-fast);
   }
   .py-btn.primary {
     background: linear-gradient(135deg, #7fe6c4, #b48cff);
@@ -279,7 +286,7 @@ else:
     flex: 1;
     min-height: 0;
     display: grid;
-    grid-template-columns: minmax(280px, 1fr) minmax(300px, 1fr);
+    grid-template-columns: minmax(300px, 1.1fr) minmax(280px, 0.9fr);
     gap: 12px;
   }
   .py-ide.compact .py-workspace {
@@ -304,8 +311,8 @@ else:
     gap: 12px;
     min-height: 0;
   }
-  .py-steps-pane { flex: 1.2; min-height: 0; padding: 12px; }
-  .py-output-pane { flex: 0.8; min-height: 120px; }
+  .py-steps-pane { flex: 1.25; min-height: 0; padding: 10px 12px; }
+  .py-output-pane { flex: 0.75; min-height: 100px; }
 
   .py-pane-head {
     display: flex;
@@ -313,6 +320,30 @@ else:
     justify-content: space-between;
     padding: 8px 12px;
     border-bottom: 1px solid var(--border-color);
+    gap: 8px;
+  }
+  .py-pane-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  .py-pane-tabs button {
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.74rem;
+    cursor: pointer;
+  }
+  .py-pane-tabs button.active {
+    background: rgb(127 230 196 / 0.15);
+    border-color: rgb(127 230 196 / 0.3);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .py-pane-tabs button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
   .py-lbl {
     font-size: 0.72rem;
@@ -327,56 +358,20 @@ else:
     background: rgb(127 230 196 / 0.15);
     color: #7fe6c4;
     font-weight: 600;
+    font-variant-numeric: tabular-nums;
   }
 
-  .py-code-wrap {
-    position: relative;
+  .py-code-body {
     flex: 1;
     min-height: 0;
-    display: grid;
-    grid-template-columns: 42px 1fr;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
-  }
-  .py-code-wrap :global(.py-code-editor) {
-    min-height: 0;
-  }
-  .py-gutter {
-    padding: 12px 0;
-    overflow: hidden;
-    background: rgb(0 0 0 / 0.15);
-    border-right: 1px solid var(--border-color);
-    user-select: none;
-  }
-  .py-gutter-line {
-    display: block;
-    height: 21px;
-    line-height: 21px;
-    text-align: right;
-    padding-right: 8px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    color: rgb(255 255 255 / 0.25);
-    transition: color var(--motion-step) var(--motion-step-ease), background var(--motion-step);
-  }
-  .py-gutter-line.hit { color: rgb(255 255 255 / 0.45); }
-  .py-gutter-line.active {
-    color: #7fe6c4;
-    font-weight: 700;
-    background: rgb(127 230 196 / 0.12);
-    animation: viz-row-pulse 1.3s ease-in-out infinite;
   }
 
-  .py-line-highlight {
-    position: absolute;
-    left: 42px;
-    right: 0;
-    top: calc(12px + var(--line) * 21px);
-    height: 21px;
-    background: rgb(127 230 196 / 0.1);
-    border-left: 3px solid #7fe6c4;
-    pointer-events: none;
-    animation: viz-highlight-pulse-soft 1.4s ease-in-out infinite;
-    transition: top var(--motion-step) var(--motion-step-ease);
+  .py-code-body :global(.py-code-editor) {
+    flex: 1;
+    min-height: 0;
   }
 
   .py-stdout {
@@ -397,6 +392,6 @@ else:
   @media (max-width: 960px) {
     .py-workspace { grid-template-columns: 1fr; }
     .py-ide { height: auto; min-height: calc(100vh - 88px); }
-    .py-code-wrap, .py-steps-pane { min-height: 240px; }
+    .py-code-body, .py-steps-pane { min-height: 260px; }
   }
 </style>

@@ -18,8 +18,7 @@
     height?: number;
     embedded?: boolean;
     answerLabel?: string;
-    /** 嵌入 Tab 切换时为 false；重新显示时会重置画布 */
-    active?: boolean;
+    active?: boolean; // 嵌在 Tab 里时可能为 false；重新显示会清画布
   }
 
   let {
@@ -68,7 +67,7 @@
     };
   });
 
-  /** 移动端离开公式 Tab 时释放 OCR Worker + Pyodide，避免 Safari OOM */
+  // 移动端离开公式 Tab 就卸 OCR Worker + Pyodide，Safari 内存扛不住
   $effect(() => {
     if (active || !deviceProfile.disposeOnInactive) return;
     clearDebounce();

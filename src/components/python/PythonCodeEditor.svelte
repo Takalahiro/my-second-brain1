@@ -44,7 +44,7 @@
     textareaEl.selectionEnd = result.selEnd;
   }
 
-  /** 父组件追踪行号时同步滚动 */
+  // 给父组件用：按行号滚 textarea，顺便同步高亮层
   export function scrollToLine(line: number, lineHeight = 21) {
     if (!textareaEl || line < 1) return;
     const target = (line - 1) * lineHeight;

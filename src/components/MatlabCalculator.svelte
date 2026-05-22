@@ -3,7 +3,7 @@
   import { evaluate, plotFunction, CALC_HELP, type CalcResult } from '../lib/calc-engine';
 
   interface Props {
-    /** 紧凑模式（小组件） */
+    // 紧凑模式（小组件用）
     compact?: boolean;
   }
   let { compact = false }: Props = $props();
@@ -11,12 +11,26 @@
   type TabId = 'matrix' | 'calculus' | 'discrete' | 'statistics' | 'expr';
   let tab = $state<TabId>('matrix');
 
-  const labLoaders: Record<Exclude<TabId, 'expr'>, () => Promise<{ default: Component }>> = {
-    matrix: () => import('./matrix/MatrixLab.svelte'),
-    calculus: () => import('./calculus/CalculusLab.svelte'),
-    discrete: () => import('./discrete/DiscreteLab.svelte'),
-    statistics: () => import('./statistics/StatisticsLab.svelte'),
+  // Vite 需要在构建期静态分析 lazy 路径；裸 import('.svelte') 在 Astro dev 下会 404 源文件
+  const labModules = import.meta.glob<{ default: Component }>([
+    './matrix/MatrixLab.svelte',
+    './calculus/CalculusLab.svelte',
+    './discrete/DiscreteLab.svelte',
+    './statistics/StatisticsLab.svelte',
+  ]);
+
+  const labPaths: Record<Exclude<TabId, 'expr'>, string> = {
+    matrix: './matrix/MatrixLab.svelte',
+    calculus: './calculus/CalculusLab.svelte',
+    discrete: './discrete/DiscreteLab.svelte',
+    statistics: './statistics/StatisticsLab.svelte',
   };
+
+  function loadLab(id: Exclude<TabId, 'expr'>) {
+    const loader = labModules[labPaths[id]];
+    if (!loader) return Promise.reject(new Error(`未知模块: ${id}`));
+    return loader();
+  }
 
   let LabComponent = $state<Component | null>(null);
   let labLoading = $state(false);
@@ -153,7 +167,7 @@
     labLoading = true;
     labError = null;
     LabComponent = null;
-    labLoaders[currentTab]()
+    loadLab(currentTab)
       .then((mod) => {
         if (seq !== labLoadSeq) return;
         LabComponent = mod.default;

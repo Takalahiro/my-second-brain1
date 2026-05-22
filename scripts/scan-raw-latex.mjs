@@ -18,7 +18,7 @@ async function walk(d, out = []) {
   return out;
 }
 
-/** 源文件是否含数学标记 */
+/** 源 .md 里有没有 math delimiter（$$ / $ / \\( / \\[） */
 function sourceHasMath(md) {
   return /\$\$[\s\S]*?\$\$|\$[^$\n]+\$|\\\(|\\\[/.test(md);
 }
@@ -40,7 +40,7 @@ for (const f of files) {
   const katexCount = (article.match(/class="katex/g) || []).length;
   const katexErr = (article.match(/katex-error/g) || []).length;
 
-  // 未渲染的 LaTeX 特征（在 article 里以纯文本出现）
+  // article 里还留着裸 LaTeX 的特征（说明 KaTeX 没吃到）
   const rawPatterns = [
     { name: 'raw_$$', re: /(?<!class="katex[^"]*">[^<]*)\$\$[^$]+\$\$/ },
     { name: 'raw_frac', re: /\\frac\{[^}]+\}\{[^}]+\}/ },
@@ -50,7 +50,7 @@ for (const f of files) {
 
   const found = [];
   for (const p of rawPatterns) {
-    // 排除已在 katex annotation 里的
+    // 把 katex annotation 剥掉再 match，别误报
     const stripped = article.replace(/<annotation[^>]*>[\s\S]*?<\/annotation>/g, '');
     if (p.re.test(stripped)) found.push(p.name);
   }

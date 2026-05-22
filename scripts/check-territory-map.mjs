@@ -1,5 +1,5 @@
 /**
- * 领土地图模型自检：层级、国家轮廓、笔记与 wikilink
+ * 领土地图 sanity check — 树结构、国家 profile、wikilink 能不能 render。
  * node scripts/check-territory-map.mjs
  */
 import { readFileSync } from 'node:fs';
@@ -21,7 +21,7 @@ if (!wikiPath) {
 }
 const wiki = JSON.parse(readFileSync(wikiPath, 'utf8'));
 
-// 动态 import 编译产物较麻烦，在此复刻 buildTerritoryTree + 关键校验逻辑
+// 懒得 import 编译产物，这里 copy 一份 buildTerritoryTree + 核心校验
 function buildTerritoryTree(nodes) {
   const rootNode = { name: '世界', path: '', depth: 0, noteCount: 0, totalNotes: 0, children: [] };
   const lookup = new Map([['', rootNode]]);

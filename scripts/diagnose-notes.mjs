@@ -18,10 +18,10 @@ async function walk(dir) {
   }
 }
 
-// 把 markdown 里的代码块（fenced + indented + inline code）整体替换为空格，
-// 这样后续的 [[ ]] 计数就只针对真正的 wiki link，不会把 numpy `[[1,2,3]]`、
-// Python `nums[nums[0]]` 这类代码误判为未闭合 wiki link。
-// 按行处理 fenced code，支持任意长度的围栏（```、````、`````），保留行数对齐
+// 先把 markdown 里的 code block（fenced + indented + inline）整块替换成空格，
+// 后面数 [[ ]] 就只算真正的 wiki link，不会把 numpy `[[1,2,3]]`、
+// Python `nums[nums[0]]` 误判成 unclosed wikilink。
+// 按行剥 fenced code，``` / ```` / ````` 长度不固定，空行占位保持行号对齐
 function stripCodeBlocks(md) {
   const lines = md.split(/\r?\n/);
   const out = [];
@@ -30,7 +30,7 @@ function stripCodeBlocks(md) {
     const open = line.match(/^(`{3,})/);
     if (fence) {
       if (open && open[1].length >= fence.length) fence = null;
-      out.push(''); // 保留空行占位
+      out.push(''); // 占位，行数别乱
     } else if (open) {
       fence = open[1];
       out.push('');
@@ -54,8 +54,8 @@ async function checkNote(path) {
       return;
     }
 
-    // 文件名特殊字符（括号、空格等）已由 Astro 6 glob loader 与 slugify 自动归一化为
-    // 合法 URL（[()（）] 全部删除，空格 → -），所以不再视为错误，仅做 INFO 提示。
+    // 文件名带括号/空格 — Astro glob loader + slugify 会自动 normalize 成合法 URL，
+    // 不算 error，顶多 INFO 提示一下。
     const filename = rel.split(/[\\/]/).pop().replace(/\.md$/, '');
     if (/[()（）]/.test(filename)) {
       issues.push({ file: rel, type: 'info_special_chars_in_filename', filename });
@@ -68,8 +68,8 @@ async function checkNote(path) {
     const prose = stripCodeBlocks(fm.content);
 
     if (/\[\[_TOC_\]\]|\[TOC\]/i.test(prose)) {
-      // remark-obsidian-image 已经把 [TOC] / [[_TOC_]] 占位符从渲染中剔除，
-      // 这里只做 INFO 提示，不算 bug。
+      // remark-obsidian-image 会把 [TOC] / [[_TOC_]] 占位符剔掉，
+      // 这里只是 INFO，不算 bug。
       issues.push({ file: rel, type: 'info_has_toc_marker' });
     }
 
@@ -78,7 +78,7 @@ async function checkNote(path) {
       issues.push({ file: rel, type: 'empty_wiki_link', count: emptyLinks.length });
     }
 
-    // 计算 [[ ]] 配对前，先剥离会导致计数错位的 POSIX 字符类与 [[:xxx:]]/[]+] 等正则字面量
+    // 数 [[ ]] 配对前，先把 [[:alpha:]] 这类 POSIX char class 和 regex literal 剥掉
     const withoutPosixClass = prose.replace(/\[\[:[\w]+:\]\]/g, '');
     const openCount  = (withoutPosixClass.match(/\[\[/g) || []).length;
     const closeCount = (withoutPosixClass.match(/\]\]/g) || []).length;

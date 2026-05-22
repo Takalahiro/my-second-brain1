@@ -1,4 +1,4 @@
-/** WMO weather codes that imply rain, drizzle, showers, or thunderstorms. */
+// WMO 代码里哪些算「有雨」——毛毛雨、阵雨、雷暴都算
 export function weatherImpliesRain(code: number): boolean {
   return (
     (code >= 51 && code <= 67) ||

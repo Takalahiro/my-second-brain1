@@ -1,16 +1,13 @@
 #!/usr/bin/env node
 /**
- * obsidian-vault 双向同步脚本
+ * obsidian-vault 双向 sync — 把笔记子仓库和父 repo 对齐。
  *
- * 使用：
- *   pnpm vault:sync                          # 自动消息
- *   pnpm vault:sync "新增机器学习笔记"        # 自定义消息
+ * 跑法：
+ *   pnpm vault:sync
+ *   pnpm vault:sync "新增机器学习笔记"   # 自己写 commit msg 也行
  *
- * 它会：
- *   1. 在 obsidian-vault 内：git add → git commit → git push（如果有未提交改动）
- *   2. 拉取 vault 的远程最新版（避免被本地落后版本覆盖）
- *   3. 在父仓库内：把更新的 submodule pointer commit 上去
- *   4. 触发 Cloudflare Pages 重新部署（push 到父仓库 main 即可）
+ * 大概流程：vault 里有改动就先 commit+push → pull 一下防冲突 →
+ * 父仓库更新 submodule pointer → push 后 Cloudflare Pages 会自动 redeploy。
  */
 import { execSync, spawnSync } from 'node:child_process';
 import process from 'node:process';
@@ -41,7 +38,7 @@ console.log('  obsidian-vault 同步');
 console.log('  消息:', vaultMsg);
 console.log('═════════════════════════════════════════════════════════════');
 
-// ── Step 1: vault 内 commit + push
+// Step 1 — vault 里有 dirty 文件就 commit + push
 const vaultDirty = runQuiet('git status --porcelain', VAULT);
 if (vaultDirty) {
   console.log('\n▌ Step 1: obsidian-vault 有未提交改动');
@@ -49,7 +46,7 @@ if (vaultDirty) {
   run('git add -A', VAULT);
   run(`git commit -m "${vaultMsg.replace(/"/g, '\\"')}"`, VAULT);
 
-  // 先拉远程避免冲突
+  // push 前先 pull，不然容易撞 remote
   const branch = runQuiet('git rev-parse --abbrev-ref HEAD', VAULT) || 'main';
   console.log(`  current branch: ${branch}`);
   run(`git pull --rebase origin ${branch}`, VAULT);
@@ -58,7 +55,7 @@ if (vaultDirty) {
   console.log('\n▌ Step 1: obsidian-vault 没有改动，跳过');
 }
 
-// ── Step 2: 父仓库更新 submodule pointer
+// Step 2 — 父仓库把 submodule pointer 跟上
 const parentDirty = runQuiet('git status --porcelain obsidian-vault');
 if (parentDirty) {
   console.log('\n▌ Step 2: 父仓库的 submodule pointer 需要更新');

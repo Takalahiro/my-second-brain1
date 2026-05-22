@@ -275,11 +275,88 @@ Vault 同步详见 [docs/VAULT_SYNC.md](docs/VAULT_SYNC.md)。
 
 ---
 
+## 专业技术要点
+
+以下是在二次开发或排错时最常被问到的设计决策与实现细节。
+
+### 架构与构建
+
+- **无后端 SSG**：笔记在 `pnpm build` 时编译为静态 HTML；`wikilinks.json`、`stats.json` 等索引同样在构建期生成，运行时只读 JSON，不连数据库。
+- **`prepare:vault` 前置钩子**：每次 `dev` / `build` 都会同步 submodule、拷贝 `vault-assets`、刷新 mtime / 统计 / 双链报告，保证 Content Layer 与静态资源一致。
+- **Islands 分包**：桌面小组件、图谱、Pyodide、TF.js 等重模块通过 `client:load` / `client:idle` / 动态 `import()` 按需加载，工具页（`/matlab` 各 Tab）进一步 lazy import，避免首屏 JS 过大。
+
+### Markdown 与内容
+
+- **Unified 插件链**（见 `astro.config.mjs`）：Wiki 双链 → Obsidian 图片嵌入 → 数学归一化 → KaTeX → Mermaid → 表格外包，在 AST 层统一处理，而非运行时正则替换。
+- **Slug 与双链解析**：`slugify` + `build-wikilinks.mjs` 在构建期解析 `[[link]]`，已存在笔记为有效链接，缺失目标记入 `broken` / `orphans` 供 UI 标红。
+- **Git mtime**：笔记「最后更新」优先取 vault 内文件的 git 历史，而非文件系统 mtime，便于 CI 与子模块浅克隆场景。
+
+### 浏览器内计算与内存
+
+- **Python IDE**：Pyodide + `sys.settrace` + Python `ast`，按语句类型输出中文步骤说明（非 LLM）。
+- **公式 OCR**：FormulaNet 在 Web Worker 中跑 Transformers.js；移动端跳过 WebGPU 预加载、Tab 隐藏时 terminate Worker，并定期 recycle 以防 Safari OOM。
+- **SymPy 求解**：Pyodide 按需拉取 `formula-solver.py`（版本号 `FORMULA_SOLVER_VERSION` 用于缓存失效）；LaTeX → SymPy 字符串为启发式转换，复杂式子需人工核对。
+- **MNIST / TF.js**：LeNet 权重入库（~879 KB）；离开 CNN Tab 时 `tf.dispose` 释放 WebGL，避免与 OCR 争抢 GPU。
+
+### UI 与体验
+
+- **字体绑定双图标**：非 `jp-pixel` 字体用 Lucide 描边图标（各字体 CSS 变量微调笔画）；「日式像素」字体切换为 16×16 块面图标（`PixelIcon` 双 SVG + `data-font` 切换）。
+- **桌面小组件**：位置 / 尺寸 / 旋转持久化到 `localStorage`；触控手势与 `draggable` 模块分离，移动端抽屉模式禁用 transform 拖拽。
+- **关系图谱**：力导向带 alpha 冷却防抖动；领土地图视图用 seed 可复现的随机轮廓与 LOD；前台每 5 分钟可选刷新 `wikilinks.json`。
+
+### 部署与约束
+
+- **Cloudflare Pages**：输出目录 `dist`；**必须开启 git submodule**；`public/_headers` 区分 HTML（短缓存）与静态资源（长缓存）。
+- **体积审计**：`pnpm check:25mib` 扫描 git 跟踪文件，单文件 ≤ 25 MiB（大模型如 FormulaNet 走 CDN 运行时下载，不入库）。
+- **自检**：`pnpm build && pnpm preview` 后运行 `pnpm check:self http://localhost:4321` 批量探测主要路由与 JSON 端点。
+
+### 主要第三方许可
+
+| 组件 | 许可 |
+|------|------|
+| 本站代码 | MIT（见 [LICENSE](./LICENSE)） |
+| [Lucide](https://lucide.dev/) 图标 | ISC |
+| FormulaNet / Transformers.js | 各自上游许可 |
+| Pyodide / SymPy | 各自上游许可 |
+| `obsidian-vault` 笔记内容 | 以 vault 仓库为准，可能与代码许可不同 |
+
+---
+
 ## 开源协议
 
 本项目采用 **[MIT License](./LICENSE)** 发布。
 
-您可以自由使用、修改、分发本软件，但需保留版权声明与许可全文。笔记内容（`obsidian-vault`）可能适用独立许可，请以 vault 仓库为准。
+```
+MIT License
+
+Copyright (c) 2026 Takahiro
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+**你可以：** 自由使用、复制、修改、合并、发布、再许可和/或销售本软件副本。
+
+**你需要：** 在所有副本或重要部分中保留上述版权声明与许可全文。
+
+**免责声明：** 软件按「原样」提供，不提供任何明示或暗示担保；作者不对任何索赔或损害负责。
+
+笔记内容（`obsidian-vault` 子模块）可能适用独立许可，请以 vault 仓库说明为准。
 
 ---
 

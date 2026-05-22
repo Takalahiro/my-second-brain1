@@ -1,4 +1,4 @@
-/** 神经网络实验室 — 页面级命名（/digits 路由，含多个演示模块） */
+// 神经网络实验室页面命名（/digits 路由，里面好几个 demo）
 export const NEURAL_LAB = {
   title: '神经网络实验室',
   description: '深度学习可视化、交互推理与模型实验',
@@ -8,7 +8,7 @@ export const NEURAL_LAB = {
     mnist: 'mnist',
     formula: 'formula',
   } as const,
-  /** 手写数字 CNN 演示 */
+  // 手写数字 CNN demo
   demoMnist: {
     id: 'mnist' as const,
     tabLabel: '手写数字',
@@ -16,7 +16,7 @@ export const NEURAL_LAB = {
     subtitle: 'MNIST LeNet · 双路高精度推理 · 2D/3D 特征图与数据流',
     panelTitle: '卷积网络可视化',
   },
-  /** Texo 公式识别演示 */
+  // Texo 公式识别 demo
   demoFormula: {
     id: 'formula' as const,
     tabLabel: '数学公式',

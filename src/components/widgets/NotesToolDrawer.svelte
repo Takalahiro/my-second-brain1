@@ -1,13 +1,15 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { clampFabPosition, loadFabPosition, saveFabPosition } from '../../lib/draggable-fab';
+  import PixelIcon from '../PixelIcon.svelte';
+  import type { PixelIconName } from '../../lib/pixel-icons';
 
   type ToolKey = 'python' | 'matlab' | 'whiteboard';
 
   interface ToolItem {
     id: ToolKey;
     name: string;
-    icon: string;
+    icon: PixelIconName;
     desc: string;
   }
 
@@ -133,9 +135,9 @@
   }
 
   const items: ToolItem[] = [
-    { id: 'python', name: 'Python', icon: '🐍', desc: 'Pyodide 在线运行' },
-    { id: 'matlab', name: 'MATLAB', icon: '🧮', desc: '表达式 · 函数绘图' },
-    { id: 'whiteboard', name: '白板', icon: '✏️', desc: 'Excalidraw 手绘' },
+    { id: 'python', name: 'Python', icon: 'python', desc: 'Pyodide 在线运行' },
+    { id: 'matlab', name: 'MATLAB', icon: 'matlab', desc: '表达式 · 函数绘图' },
+    { id: 'whiteboard', name: '白板', icon: 'pen', desc: 'Excalidraw 手绘' },
   ];
 
   function ensureGhost(label: string) {
@@ -159,7 +161,7 @@
 
   function onTilePointerDown(e: PointerEvent, w: ToolItem) {
     dragKey = w.id;
-    ensureGhost(`${w.icon} ${w.name}`);
+    ensureGhost(w.name);
     moveGhost(e.clientX, e.clientY);
     (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
     e.preventDefault();
@@ -195,7 +197,7 @@
   onpointercancel={onFabPointerUp}
   onclick={toggleFab}
 >
-  <span aria-hidden="true">🛠</span>
+  <PixelIcon name="gear" size={18} />
 </button>
 
 {#if open}
@@ -224,7 +226,7 @@
             dragKey = null;
           }}
         >
-          <span class="ntd-icon" aria-hidden="true">{w.icon}</span>
+          <span class="ntd-icon" aria-hidden="true"><PixelIcon name={w.icon} size={18} /></span>
           <div>
             <div class="ntd-name">{w.name}</div>
             <div class="ntd-desc">{w.desc}</div>
@@ -357,8 +359,9 @@
     opacity: 0.5;
   }
   .ntd-icon {
-    font-size: 1.25rem;
-    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   .ntd-name {
     font-weight: 600;

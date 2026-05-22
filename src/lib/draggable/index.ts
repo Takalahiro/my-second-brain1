@@ -1,16 +1,14 @@
-/**
- * 通用 Svelte action：让任意 DOM 元素可拖动。
- *
- * 性能要点：
- * - pointermove 用 rAF 合并，避免每帧多次写 transform
- * - 拖动中才加 will-change: transform
- * - update() 仅在结构性选项变化时重绑，忽略 onEnd 回调引用变化
- */
+// 通用 Svelte action：让 DOM 元素可拖
+//
+// 性能上的小习惯：
+// - pointermove 用 rAF 合并，别一帧写好几次 transform
+// - 真在拖才加 will-change: transform
+// - update() 只在结构性选项变了才重绑，onEnd 回调换引用不算
 
 import type { Action } from 'svelte/action';
 
 export interface DraggableOptions {
-  /** false 时不附加任何 listener；运行期切换 enabled 会动态 attach/detach */
+  // false 时不挂 listener；运行期切 enabled 会动态 attach/detach
   enabled?: boolean;
   handle?: string;
   storageKey?: string;
@@ -113,11 +111,8 @@ export const draggable: Action<HTMLElement, DraggableOptions | undefined> = (
   let pendingX = 0;
   let pendingY = 0;
 
-  /**
-   * Handle 解析：返回所有匹配元素。支持「顶部 + 底部 + 边缘多个 handle」的场景。
-   * 用 querySelectorAll，对每个元素都会附加 cursor 样式，并在 hit-test 时检查
-   * pointerdown 落在任意一个 handle 内即可开始拖动。
-   */
+  // Handle 解析：可能多个（顶部 + 底部 + 边缘）
+  // querySelectorAll 全挂 cursor，pointerdown 落在任意一个 handle 上就能拖
   function getHandles(): HTMLElement[] {
     if (opts.handle) {
       const list = node.querySelectorAll<HTMLElement>(opts.handle);

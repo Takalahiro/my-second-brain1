@@ -7,6 +7,8 @@
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import { VOICE_TRACKS, type VoiceTrack } from '../../lib/voice-tracks';
+  import PixelIcon from '../PixelIcon.svelte';
+  import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
 
   interface Props { onClose?: () => void; globalMuted?: boolean; }
   let { onClose, globalMuted = false }: Props = $props();
@@ -43,7 +45,7 @@
   let dryGain: GainNode | null = null;
   let wetGain: GainNode | null = null;
   let convolver: ConvolverNode | null = null;
-  /** key -> Web Audio 节点 + HTMLAudio 元素（移动端兼容性更好） */
+  // 每条音轨对应 Web Audio 节点 + HTMLAudio（移动端更稳）
   const nodes = new Map<string, { gain: GainNode; audio: HTMLAudioElement }>();
 
   onMount(() => {
@@ -336,7 +338,7 @@
       onMaximize={() => { maximized = !maximized; persist(); }}
       maximized={maximized}
     />
-    <span class="wn-title">🌧 白噪音</span>
+    <span class="wn-title"><PixelIcon name={WIDGET_ICON_MAP.whitenoise} size={14} /> 白噪音</span>
     <button type="button" class="wn-play" data-no-drag onclick={() => togglePlay()}>
       {playing ? '⏸' : '▶'}
     </button>
@@ -428,7 +430,14 @@
     cursor: grab;
     background: rgb(0 0 0 / 0.18);
   }
-  .wn-title { font-size: 0.78rem; font-weight: 600; flex: 1; }
+  .wn-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
   .wn-play {
     width: 32px; height: 28px;
     border-radius: 8px;

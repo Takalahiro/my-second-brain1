@@ -3,11 +3,12 @@
   import type { MarkdownHeading } from 'astro';
   import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
   import { clampFabPosition, loadFabPosition, saveFabPosition } from '../../lib/draggable-fab';
+  import PixelIcon from '../PixelIcon.svelte';
   import NoteOutline from './NoteOutline.svelte';
 
   interface Props {
     headings: MarkdownHeading[];
-    /** sidebar = 桌面侧栏内联；mobile = 触屏浮动抽屉 */
+    // sidebar = 桌面侧栏内联；mobile = 手机浮动抽屉
     variant?: 'sidebar' | 'mobile';
   }
 
@@ -162,7 +163,7 @@
       onpointercancel={onFabPointerUp}
       onclick={toggleDrawer}
     >
-      📋 大纲
+      <PixelIcon name="list" size={16} /> 大纲
     </button>
 
     {#if drawerOpen}
@@ -174,7 +175,7 @@
       ></button>
       <aside class="outline-drawer pixel-card glass-container" aria-label="文章大纲">
         <header class="outline-drawer-head">
-          <h3 class="outline-drawer-title">📋 大纲</h3>
+          <h3 class="outline-drawer-title"><PixelIcon name="list" size={16} /> 大纲</h3>
           <button type="button" class="outline-close pixel-button" onclick={closeDrawer} aria-label="关闭">
             ✕
           </button>
@@ -196,6 +197,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.35rem;
     position: fixed;
     left: max(env(safe-area-inset-left, 0px), 12px);
     bottom: calc(env(safe-area-inset-bottom, 0px) + 64px);
@@ -260,6 +262,9 @@
   .outline-drawer-title {
     margin: 0;
     font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
   }
   .outline-close {
     min-width: 44px;

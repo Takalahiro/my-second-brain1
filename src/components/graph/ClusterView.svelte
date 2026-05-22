@@ -1,12 +1,7 @@
 <script lang="ts">
-  /**
-   * 同心簇环：每个 folder 作为一个独立的小行星系统。
-   *  - folder 的中心节点是该 folder 中度数最高的笔记
-   *  - 其余按度数 desc 顺时针排满
-   *  - folder 之间排成黄金角网格（spiral 排布）
-   *  - 孤岛在 folder 系统的外圈淡显示
-   * 风格：太阳系/星座感
-   */
+  // 同心簇环：每个 folder 一个小行星系统
+  // folder 中心 = 该 folder 里链接最多的笔记，其余按度数顺时针排
+  // folder 之间用黄金角螺旋铺开；孤岛挂在外圈淡显示
   import type { RawLink, WikiData, RawNode, GraphSettings } from './graph-data';
   import { folderColor, noteHref } from './graph-data';
   import { ZP_MIN, ZP_MAX, clamp } from './use-zoom-pan';
@@ -183,7 +178,7 @@
   function zoomOut() { if (!svgEl) return; const b = svgEl.getBoundingClientRect(); setZoomCentered(1/1.25, b.left + b.width/2, b.top + b.height/2); }
   function resetView() { zoom = 1; panX = 0; panY = 0; }
 
-  /** folder 网格中心 */
+  // 各 folder 在网格里的中心点
   const centers = $derived.by(() => {
     if (folders.length === 0) return [] as { folder: string; cx: number; cy: number; r: number; color: string }[];
     const cols = Math.min(4, Math.max(2, Math.ceil(Math.sqrt(folders.length))));

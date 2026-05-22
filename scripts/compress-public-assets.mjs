@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * 压缩 public/ 下超过 MAX_MIB 的资源：
- * - 音频 → OGG Opus（保留文件名 stem，扩展名 .ogg）
- * - PDF → Ghostscript /ebook（若已安装）
+ * public/ 里超过 MAX_MIB 的大文件压一压：
+ *   音频 → OGG Opus（stem 不变，扩展名改 .ogg）
+ *   PDF → Ghostscript /ebook preset（装了 gs 才行）
  */
 import { spawnSync } from 'node:child_process';
 import {

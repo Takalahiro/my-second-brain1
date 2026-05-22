@@ -1,5 +1,6 @@
 /**
- * 基础自检：build 后可用 `node scripts/self-check.mjs [baseUrl]`
+ * build 完随手 ping 一圈关键路由，看有没有 404。
+ * node scripts/self-check.mjs [baseUrl]   默认 localhost:4323
  */
 const base = (process.argv[2] || 'http://localhost:4323').replace(/\/$/, '');
 

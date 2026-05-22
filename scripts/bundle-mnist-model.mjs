@@ -1,6 +1,6 @@
 /**
- * Bundle MNIST weights (from Python) into public/models/mnist/ for TF.js.
- * Run: python scripts/export-mnist-model.py && node scripts/bundle-mnist-model.mjs
+ * 把 Python 导出的 MNIST weights 打包成 TF.js 能 load 的格式，丢到 public/models/mnist/。
+ * 先跑 python scripts/export-mnist-model.py，再 node scripts/bundle-mnist-model.mjs
  */
 import * as tf from '@tensorflow/tfjs';
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
@@ -76,7 +76,7 @@ async function main() {
 
   await tf.ready();
   const model = buildModel();
-  // Build graph so weight variables exist
+  // 先跑一遍 forward，weight variables 才会 materialize
   model.predict(tf.zeros([1, 28, 28, 1]));
 
   const tensors = weights.map((w) => tf.tensor(w.values, w.shape));

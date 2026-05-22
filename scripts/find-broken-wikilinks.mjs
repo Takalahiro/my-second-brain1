@@ -19,20 +19,20 @@ async function walk(d, out = []) {
 }
 
 function stripCodeBlocks(s) {
-  // 按行处理 fenced code block，支持嵌套围栏（```、````、`````）
+  // 按行剥 fenced code block，``` / ```` / ````` 嵌套都能 handle
   const lines = s.split(/\r?\n/);
   const out = [];
-  let fence = null; // 当前打开的围栏字符串，例如 '```' 或 '````'
+  let fence = null; // 当前打开的 fence，比如 '```'
   for (const line of lines) {
     const open = line.match(/^(`{3,})/);
     if (fence) {
       if (open && open[1].length >= fence.length) {
         fence = null;
       }
-      // 在围栏内：丢弃整行
+      // fence 里面整行扔掉
     } else if (open) {
       fence = open[1];
-      // 围栏起始行：丢弃
+      // 开 fence 那行也扔
     } else {
       out.push(line);
     }
@@ -56,9 +56,9 @@ for (const f of files) {
   while ((m = wikiRe.exec(content)) !== null) {
     const bang = m[1];
     const target = m[2].trim();
-    // 排除：图片嵌入（! 前缀 或 .png/.jpg 等扩展名）
+    // skip：图片 embed（! 前缀 or .png/.jpg 之类）
     if (bang || IMG_EXT.test(target)) continue;
-    // 排除：POSIX 字符类（[[:alpha:]] 之类）
+    // skip：POSIX char class，比如 [[:alpha:]]
     if (/^:[\w]+:$/.test(target)) continue;
     const slug = slugify(target);
     if (!existingSlugs.has(slug)) {

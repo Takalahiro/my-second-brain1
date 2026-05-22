@@ -3,7 +3,7 @@ export type WidgetLayout = {
   y: number;
   w: number;
   h: number;
-  /** rotation in degrees */
+  // 旋转角度（度）
   r?: number;
 };
 

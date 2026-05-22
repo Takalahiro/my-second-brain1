@@ -36,6 +36,10 @@ logs/
 # MNIST 训练中间产物（权重 JSON）
 scripts/.cache/
 
+# Python 字节码
+__pycache__/
+*.py[cod]
+
 # 本地 Ghostscript（compress-public-assets 可选）
 tools/ghostscript/
 

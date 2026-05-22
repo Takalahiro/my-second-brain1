@@ -23,7 +23,7 @@ function sliceChannel(data: Float32Array, h: number, w: number, c: number, ch: n
   return out;
 }
 
-/** 选取能量最高的 channel，最能代表「这一层看到了什么」 */
+// 挑能量最高的 channel，最能代表「这层看到了啥」
 export function pickRepresentativeMap(layer: LayerActivation): SpatialMap {
   const { h, w, c } = parseShape(layer.shape);
   const raw = layer.data instanceof Float32Array ? layer.data : Float32Array.from(layer.data);
@@ -65,7 +65,7 @@ export function normalizeMap(data: Float32Array) {
   return out;
 }
 
-/** 绘制 2D 热力图到 canvas，用于纹理与 HUD 缩略图 */
+// 2D 热力图画到 canvas，纹理和 HUD 缩略图都用这个
 export function drawHeatmapToCanvas(
   data: Float32Array,
   h: number,

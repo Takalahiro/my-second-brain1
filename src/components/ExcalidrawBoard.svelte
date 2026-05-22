@@ -1,8 +1,5 @@
 <script lang="ts">
-  /**
-   * Excalidraw 白板 —— 嵌入官方站点（全屏 iframe）
-   * 绘图数据保存在 excalidraw.com 的浏览器本地存储中。
-   */
+  // Excalidraw 白板 — 全屏 iframe 嵌官方站，数据存在 excalidraw.com 本地
   let loaded = $state(false);
 
   function onLoad() {

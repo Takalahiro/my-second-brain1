@@ -1,12 +1,14 @@
 <script lang="ts">
   import type { FolderNode as TreeNode } from '../../lib/folder-tree';
+  import type { PixelIconName } from '../../lib/pixel-icons';
   import FolderNode from '../FolderNode.svelte';
   import NoteGrid from './NoteGrid.svelte';
+  import PixelIcon from '../PixelIcon.svelte';
 
   interface Note {
     id: string;
     title: string;
-    emoji?: string;
+    icon?: PixelIconName;
     count?: number;
     lastUpdated?: string;
     slug: string;
@@ -14,7 +16,7 @@
   interface FolderCard {
     id: string;
     title: string;
-    emoji?: string;
+    icon?: PixelIconName;
     count?: number;
     lastUpdated?: string;
     href: string;
@@ -22,7 +24,7 @@
   }
   interface Category {
     title: string;
-    folderEmoji?: string;
+    folderIcon?: PixelIconName;
     folders?: FolderCard[];
     notes: Note[];
   }
@@ -38,13 +40,8 @@
 
   const MODE_KEY = 'second-brain:notes-display-mode';
 
-  /**
-   * 同步读取折叠模式：
-   * 1. <html data-notes-mode> 是 BaseLayout 预水合脚本写的，最早可用
-   * 2. localStorage 兜底
-   * 3. 默认 widgets
-   * 这样 client:only 组件首次渲染就是正确状态，不会闪烁。
-   */
+  // 同步读折叠模式：先看 html data-notes-mode（BaseLayout 预水合写的），再 localStorage，默认 widgets
+  // 这样 client:only 首次渲染就对，不会闪一下
   function readInitialMode(): 'widgets' | 'recursive' {
     if (typeof document !== 'undefined') {
       const html = document.documentElement.getAttribute('data-notes-mode');
@@ -114,7 +111,7 @@
 
 <section class="notes-toolbar pixel-card glass-container">
   <div class="notes-toolbar-title">
-    <span class="notes-toolbar-emoji">☕</span>
+    <span class="notes-toolbar-icon"><PixelIcon name="cup" size={18} /></span>
     <h1 class="notes-toolbar-text">Notes</h1>
   </div>
 
@@ -176,7 +173,7 @@
         title={category.title}
         folders={category.folders ?? []}
         notes={category.notes}
-        folderEmoji={category.folderEmoji}
+        folderIcon={category.folderIcon}
       />
     {/each}
   {/if}
@@ -198,8 +195,15 @@
     align-items: center;
     gap: 0.55rem;
   }
-  .notes-toolbar-emoji {
-    font-size: 1.7rem;
+  .notes-toolbar-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: rgb(180 140 255 / 0.12);
+    color: rgb(140 100 220);
   }
   .notes-toolbar-text {
     margin: 0;
@@ -290,8 +294,9 @@
     .notes-toolbar-title {
       gap: 0.45rem;
     }
-    .notes-toolbar-emoji {
-      font-size: 1.25rem;
+    .notes-toolbar-icon {
+      width: 30px;
+      height: 30px;
     }
     .notes-toolbar-text {
       font-size: 1.25rem;

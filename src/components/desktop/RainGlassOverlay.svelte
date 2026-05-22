@@ -3,7 +3,7 @@
 
   interface Props {
     active?: boolean;
-    /** bar = menu bar; widget = floating panels */
+    // bar = 菜单栏；widget = 浮窗面板
     size?: 'bar' | 'widget';
   }
 

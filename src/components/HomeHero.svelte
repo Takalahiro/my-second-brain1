@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import PixelIcon from './PixelIcon.svelte';
 
   interface SyncInfo {
     noteCount: number;
@@ -131,7 +132,7 @@
         onclick={closeManual}
       >×</button>
       <header class="manual-card-head">
-        <span class="manual-emoji" aria-hidden="true">📖</span>
+        <span class="manual-emoji" aria-hidden="true"><PixelIcon name="book" size={24} /></span>
         <h1 class="manual-title">使用说明</h1>
         <p class="manual-sub">My Second Brain · 快速上手</p>
       </header>
@@ -139,7 +140,7 @@
       <div class="manual-body">
         <section>
           <h3>桌面与组件</h3>
-          <p>顶栏 <strong>⚙</strong> 控制中心 · <strong>🧹</strong> 清屏；菜单栏可直达 <strong>笔记 / Python / MATLAB / 白板 / 图谱</strong>。</p>
+          <p>顶栏 <strong>控制中心</strong> · <strong>清屏</strong>；菜单栏可直达 <strong>笔记 / Python / MATLAB / 白板 / 图谱</strong>。</p>
           <ul>
             <li>主界面菜单栏与内容页顶栏导航样式统一</li>
             <li>雨滴默认跟随天气；控制中心 → 墙纸可改「跟随天气」</li>
@@ -154,7 +155,7 @@
           <h3>笔记与工具</h3>
           <ul>
             <li><a href="/notes">笔记</a>：小组件 / 折叠树；文末显示 Git 最后更新时间</li>
-            <li>阅读笔记时点 <strong>🛠</strong>：浮窗打开 Python / MATLAB / 白板</li>
+            <li>阅读笔记时点 <strong>工具按钮</strong>：浮窗打开 Python / MATLAB / 白板</li>
             <li>顶栏 Logo 菜单：<a href="/python">Python</a> · <a href="/matlab">MATLAB</a> · <a href="/whiteboard">白板</a> · <a href="/graph">图谱</a></li>
           </ul>
         </section>
@@ -396,8 +397,9 @@
     background: rgb(255 255 255 / 0.04);
   }
   .manual-emoji {
-    font-size: 1.6rem;
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 6px;
   }
   .manual-title {

@@ -7,6 +7,8 @@
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
+  import PixelIcon from '../PixelIcon.svelte';
+  import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
 
   interface Props {
     onClose?: () => void;
@@ -137,7 +139,7 @@
   function doMaximize() { maximized = !maximized; if (maximized) minimized = false; persistState(); }
   function toggleSettings() { showSettings = !showSettings; }
 
-  /** 三档自适应：compact / medium / expanded */
+  // 三档自适应：compact / medium / expanded
   const tier = $derived(getWidgetTier({ width, height, minimized, maximized, compactMax: 460, expandedMin: 780 }));
   const sizeMode = $derived<'sm' | 'md' | 'lg'>(tier === 'compact' ? 'sm' : tier === 'expanded' ? 'lg' : 'md');
 
@@ -226,7 +228,7 @@
   <header class="sw-header" onpointerdown={onHeaderPointerDown}>
     <WindowChrome onClose={() => onClose?.()} onMinimize={doMinimize} onMaximize={doMaximize} maximized={maximized} />
     <div class="sw-title">
-      <span aria-hidden="true">📊</span>
+      <span aria-hidden="true"><PixelIcon name={WIDGET_ICON_MAP.stats} size={14} /></span>
       <span>学习统计</span>
       <span class="sw-mode-tag">{TIER_LABEL[tier]}</span>
     </div>

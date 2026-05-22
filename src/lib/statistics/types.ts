@@ -1,4 +1,4 @@
-/** 统计可视化步骤（与 CalcStepPlayer 兼容） */
+// 统计可视化步骤，跟 CalcStepPlayer 兼容
 export type StatVizStep = {
   id: string;
   title: string;

@@ -1,6 +1,4 @@
-/**
- * 2D 绘图坐标与网格工具
- */
+// 2D 绘图坐标和网格小工具
 export type PlotBounds = { xMin: number; xMax: number; yMin: number; yMax: number };
 
 export type PlotPadding = { left: number; right: number; top: number; bottom: number };
@@ -114,12 +112,12 @@ export function setupCanvas(canvas: HTMLCanvasElement) {
   return { ctx, cw, ch };
 }
 
-/** 0–1 脉冲因子，周期约 1.2s */
+// 0–1 脉冲，周期大概 1.2s
 export function pulseT(now = performance.now(), periodMs = 1200): number {
   return 0.5 + 0.5 * Math.sin((now / periodMs) * Math.PI * 2);
 }
 
-/** 带光晕脉冲的标记点 */
+// 带光晕脉冲的标记点
 export function drawPulsePoint(
   ctx: CanvasRenderingContext2D,
   px: number,

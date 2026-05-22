@@ -1,9 +1,4 @@
-/**
- * 共享的 zoom + pan 控制：所有 SVG 视图复用
- * - 鼠标滚轮缩放（中心向鼠标位置聚焦）
- * - 空白区域 pointer 拖动平移
- * - 提供 zoomIn/zoomOut/reset 工具方法
- */
+// 各 SVG 视图共用的缩放/平移：滚轮以鼠标为中心缩放，空白处拖动画布
 
 export type ZoomPanState = {
   zoom: number;

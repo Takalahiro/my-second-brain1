@@ -1,12 +1,9 @@
 #!/usr/bin/env node
 /**
- * 构建前预处理脚本（本地 dev / build 都会跑，也是 Cloudflare Pages build 第一步）。
+ * build 前预处理 — local dev / CI / Cloudflare Pages 第一步都会跑这个。
  *
- * 1. 校验 obsidian-vault submodule 存在并且不是空目录；空了就 git submodule update --init。
- * 2. 在浅克隆环境（Cloudflare/CI）里把 vault 的 git 历史展开成完整深度，
- *    这样 `git log --follow` 可以拿到每篇笔记的真实最后编辑时间。
- * 3. 把 vault 里的资源（图片/PDF/视频）扁平复制到 `public/vault-assets/`。
- * 4. 跑 `build-mtime-manifest.mjs` 输出 `src/lib/notes-mtime.json`。
+ * 干的事：确认 vault submodule 不是空的 → 浅 clone 就 unshallow 一下（让 git log 能用）→
+ * sync assets → 生成 notes-mtime.json → media-manifest / stats / wikilinks。
  */
 import { execSync, spawnSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
@@ -30,7 +27,7 @@ function runRequired(cmd, args, opts = {}) {
   }
 }
 
-// Step 1: 确保 vault submodule 已 checkout
+// Step 1 — vault submodule 得 checkout 出来
 const vaultEmpty = !existsSync(VAULT) || readdirSync(VAULT).length === 0;
 if (vaultEmpty) {
   console.log('▌ vault submodule 为空，运行 git submodule update --init --recursive ...');
@@ -43,11 +40,8 @@ if (vaultEmpty) {
   }
 }
 
-// Step 2: 在浅克隆（CI/Cloudflare）里展开 vault 的 git 历史，让 git log --follow 可用
-//   注意：Cloudflare Pages clone parent repo 时通常 --depth=20，submodule 也是 shallow。
-//   git log --follow 在 shallow 克隆里只能看到极少几个 commit，无法准确拿到每篇笔记的
-//   最后修改时间。所以这里 best-effort 跑 fetch --unshallow。如果环境不允许（已经是完整克隆
-//   或网络受限），失败也无所谓 —— mtime manifest 后面有 fs.statSync 兜底。
+// Step 2 — CI/Cloudflare 经常是 shallow clone，git log --follow 几乎没用
+//   这里 best-effort unshallow；失败了也无所谓，后面 fs mtime 会兜底
 const isShallow = (() => {
   try {
     return execSync('git rev-parse --is-shallow-repository', { cwd: VAULT })
@@ -63,19 +57,19 @@ if (isShallow) {
   if (!ok) console.warn('  ⚠ unshallow 失败，将退回到文件 mtime 作为兜底');
 }
 
-// Step 3: 同步资源
+// Step 3 — 图片/PDF/视频 flat copy 到 public/vault-assets/
 runRequired('node', [path.join(SCRIPTS, 'sync-assets.mjs')]);
 
-// Step 4: 生成 mtime manifest（git log + fs.statSync 双重读取）
+// Step 4 — notes-mtime.json（git log + fs.stat 双保险）
 runRequired('node', [path.join(SCRIPTS, 'build-mtime-manifest.mjs')]);
 
-// Step 5: 扫描 public/video|picture|music 生成 media-manifest.json（背景 + 音乐播放器使用）
+// Step 5 — public/video|picture|music → media-manifest.json（背景 + 播放器用）
 runRequired('node', [path.join(SCRIPTS, 'build-media-manifest.mjs')]);
 
-// Step 6: 生成学习统计 stats.json（笔记数 / 字数 / 标签 / 月度趋势 / 热力图）
+// Step 6 — stats.json（笔记数 / 字数 / tags / heatmap 那些）
 runRequired('node', [path.join(SCRIPTS, 'build-stats.mjs')]);
 
-// Step 7: 扫描 [[wikilinks]] 双链：报告 + graph 数据
+// Step 7 — wikilinks scan → graph 数据 + 报告
 runRequired('node', [path.join(SCRIPTS, 'build-wikilinks.mjs')]);
 
 console.log('✅ vault prepared.');

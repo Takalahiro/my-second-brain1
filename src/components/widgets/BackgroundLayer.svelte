@@ -24,7 +24,7 @@
 
   let isMobile = $state(false);
   let lowPerf = $state(false);
-  /** 首屏先展示 poster，空闲后再加载视频，减轻从工具页返回时的主线程压力 */
+  // 首屏先出 poster，浏览器闲下来再加载视频，从工具页回来不会卡主线程
   let videoReady = $state(false);
 
   /* ---- 双层 crossfade ---- */

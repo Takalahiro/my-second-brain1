@@ -1,10 +1,6 @@
 <script lang="ts">
-  /**
-   * 公共八向缩放手柄：N / S / E / W + 4 个角。
-   * 父组件维护 width / height / posX / posY 四个 $state，把当前值传进来。
-   * 缩放过程中通过 onResize({ x, y, w, h }) 回写。
-   * 结束时调用 onResizeEnd() 用于持久化。
-   */
+  // 八向缩放手柄：N/S/E/W + 四个角
+  // 父组件维护 width/height/posX/posY，缩放时 onResize 回写，结束 onResizeEnd 持久化
   interface Props {
     width: number;
     height: number;
@@ -15,7 +11,7 @@
     maxWidth?: number;
     maxHeight?: number;
     disabled?: boolean;
-    /** 等比缩放：x/y/wh 联动，按当前比例锁定 */
+    // 等比缩放：xy 和 wh 一起动，锁当前比例
     aspectLock?: boolean;
     onResize: (next: { x: number; y: number; w: number; h: number }) => void;
     onResizeEnd?: () => void;

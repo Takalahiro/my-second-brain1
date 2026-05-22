@@ -1,9 +1,5 @@
 <script lang="ts">
-  /**
-   * 弧线和弦图：节点沿底部 baseline 一字排列，按 folder 分组并着色；
-   * 链接以贝塞尔半圆弧画在上方；孤岛同样显示在 baseline，但没有弧线。
-   * 风格：水墨/电路风。
-   */
+  // 弧线和弦图：节点沿底边一字排，按 folder 上色；链接画成上方贝塞尔弧；孤岛也在底边但没有弧
   import type { RawLink, WikiData, RawNode, GraphSettings } from './graph-data';
   import { folderColor, noteHref } from './graph-data';
   import { ZP_MIN, ZP_MAX, clamp } from './use-zoom-pan';

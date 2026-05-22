@@ -5,7 +5,7 @@
 
   interface Props {
     headings: MarkdownHeading[];
-    /** 移动端点击标题跳转后回调（用于关闭抽屉） */
+    // 手机端点标题跳走后回调（用来关抽屉）
     onAfterNavigate?: () => void;
   }
 
@@ -28,7 +28,7 @@
     collapsedMap = { ...collapsedMap, [slug]: !collapsedMap[slug] };
   }
 
-  /** 折叠到 H2：只显示一级标题，子级全部收起 */
+  // 只展开到 H2：一级标题可见，下面全折叠
   function collapseToH2() {
     const next: Record<string, boolean> = {};
     for (const n of tree) {

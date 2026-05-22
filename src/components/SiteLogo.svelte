@@ -1,6 +1,6 @@
 <script lang="ts">
   interface Props {
-    /** Visual height in CSS pixels */
+    // 显示高度（CSS px）
     size?: number;
     class?: string;
     alt?: string;

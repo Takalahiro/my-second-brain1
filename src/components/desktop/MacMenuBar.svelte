@@ -4,6 +4,7 @@
   import FontSwitcher from '../FontSwitcher.svelte';
   import MenuBarRainGlass from './MenuBarRainGlass.svelte';
   import SiteLogo from '../SiteLogo.svelte';
+  import PixelIcon from '../PixelIcon.svelte';
   import { SITE_NAV_LINKS } from '../../lib/site-nav';
 
   interface Props {
@@ -143,7 +144,7 @@
           <li class="mac-menu-sep" role="separator"></li>
           <li role="none">
             <button type="button" role="menuitem" onclick={() => runMenuAction(onOpenSpotlight)}>
-              搜索组件 {coarsePointer ? '🔍' : '⌘K'}
+              搜索组件 {#if coarsePointer}<PixelIcon name="search" size={14} />{:else}⌘K{/if}
             </button>
           </li>
           {#if coarsePointer}
@@ -190,7 +191,7 @@
         disabled={isCleared}
         onclick={() => { if (!isCleared) onClearAll?.(); }}
       >
-        🧹
+        <PixelIcon name="clear" size={16} />
       </button>
     {/if}
     <button

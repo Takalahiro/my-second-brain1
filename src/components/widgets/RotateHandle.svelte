@@ -1,9 +1,7 @@
 <script lang="ts">
   import { ROTATION_LOCKS, normalizeRotation, snapRotation } from '../../lib/widget-rotation';
 
-  /**
-   * 右下角旋转手柄：绕窗口中心旋转，松手吸附 0/90/180/270°。
-   */
+  // 右下角旋转手柄：绕窗口中心转，松手吸附 0/90/180/270°
   interface Props {
     disabled?: boolean;
     getCenter: () => { x: number; y: number };

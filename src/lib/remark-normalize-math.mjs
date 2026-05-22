@@ -4,12 +4,10 @@ import { gfmFromMarkdown } from 'mdast-util-gfm';
 import { math } from 'micromark-extension-math';
 import { mathFromMarkdown } from 'mdast-util-math';
 
-/**
- * 归一化 Obsidian 风格 LaTeX 并**始终用 gfm+math 重新 parse**。
- *
- * 关键：即便源文件已是标准 $$ 独立成行格式，若不在此 reparse，初始 mdast 没有 math 扩展，
- * remark-math 无法把公式变成 math 节点 → 页面上显示为纯文本。
- */
+// 归一化 Obsidian 风格 LaTeX，然后**始终**用 gfm+math 重新 parse
+//
+// 关键：就算源文件已经是标准 $$ 独立成行，不在这里 reparse 的话
+// 初始 mdast 没有 math 扩展，remark-math 变不出 math 节点 → 页面上就是纯文本
 export default function remarkNormalizeMath() {
   return (tree, file) => {
     if (typeof file.value !== 'string' && !Buffer.isBuffer(file.value)) return;
@@ -89,7 +87,7 @@ function normalize(src) {
   return working;
 }
 
-/** 让 KaTeX 能渲染：去掉 label、展开 equation 环境等 */
+// 让 KaTeX 能渲染：去 label、展开 equation 环境之类
 function sanitizeMathBody(body) {
   return body
     .replace(/\\label\{[^}]*\}/g, '')

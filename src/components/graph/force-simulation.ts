@@ -1,11 +1,9 @@
-/**
- * 力导向仿真（带 alpha 冷却）——解决 perpetual jitter。
- *
- * 抖动根因：
- * 1. 仿真永不停止 → 弹簧/斥力在平衡点附近持续振荡
- * 2. 阻尼不足（underdamped）+ 每帧 60fps 全量 SVG 重绘
- * 3. 速度未在收敛时清零 → 肉眼可见微颤
- */
+// 力导向布局：带 alpha 冷却，避免永远抖个不停
+//
+// 以前抖的原因：
+// 1. 仿真不停止 → 平衡点附近一直振荡
+// 2. 阻尼不够 + 每帧 60fps 整页 SVG 重绘
+// 3. 速度没在收敛时清零 → 肉眼可见微颤
 
 export type ForceSimNode = {
   x: number;
@@ -44,7 +42,7 @@ export function reheatForce(ctrl: ForceSimController, alpha = 0.85) {
   ctrl.running = true;
 }
 
-/** 单步仿真；返回是否发生了可见位移（供决定是否 bump 渲染帧） */
+// 跑一步仿真；返回 true 表示节点有明显位移（用来决定要不要 bump 一帧重绘）
 export function stepForceSimulation(
   nodes: ForceSimNode[],
   links: ForceLink[],

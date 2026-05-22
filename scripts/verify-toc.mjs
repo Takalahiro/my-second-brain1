@@ -21,12 +21,12 @@ for (const u of urls) {
     h4: (t.match(/<h4\s[^>]*id=/g) || []).length,
   };
 
-  // 关键：抽取 TableOfContents Svelte 区域的 toc-node 树
+  // 从 TableOfContents Svelte 那块 aside 里抠 toc-node 树
   const toc = t.match(/<aside[^>]*class="toc-floating[^"]*"[\s\S]*?<\/aside>/)?.[0] ?? '';
   const tocL1Nodes = (toc.match(/<li class="toc-node[^"]*"[^>]*data-depth="2"/g) || []).length;
   const tocL2Nodes = (toc.match(/<li class="toc-node[^"]*"[^>]*data-depth="3"/g) || []).length;
   const tocL3Nodes = (toc.match(/<li class="toc-node[^"]*"[^>]*data-depth="4"/g) || []).length;
-  // Svelte 没用 data-depth attr，所以上面可能 0. 用 toc-children 的嵌套深度作为指标
+  // Svelte 没挂 data-depth，上面可能全是 0；用 toc-children 嵌套层数当 proxy
   const tocChildrenLayers = (toc.match(/toc-children/g) || []).length;
   const tocItems = (toc.match(/class="toc-link[^"]*"/g) || []).length;
 

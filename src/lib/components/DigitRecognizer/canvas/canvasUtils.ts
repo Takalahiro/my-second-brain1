@@ -1,4 +1,4 @@
-/** 280×280 画板常量 */
+// 280×280 画板常量
 export const CANVAS_SIZE = 280;
 export const MNIST_SIZE = 28;
 
@@ -32,7 +32,7 @@ export function canvasHasInk(canvas: HTMLCanvasElement): boolean {
   return false;
 }
 
-/** 简单示例数字（程序化笔画） */
+// 程序化画几个示例数字
 export function drawSampleDigit(canvas: HTMLCanvasElement, digit: number) {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;

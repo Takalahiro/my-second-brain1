@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 /**
- * 扫描 obsidian-vault 生成 src/data/stats.json，用于"学习统计面板"组件：
- * - totalNotes：笔记总数
- * - totalWords：粗略字数（中文字符 + 英文单词）
- * - byFolder：按顶层目录的笔记数 / 字数
- * - byMonth：最近 12 个月每月新增（按 git/fs mtime）
- * - topTags：frontmatter tags 频率 Top 15
- * - heatmap：最近 12 周（84 天）每天编辑活动
+ * 扫 vault 生成 stats.json，给「学习统计面板」 widget 用。
+ * 产出：笔记数、粗算字数、byFolder / byMonth / topTags、最近 12 周 heatmap。
  */
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
@@ -64,12 +59,12 @@ function parseFrontmatter(text) {
     }
     fm[k] = v;
   }
-  // 兼容多行 tags: ['a','b']  或  下一行 - tag1
+  // tags 写法比较野：单行 ['a','b'] 或者下一行 - tag1 都有
   return { fm, body };
 }
 
 function countWords(body) {
-  // 简单粗略：去掉代码块、行内代码、URL，再计数
+  // 字数统计很粗糙：去掉 code block / inline code / URL 再数
   const clean = body
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/`[^`]*`/g, ' ')
@@ -113,7 +108,7 @@ for (const f of files) {
   stats.byFolder[topFolder].count += 1;
   stats.byFolder[topFolder].words += words;
 
-  // mtime
+  // mtime — 有 manifest 就用，没有就 stat 文件
   const mtimeStr = mtimeMap[f.rel];
   let mtime;
   if (mtimeStr) {
@@ -128,7 +123,7 @@ for (const f of files) {
   const d = ymdKey(mtime);
   stats.byDay[d] = (stats.byDay[d] || 0) + 1;
 
-  // tags
+  // tags 计数
   let tags = fm.tags;
   if (typeof tags === 'string') tags = tags.split(/[,\s]+/).filter(Boolean);
   if (Array.isArray(tags)) {
@@ -140,12 +135,12 @@ for (const f of files) {
   }
 }
 
-// 转换为有序数组
+// 排个序，top 12 folder
 const byFolder = Object.values(stats.byFolder)
   .sort((a, b) => b.count - a.count)
   .slice(0, 12);
 
-// 最近 12 个月
+// 最近 12 个月，缺的月份填 0
 const months = [];
 const today = new Date();
 for (let i = 11; i >= 0; i--) {
@@ -159,7 +154,7 @@ const topTags = Object.entries(stats.topTags)
   .sort((a, b) => b.count - a.count)
   .slice(0, 15);
 
-// 最近 84 天热力图（7 列 × 12 行）
+// heatmap：84 天 = 12 周 × 7 列
 const heatmap = [];
 for (let i = 83; i >= 0; i--) {
   const d = new Date();

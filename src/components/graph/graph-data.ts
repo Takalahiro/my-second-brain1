@@ -1,10 +1,4 @@
-/**
- * 共享的图谱数据加载逻辑：
- * - 全量节点（包含孤岛）
- * - 边
- * - 文件夹色板
- * - 类型与工具
- */
+// 图谱共用的数据：节点（含孤岛）、边、文件夹配色
 
 export type RawNode = {
   id: string;
@@ -56,7 +50,7 @@ export async function loadWiki(options?: { fresh?: boolean }): Promise<WikiData>
   return (await res.json()) as WikiData;
 }
 
-/** 页面可见时每 intervalMs 刷新 wikilink（新增双链后弧线自动补齐） */
+// 页面在前台时，每隔 intervalMs 拉一次 wikilinks，新双链会自动出现在弧线图里
 export function watchWikiRefresh(onData: (d: WikiData) => void, intervalMs = 5 * 60_000) {
   if (typeof document === 'undefined') return () => {};
   let timer: ReturnType<typeof setInterval> | null = null;
@@ -75,33 +69,23 @@ export function watchWikiRefresh(onData: (d: WikiData) => void, intervalMs = 5 *
   };
 }
 
-/** 把笔记 id（例：`MATH/Algebra`）转成 `/notes/<basename>/` */
+// 笔记 id（如 MATH/Algebra）→ /notes/<basename>/
 export function noteHref(id: string) {
   const base = id.split('/').pop() ?? id;
   return `/notes/${encodeURI(base)}/`;
 }
 
-/** ============== 用户可自定义的图谱设置 ============== */
+// ---- 图谱设置（localStorage 持久化）----
 export type GraphSettings = {
-  /** 是否显示孤岛节点 */
-  showOrphans: boolean;
-  /** 标签显示策略：always 一直显示 / hover 悬停才显示 / never 不显示 */
-  showLabels: 'always' | 'hover' | 'never';
-  /** 单击节点是否直接跳转笔记（否则单击选中、双击跳转） */
-  clickToOpen: boolean;
-  /** 节点半径整体倍率 */
+  showOrphans: boolean; // 要不要画孤岛节点
+  showLabels: 'always' | 'hover' | 'never'; // 标签何时显示
+  clickToOpen: boolean; // 单击直接跳笔记，否则单击选中、双击跳转
   nodeScale: number;
-  /** 边宽整体倍率 */
   edgeScale: number;
-  /** 边整体透明度（0..1） */
-  edgeOpacity: number;
-  /** 背景暗度（0=最暗，1=正常） */
-  bgDim: number;
-  /** 力导向：斥力 */
+  edgeOpacity: number; // 0..1
+  bgDim: number; // 0 最暗，1 正常
   forceRepel: number;
-  /** 力导向：弹簧系数 */
   forceSpring: number;
-  /** 力导向：边长 */
   forceEdgeLen: number;
 };
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 /**
- * 扫描 obsidian-vault 中所有 [[xxx]] / [[xxx|alias]] / [[xxx#heading]] 双链
- *  - 解析每条链接的目标，匹配实际存在的笔记（大小写不敏感、basename / 完整路径双策略）
- *  - 排除代码块、行内代码、HTML 注释
- *  - 输出：
- *      src/data/wikilinks.json   { nodes, links, broken, orphans, stats }
- *      docs/WIKILINKS_REPORT.md  人类可读报告（broken / orphan / hot nodes）
- *  - 后续 Graph 可视化直接读 wikilinks.json
+ * 扫 vault 里所有 [[wikilink]]，解析 target，输出 graph 数据 + 人类可读报告。
+ *
+ * 产出：
+ *   src/data/wikilinks.json   — nodes / links / broken / orphans / stats
+ *   docs/WIKILINKS_REPORT.md  — broken、orphan、hot nodes 一览
+ *
+ * Graph 组件直接读 wikilinks.json，不用重复 parse。
  */
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
@@ -43,7 +43,7 @@ function parseFrontmatter(text) {
   return { fm: {}, body: text.slice(end + 4) };
 }
 
-/** 去掉代码块、行内代码、HTML 注释，避免误识别 */
+/** 剥掉 code block / inline code / HTML comment，别误伤 [[link]] */
 function stripNoise(body) {
   return body
     .replace(/```[\s\S]*?```/g, ' ')
@@ -55,10 +55,10 @@ function stripNoise(body) {
 const WIKI_RE = /\[\[([^\[\]\n]+?)\]\]/g;
 
 const files = walk(VAULT);
-// Step 1: 建立 basename → canonical（rel path 去 .md）映射，相对路径 → canonical 映射
+// Pass 1 — 建 index：basename → canonical，完整 rel path → canonical
 const baseIndex = new Map();    // lowercased basename -> [{ canonical, rel }]
-const pathIndex = new Map();    // lowercased rel path no ext -> canonical
-const canonical = new Map();    // canonical (basename, no ext) -> { rel, folder, title, links: [], backlinks: [] }
+const pathIndex = new Map();    // lowercased rel (no ext) -> canonical
+const canonical = new Map();    // canonical id -> { rel, folder, title, links, backlinks }
 
 for (const f of files) {
   const noExt = f.rel.replace(/\.md$/i, '');
@@ -74,13 +74,13 @@ for (const f of files) {
 }
 
 function resolveTarget(rawTarget) {
-  // 去掉 #heading / .md
+  // 去掉 #heading 和 .md 后缀
   let t = rawTarget.split('#')[0].trim().replace(/\.md$/i, '');
   if (!t) return null;
   const lc = t.toLowerCase();
-  // 1) 完整路径精确命中
+  // 先试完整 path
   if (pathIndex.has(lc)) return pathIndex.get(lc);
-  // 2) basename 命中 (取第一个；多个则记录冲突)
+  // 再 fallback basename（同名多个的话取第一个，后面 ambiguous 会记）
   const hits = baseIndex.get(path.basename(lc));
   if (hits && hits.length > 0) return hits[0];
   return null;
@@ -102,7 +102,7 @@ for (const f of files) {
   while ((m = WIKI_RE.exec(clean))) {
     const inner = m[1];
     stats.totalLinks++;
-    // 处理 alias
+    // alias 写法 [[target|显示名]]
     let target = inner;
     let alias = null;
     if (inner.includes('|')) {
@@ -120,7 +120,7 @@ for (const f of files) {
       continue;
     }
     stats.resolved++;
-    // 检查是否有多重命中
+    // 同名 basename 命中多个 candidate → 记 ambiguous
     const lcBase = path.basename(target.split('#')[0].trim().toLowerCase().replace(/\.md$/i, ''));
     const hits = baseIndex.get(lcBase) || [];
     if (hits.length > 1) {
@@ -131,7 +131,7 @@ for (const f of files) {
   }
 }
 
-// Step 2: 输出 graph 数据
+// Pass 2 — 拼 graph JSON
 const nodes = Array.from(canonical.entries()).map(([id, node]) => ({
   id,
   title: node.title,
@@ -162,7 +162,7 @@ const out = {
 mkdirSync(DATA_DIR, { recursive: true });
 writeFileSync(OUT_JSON, JSON.stringify(out, null, 2));
 
-// Step 3: 人类可读报告
+// Pass 3 — 写 markdown 报告给人看
 mkdirSync(DOCS_DIR, { recursive: true });
 const lines = [];
 lines.push(`# 双链 (Wikilinks) 检查报告`);

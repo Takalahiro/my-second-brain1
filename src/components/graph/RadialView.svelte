@@ -1,8 +1,5 @@
 <script lang="ts">
-  /**
-   * 圆环辐射：按 folder 划分扇区，节点按度数从外向内排。
-   * 包含孤岛：孤岛节点统一塞到最内圈（半径 < 内圈）并加描边。
-   */
+  // 圆环辐射：按 folder 分扇区，节点按度数从外往里排；孤岛塞最内圈并加描边
   import type { RawLink, RawNode, WikiData, GraphSettings } from './graph-data';
   import { folderColor, noteHref } from './graph-data';
   import { ZP_MIN, ZP_MAX, clamp } from './use-zoom-pan';
@@ -43,7 +40,7 @@
 
   const folders = $derived(Array.from(new Set(visibleNodes.map((n) => n.folder))).sort());
 
-  /** 计算所有节点位置（孤岛 + 普通） */
+  // 算所有节点坐标（含孤岛）
   const placed = $derived.by<Place[]>(() => {
     const F = folders.length;
     if (F === 0) return [];

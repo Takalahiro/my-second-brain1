@@ -1,4 +1,4 @@
-/** 浏览器内会话级网络流量估算（Performance API + Network Information） */
+// 浏览器里粗估本会话流量，Performance API + Network Information
 
 export type NetworkConnectionInfo = {
   effectiveType?: string;
@@ -134,7 +134,7 @@ export function createNetworkTrafficMonitor(): NetworkTrafficMonitor {
   }, 1000);
 
   const onConnectionChange = () => {
-    /* snapshot reads live connection each tick */
+    // getSnapshot 每次现读 connection
   };
   const conn = (navigator as Navigator & { connection?: EventTarget }).connection;
   conn?.addEventListener?.('change', onConnectionChange);

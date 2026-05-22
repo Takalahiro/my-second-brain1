@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * 扫描 public/video, public/picture/scenes, public/picture/mobile, public/music
- * 输出 src/data/media-manifest.json。
+ * 扫 public/video、picture/scenes、picture/mobile、music，
+ * 输出 src/data/media-manifest.json 给背景切换和音乐播放器。
  *
- * 文件名里可能包含空格 / CJK 字符；这里只保留原始文件名，URL 编码留给前端组件做。
+ * 文件名可能有空格 / 中文 — 这里只存原始名，encodeURIComponent 交给前端。
  */
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { extname, basename, join, resolve, dirname } from 'node:path';
@@ -36,11 +36,11 @@ function titleize(name) {
 }
 
 function publicUrl(rel) {
-  // rel 形如 "video/usyd rain.mp4"
+  // rel 像 "video/usyd rain.mp4"
   return '/' + rel.split('/').map(encodeURIComponent).join('/');
 }
 
-// ---- 场景：以 5 个核心场景为基准，匹配视频和图片 ----
+// 5 个 core scene — 视频和 poster 都靠 stem 名字 match
 const SCENES = ['usyd', 'kyoto', 'shanghai', 'sydney', 'tokyo'];
 const RAIN_SCENES = ['shanghai', 'tokyo', 'usyd'];
 
@@ -82,7 +82,7 @@ const mobile = mobileFiles.map((name, idx) => ({
 }));
 
 function inferArtist(name) {
-  // ONE OK ROCK - title.flac / [Alexandros] - title_SQ.flac
+  // 从文件名猜 artist — "ONE OK ROCK - xxx.flac" / "[Alexandros] - xxx_SQ.flac" 这类
   const m = name.match(/^(?:\[([^\]]+)\]|([^-]+?))\s*-\s*(.+)$/);
   if (m) {
     const artist = (m[1] || m[2] || '').trim();

@@ -1,4 +1,4 @@
-/** 步骤阶段：用于 UI 配色与通俗说明 */
+// 步骤阶段，UI 配色和通俗说明用
 export type StepPhase =
   | 'intro'
   | 'eliminate'

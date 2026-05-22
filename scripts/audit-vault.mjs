@@ -16,7 +16,7 @@ async function tree(dir, depth = 0, maxDepth = 6) {
   return { dir, depth, dirs, files };
 }
 
-// 收集每个文件夹的直接 .md 文件和子文件夹
+// 每个 folder 直接挂的 .md + 子 folder 一览
 async function walk(dir, results = []) {
   const node = await tree(dir);
   results.push(node);

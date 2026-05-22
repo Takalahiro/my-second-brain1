@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * 检查 git 跟踪文件是否超过 25 MiB。
- * 公式模型从 Hugging Face 运行时下载，不在此脚本范围内。
+ * git 跟踪的文件有没有超过 25 MiB — pre-commit / CI 守门用。
+ * FormulaNet 模型是 runtime 从 HF 拉的，不在这个检查范围里。
  */
 import { execSync } from 'node:child_process';
 import { statSync } from 'node:fs';
@@ -24,7 +24,7 @@ for (const rel of listTrackedFiles()) {
       overs.push({ rel, mib: (size / 1024 / 1024).toFixed(2) });
     }
   } catch {
-    /* 跳过缺失文件 */
+    /* 文件没了就 skip */
   }
 }
 

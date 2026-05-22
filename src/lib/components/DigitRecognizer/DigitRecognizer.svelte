@@ -11,7 +11,7 @@
 
   interface Props {
     embedded?: boolean;
-    /** Tab 隐藏时释放 TF.js GPU，避免与公式 OCR 争抢 */
+    // Tab 藏起来时释放 TF.js GPU，别跟公式 OCR 抢显存
     paused?: boolean;
   }
 

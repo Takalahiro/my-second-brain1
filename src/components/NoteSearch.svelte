@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
+  import PixelIcon from './PixelIcon.svelte';
 
   type Note = { slug: string; title: string; description?: string; tags?: string[] };
 
@@ -132,7 +133,7 @@
                 role="option"
                 aria-selected={i === activeIdx}
               >
-                <span class="ns-it-icon">📝</span>
+                <span class="ns-it-icon"><PixelIcon name="note" size={16} /></span>
                 <span class="ns-it-main">
                   <span class="ns-it-title">{@html highlight(r.title)}</span>
                   {#if r.description}
@@ -247,7 +248,12 @@
   .ns-item.is-active {
     background: linear-gradient(135deg, rgba(255, 141, 232, 0.18), rgba(180, 140, 255, 0.18));
   }
-  .ns-it-icon { text-align: center; }
+  .ns-it-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
   .ns-it-main { display: flex; flex-direction: column; min-width: 0; }
   .ns-it-title {
     font-weight: 600; font-size: 0.86rem;

@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { noteIdToSlug } from '../../lib/backlinks';
 import { getNoteLastUpdated, formatLastUpdated } from '../../lib/git-mtime';
+import PixelIcon from '../../components/PixelIcon.astro';
 
 function decodeFolderPath(raw: string) {
   return raw
@@ -40,14 +41,14 @@ notes.sort((a, b) => {
 });
 ---
 
-<BaseLayout title={`📁 ${decodedPath}`}>
+<BaseLayout title={decodedPath}>
   <nav class="text-sm text-gray-500 mb-4">
     <a href="/notes" class="hover:underline">笔记</a>
     <span class="mx-2">/</span>
-    <span>📁 {decodedPath}</span>
+    <span class="inline-flex items-center gap-1"><PixelIcon name="folder" size={14} /> {decodedPath}</span>
   </nav>
 
-  <h1 class="text-3xl font-bold mb-3">📁 {decodedPath}</h1>
+  <h1 class="text-3xl font-bold mb-3 inline-flex items-center gap-2"><PixelIcon name="folder" size={24} /> {decodedPath}</h1>
   <p class="text-gray-500 mb-6">{notes.length} 篇笔记</p>
 
   <ul class="space-y-3">

@@ -1,20 +1,33 @@
 <script lang="ts">
+  import PixelIcon from '../PixelIcon.svelte';
+  import { DEFAULT_NOTE_ICON, type PixelIconName } from '../../lib/pixel-icons';
+
   interface Props {
     id: string;
     title: string;
-    emoji?: string;
+    icon?: PixelIconName;
     count?: number;
     lastUpdated?: string;
     href: string;
     viewMode?: 'grid' | 'list';
   }
 
-  let { id, title, emoji = '📝', count, lastUpdated, href, viewMode = 'grid' }: Props = $props();
+  let {
+    id,
+    title,
+    icon = DEFAULT_NOTE_ICON,
+    count,
+    lastUpdated,
+    href,
+    viewMode = 'grid',
+  }: Props = $props();
 </script>
 
 <article class="pixel-card glass-container note-card" class:is-list={viewMode === 'list'}>
   <a href={href} class="note-card-link" aria-label={`打开笔记 ${title}`}>
-    <div class="note-emoji">{emoji}</div>
+    <div class="note-icon-wrap">
+      <PixelIcon name={icon} size={viewMode === 'list' ? 18 : 22} />
+    </div>
     <div class="note-body">
       <h3 class="note-title">{title}</h3>
       <div class="note-meta">
@@ -31,77 +44,71 @@
 
 <style>
   .note-card {
-    border-width: var(--border-thin);
     overflow: hidden;
+    transition: transform var(--motion-base) var(--motion-ease), box-shadow var(--motion-base) var(--motion-ease);
   }
   .note-card-link {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
     text-decoration: none;
     color: inherit;
-    padding: 1.1rem;
-    min-height: 180px;
+    height: 100%;
   }
-  .note-emoji {
-    font-size: 2.8rem;
-    line-height: 1;
-    text-align: center;
-    margin-bottom: 0.75rem;
-    transition: transform var(--motion-fast) var(--motion-ease);
+  .note-icon-wrap {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: rgb(180 140 255 / 0.1);
+    border: 1px solid rgb(180 140 255 / 0.18);
+    color: rgb(140 100 220);
+    transition: transform var(--motion-fast) var(--motion-ease), background var(--motion-fast) var(--motion-ease);
   }
-  .note-card:hover .note-emoji {
-    transform: scale(1.08);
+  .note-card:hover .note-icon-wrap {
+    transform: translateY(-1px);
+    background: rgb(180 140 255 / 0.16);
+  }
+  .note-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
   }
   .note-title {
-    margin: 0 0 0.65rem;
-    text-align: center;
-    font-size: 1.02rem;
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.35;
     color: var(--text-primary);
   }
   .note-meta {
     display: flex;
-    align-items: center;
-    justify-content: center;
     flex-wrap: wrap;
-    gap: 0.45rem;
+    gap: 0.4rem;
+    align-items: center;
   }
   .note-count {
-    background: var(--accent-mint);
-    color: var(--text-primary);
-  }
-  :global(.dark) .note-count {
-    background: #365245;
-    border-color: #4f705f;
-    color: #e8f8ef;
+    font-size: 0.68rem;
   }
   .note-updated {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: var(--text-secondary);
   }
-
   .note-card.is-list .note-card-link {
-    min-height: auto;
-    padding: 0.8rem 1rem;
-    display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.85rem;
+    padding: 0.75rem 1rem;
   }
-  .note-card.is-list .note-emoji {
-    margin: 0;
-    font-size: 1.4rem;
-    flex: 0 0 auto;
+  .note-card.is-list .note-icon-wrap {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
   }
   .note-card.is-list .note-body {
     flex: 1;
-    min-width: 0;
-  }
-  .note-card.is-list .note-title {
-    text-align: left;
-    margin-bottom: 0.4rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .note-card.is-list .note-meta {
-    justify-content: flex-start;
   }
 </style>

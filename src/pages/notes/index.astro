@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import NotesExplorer from '../../components/Notes/NotesExplorer.svelte';
 import { buildFolderTree, countNotes } from '../../lib/folder-tree';
 import { maxMtimeForFolder, enrichFolderTreeMtime } from '../../lib/note-mtime-helpers';
+import { DEFAULT_FOLDER_ICON, folderEmojiToIcon, type PixelIconName } from '../../lib/pixel-icons';
 
 const notes = await getCollection('notes', ({ data }) => !data.draft);
 const tree = buildFolderTree(notes);
@@ -12,13 +13,8 @@ const allNoteIds = notes.map((n) => n.id);
 
 const topFolders = tree.children;
 
-function guessFolderEmoji(name: string) {
-  const lower = name.toLowerCase();
-  if (name.includes('数学') || lower.includes('math')) return '📐';
-  if (name.includes('计算机') || lower.includes('computer')) return '💻';
-  if (name.includes('data') || name.includes('统计')) return '📊';
-  if (name.includes('info')) return '🧠';
-  return '📁';
+function guessFolderIcon(name: string): PixelIconName {
+  return folderEmojiToIcon(name);
 }
 
 function encodeFolderPath(path: string) {
@@ -32,7 +28,7 @@ function encodeFolderPath(path: string) {
 function flattenFolders(node: (typeof topFolders)[number], depth = 0): Array<{
   id: string;
   title: string;
-  emoji: string;
+  icon: PixelIconName;
   count: number;
   lastUpdated: string;
   href: string;
@@ -41,7 +37,7 @@ function flattenFolders(node: (typeof topFolders)[number], depth = 0): Array<{
   const acc: Array<{
     id: string;
     title: string;
-    emoji: string;
+    icon: PixelIconName;
     count: number;
     lastUpdated: string;
     href: string;
@@ -52,7 +48,7 @@ function flattenFolders(node: (typeof topFolders)[number], depth = 0): Array<{
     acc.push({
       id: `folder:${child.path}`,
       title: child.name,
-      emoji: '📁',
+      icon: DEFAULT_FOLDER_ICON,
       count: countNotes(child),
       lastUpdated: maxMtimeForFolder(child.path, allNoteIds),
       href: `/folder/${encodeFolderPath(child.path)}`,
@@ -65,7 +61,7 @@ function flattenFolders(node: (typeof topFolders)[number], depth = 0): Array<{
 
 const categories = topFolders.map((folder) => ({
   title: folder.name,
-  folderEmoji: guessFolderEmoji(folder.name),
+  folderIcon: guessFolderIcon(folder.name),
   folders: flattenFolders(folder),
   // 主列表页只展示目录卡片；笔记内容在目录页内展示
   notes: [],

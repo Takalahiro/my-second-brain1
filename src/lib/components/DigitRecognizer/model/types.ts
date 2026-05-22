@@ -13,7 +13,7 @@ export type LayerMeta = {
 
 export type LayerActivation = {
   meta: LayerMeta;
-  /** 卷积/池化: [h,w,c] 或 全连接: number[] */
+  // 卷积/池化 [h,w,c]，全连接就是 number[]
   data: Float32Array | number[];
   shape: number[];
 };
@@ -40,7 +40,7 @@ export type InferenceResult = {
   layers: LayerActivation[];
   prediction: PredictionResult;
   inputPreview: Float32Array;
-  /** 双路推理时选中的路径 */
+  // 双路推理时最终选中的那条
   variantIndex?: number;
   variantLabel?: string;
   variantSummaries?: VariantSummary[];
@@ -60,7 +60,7 @@ export type ModelState = {
   vizModel: tf.LayersModel | null;
 };
 
-/** 展示用 LeNet 风格层描述（与 mnist_v1 实际结构映射） */
+// 展示用的 LeNet 层描述，跟 mnist_v1 实际结构对得上
 export const ARCH_LAYERS: Array<{ match: RegExp; meta: Omit<LayerMeta, 'id'> }> = [
   {
     match: /input/i,

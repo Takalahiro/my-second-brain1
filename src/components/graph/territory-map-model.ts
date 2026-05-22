@@ -1,7 +1,4 @@
-/**
- * 构建完整世界地图模型：国家 → 州 → 城市 → 笔记
- * 缩放自动切块（LOD），笔记间 wikilink 弧线动画
- */
+// 世界地图模型：国家 → 州 → 城市 → 笔记，缩放自动 LOD，wikilink 弧线动画
 import type { RawLink, RawNode } from './graph-data';
 import { folderColor, noteHref, PALETTE } from './graph-data';
 import {
@@ -23,8 +20,7 @@ export type MapEntity = {
   id: string;
   kind: EntityKind;
   name: string;
-  /** 文件夹 path；note 为笔记 id */
-  path: string;
+  path: string; // folder path；note 实体则是笔记 id
   depth: number;
   parentId: string | null;
   pathD: string;
@@ -34,12 +30,10 @@ export type MapEntity = {
   color: string;
   stroke: string;
   strokeWidth: number;
-  /** 显示所需最低 zoom */
-  minZoom: number;
+  minZoom: number; // 低于这个 zoom 就不画
   href?: string;
   r?: number;
-  /** 无双向链接的孤岛笔记 */
-  isOrphan?: boolean;
+  isOrphan?: boolean; // 没有双向链接的孤岛笔记
 };
 
 export type MapLink = {
@@ -104,7 +98,7 @@ function catmullRomClosed(points: { x: number; y: number }[], tension = 0.48): s
   return `${d} Z`;
 }
 
-/** 每个国家完全不同的轮廓算法 */
+// 每个国家用不同的轮廓算法，看起来不像复制粘贴
 function countryOutline(
   cx: number,
   cy: number,
@@ -169,7 +163,7 @@ function boundsFromPath(pathD: string, cx: number, cy: number, r: number) {
 
 type OccupiedZone = { cx: number; cy: number; r: number };
 
-/** 国家/领土占用的区域（用于找空白洋面） */
+// 国家/领土占用的区域，用来找还能放孤岛的空白洋面
 function collectOccupiedZones(entities: MapEntity[], pad = 48): OccupiedZone[] {
   return entities
     .filter((e) => e.kind === 'country')
@@ -186,7 +180,7 @@ function zoneClear(x: number, y: number, islandR: number, zones: OccupiedZone[],
   return true;
 }
 
-/** Fisher-Yates 洗牌：落点顺序随机，构建结果仍可复现 */
+// Fisher-Yates 洗牌：落点顺序随机，但 seed 固定时结果可复现
 function shuffleBySeed<T>(items: T[], seed: string): T[] {
   const arr = [...items];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -196,7 +190,7 @@ function shuffleBySeed<T>(items: T[], seed: string): T[] {
   return arr;
 }
 
-/** 均匀随机采样洋面落点，仅要求不与 occupied / placed 重叠 */
+// 在洋面上均匀随机采样落点，只要不和 occupied / placed 重叠就行
 function findRandomOceanSlot(
   slotSeed: string,
   islandR: number,
@@ -235,7 +229,7 @@ function findRandomOceanSlot(
   return null;
 }
 
-/** 每座孤岛完全独立的随机轮廓（点数、角度、半径均随机） */
+// 每座孤岛独立随机轮廓（点数、角度、半径都随机）
 function randomIslandOutline(cx: number, cy: number, baseR: number, seed: string): string {
   const pointCount = 16 + Math.floor(seeded(seed, 0) * 24);
   const angleJitter = 0.35 + seeded(seed, 1) * 1.1;
@@ -458,7 +452,7 @@ function layoutFolderRecursive(
   layoutNotesInFolder(node, cx, cy, innerRx * 0.35, innerRy * 0.35, allNodes, rootFolders, out, orphanIds);
 }
 
-/** 孤岛笔记：落点全随机，仅保证彼此（及国家）不重叠 */
+// 孤岛笔记：落点全随机，只保证彼此（和国家）不重叠
 function layoutOrphanArchipelago(
   orphanNodes: RawNode[],
   worldW: number,
@@ -518,7 +512,7 @@ function layoutOrphanArchipelago(
   }
 }
 
-/** 国家在世界画布上的固定位置（拟真分散） */
+// 国家在世界画布上的固定位置（故意分散，拟真一点）
 function profileForCountry(path: string, i: number) {
   const h = Math.floor(seeded(path, 99) * PROFILES.length);
   return PROFILES[(h + i) % PROFILES.length];

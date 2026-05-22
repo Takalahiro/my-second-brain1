@@ -1,6 +1,6 @@
 import type { Matrix } from './types';
 
-/** 解析 MATLAB 文本矩阵：[1 2 3; 4 5 6] */
+// 解析 MATLAB 文本矩阵：[1 2 3; 4 5 6]
 export function parseMatlabMatrix(text: string): Matrix {
   let s = text.trim();
   if (!s) throw new Error('矩阵文本为空');

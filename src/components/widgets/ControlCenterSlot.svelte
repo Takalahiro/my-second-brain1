@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import PixelIcon from '../PixelIcon.svelte';
   import {
     SLOT_WIDGET_OPTIONS,
     readSlotPreview,
@@ -61,7 +62,7 @@
 
 <div class="cc-slot">
   <header class="cc-slot-head">
-    <span class="cc-slot-icon" aria-hidden="true">{meta.icon}</span>
+    <span class="cc-slot-icon" aria-hidden="true"><PixelIcon name={meta.icon} size={16} /></span>
     <span class="cc-slot-label">{meta.name}</span>
     <button
       type="button"
@@ -102,7 +103,7 @@
             class:is-active={opt.id === widgetId}
             onclick={() => pick(opt.id)}
           >
-            <span class="cc-slot-pick-icon">{opt.icon}</span>
+            <span class="cc-slot-pick-icon"><PixelIcon name={opt.icon} size={18} /></span>
             <span class="cc-slot-pick-name">{opt.name}</span>
           </button>
         {/each}
@@ -130,7 +131,10 @@
     padding: 10px 12px 0;
     flex-shrink: 0;
   }
-  .cc-slot-icon { font-size: 1rem; }
+  .cc-slot-icon {
+    display: inline-flex;
+    align-items: center;
+  }
   .cc-slot-label {
     flex: 1;
     font-size: 0.72rem;
@@ -237,7 +241,11 @@
     border-color: rgb(180 140 255 / 0.65);
     background: rgb(180 140 255 / 0.18);
   }
-  .cc-slot-pick-icon { font-size: 1.15rem; }
+  .cc-slot-pick-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
   .cc-slot-pick-name {
     line-height: 1.2;
     text-align: center;

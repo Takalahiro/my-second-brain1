@@ -99,12 +99,12 @@ function renderToMnist(
   return gray;
 }
 
-/** 直接缩放（与原版一致） */
+// 直接缩到 28×28，跟原版一样
 export function preprocessDirect(source: HTMLCanvasElement): Float32Array {
   return renderToMnist(imageDataFromCanvas(source), 0, 0, source.width, source.height);
 }
 
-/** 裁剪墨迹区域、留白、可选加粗后缩放 */
+// 裁墨迹、留白、可选加粗，再缩放
 export function preprocessCentered(
   source: HTMLCanvasElement,
   options: { thicken?: boolean } = {}
@@ -169,7 +169,7 @@ export function preprocessVariants(
   return specs.map((spec) => ({ spec, gray: preprocessVariant(source, spec) }));
 }
 
-/** 双路评分：置信度优先，平局看 top-1 与 top-2 间隔 */
+// 双路评分：先看置信度，平局再看 top-1 和 top-2 差多少
 export function scorePrediction(probabilities: number[]): number {
   const sorted = [...probabilities].sort((a, b) => b - a);
   const top = sorted[0] ?? 0;

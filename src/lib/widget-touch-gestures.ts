@@ -1,8 +1,6 @@
-/**
- * 移动端小组件手势：
- * - 双指：以窗口中心 pinch 缩放
- * （旋转请用桌面/移动端的 ↻ 手柄）
- */
+// 移动端小组件手势
+// - 双指：以窗口中心 pinch 缩放
+// 旋转走桌面/移动端的 ↻ 手柄
 
 import type { Action } from 'svelte/action';
 import { clamp } from './floating-widget-layout';
@@ -49,7 +47,7 @@ export function attachWidgetTouchGestures(
 ) {
   let opts = options;
   let mode: GestureMode = 'none';
-  /** 落在小组件上的触点 id */
+  // 落在小组件上的触点 id
   const trackedIds = new Set<number>();
 
   let startSpread = 0;
@@ -157,7 +155,7 @@ export function attachWidgetTouchGestures(
   };
 }
 
-/** Svelte action：绑定到小组件根节点 */
+// Svelte action，绑小组件根节点
 export const widgetTouchGestures: Action<HTMLElement, WidgetTouchGestureOptions> = (
   node,
   options

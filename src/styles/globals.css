@@ -257,20 +257,37 @@ h6 {
 html[data-font='wenkai'] {
   --font-body-current: 'LXGW WenKai', 'Inter', sans-serif;
   --font-heading-current: 'LXGW WenKai', 'Inter', sans-serif;
+  --app-icon-stroke-width: 1.65;
+  --app-icon-stroke-linecap: round;
+  --app-icon-stroke-linejoin: round;
 }
 html[data-font='inter'] {
   --font-body-current: 'Inter', 'LXGW WenKai', sans-serif;
   --font-heading-current: 'Inter', 'LXGW WenKai', sans-serif;
+  --app-icon-stroke-width: 2;
+  --app-icon-stroke-linecap: round;
+  --app-icon-stroke-linejoin: round;
 }
 html[data-font='serif'] {
   --font-body-current: 'Noto Serif SC', 'LXGW WenKai', serif;
   --font-heading-current: 'Noto Serif SC', 'Inter', serif;
+  --app-icon-stroke-width: 1.35;
+  --app-icon-stroke-linecap: round;
+  --app-icon-stroke-linejoin: round;
 }
 html[data-font='plex'] {
   --font-body-current: 'IBM Plex Sans', 'LXGW WenKai', sans-serif;
   --font-heading-current: 'IBM Plex Sans', 'Inter', sans-serif;
+  --app-icon-stroke-width: 1.85;
+  --app-icon-stroke-linecap: square;
+  --app-icon-stroke-linejoin: miter;
 }
 html[data-font='jp-pixel'] {
   --font-body-current: 'DotGothic16', 'LXGW WenKai', 'Inter', sans-serif;
   --font-heading-current: 'DotGothic16', 'Inter', sans-serif;
+}
+html:not([data-font='jp-pixel']) {
+  --app-icon-stroke-width: 1.65;
+  --app-icon-stroke-linecap: round;
+  --app-icon-stroke-linejoin: round;
 }

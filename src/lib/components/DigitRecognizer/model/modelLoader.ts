@@ -2,7 +2,7 @@ import type * as tf from '@tensorflow/tfjs';
 import type { ModelState } from './types';
 import { tf as tfRuntime } from '../../../tfjs-client';
 
-/** 本地托管 LeNet 风格 MNIST 模型 — 见 scripts/export-mnist-model.py */
+// 本地托管的 LeNet 风格 MNIST 模型，见 scripts/export-mnist-model.py
 export const MNIST_MODEL_URL = '/models/mnist/model.json';
 
 function getTf() {
@@ -42,7 +42,7 @@ export function disposeModels(state: ModelState) {
   state.vizModel?.dispose();
 }
 
-/** 离开 CNN 页时释放 TF.js 引擎，避免 WebGL 与主界面争抢 GPU */
+// 离开 CNN 页释放 TF.js，别让 WebGL 跟主界面抢 GPU
 export async function disposeTfEngine() {
   try {
     const tf = await getTf();

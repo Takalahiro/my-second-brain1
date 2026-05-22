@@ -7,11 +7,9 @@ export interface HeadingNode {
   children: HeadingNode[];
 }
 
-/**
- * 把扁平的 headings（按文档顺序）按 depth 构造成嵌套树。
- * 例如：H2 - H3 - H3 - H4 - H2 → 两个 H2 兄弟节点，第一个 H2 下两个 H3，第二个 H3 下一个 H4。
- * 只保留 minDepth ~ maxDepth 范围的标题。
- */
+// 扁平 headings 按 depth 拼成树
+// 比如 H2-H3-H3-H4-H2 → 两个 H2 兄弟，第一个下面两个 H3，第二个 H3 带 H4
+// 只留 minDepth ~ maxDepth 范围内的
 export function buildHeadingTree(
   headings: MarkdownHeading[],
   minDepth = 2,

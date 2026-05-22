@@ -49,7 +49,7 @@
   let cdGestureMoved = false;
   let cdStart = { x: 0, y: 0, t: 0 };
   let cdDragX = $state(0);
-  /** 'idle' | 'flying-left' | 'flying-right' | 'warp-left' | 'warp-right' */
+  // CD 切盘动画状态：idle | flying-left | flying-right | warp-left | warp-right
   let cdAnim = $state<'idle' | 'flying-left' | 'flying-right' | 'warp-left' | 'warp-right'>('idle');
   let cdAnimating = false;
 
@@ -207,7 +207,7 @@
     audioEl.muted = muted || globalMuted;
   });
 
-  /** 切换 track 时主动 reload，避免某些浏览器卡在旧 src */
+  // 换 track 时主动 reload，有些浏览器会卡在旧 src 上
   let lastSrc = '';
   $effect(() => {
     const src = current?.src ?? '';

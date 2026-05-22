@@ -17,7 +17,7 @@ function factorial(n: number): number {
   return r;
 }
 
-/** n 阶导数在 x 处（优先符号求导，失败则数值） */
+// n 阶导数在 x 处，能符号就符号，不行再数值
 export function nthDerivativeAt(expr: string, x: number, n: number): number {
   if (n === 0) return evalFn(expr, x);
   try {
@@ -26,7 +26,7 @@ export function nthDerivativeAt(expr: string, x: number, n: number): number {
     const v = node.compile().evaluate({ x });
     if (typeof v === 'number' && Number.isFinite(v)) return v;
   } catch {
-    /* numeric fallback */
+    // 符号求导不行就数值算
   }
   const h = 1e-4;
   if (n === 1) return numericalDerivative(expr, x, h);
@@ -260,7 +260,7 @@ export function buildIntegralSteps(
   };
 }
 
-/** 用户友好显示 */
+// 给用户看的表达式，别整太数学
 export function displayExpr(internal: string): string {
   return internal
     .replace(/\^2/g, '²')

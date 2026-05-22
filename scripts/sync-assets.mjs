@@ -23,7 +23,7 @@ async function walk(dir, base) {
     if (e.isDirectory()) {
       await walk(full, base);
     } else if (EXTS.has(extname(e.name).toLowerCase())) {
-      // 扁平复制：所有图片直接放到 public/vault-assets/ 下（用文件名查找）
+      // flat copy：不管 vault 里嵌多深，图片都丢 public/vault-assets/ 根目录，靠文件名找
       const dest = join(TARGET, e.name);
       await mkdir(dirname(dest), { recursive: true });
       await cp(full, dest);

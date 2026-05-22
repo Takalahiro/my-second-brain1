@@ -1,14 +1,11 @@
-/**
- * 笔记最后更新时间。
- *
- * 取数策略（按优先级）：
- *   1. 构建期生成的 `src/lib/notes-mtime.json` manifest
- *      （由 `scripts/build-mtime-manifest.mjs` 写出，包含每篇 .md 的 ISO 时间字符串）
- *   2. 实时跑 `git log --follow`（本地完整克隆时是真值；CI 浅克隆里几乎肯定为空）
- *   3. 文件系统 mtime（兜底；fresh CI checkout 里都是 clone 时刻，所以仅用于本地）
- *
- * 因为站点是静态站，所以这只在构建期 / SSR 调用，每个文件查一次即缓存。
- */
+// 笔记最后更新时间
+//
+// 取数顺序（谁先有就用谁）：
+//   1. 构建期生成的 src/lib/notes-mtime.json（scripts/build-mtime-manifest.mjs 写的）
+//   2. 现场跑 git log --follow（本地完整克隆靠谱；CI 浅克隆基本空）
+//   3. 文件系统 mtime（兜底；fresh checkout 全是 clone 时刻，主要本地用）
+//
+// 静态站只在 build / SSR 调，查过就缓存
 import { execFileSync } from 'node:child_process';
 import { statSync } from 'node:fs';
 import path from 'node:path';
@@ -20,14 +17,10 @@ const manifestMap = manifest as Record<string, string>;
 
 let warnedGitMissing = false;
 
-/**
- * 给 collection note 取最后更新时间。
- *
- * Astro 6 提供的 `note.filePath` 是相对 process.cwd() 的路径（如 `obsidian-vault/MATH/foo.md`）。
- * 该函数也容忍：
- *   - 绝对路径
- *   - vault 内相对路径（如 `MATH/foo.md` 或不带 .md 后缀）
- */
+// 给 collection note 取最后更新时间
+//
+// Astro 6 的 note.filePath 相对 cwd（如 obsidian-vault/MATH/foo.md）
+// 也兼容绝对路径、vault 内相对路径（MATH/foo.md 或没带 .md 后缀）
 export function getNoteLastUpdated(filePath: string | undefined): Date | null {
   if (!filePath) return null;
 
@@ -83,7 +76,7 @@ export function getNoteLastUpdated(filePath: string | undefined): Date | null {
   return result;
 }
 
-/** 友好显示：YYYY-MM-DD HH:mm */
+// 展示格式：YYYY-MM-DD HH:mm
 export function formatLastUpdated(d: Date): string {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');

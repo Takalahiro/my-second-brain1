@@ -1,18 +1,16 @@
-/**
- * 白噪音音轨清单 —— 文件名关键词作为 key，文件在 public/voice/
- */
+// 白噪音音轨清单，文件名关键词当 key，文件在 public/voice/
 export type VoiceTrack = {
-  /** 关键词 key（来自文件名） */
+  // key，来自文件名
   key: string;
-  /** 显示名 */
+  // 显示名
   label: string;
-  /** 相对 public 的路径 */
+  // 相对 public 的路径
   src: string;
-  /** 分类标签 */
+  // 分类标签
   tag: string;
 };
 
-/** 从文件名解析出的 12 条音轨 */
+// 从文件名解析出来的 12 条音轨
 export const VOICE_TRACKS: VoiceTrack[] = [
   { key: '水下水语', src: '/voice/4.【大自然白噪音】水下水语.ogg', label: '水下水语', tag: '自然' },
   { key: '溪边长笛', src: '/voice/7.溪边长笛.ogg', label: '溪边长笛', tag: '自然' },

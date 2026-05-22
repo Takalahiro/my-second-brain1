@@ -1,4 +1,4 @@
-/** 小部件三档尺寸：拖动改变大小时自动切换展示内容 */
+// 小组件三档尺寸，拖大拖小会自动换展示内容
 export type WidgetTier = 'compact' | 'medium' | 'expanded';
 
 export const TIER_LABEL: Record<WidgetTier, string> = {
@@ -12,7 +12,7 @@ export type WidgetTierInput = {
   height: number;
   minimized?: boolean;
   maximized?: boolean;
-  /** 覆盖默认阈值（按小部件类型微调） */
+  // 某些小组件想自己调阈值的话用这个
   compactMax?: number;
   expandedMin?: number;
 };

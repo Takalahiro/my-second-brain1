@@ -1,14 +1,10 @@
 <script lang="ts">
-  /**
-   * macOS 风格三点：×（关闭）/ −（最小化）/ +（最大化）
-   *
-   * 任意一个回调缺省则隐藏对应点。
-   */
+  // macOS 三点：× 关 / − 最小化 / + 最大化；缺回调就隐藏对应按钮
   interface Props {
     onClose?: () => void;
     onMinimize?: () => void;
     onMaximize?: () => void;
-    /** 当前是否最大化（决定 + 是否变为 还原 ↘） */
+    // 是否已最大化（+ 会变成还原 ↘）
     maximized?: boolean;
   }
   let { onClose, onMinimize, onMaximize, maximized = false }: Props = $props();

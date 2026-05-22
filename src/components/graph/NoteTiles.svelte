@@ -1,10 +1,8 @@
 <script lang="ts">
-  /**
-   * 笔记瓦片网格：按 folder 分组的卡片网格，含搜索与孤岛标记。
-   * 风格与 /notes 卡片一致。
-   */
+  // 笔记瓦片网格：按 folder 分组，带搜索和孤岛标记，风格跟 /notes 卡片一致
   import type { WikiData } from './graph-data';
   import { folderColor, noteHref } from './graph-data';
+  import PixelIcon from '../PixelIcon.svelte';
 
   interface Props {
     data: WikiData;
@@ -82,7 +80,7 @@
                 onauxclick={() => (location.href = noteHref(n.id))}
                 title={n.id}
               >
-                <span class="tile-emoji">{orphan ? '🏝' : '📝'}</span>
+                <span class="tile-icon"><PixelIcon name={orphan ? 'island' : 'note'} size={16} /></span>
                 <span class="tile-title">{n.title}</span>
                 <span class="tile-meta">
                   {#if orphan}
@@ -190,7 +188,11 @@
     transform: translateY(-2px);
   }
   .tile.is-orphan { opacity: 0.85; }
-  .tile-emoji { font-size: 1.05rem; }
+  .tile-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
   .tile-title {
     font-size: 0.82rem;
     font-weight: 600;

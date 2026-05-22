@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 /**
- * 从 GitHub 拉取 obsidian-vault 子仓库的最新版到本地。
- *
- * 使用场景：在另一台机器上写了笔记 push 到 GitHub，回到这台机器先 pnpm vault:pull
- * 再做开发，确保本地 vault 是最新的。
+ * 从 GitHub 拉最新 obsidian-vault 到本地。
+ * 场景：在别的机器写了笔记 push 了，回来这台先 pnpm vault:pull 再 dev。
  */
 import { spawnSync, execSync } from 'node:child_process';
 
@@ -35,14 +33,14 @@ console.log(`▌ 从 GitHub 拉取最新 obsidian-vault (branch=${branch})`);
 run(`git fetch origin`, VAULT);
 run(`git reset --hard origin/${branch}`, VAULT);
 
-// 同时把父仓库 submodule pointer 更新
+// 父 repo 的 submodule pointer 可能也变了
 const parentDirty = runQuiet('git status --porcelain obsidian-vault');
 if (parentDirty) {
   console.log('\n▌ 检测到 submodule pointer 变化，需要在父仓库 commit');
   console.log('   运行：git add obsidian-vault && git commit -m "chore: bump vault"');
 }
 
-// 资源同步 + 重新生成 mtime manifest
+// 顺手 sync assets + 重生 mtime manifest
 run('pnpm prepare:vault');
 
 console.log('\n✅ vault 拉取完成');

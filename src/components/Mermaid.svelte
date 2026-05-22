@@ -1,16 +1,8 @@
 <script lang="ts">
-  /**
-   * 全局 Mermaid 渲染器组件。
-   *
-   * - 在 markdown → HTML 阶段，`src/lib/remark-mermaid.mjs` 已经把每一个 ```mermaid 代码块
-   *   替换为 `<div class="mermaid-block" data-source="…" data-state="pending"></div>` 占位。
-   *   此组件在客户端 hydrate 后，扫描这些占位并把 `data-source` 交给 mermaid 渲染成 SVG。
-   * - 用 IntersectionObserver 懒渲染：图表滚动进可视区域才解析，避免长文档一次 parse 几十个图表卡死主线程。
-   * - 监听 `<html class>` 变化以适配明暗主题切换。
-   *
-   * 同时兼容回退情形：如果将来某条 markdown 还是被走了 Shiki（出现了 `<pre><code class="language-mermaid">`），
-   * 这里也会把它转成 mermaid-block 再渲染。
-   */
+  // 全局 Mermaid 渲染器
+  // markdown 阶段 remark-mermaid 会把 ```mermaid 换成 .mermaid-block 占位
+  // hydrate 后扫占位、交给 mermaid 出 SVG；进视口才 parse，避免长文一次卡死
+  // 还监听 html class 换明暗主题；兜底处理漏网的 pre>code.language-mermaid
   import { onMount } from 'svelte';
 
   let mermaidPromise: Promise<typeof import('mermaid').default> | null = null;
@@ -32,7 +24,7 @@
     return mermaidPromise;
   }
 
-  /** 收集页面上所有 mermaid 占位 div；同时把残留的 `<pre><code class="language-mermaid">` 兜底转成占位 */
+  // 收集所有 mermaid 占位；顺便把残留的 pre>code.language-mermaid 转成占位
   function collectBlocks(): HTMLElement[] {
     document.querySelectorAll('pre code.language-mermaid, code.language-mermaid').forEach((codeEl) => {
       const pre = codeEl.closest('pre');
@@ -58,11 +50,7 @@
     return el.dataset.source ?? '';
   }
 
-  /**
-   * 目标：取消横向滚动且移动端完整显示。
-   * 策略：始终让 SVG 按容器宽度适配（width:100% + preserveAspectRatio: meet），
-   * 由 viewBox 负责等比缩放，确保图与文字一起缩小，不再出现横向滚动。
-   */
+  // 不要横向滚动，移动端也要完整显示：SVG 100% 宽 + preserveAspectRatio meet
   function postProcessSvg(host: HTMLElement) {
     const svg = host.querySelector<SVGSVGElement>('svg');
     if (!svg) return;
@@ -103,7 +91,7 @@
     return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
   }
 
-  /** 重新渲染所有 mermaid 块（主题切换用） */
+  // 主题切换时全部重渲
   async function reRenderAll() {
     const all = document.querySelectorAll<HTMLElement>('.mermaid-block');
     const sources: Array<{ el: HTMLElement; src: string }> = [];

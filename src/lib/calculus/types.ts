@@ -4,7 +4,7 @@ export type CalcVizStep = {
   explanation: string;
   latex: string;
   phase?: 'intro' | 'compute' | 'term' | 'sum' | 'remainder' | 'eliminate' | 'result';
-  /** 本步绘图附加参数 */
+  // 这步绘图用的附加参数
   viz?: {
     taylorOrder?: number;
     riemannN?: number;

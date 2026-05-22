@@ -6,9 +6,9 @@
     node: HeadingNode;
     activeSlug: string | null;
     onNavigate: (slug: string) => void;
-    /** 由父级统一管理的折叠状态 Map（key=slug, value=true 表示已折叠） */
+    // 折叠状态由父级统一管理（key=slug，true=已折叠）
     collapsedMap: Record<string, boolean>;
-    /** 折叠状态变更回调 */
+    // 折叠/展开时通知父级
     onToggle: (slug: string) => void;
   }
 

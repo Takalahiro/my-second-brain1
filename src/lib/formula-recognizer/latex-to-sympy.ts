@@ -1,4 +1,4 @@
-/** 将常见 LaTeX 片段转为 SymPy 可读的 Python 表达式（启发式） */
+// 常见 LaTeX 片段 → SymPy 能读的 Python 表达式（启发式，不保证全对）
 export function latexToSympyHints(latex: string): string {
   let s = latex.trim();
   s = s.replace(/^\$+|\$+$/g, '');

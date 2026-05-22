@@ -1,19 +1,19 @@
 import { getNoteLastUpdated, formatLastUpdated } from './git-mtime';
 import type { FolderNode } from './folder-tree';
 
-/** 单篇笔记的「最后更新」展示文本 */
+// 单篇笔记「最后更新」那行字
 export function noteLastUpdatedText(noteId: string): string | undefined {
   const d = getNoteLastUpdated(noteId);
   return d ? formatLastUpdated(d) : undefined;
 }
 
-/** note.id 是否位于 folderPath 下（含子目录） */
+// note.id 是不是在 folderPath 下面（子目录也算）
 export function noteInFolder(noteId: string, folderPath: string): boolean {
   if (!folderPath) return true;
   return noteId.startsWith(folderPath + '/');
 }
 
-/** 文件夹下所有笔记中最新的更新时间（用于目录卡片） */
+// 文件夹里所有笔记里最新的更新时间，目录卡片用
 export function maxMtimeForFolder(folderPath: string, noteIds: string[]): string {
   let max: Date | null = null;
   for (const id of noteIds) {
@@ -24,7 +24,7 @@ export function maxMtimeForFolder(folderPath: string, noteIds: string[]): string
   return max ? formatLastUpdated(max) : '';
 }
 
-/** 构建期为目录树笔记填入 lastUpdated 并按 git mtime 排序（仅 SSR / build 调用） */
+// 构建期给目录树笔记填 lastUpdated，按 git mtime 排好序（SSR / build 才调）
 export function enrichFolderTreeMtime(node: FolderNode): void {
   for (const n of node.notes) {
     const d = getNoteLastUpdated(n.id);

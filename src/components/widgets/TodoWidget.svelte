@@ -7,6 +7,8 @@
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
+  import PixelIcon from '../PixelIcon.svelte';
+  import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
 
   interface Props {
     onClose?: () => void;
@@ -203,7 +205,7 @@
   <header class="tw-header" onpointerdown={onHeaderPointerDown}>
     <WindowChrome onClose={() => onClose?.()} onMinimize={doMinimize} onMaximize={doMaximize} maximized={maximized} />
     <div class="tw-title">
-      <span aria-hidden="true">✅</span>
+      <span aria-hidden="true"><PixelIcon name={WIDGET_ICON_MAP.todo} size={14} /></span>
       <span>待办</span>
       <span class="tw-tier">{TIER_LABEL[tier]}</span>
     </div>

@@ -1,38 +1,27 @@
-export type SlotWidgetKey =
-  | 'music'
-  | 'notes'
-  | 'todo'
-  | 'calendar'
-  | 'pomodoro'
-  | 'weather'
-  | 'stats'
-  | 'world'
-  | 'graph'
-  | 'territory'
-  | 'calculator'
-  | 'python'
-  | 'whiteboard'
-  | 'whitenoise';
+import type { PixelIconName } from './pixel-icons';
+import { WIDGET_ICON_MAP, type WidgetIconKey } from './pixel-icons';
+
+export type SlotWidgetKey = WidgetIconKey;
 
 export const SLOT_STORAGE_KEY = 'second-brain:control-center-slot';
 
 export const DEFAULT_SLOT_WIDGET: SlotWidgetKey = 'weather';
 
-export const SLOT_WIDGET_OPTIONS: Array<{ id: SlotWidgetKey; name: string; icon: string }> = [
-  { id: 'music', name: '音乐', icon: '🎵' },
-  { id: 'notes', name: '笔记', icon: '📖' },
-  { id: 'todo', name: '待办', icon: '✅' },
-  { id: 'calendar', name: '日历', icon: '📅' },
-  { id: 'pomodoro', name: '番茄钟', icon: '🍅' },
-  { id: 'weather', name: '天气', icon: '☁️' },
-  { id: 'stats', name: '统计', icon: '📊' },
-  { id: 'world', name: '世界时钟', icon: '🌍' },
-  { id: 'graph', name: '关系图谱', icon: '🕸️' },
-  { id: 'territory', name: '文件夹地图', icon: '🗺️' },
-  { id: 'calculator', name: 'MATLAB', icon: '🧮' },
-  { id: 'python', name: 'Python', icon: '🐍' },
-  { id: 'whiteboard', name: '白板', icon: '✏️' },
-  { id: 'whitenoise', name: '白噪音', icon: '🌧️' },
+export const SLOT_WIDGET_OPTIONS: Array<{ id: SlotWidgetKey; name: string; icon: PixelIconName }> = [
+  { id: 'music', name: '音乐', icon: WIDGET_ICON_MAP.music },
+  { id: 'notes', name: '笔记', icon: WIDGET_ICON_MAP.notes },
+  { id: 'todo', name: '待办', icon: WIDGET_ICON_MAP.todo },
+  { id: 'calendar', name: '日历', icon: WIDGET_ICON_MAP.calendar },
+  { id: 'pomodoro', name: '番茄钟', icon: WIDGET_ICON_MAP.pomodoro },
+  { id: 'weather', name: '天气', icon: WIDGET_ICON_MAP.weather },
+  { id: 'stats', name: '统计', icon: WIDGET_ICON_MAP.stats },
+  { id: 'world', name: '世界时钟', icon: WIDGET_ICON_MAP.world },
+  { id: 'graph', name: '关系图谱', icon: WIDGET_ICON_MAP.graph },
+  { id: 'territory', name: '文件夹地图', icon: WIDGET_ICON_MAP.territory },
+  { id: 'calculator', name: 'MATLAB', icon: WIDGET_ICON_MAP.calculator },
+  { id: 'python', name: 'Python', icon: WIDGET_ICON_MAP.python },
+  { id: 'whiteboard', name: '白板', icon: WIDGET_ICON_MAP.whiteboard },
+  { id: 'whitenoise', name: '白噪音', icon: WIDGET_ICON_MAP.whitenoise },
 ];
 
 export type SlotPreview = {
@@ -106,7 +95,7 @@ export function readSlotPreview(id: SlotWidgetKey): SlotPreview {
     }
     case 'world': {
       const s = readJson<{ selectedId?: string }>('second-brain:world-state');
-      return { title: meta.name, value: s?.selectedId ?? '🌍', sub: '点击地图切换' };
+      return { title: meta.name, value: s?.selectedId ?? '—', sub: '点击地图切换' };
     }
     case 'calendar': {
       const s = readJson<{ events?: unknown[] }>('second-brain:cal-state');
@@ -119,6 +108,6 @@ export function readSlotPreview(id: SlotWidgetKey): SlotPreview {
       return { title: meta.name, value: String(on), sub: '轨正在播放' };
     }
     default:
-      return { title: meta.name, value: meta.icon, sub: '点击启用到桌面' };
+      return { title: meta.name, value: '·', sub: '点击启用到桌面' };
   }
 }

@@ -29,7 +29,7 @@
     activeDemo === NEURAL_LAB.demoFormula.id ? NEURAL_LAB.demoFormula : NEURAL_LAB.demoMnist
   );
 
-  /** 移动端切回 MNIST Tab 时释放公式 OCR / SymPy 占用的内存 */
+  // 移动端切回 MNIST Tab 时，把公式 OCR / SymPy 占的内存清掉
   $effect(() => {
     if (isFormula || !deviceProfile.disposeOnInactive) return;
     disposeFormulaModel();

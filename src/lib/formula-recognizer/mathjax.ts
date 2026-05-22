@@ -34,7 +34,7 @@ function waitForMathJax(): Promise<void> {
   return mathJaxPromise;
 }
 
-/** 将 LaTeX 渲染到指定容器（MathJax 3） */
+// LaTeX → 指定容器（MathJax 3）
 export async function renderLatexPreview(
   container: HTMLElement,
   latex: string,

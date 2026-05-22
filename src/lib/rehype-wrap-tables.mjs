@@ -1,6 +1,6 @@
 import { visit } from 'unist-util-visit';
 
-/** 给每个 <table> 外包一层 .table-wrap，统一横向滚动与外边距 */
+// 每个 <table> 外包 .table-wrap，横向滚动和外边距统一
 export default function rehypeWrapTables() {
   return (tree) => {
     visit(tree, 'element', (node, index, parent) => {

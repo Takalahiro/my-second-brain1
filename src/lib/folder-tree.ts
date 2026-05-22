@@ -1,15 +1,15 @@
 import { noteIdToSlug } from './slugify';
 
 export interface NoteRef {
-  /** Astro collection 里的 id，例如 "计算机/Machine Learning/基础机器学习 Machine Learning.md" */
+  // Astro collection 里的 id，比如 "计算机/Machine Learning/基础机器学习 Machine Learning.md"
   id: string;
-  /** 显示用的标题（frontmatter.title 或 fallback 到文件名） */
+  // 显示标题，frontmatter.title 没有就用文件名
   title: string;
-  /** 路由 slug */
+  // 路由 slug
   slug: string;
-  /** 可选元数据 */
+  // 可选元数据
   date?: Date;
-  /** 构建期 git/fs 最后更新（展示用） */
+  // 构建期 git/fs 算出来的最后更新，展示用
   lastUpdated?: string;
   tags?: string[];
   description?: string;
@@ -17,7 +17,7 @@ export interface NoteRef {
 
 export interface FolderNode {
   name: string;
-  /** 完整路径，例如 "计算机/Machine Learning" */
+  // 完整路径，比如 "计算机/Machine Learning"
   path: string;
   children: FolderNode[];
   notes: NoteRef[];
@@ -33,10 +33,7 @@ interface MinimalCollectionEntry {
   };
 }
 
-/**
- * 把 Astro Content Collection 的 notes 列表按其 id 的 "/" 段构建成嵌套树。
- * 严格按 vault 实际目录层级。
- */
+// 把 Astro notes collection 按 id 里的 "/" 段拼成嵌套树，跟 vault 目录层级一致
 export function buildFolderTree(notes: MinimalCollectionEntry[]): FolderNode {
   const root: FolderNode = { name: '根目录', path: '', children: [], notes: [] };
 
@@ -92,7 +89,7 @@ export function buildFolderTree(notes: MinimalCollectionEntry[]): FolderNode {
   return root;
 }
 
-/** 计算文件夹下（含所有子文件夹）所有笔记数 */
+// 数一下文件夹下所有笔记（子文件夹里的也算）
 export function countNotes(node: FolderNode): number {
   let count = node.notes.length;
   for (const child of node.children) count += countNotes(child);

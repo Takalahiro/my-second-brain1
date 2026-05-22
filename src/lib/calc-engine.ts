@@ -1,11 +1,9 @@
-/**
- * MATLAB 风格计算器引擎（基于 mathjs）
- */
+// MATLAB 风格计算器，底层 mathjs
 import { create, all } from 'mathjs';
 
 const math = create(all, {});
 
-/** 将 MATLAB 风格表达式预处理为 mathjs 可解析形式 */
+// MATLAB 写法预处理一下，mathjs 才吃得下
 export function matlabToMath(expr: string): string {
   let s = expr.trim();
   // 矩阵 [1 2; 3 4] -> [1,2;3,4] 已由 mathjs 支持分号
@@ -35,7 +33,7 @@ export function evaluate(expr: string): CalcResult {
   }
 }
 
-/** 生成 2D 函数曲线数据 y = f(x) */
+// 画 y = f(x) 曲线用的采样点
 export function plotFunction(
   fn: string,
   xMin = -10,

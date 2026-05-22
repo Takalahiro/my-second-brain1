@@ -4,6 +4,8 @@
     folderColor, loadWiki, loadSettings, noteHref, saveSettings,
     DEFAULT_SETTINGS, type GraphSettings, type WikiData,
   } from './graph/graph-data';
+  import { GRAPH_VIEW_ICONS, type PixelIconName } from '../lib/pixel-icons';
+  import PixelIcon from './PixelIcon.svelte';
   import ForceView from './graph/ForceView.svelte';
   import RadialView from './graph/RadialView.svelte';
   import ArcView from './graph/ArcView.svelte';
@@ -13,15 +15,15 @@
   import SettingsPanel from './graph/SettingsPanel.svelte';
 
   type ViewKey = 'force' | 'radial' | 'arc' | 'cluster' | 'territory' | 'tiles' | 'settings';
-  type Tab = { id: ViewKey; name: string; icon: string; desc: string };
+  type Tab = { id: ViewKey; name: string; icon: PixelIconName; desc: string };
   const tabs: Tab[] = [
-    { id: 'force',     name: '力导向',   icon: '✨', desc: '物理仿真布局；收敛后静止，不再抖动' },
-    { id: 'territory', name: '文件夹地图', icon: '🗺️', desc: '滚轮缩放自动展开：国家→州→城市→笔记；双链白光弧线' },
-    { id: 'radial',    name: '圆环辐射', icon: '🌌', desc: '按目录划扇区，度高靠外' },
-    { id: 'arc',      name: '弧线和弦', icon: '🌈', desc: '一字排开，弧线连接' },
-    { id: 'cluster',  name: '同心簇环', icon: '🪐', desc: '每目录一个小行星系' },
-    { id: 'tiles',    name: '笔记瓦片', icon: '🗂', desc: '卡片网格全览' },
-    { id: 'settings', name: '设置',     icon: '⚙', desc: '集中调整孤岛/标签/交互/外观/物理参数' },
+    { id: 'force',     name: '力导向',   icon: GRAPH_VIEW_ICONS.force, desc: '物理仿真布局；收敛后静止，不再抖动' },
+    { id: 'territory', name: '文件夹地图', icon: GRAPH_VIEW_ICONS.territory, desc: '滚轮缩放自动展开：国家→州→城市→笔记；双链白光弧线' },
+    { id: 'radial',    name: '圆环辐射', icon: GRAPH_VIEW_ICONS.radial, desc: '按目录划扇区，度高靠外' },
+    { id: 'arc',      name: '弧线和弦', icon: GRAPH_VIEW_ICONS.arc, desc: '一字排开，弧线连接' },
+    { id: 'cluster',  name: '同心簇环', icon: GRAPH_VIEW_ICONS.cluster, desc: '每目录一个小行星系' },
+    { id: 'tiles',    name: '笔记瓦片', icon: GRAPH_VIEW_ICONS.tiles, desc: '卡片网格全览' },
+    { id: 'settings', name: '设置',     icon: GRAPH_VIEW_ICONS.settings, desc: '集中调整孤岛/标签/交互/外观/物理参数' },
   ];
 
   let view = $state<ViewKey>('force');
@@ -106,7 +108,7 @@
         role="tab"
         aria-selected={view === t.id}
       >
-        <span class="gp-tab-icon">{t.icon}</span>
+        <span class="gp-tab-icon"><PixelIcon name={t.icon} size={15} /></span>
         <span class="gp-tab-name">{t.name}</span>
       </button>
     {/each}

@@ -1,4 +1,4 @@
-/** 清理并规范化 OCR 输出的 LaTeX */
+// OCR 吐出来的 LaTeX 洗一洗
 export function sanitizeLatex(raw: string): string {
   if (!raw) return '';
 
@@ -43,7 +43,7 @@ export function sanitizeLatex(raw: string): string {
   return code;
 }
 
-/** 简单质量分：越高越可能是有效公式 */
+// 简单质量分，越高越像有效公式
 export function latexQualityScore(latex: string): number {
   if (!latex.trim()) return 0;
   let score = Math.min(latex.length, 120);

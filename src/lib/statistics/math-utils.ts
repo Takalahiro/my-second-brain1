@@ -1,4 +1,4 @@
-/** 数值统计工具：erf、不完全 Gamma/Beta 等 */
+// 数值统计小工具：erf、不完全 Gamma/Beta 等
 
 export function erf(x: number): number {
   const sign = x < 0 ? -1 : 1;

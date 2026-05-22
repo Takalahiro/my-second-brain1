@@ -1,6 +1,4 @@
-/**
- * 为传统小组件生成 widgetTouchGestures 的绑定参数
- */
+// 给老小组件拼 widgetTouchGestures 的绑定参数
 import type { WidgetTouchGestureOptions } from './widget-touch-gestures';
 
 export type WidgetLayoutState = {

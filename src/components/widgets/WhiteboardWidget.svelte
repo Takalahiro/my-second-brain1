@@ -32,7 +32,7 @@
   layoutKey="second-brain:whiteboard-layout"
   ariaLabel="Excalidraw 白板"
   title="白板"
-  icon="✏️"
+  icon="pen"
   href="/whiteboard"
   className="whiteboard-widget"
   defaultWidth={640}

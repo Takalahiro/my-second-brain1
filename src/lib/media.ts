@@ -1,8 +1,5 @@
-/**
- * Phase 3：背景 / 音乐 / 场景 共享类型与读取入口。
- *
- * media-manifest.json 在 build 期由 scripts/build-media-manifest.mjs 生成。
- */
+// 背景 / 音乐 / 场景 共享类型和读取入口
+// media-manifest.json 是 build 时 scripts/build-media-manifest.mjs 生成的
 
 import manifest from '../data/media-manifest.json';
 

@@ -1,20 +1,20 @@
-/** Mobile / memory-constrained device heuristics for FormulaNet + Pyodide */
+// 移动端 / 低内存设备的启发式配置，FormulaNet + Pyodide 用
 
 export type FormulaDeviceProfile = {
-  /** iOS Safari or other low-memory mobile browsers */
+  // iOS Safari 或其他低内存移动浏览器
   constrained: boolean;
   highAccuracyDefault: boolean;
   autoSolveDefault: boolean;
   preloadModel: boolean;
-  /** PNG export multiplier (1 avoids 768×768 offscreen on mobile) */
+  // PNG 导出倍率（1 避免移动端开 768×768 offscreen）
   exportScale: number;
-  /** Skip WebGPU attempt (iOS Safari often fails and wastes memory) */
+  // 跳过 WebGPU 尝试（iOS Safari 经常失败还白占内存）
   preferWasm: boolean;
-  /** Lower beam width / token cap during generation */
+  // 生成时压低 beam 宽度和 token 上限
   liteGeneration: boolean;
-  /** Terminate OCR worker when formula tab hidden */
+  // 公式 tab 藏了就把 OCR worker 干掉
   disposeOnInactive: boolean;
-  /** Recycle OCR worker every N recognitions (0 = keep loaded) */
+  // 每 N 次识别回收一次 worker（0 = 一直挂着）
   recycleWorkerEvery: number;
 };
 
@@ -31,7 +31,7 @@ function isMobileViewport(): boolean {
   return window.matchMedia('(max-width: 768px)').matches;
 }
 
-/** iOS Safari has strict per-tab memory limits (~1–1.5 GB) */
+// iOS Safari 单 tab 内存很紧，大概 1–1.5 GB
 export function isMemoryConstrainedDevice(): boolean {
   if (typeof navigator === 'undefined') return false;
   if (isIOS()) return true;

@@ -13,6 +13,8 @@
     type ForceSimController,
   } from '../graph/force-simulation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
+  import PixelIcon from '../PixelIcon.svelte';
+  import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
 
   interface Props {
@@ -57,7 +59,7 @@
   let edgeLen = $state(70);
   let simCtrl: ForceSimController = createForceController();
 
-  /** 单击节点直接跳转笔记 */
+  // 单击节点直接打开笔记
   let clickToOpen = $state(true);
 
   // 缩放/平移
@@ -87,11 +89,11 @@
   let maximized = $state(false);
 
   let raf: number | null = null;
-  /** 每帧递增，驱动 Svelte 5 重绘节点坐标 */
+  // 每帧 +1，逼 Svelte 5 重画节点位置
   let simFrame = $state(0);
   let canvasEl: HTMLDivElement | null = null;
 
-  /** 文件夹配色 */
+  // folder 配色盘
   const folderPalette = [
     '#ff9ed4', '#b48cff', '#7dd0ff', '#7fe6c4',
     '#ffd86b', '#ff9d6b', '#a4b8ff', '#ffa3a3',
@@ -213,10 +215,10 @@
     return Math.min(14, 3.5 + Math.sqrt(n.inDegree + n.outDegree) * 1.4);
   }
 
-  /** 同 folder 的可选过滤列表 */
+  // 可选的 folder 过滤列表
   const folders = $derived(Array.from(new Set(nodes.map((n) => n.folder))).sort());
 
-  /** 邻居集合（用于高亮）*/
+  // 当前 hover/选中节点的邻居，用来高亮
   const highlightSet = $derived.by(() => {
     const id = hoveredId ?? selectedId;
     if (!id) return null;
@@ -385,7 +387,7 @@
   <header class="gw-header" onpointerdown={onHeaderPointerDown}>
     <WindowChrome onClose={() => onClose?.()} onMinimize={doMinimize} onMaximize={doMaximize} maximized={maximized} />
     <div class="gw-title">
-      <span aria-hidden="true">🕸️</span>
+      <span aria-hidden="true"><PixelIcon name={WIDGET_ICON_MAP.graph} size={14} /></span>
       <span>关系图谱</span>
       <span class="gw-tier">{TIER_LABEL[tier]}</span>
     </div>

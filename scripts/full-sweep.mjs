@@ -34,17 +34,17 @@ async function get(url) {
 
 const report = { static: {}, notes: [], folders: [], tags: [], broken: [], issues: {}, summary: {} };
 
-// 1. 关键静态页
+// 1. 关键 static pages 能不能打开
 for (const path of ['/', '/notes', '/tags']) {
   const r = await get(path);
   report.static[path] = { status: r.status, length: r.text.length };
 }
 
-// 2. 全量 vault .md 文件 → 期望 slug
+// 2. vault 里所有 .md → 期望 slug
 const mdFiles = await listVaultMd(VAULT);
 console.log(`Vault 中找到 ${mdFiles.length} 篇笔记`);
 
-// 3. /notes 页面 SSR 暴露多少个 note-link
+// 3. /notes SSR 里实际 expose 了多少个 note-link
 const notesPage = await get('/notes');
 const ssrNoteLinks = [...new Set(
   [...notesPage.text.matchAll(/href="(\/notes\/[^"#?]+)"/g)].map((m) => decodeURIComponent(m[1]))
@@ -52,7 +52,7 @@ const ssrNoteLinks = [...new Set(
 report.summary.notes_visible_in_ssr = ssrNoteLinks.length;
 report.summary.notes_total_in_vault = mdFiles.length;
 
-// 4. 全量遍历每篇笔记
+// 4. 逐篇笔记扫一遍
 console.log(`扫描 ${mdFiles.length} 个笔记 URL...`);
 let i = 0;
 for (const md of mdFiles) {
@@ -90,7 +90,7 @@ for (const md of mdFiles) {
   report.notes.push(note);
 }
 
-// 5. 标签 + 文件夹
+// 5. tag pages + folder pages
 const allTagHrefs = [...new Set(
   [...notesPage.text.matchAll(/href="(\/tags\/[^"#?]+)"/g)].map((m) => decodeURIComponent(m[1]))
 )];
@@ -109,7 +109,7 @@ for (const h of allFolderHrefs) {
   if (r.status !== 200) report.broken.push({ url: h, status: r.status });
 }
 
-// 6. 问题分类
+// 6. 把问题分个类
 const issues = {
   notInSSR:        [],
   missingToc:      [],

@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { noteIdToSlug } from '../lib/backlinks';
+import PixelIcon from './PixelIcon.astro';
 
 interface Props {
   backlinks: CollectionEntry<'notes'>[];
@@ -11,8 +12,8 @@ const { backlinks } = Astro.props;
 
 {backlinks.length > 0 && (
   <section class="not-prose mt-12 pt-6 border-t border-gray-200 dark:border-gray-800">
-    <h2 class="text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mb-4">
-      🔗 反向链接 ({backlinks.length})
+    <h2 class="text-sm uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold mb-4 inline-flex items-center gap-2">
+      <PixelIcon name="link" size={14} /> 反向链接 ({backlinks.length})
     </h2>
     <ul class="space-y-2">
       {backlinks.map((note) => {

@@ -32,7 +32,7 @@
   layoutKey="second-brain:calc-layout"
   ariaLabel="MATLAB 计算器"
   title="MATLAB"
-  icon="∑"
+  icon="calc"
   href="/matlab"
   className="calc-widget"
   defaultWidth={420}

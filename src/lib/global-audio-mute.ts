@@ -1,4 +1,4 @@
-/** 壁纸层一键静音：音乐播放器 + 白噪音等站点音频 */
+// 壁纸层一键静音——音乐播放器、白噪音等站点音频一起管
 export const GLOBAL_MUTE_KEY = 'second-brain:global-muted';
 
 export function readGlobalMuted(): boolean {

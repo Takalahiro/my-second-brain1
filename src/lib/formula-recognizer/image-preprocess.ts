@@ -1,4 +1,4 @@
-/** UniMER / FormulaNet 预处理常量（与 Texo-web 一致） */
+// UniMER / FormulaNet 预处理常量，跟 Texo-web 对齐
 export const INPUT_SIZE = 384;
 const UNIMERNET_MEAN = 0.7931;
 const UNIMERNET_STD = 0.1738;
@@ -88,7 +88,7 @@ function cropMargin(image: GreyImage): GreyImage {
   return { width: cw, height: ch, data: cropped };
 }
 
-/** 裁剪后留白，避免笔画贴边被截断 */
+// 裁剪后留点白边，笔画贴边不会被截掉
 function padCrop(image: GreyImage, ratio = CROP_PADDING_RATIO): GreyImage {
   const padX = Math.max(4, Math.round(image.width * ratio));
   const padY = Math.max(4, Math.round(image.height * ratio));
@@ -104,7 +104,7 @@ function padCrop(image: GreyImage, ratio = CROP_PADDING_RATIO): GreyImage {
   return { width: newW, height: newH, data: padded };
 }
 
-/** 轻微加粗笔画，提升细线识别率 */
+// 笔画稍微加粗，细线好认一点
 function thickenStrokes(image: GreyImage, radius = 1): GreyImage {
   const { width, height, data } = image;
   const out = new Uint8ClampedArray(data);
@@ -126,7 +126,7 @@ function thickenStrokes(image: GreyImage, radius = 1): GreyImage {
   return { width, height, data: out };
 }
 
-/** 双线性缩放 + 居中填充（Canvas 高质量插值） */
+// 双线性缩放 + 居中填充，Canvas 高质量插值
 function resizePad(image: GreyImage, targetW: number, targetH: number): GreyImage {
   const srcCanvas = new OffscreenCanvas(image.width, image.height);
   const srcCtx = srcCanvas.getContext('2d');
@@ -186,7 +186,7 @@ function runPipeline(bitmap: ImageBitmap, options?: { thicken?: boolean }): Floa
   return normalize(grey);
 }
 
-/** 将图片 Blob 预处理为 FormulaNet 输入张量 */
+// 图片 Blob → FormulaNet 输入张量
 export async function preprocessImageBlob(
   blob: Blob,
   options?: { thicken?: boolean }
@@ -199,10 +199,8 @@ export async function preprocessImageBlob(
   }
 }
 
-/**
- * 高精度：两种预处理各推理一次，取得分更高的结果。
- * 返回 [primary, alternate] 供 worker 选择。
- */
+// 高精度：两种预处理各跑一遍，取得分高的
+// 返回 [primary, alternate] 给 worker 挑
 export async function preprocessImageVariants(blob: Blob): Promise<Float32Array[]> {
   const bitmap = await createImageBitmap(blob);
   try {
@@ -215,7 +213,7 @@ export async function preprocessImageVariants(blob: Blob): Promise<Float32Array[
   }
 }
 
-/** @deprecated 使用 sanitizeLatex */
+// @deprecated 改用 sanitizeLatex
 export function formatLatex(code: string): string {
   return code.trim();
 }

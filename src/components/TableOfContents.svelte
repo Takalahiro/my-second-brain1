@@ -62,7 +62,7 @@
     }
   }
 
-  /** 一次性 hydration：读偏好 + 监听断点切换 */
+  // 一次性 hydration：读用户偏好 + 监听桌面/移动断点
   $effect(() => {
     if (typeof window === 'undefined') return;
     const mql = window.matchMedia('(min-width: 1024px)');
@@ -93,7 +93,7 @@
     };
   });
 
-  /** 仅 panel 展开 + 桌面端 跑 IO（移动端抽屉用完即收，无需高亮当前章节） */
+  // 只有桌面端且 panel 展开时才跑 IO 高亮当前章节（手机抽屉用完就关，不用）
   $effect(() => {
     if (!hydrated || minimized || !isDesktop) return;
     if (typeof IntersectionObserver === 'undefined') return;

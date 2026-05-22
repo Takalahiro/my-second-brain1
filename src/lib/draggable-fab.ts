@@ -1,4 +1,4 @@
-/** 固定定位悬浮球：位置读写与边界约束 */
+// 悬浮球位置存取 + 别拖出屏幕
 
 export function loadFabPosition(storageKey: string): { left: number; top: number } | null {
   if (typeof localStorage === 'undefined') return null;

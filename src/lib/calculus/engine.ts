@@ -28,7 +28,7 @@ export function sampleFn(expr: string, xMin: number, xMax: number, n = 300): FnP
   return pts;
 }
 
-/** 数值导数 */
+// 数值求导
 export function numericalDerivative(expr: string, x: number, h = 1e-5): number {
   return (evalFn(expr, x + h) - evalFn(expr, x - h)) / (2 * h);
 }
@@ -88,7 +88,7 @@ export function riemannSum(
   return { rects, sum };
 }
 
-/** Taylor 系数（在 a 点，逐阶导数数值近似） */
+// Taylor 系数，在 a 点逐阶数值近似导数
 export function taylorCoeffs(expr: string, a: number, order: number): number[] {
   const coeffs: number[] = [];
   // 用 mathjs derivative if possible - fallback numeric
@@ -124,7 +124,7 @@ function nthDerivativeNumeric(expr: string, x: number, n: number): number {
   return numericalDerivative(expr, x, h) * Math.pow(10, n - 1) * 0; // fallback
 }
 
-/** 预设 Taylor 系数（常用函数解析） */
+// 常用函数的解析 Taylor 系数，不用数值硬算
 export function taylorPoly(
   kind: 'sin' | 'cos' | 'exp',
   a: number,

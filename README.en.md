@@ -275,11 +275,88 @@ Tracked files must be ≤ 25 MiB per file (Cloudflare Pages). See `scripts/check
 
 ---
 
+## Technical Highlights
+
+Design decisions and implementation notes that matter most when extending or debugging the project.
+
+### Architecture & build
+
+- **Backend-free SSG**: Notes compile to static HTML at `pnpm build`; indexes like `wikilinks.json` and `stats.json` are generated at build time—runtime only fetches JSON, no database.
+- **`prepare:vault` hook**: Every `dev` / `build` syncs the submodule, copies `vault-assets`, and refreshes mtime / stats / wikilink reports so Content Layer stays aligned with assets.
+- **Islands & code-splitting**: Heavy client modules (widgets, graph, Pyodide, TF.js) load via `client:load` / `client:idle` / dynamic `import()`; `/matlab` tabs lazy-import further to keep first paint small.
+
+### Markdown & content
+
+- **Unified plugin pipeline** (`astro.config.mjs`): wiki links → Obsidian image embeds → math normalization → KaTeX → Mermaid → table wrappers—all on the AST, not runtime regex hacks.
+- **Slug & wikilink resolution**: `slugify` + `build-wikilinks.mjs` resolve `[[links]]` at build time; broken targets land in `broken` / `orphans` for red UI hints.
+- **Git mtime**: “Last updated” prefers git history inside the vault submodule over filesystem mtime—better for CI and shallow clones.
+
+### In-browser compute & memory
+
+- **Python IDE**: Pyodide + `sys.settrace` + Python `ast` for Chinese step explanations (rule-based, not LLM).
+- **Formula OCR**: FormulaNet runs in a Web Worker via Transformers.js; mobile skips WebGPU preload, terminates the worker when the tab hides, and recycles periodically to avoid Safari OOM.
+- **SymPy solver**: Pyodide loads `formula-solver.py` on demand (`FORMULA_SOLVER_VERSION` busts stale caches); LaTeX→SymPy is heuristic—verify tricky expressions manually.
+- **MNIST / TF.js**: LeNet weights live in-repo (~879 KB); leaving the CNN tab calls `tf.dispose` to free WebGL before OCR runs.
+
+### UI & UX
+
+- **Font-bound dual icons**: Non–`jp-pixel` fonts use Lucide stroke icons (per-font CSS stroke vars); **日式像素** switches to 16×16 block icons (`PixelIcon` renders both SVGs, toggled by `data-font`).
+- **Desktop widgets**: Position / size / rotation persist in `localStorage`; touch gestures decouple from the `draggable` module; mobile drawer mode disables transform dragging.
+- **Graph explorer**: Force layout uses alpha cooling to stop jitter; territory map uses seeded random coastlines with LOD; optional 5-minute `wikilinks.json` refresh while the page is visible.
+
+### Deployment & constraints
+
+- **Cloudflare Pages**: Output `dist`; **git submodules required**; `public/_headers` splits short HTML cache vs long-lived assets.
+- **Size audit**: `pnpm check:25mib` enforces ≤ 25 MiB per tracked file (FormulaNet downloads at runtime, not committed).
+- **Self-check**: After `pnpm build && pnpm preview`, run `pnpm check:self http://localhost:4321` to probe key routes and JSON endpoints.
+
+### Third-party licenses
+
+| Component | License |
+|-----------|---------|
+| This repo’s code | MIT ([LICENSE](./LICENSE)) |
+| [Lucide](https://lucide.dev/) icons | ISC |
+| FormulaNet / Transformers.js | Upstream terms |
+| Pyodide / SymPy | Upstream terms |
+| `obsidian-vault` note content | See that repository—may differ from code license |
+
+---
+
 ## License
 
 This project is licensed under the **[MIT License](./LICENSE)**.
 
-You may use, modify, and distribute this software freely, provided the copyright notice and license text are included. Note content in `obsidian-vault` may be under separate terms—refer to that repository.
+```
+MIT License
+
+Copyright (c) 2026 Takahiro
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+**You may:** use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software.
+
+**You must:** include the copyright notice and license text in all copies or substantial portions.
+
+**Disclaimer:** THE SOFTWARE IS PROVIDED “AS IS”, without warranty of any kind; authors are not liable for any claim or damages.
+
+Note content in the `obsidian-vault` submodule may be under separate terms—refer to that repository.
 
 ---
 

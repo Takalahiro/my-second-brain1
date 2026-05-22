@@ -1,7 +1,7 @@
 import solverScript from './formula-solver.py?raw';
 import type { SolveResult, SolverPhase } from './solver-types';
 
-/** Bump when formula-solver.py changes — helps detect stale bundles */
+// formula-solver.py 改了记得 bump，方便发现 bundle 过期
 export const FORMULA_SOLVER_VERSION = 'v5';
 
 const PYODIDE_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
