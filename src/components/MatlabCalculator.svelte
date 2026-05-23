@@ -11,19 +11,23 @@
   type TabId = 'matrix' | 'calculus' | 'discrete' | 'statistics' | 'expr';
   let tab = $state<TabId>('matrix');
 
-  const labModules = import.meta.glob<{ default: Component }>([
-    './matrix/MatrixLab.svelte',
-    './calculus/CalculusLab.svelte',
-    './discrete/DiscreteLab.svelte',
-    './statistics/StatisticsLab.svelte',
-  ]);
+  type LabId = Exclude<TabId, 'expr'>;
+  type LabModule = { default: Component };
 
-  const labPaths: Record<Exclude<TabId, 'expr'>, string> = {
-    matrix: './matrix/MatrixLab.svelte',
-    calculus: './calculus/CalculusLab.svelte',
-    discrete: './discrete/DiscreteLab.svelte',
-    statistics: './statistics/StatisticsLab.svelte',
-  };
+  async function loadLab(id: LabId): Promise<LabModule> {
+    switch (id) {
+      case 'matrix':
+        return import('./matrix/MatrixLab.svelte');
+      case 'calculus':
+        return import('./calculus/CalculusLab.svelte');
+      case 'discrete':
+        return import('./discrete/DiscreteLab.svelte');
+      case 'statistics':
+        return import('./statistics/StatisticsLab.svelte');
+      default:
+        throw new Error(`Unknown lab: ${id satisfies never}`);
+    }
+  }
 
   const TAB_HINTS: Record<TabId, string> = {
     matrix: '输入矩阵 → 选运算 → ▶ 逐步演示',
@@ -40,12 +44,6 @@
     { label: 'e²', expr: 'e^2' },
     { label: '√2', expr: 'sqrt(2)' },
   ];
-
-  function loadLab(id: Exclude<TabId, 'expr'>) {
-    const loader = labModules[labPaths[id]];
-    if (!loader) return Promise.reject(new Error(`未知模块: ${id}`));
-    return loader();
-  }
 
   let LabComponent = $state<Component | null>(null);
   let labLoading = $state(false);

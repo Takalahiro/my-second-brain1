@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import PixelIcon from './PixelIcon.svelte';
+  import { getManualContent } from '../lib/i18n/manual-content';
+  import { getMessages, initLocale, localeState } from '../lib/i18n/locale.svelte';
 
   interface SyncInfo {
     noteCount: number;
@@ -27,7 +29,11 @@
   const showManual = $derived(mounted && !manualClosed);
   const showWelcome = $derived(mounted && !heroClosed && !showManual && !isFirstDesktopManual);
 
+  const m = $derived(getMessages());
+  const manual = $derived(getManualContent(localeState.current));
+
   onMount(() => {
+    initLocale();
     try {
       heroClosed = localStorage.getItem(HERO_KEY) === '1';
       manualClosed = localStorage.getItem(MANUAL_KEY) === '1';
@@ -92,21 +98,21 @@
 </script>
 
 {#if showWelcome}
-  <section class="home-hero" class:desktop-overlay={desktopMode} aria-label="欢迎">
+  <section class="home-hero" class:desktop-overlay={desktopMode} aria-label={m.hero.welcome}>
     <div class="hero-card pixel-card glass-container">
       <button
         type="button"
         class="card-close"
-        aria-label="关闭欢迎卡片"
-        title="关闭欢迎卡片"
+        aria-label={m.hero.closeWelcome}
+        title={m.hero.closeWelcome}
         onclick={closeHero}
       >×</button>
-      <h1 class="hero-title">My Second Brain</h1>
-      <p class="hero-sub">简约桌面 · 毛玻璃 · 任你切换</p>
+      <h1 class="hero-title">{m.hero.title}</h1>
+      <p class="hero-sub">{m.hero.subtitle}</p>
       <div class="hero-actions">
-        <a class="pixel-button hero-btn" href="/notes">进入笔记</a>
-        <a class="pixel-button hero-btn ghost" href="/tags">浏览标签</a>
-        <button type="button" class="pixel-button hero-btn ghost" onclick={openManual}>使用说明</button>
+        <a class="pixel-button hero-btn" href="/notes">{m.hero.enterNotes}</a>
+        <a class="pixel-button hero-btn ghost" href="/tags">{m.hero.browseTags}</a>
+        <button type="button" class="pixel-button hero-btn ghost" onclick={openManual}>{m.hero.manual}</button>
       </div>
     </div>
   </section>
@@ -118,78 +124,72 @@
       type="button"
       class="desktop-manual-backdrop"
       class:is-first={isFirstDesktopManual}
-      aria-label="关闭使用说明"
+      aria-label={m.hero.closeManual}
       onclick={closeManual}
     ></button>
   {/if}
-  <section class="home-hero" class:desktop-overlay={desktopMode} class:is-first-manual={isFirstDesktopManual} aria-label="使用说明">
+  <section class="home-hero" class:desktop-overlay={desktopMode} class:is-first-manual={isFirstDesktopManual} aria-label={m.hero.manualTitle}>
     <div class="manual-card pixel-card glass-container" class:is-first-manual={isFirstDesktopManual}>
       <button
         type="button"
         class="card-close"
-        aria-label="关闭使用说明"
-        title="关闭使用说明"
+        aria-label={m.hero.closeManual}
+        title={m.hero.closeManual}
         onclick={closeManual}
       >×</button>
       <header class="manual-card-head">
         <span class="manual-emoji" aria-hidden="true"><PixelIcon name="book" size={24} /></span>
-        <h1 class="manual-title">使用说明</h1>
-        <p class="manual-sub">My Second Brain · 快速上手</p>
+        <h1 class="manual-title">{m.hero.manualTitle}</h1>
+        <p class="manual-sub">{m.hero.manualSub}</p>
       </header>
 
       <div class="manual-body">
-        <section>
-          <h3>桌面与组件</h3>
-          <p>顶栏 <strong>控制中心</strong> · <strong>清屏</strong>；菜单栏可直达 <strong>笔记 / Python / MATLAB / 白板 / 图谱</strong>。</p>
-          <ul>
-            <li>主界面菜单栏与内容页顶栏导航样式统一</li>
-            <li>雨滴默认跟随天气；控制中心 → 墙纸可改「跟随天气」</li>
-            <li>樱花仅在控制中心 → 墙纸，且 <strong>Kyoto</strong> 场景可用</li>
-            <li>控制中心 → 墙纸：圆角预览图点击切换场景</li>
-            <li>窗口三圆点：<strong>红</strong>关闭 · <strong>黄</strong>最小化 · <strong>绿</strong>展开</li>
-            <li>移动端：双指旋转 · 三指缩放组件窗口</li>
-          </ul>
-        </section>
-
-        <section>
-          <h3>笔记与工具</h3>
-          <ul>
-            <li><a href="/notes">笔记</a>：小组件 / 折叠树；文末显示 Git 最后更新时间</li>
-            <li>阅读笔记时点 <strong>工具按钮</strong>：浮窗打开 Python / MATLAB / 白板</li>
-            <li>顶栏 Logo 菜单：<a href="/python">Python</a> · <a href="/matlab">MATLAB</a> · <a href="/whiteboard">白板</a> · <a href="/graph">图谱</a></li>
-          </ul>
-        </section>
-
-        <section>
-          <h3>笔记自动同步</h3>
-          <p>Obsidian 笔记在子模块 <code>obsidian-vault</code> 中，通过两层机制与网站同步：</p>
-          <ol>
-            <li><strong>本机</strong>（可选）：计划任务每小时 <code>pnpm vault:auto</code></li>
-            <li><strong>GitHub Actions</strong>：每 10 分钟检查 vault 并重建站点</li>
-          </ol>
-          {#if syncInfo}
-            <dl class="sync-status">
-              <div><dt>已索引笔记</dt><dd>{syncInfo.noteCount} 篇</dd></div>
-              {#if syncInfo.latestNoteUpdate}
-                <div><dt>manifest 最新更新</dt><dd class="pixel-digits">{syncInfo.latestNoteUpdate}</dd></div>
-              {/if}
-              {#if syncInfo.vaultSyncCommit}
-                <div><dt>上次自动同步提交</dt><dd class="pixel-digits">{syncInfo.vaultSyncCommit}</dd></div>
-              {/if}
-            </dl>
-          {/if}
-          <p class="manual-note">本地改笔记后执行 <code>pnpm vault:sync</code> 或等待计划任务。</p>
-        </section>
+        {#each manual.sections as section}
+          <section>
+            <h3>{section.title}</h3>
+            {#each section.paragraphs ?? [] as p}
+              <p>{@html p}</p>
+            {/each}
+            {#if section.items}
+              <ul>
+                {#each section.items as item}
+                  <li>{@html item}</li>
+                {/each}
+              </ul>
+            {/if}
+            {#if section.ordered}
+              <ol>
+                {#each section.ordered as item}
+                  <li>{@html item}</li>
+                {/each}
+              </ol>
+            {/if}
+            {#if section === manual.sections[2] && syncInfo}
+              <dl class="sync-status">
+                <div><dt>{manual.syncLabels.noteCount}</dt><dd>{syncInfo.noteCount} {manual.syncLabels.noteUnit}</dd></div>
+                {#if syncInfo.latestNoteUpdate}
+                  <div><dt>{manual.syncLabels.latestUpdate}</dt><dd class="pixel-digits">{syncInfo.latestNoteUpdate}</dd></div>
+                {/if}
+                {#if syncInfo.vaultSyncCommit}
+                  <div><dt>{manual.syncLabels.lastSync}</dt><dd class="pixel-digits">{syncInfo.vaultSyncCommit}</dd></div>
+                {/if}
+              </dl>
+            {/if}
+            {#if section.note}
+              <p class="manual-note">{@html section.note}</p>
+            {/if}
+          </section>
+        {/each}
       </div>
 
       <footer class="manual-card-foot">
         {#if heroClosed && !isFirstDesktopManual}
-          <button type="button" class="pixel-button hero-btn ghost" onclick={reopenHero}>显示欢迎卡片</button>
+          <button type="button" class="pixel-button hero-btn ghost" onclick={reopenHero}>{manual.showWelcome}</button>
         {/if}
         {#if isFirstDesktopManual}
-          <button type="button" class="pixel-button hero-btn" onclick={closeManual}>开始使用</button>
+          <button type="button" class="pixel-button hero-btn" onclick={closeManual}>{manual.getStarted}</button>
         {:else}
-          <a class="pixel-button hero-btn" href="/notes">进入笔记</a>
+          <a class="pixel-button hero-btn" href="/notes">{m.hero.enterNotes}</a>
         {/if}
       </footer>
     </div>
@@ -202,9 +202,9 @@
     class="home-fab"
     class:is-active={showManual}
     onclick={toggleHome}
-    aria-label={showManual ? '关闭使用说明' : '打开使用说明'}
-    title={showManual ? '关闭使用说明' : '主页 / 使用说明'}
-  >主页</button>
+    aria-label={showManual ? manual.homeFabClose : manual.homeFabOpen}
+    title={showManual ? manual.homeFabClose : manual.homeFabOpen}
+  >{manual.homeFab}</button>
 {/if}
 
 <style>

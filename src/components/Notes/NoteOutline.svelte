@@ -2,6 +2,8 @@
   import type { MarkdownHeading } from 'astro';
   import { buildHeadingTree } from '../../lib/heading-tree';
   import TocNode from '../TocNode.svelte';
+  import { getMessages, initLocale } from '../../lib/i18n/locale.svelte';
+  import { onMount } from 'svelte';
 
   interface Props {
     headings: MarkdownHeading[];
@@ -80,16 +82,18 @@
       if (raf) cancelAnimationFrame(raf);
     };
   });
+  onMount(() => initLocale());
+  const m = $derived(getMessages());
 </script>
 
 {#if tree.length > 0}
   <div class="note-outline">
     <div class="note-outline-actions">
-      <button type="button" class="note-outline-btn" title="折叠到 H2" onclick={collapseToH2}>
-        折叠
+      <button type="button" class="note-outline-btn" title={m.notes.collapseToH2} onclick={collapseToH2}>
+        {m.notes.collapse}
       </button>
-      <button type="button" class="note-outline-btn" title="全部展开" onclick={expandAll}>
-        展开
+      <button type="button" class="note-outline-btn" title={m.notes.expandAll} onclick={expandAll}>
+        {m.notes.expand}
       </button>
     </div>
     <ul class="note-outline-root">

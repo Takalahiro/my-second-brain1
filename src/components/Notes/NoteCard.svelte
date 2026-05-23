@@ -1,6 +1,8 @@
 <script lang="ts">
   import PixelIcon from '../PixelIcon.svelte';
   import { DEFAULT_NOTE_ICON, type PixelIconName } from '../../lib/pixel-icons';
+  import { formatNoteCount } from '../../lib/i18n/format';
+  import { getMessages, localeState } from '../../lib/i18n/locale.svelte';
 
   interface Props {
     id: string;
@@ -21,10 +23,13 @@
     href,
     viewMode = 'grid',
   }: Props = $props();
+
+  const m = $derived(getMessages());
+  const countLabel = $derived(count !== undefined ? formatNoteCount(localeState.current, count) : null);
 </script>
 
 <article class="pixel-card glass-container note-card" class:is-list={viewMode === 'list'}>
-  <a href={href} class="note-card-link" aria-label={`打开笔记 ${title}`}>
+  <a href={href} class="note-card-link" aria-label={`${m.notes.openNote} ${title}`}>
     <div class="note-icon-wrap">
       <PixelIcon name={icon} size={viewMode === 'list' ? 18 : 22} />
     </div>
@@ -32,7 +37,7 @@
       <h3 class="note-title">{title}</h3>
       <div class="note-meta">
         {#if count !== undefined}
-          <span class="pixel-badge note-count">{count} 篇</span>
+          <span class="pixel-badge note-count">{countLabel}</span>
         {/if}
         {#if lastUpdated}
           <span class="note-updated pixel-digits">{lastUpdated}</span>

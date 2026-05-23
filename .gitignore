@@ -43,3 +43,6 @@ __pycache__/
 # 本地 Ghostscript（compress-public-assets 可选）
 tools/ghostscript/
 
+# 3D Gaussian PLY 壁纸（单文件 ~63MiB，不入库；部署时放到 public/ply/）
+public/ply/*.ply
+

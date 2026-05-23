@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { getMessages, initLocale } from '../lib/i18n/locale.svelte';
 
   const KEY = 'second-brain:font-family';
   const OPTIONS = ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'] as const;
@@ -14,25 +15,28 @@
   }
 
   onMount(() => {
+    initLocale();
     const current = document.documentElement.getAttribute('data-font');
     const saved = localStorage.getItem(KEY);
     const next = ([saved, current].find((v) => OPTIONS.includes(v as FontKey)) ?? 'wenkai') as FontKey;
     apply(next);
   });
+
+  const m = $derived(getMessages());
 </script>
 
-<label class="font-switcher" aria-label="字体切换">
+<label class="font-switcher" aria-label={m.font.label}>
   <span class="font-switcher-icon" aria-hidden="true">Aa</span>
   <select
     class="font-switcher-select"
     bind:value={font}
     onchange={(e) => apply((e.currentTarget as HTMLSelectElement).value as FontKey)}
   >
-    <option value="wenkai">温楷</option>
-    <option value="inter">Inter</option>
-    <option value="serif">思源宋体</option>
-    <option value="plex">Plex Sans</option>
-    <option value="jp-pixel">日式像素</option>
+    <option value="wenkai">{m.font.wenkai}</option>
+    <option value="inter">{m.font.inter}</option>
+    <option value="serif">{m.font.serif}</option>
+    <option value="plex">{m.font.plex}</option>
+    <option value="jp-pixel">{m.font.jpPixel}</option>
   </select>
 </label>
 

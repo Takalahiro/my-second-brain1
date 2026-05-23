@@ -36,6 +36,11 @@ const {
       if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {
         document.documentElement.setAttribute('data-font', font);
       }
+      const loc = localStorage.getItem('second-brain:locale');
+      if (loc === 'en') {
+        document.documentElement.lang = 'en';
+        document.documentElement.dataset.locale = 'en';
+      }
     </script>
     {introSplash && (
       <script is:inline>

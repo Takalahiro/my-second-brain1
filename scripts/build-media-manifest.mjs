@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 扫 public/video、picture/scenes、picture/mobile、music，
+ * 扫 public/video、picture/scenes、picture/mobile、music、ply，
  * 输出 src/data/media-manifest.json 给背景切换和音乐播放器。
  *
  * 文件名可能有空格 / 中文 — 这里只存原始名，encodeURIComponent 交给前端。
@@ -16,6 +16,8 @@ const OUT = join(ROOT, 'src', 'data', 'media-manifest.json');
 const VIDEO_EXT = new Set(['.mp4', '.webm', '.mov']);
 const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
 const AUDIO_EXT = new Set(['.mp3', '.ogg', '.flac', '.wav', '.m4a']);
+const PLY_EXT = new Set(['.ply']);
+const SOG_EXT = new Set(['.sog']);
 
 function listDir(dir, allow) {
   if (!existsSync(dir)) return [];
@@ -48,6 +50,8 @@ const videoFiles = listDir(join(PUBLIC, 'video'), VIDEO_EXT);
 const sceneFiles = listDir(join(PUBLIC, 'picture', 'scenes'), IMAGE_EXT);
 const mobileFiles = listDir(join(PUBLIC, 'picture', 'mobile'), IMAGE_EXT);
 const musicFiles = listDir(join(PUBLIC, 'music'), AUDIO_EXT);
+const plyFiles = listDir(join(PUBLIC, 'ply'), PLY_EXT);
+const sogFiles = listDir(join(PUBLIC, 'ply'), SOG_EXT);
 
 function findVideo(scene, rain = false) {
   const target = rain ? `${scene} rain` : scene;
@@ -66,6 +70,24 @@ function findScene(scene) {
   return hit ? publicUrl(`picture/scenes/${hit}`) : null;
 }
 
+function findSog(scene) {
+  const hit = sogFiles.find((f) => {
+    const stem = basename(f, extname(f)).toLowerCase();
+    return stem === scene.toLowerCase();
+  });
+  return hit ? publicUrl(`ply/${hit}`) : null;
+}
+
+function findPly(scene) {
+  const sog = findSog(scene);
+  if (sog) return sog;
+  const hit = plyFiles.find((f) => {
+    const stem = basename(f, extname(f)).toLowerCase();
+    return stem === scene.toLowerCase();
+  });
+  return hit ? publicUrl(`ply/${hit}`) : null;
+}
+
 const scenes = SCENES.map((id) => ({
   id,
   label: titleize(id),
@@ -73,6 +95,10 @@ const scenes = SCENES.map((id) => ({
   video: findVideo(id, false),
   videoRain: RAIN_SCENES.includes(id) ? findVideo(id, true) : null,
   hasRain: RAIN_SCENES.includes(id),
+  ply: findPly(id),
+  hasPly: !!findPly(id),
+  sog: findSog(id),
+  hasSog: !!findSog(id),
 }));
 
 const mobile = mobileFiles.map((name, idx) => ({

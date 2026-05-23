@@ -27,14 +27,20 @@ export default defineConfig({
   integrations: [mdx(), svelte()],
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+    },
     optimizeDeps: {
-      include: ['@tensorflow/tfjs', 'mathjs', 'fraction.js'],
+      include: ['@tensorflow/tfjs', 'mathjs', 'fraction.js', 'three', '@mkkellogg/gaussian-splats-3d', 'katex'],
       exclude: ['@huggingface/transformers'],
     },
     worker: {
       format: 'es',
     },
     build: {
+      modulePreload: false,
       rollupOptions: {
         output: {
           manualChunks(id) {
@@ -43,9 +49,31 @@ export default defineConfig({
             if (id.includes('pyodide') || id.includes('sympy')) return 'pyodide';
             if (id.includes('node_modules/@tensorflow/tfjs')) return 'tfjs';
             if (id.includes('/tfjs-client')) return 'tfjs';
-            if (id.includes('node_modules/three')) return 'three';
+            // 共享媒体清单 / 壁纸模式 — 独立 chunk，打断 WidgetHost ↔ BackgroundLayer 循环依赖
+            if (id.includes('wallpaper-mode.ts') || id.includes('src/lib/media')) return 'widget-core';
+            // 壁纸点云：Three + 解析/着色器打同一包，避免跨 chunk 404
+            if (
+              id.includes('BackgroundPlyLayer') ||
+              id.includes('gs3-wallpaper') ||
+              id.includes('gaussian-splats-3d') ||
+              id.includes('node_modules/three')
+            ) {
+              return 'wallpaper-three';
+            }
+            // Svelte 运行时单独分包，避免 widget 加载时连带 TF.js + Three（digits 页）
+            if (id.includes('node_modules/svelte') || id.includes('node_modules/esm-env')) return 'svelte';
             if (id.includes('DigitRecognizer')) return 'digits';
             if (id.includes('cytoscape') || id.includes('GraphWidget')) return 'graph-viz';
+            if (
+              id.includes('/matrix/') ||
+              id.includes('/calculus/CalculusLab') ||
+              id.includes('/discrete/DiscreteLab') ||
+              id.includes('/statistics/StatisticsLab') ||
+              id.includes('MatlabCalculator')
+            ) {
+              return 'matlab-labs';
+            }
+            if (id.includes('node_modules/katex')) return 'katex';
           },
         },
       },

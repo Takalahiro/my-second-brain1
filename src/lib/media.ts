@@ -10,6 +10,10 @@ export interface SceneEntry {
   video: string | null;
   videoRain: string | null;
   hasRain: boolean;
+  ply: string | null;
+  hasPly: boolean;
+  sog: string | null;
+  hasSog: boolean;
 }
 
 export interface MobileSceneEntry {

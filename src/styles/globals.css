@@ -4,7 +4,7 @@
 @import './global.css';
 @import './pixel.css';
 @import './site-nav.css';
-@import './step-viz.css';
+@import './gs-wallpaper.css';
 
 :root {
   /* 浅色 · 简约中性 */
@@ -243,15 +243,50 @@ body {
   color: var(--widget-fg) !important;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-heading-current);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+:root:not(.dark) .mac-settings :is(
+  .mac-list,
+  .mac-spotlight-list,
+  .mac-category-grid,
+  .mac-wall-grid
+) {
+  color: var(--chrome-text);
+}
+
+:root:not(.dark) .mac-settings :is(
+  .mac-footnote,
+  .mac-pane-hint,
+  .mac-empty,
+  .mac-row-sub,
+  .mac-spotlight-row-sub,
+  .mac-group-label
+) {
+  color: var(--chrome-text-muted) !important;
+}
+
+:root:not(.dark) .mac-settings :is(
+  .mac-list,
+  .mac-spotlight-list
+) {
+  background: var(--chrome-subtle);
+  border-color: var(--chrome-border);
+}
+
+:root:not(.dark) .drawer-mask {
+  background: rgb(0 0 0 / 0.22);
+}
+
+
+html[data-locale='en'] {
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html[data-locale='en']:not([data-font='jp-pixel']) body {
+  font-variant-ligatures: common-ligatures;
+  text-rendering: optimizeLegibility;
+}
+html[data-locale='en'] .prose {
+  line-height: 1.75;
 }
 
 html[data-font='wenkai'] {

@@ -2,10 +2,11 @@
   import { onMount } from 'svelte';
   import ThemeToggle from '../ThemeToggle.svelte';
   import FontSwitcher from '../FontSwitcher.svelte';
+  import LocaleToggle from '../LocaleToggle.svelte';
   import MenuBarRainGlass from './MenuBarRainGlass.svelte';
   import SiteLogo from '../SiteLogo.svelte';
   import PixelIcon from '../PixelIcon.svelte';
-  import { SITE_NAV_LINKS } from '../../lib/site-nav';
+  import { getSiteNavLinks, getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
 
   interface Props {
     controlCenterOpen?: boolean;
@@ -40,7 +41,7 @@
   let coarsePointer = $state(false);
 
   const menuTime = $derived(
-    now.toLocaleString('zh-CN', {
+    now.toLocaleString(localeState.current === 'en' ? 'en-US' : 'zh-CN', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -49,6 +50,8 @@
       hour12: false,
     })
   );
+  const navLinks = $derived(getSiteNavLinks());
+  const m = $derived(getMessages());
 
   function closeMenu() {
     menuOpen = false;
@@ -66,6 +69,7 @@
   }
 
   onMount(() => {
+    initLocale();
     coarsePointer = window.matchMedia('(pointer: coarse)').matches;
 
     const id = window.setInterval(() => {
@@ -90,12 +94,12 @@
   <button
     type="button"
     class="mac-menu-backdrop"
-    aria-label="关闭菜单"
+    aria-label={m.menu.closeMenu}
     onclick={closeMenu}
   ></button>
 {/if}
 
-<header class="mac-menu-bar" class:has-rain-glass={rainDrops} aria-label="系统菜单栏">
+<header class="mac-menu-bar" class:has-rain-glass={rainDrops} aria-label={m.menu.systemMenu}>
   <MenuBarRainGlass active={rainDrops} />
   <div class="mac-menu-left">
     <div class="mac-menu-apple">
@@ -104,8 +108,8 @@
         class="mac-menu-item mac-menu-logo mac-menu-touch"
         aria-haspopup="menu"
         aria-expanded={menuOpen}
-        aria-label="系统菜单"
-        title="系统菜单"
+        aria-label={m.menu.systemMenu}
+        title={m.menu.systemMenu}
         onpointerdown={toggleMenu}
       >
         <SiteLogo size={22} />
@@ -114,11 +118,11 @@
         <ul class="mac-menu-dropdown" role="menu">
           <li role="none">
             <button type="button" role="menuitem" onclick={() => runMenuAction(onToggleManual)}>
-              使用说明
+              {m.menu.manual}
             </button>
           </li>
           <li class="mac-menu-sep" role="separator"></li>
-          {#each SITE_NAV_LINKS as item (item.href)}
+          {#each navLinks as item (item.href)}
             <li role="none">
               <a href={item.href} role="menuitem" title={item.title} onclick={closeMenu}>{item.label}</a>
             </li>
@@ -131,27 +135,27 @@
               disabled={isCleared}
               onclick={() => { if (!isCleared) runMenuAction(onClearAll); }}
             >
-              清屏（保留壁纸）
+              {m.menu.clearScreen}
             </button>
           </li>
           {#if hasSnapshot}
             <li role="none">
               <button type="button" role="menuitem" onclick={() => runMenuAction(onRestore)}>
-                恢复组件布局
+                {m.menu.restoreLayout}
               </button>
             </li>
           {/if}
           <li class="mac-menu-sep" role="separator"></li>
           <li role="none">
             <button type="button" role="menuitem" onclick={() => runMenuAction(onOpenSpotlight)}>
-              搜索组件 {#if coarsePointer}<PixelIcon name="search" size={14} />{:else}⌘K{/if}
+              {m.menu.searchWidgets} {#if coarsePointer}<PixelIcon name="search" size={14} />{:else}⌘K{/if}
             </button>
           </li>
           {#if coarsePointer}
             <li class="mac-menu-sep" role="separator"></li>
             <li role="none">
               <button type="button" role="menuitem" onclick={() => runMenuAction(onToggleControlCenter)}>
-                控制中心
+                {m.menu.controlCenter}
               </button>
             </li>
           {/if}
@@ -159,8 +163,8 @@
       {/if}
     </div>
     <span class="mac-menu-item mac-menu-app-name">My Second Brain</span>
-    <nav class="mac-menu-nav" aria-label="站点导航">
-      {#each SITE_NAV_LINKS as item (item.href)}
+    <nav class="mac-menu-nav" aria-label={m.nav.siteNav}>
+      {#each navLinks as item (item.href)}
         <a href={item.href} class="mac-menu-nav-link" title={item.title}>{item.label}</a>
       {/each}
     </nav>
@@ -168,6 +172,7 @@
 
   <div class="mac-menu-right">
     <div class="mac-menu-util">
+      <LocaleToggle />
       <FontSwitcher />
       <ThemeToggle />
     </div>
@@ -175,8 +180,8 @@
       <button
         type="button"
         class="mac-menu-item mac-menu-icon-btn mac-menu-touch mac-menu-clear is-restore"
-        aria-label="恢复清屏前的组件布局"
-        title="恢复刚才的组件"
+        aria-label={m.menu.restoreBtn}
+        title={m.menu.restoreBtn}
         onclick={() => onRestore?.()}
       >
         ↩
@@ -186,8 +191,8 @@
         type="button"
         class="mac-menu-item mac-menu-icon-btn mac-menu-touch mac-menu-clear"
         class:is-disabled={isCleared}
-        aria-label="一键清屏，只保留背景"
-        title={isCleared ? '当前已只剩背景' : '一键清屏，只保留背景'}
+        aria-label={m.menu.clearScreenBtn}
+        title={isCleared ? m.menu.clearScreenDisabled : m.menu.clearScreenBtn}
         disabled={isCleared}
         onclick={() => { if (!isCleared) onClearAll?.(); }}
       >
@@ -197,8 +202,8 @@
     <button
       type="button"
       class="mac-menu-item mac-menu-icon-btn mac-menu-touch mac-menu-icon-compact"
-      aria-label={globalMuted ? '取消静音' : '静音'}
-      title={globalMuted ? '取消静音' : '静音'}
+      aria-label={globalMuted ? m.menu.unmute : m.menu.mute}
+      title={globalMuted ? m.menu.unmute : m.menu.mute}
       onclick={() => onToggleMute?.()}
     >
       {globalMuted ? '🔇' : '🔊'}
@@ -207,8 +212,8 @@
       type="button"
       class="mac-menu-item mac-menu-icon-btn mac-menu-touch mac-menu-gear"
       class:is-active={controlCenterOpen}
-      aria-label={controlCenterOpen ? '关闭控制中心' : '打开控制中心'}
-      title="控制中心"
+      aria-label={controlCenterOpen ? m.menu.closeControlCenter : m.menu.openControlCenter}
+      title={m.menu.controlCenter}
       aria-pressed={controlCenterOpen}
       onclick={() => onToggleControlCenter?.()}
     >

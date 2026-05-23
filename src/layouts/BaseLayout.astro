@@ -2,7 +2,7 @@
 import '../styles/globals.css';
 import ThemeToggle from '../components/ThemeToggle.svelte';
 import FontSwitcher from '../components/FontSwitcher.svelte';
-import SiteNavBar from '../components/SiteNavBar.astro';
+import SiteNavBar from '../components/SiteNavBar.svelte';
 import Mermaid from '../components/Mermaid.svelte';
 import MobileViewModeToggle from '../components/MobileViewModeToggle.svelte';
 import NotesToolHost from '../components/widgets/NotesToolHost.svelte';
@@ -51,10 +51,16 @@ const {
       if (notesMode === 'widgets' || notesMode === 'recursive') {
         document.documentElement.setAttribute('data-notes-mode', notesMode);
       }
+
+      const loc = localStorage.getItem('second-brain:locale');
+      if (loc === 'en') {
+        document.documentElement.lang = 'en';
+        document.documentElement.dataset.locale = 'en';
+      }
     </script>
   </head>
   <body class="min-h-screen transition-colors site-body">
-    <SiteNavBar variant="site" currentPath={Astro.url.pathname} />
+    <SiteNavBar client:load variant="site" currentPath={Astro.url.pathname} />
     <main class="site-main max-w-5xl mx-auto px-4 py-8">
       <slot />
     </main>

@@ -1,5 +1,8 @@
 ---
 import NoteOutlineHost from './NoteOutlineHost.svelte';
+import NoteDetailToolbar from './NoteDetailToolbar.svelte';
+import NoteUpdatedFooter from './NoteUpdatedFooter.svelte';
+import I18nText from '../I18nText.svelte';
 import PixelIcon from '../PixelIcon.astro';
 import type { MarkdownHeading } from 'astro';
 
@@ -12,7 +15,7 @@ interface Props {
   tags?: string[];
   headings?: MarkdownHeading[];
   backlinks?: BacklinkItem[];
-  lastUpdatedText?: string | null;
+  lastUpdatedFormatted?: string | null;
 }
 
 const {
@@ -20,22 +23,13 @@ const {
   tags = [],
   headings = [],
   backlinks = [],
-  lastUpdatedText = null,
+  lastUpdatedFormatted = null,
 } = Astro.props;
 
 const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
 ---
 
-<section class="detail-toolbar pixel-card glass-container">
-  <div class="detail-left">
-    <a href="/notes" class="pixel-button">← 返回</a>
-    <h1 class="detail-title">{title}</h1>
-  </div>
-  <div class="detail-actions">
-    <button type="button" class="pixel-button detail-action-btn" title="收藏"><PixelIcon name="star" size={16} /></button>
-    <button type="button" class="pixel-button detail-action-btn" title="复制链接"><PixelIcon name="link" size={16} /></button>
-  </div>
-</section>
+<NoteDetailToolbar {title} client:load />
 
 {tags.length > 0 && (
   <div class="detail-tags">
@@ -48,8 +42,8 @@ const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
 <div class="detail-grid">
   <article class="glass-container detail-article prose dark:prose-invert max-w-none">
     <slot />
-    {lastUpdatedText && (
-      <p class="not-prose detail-updated pixel-digits">{lastUpdatedText}</p>
+    {lastUpdatedFormatted && (
+      <NoteUpdatedFooter formatted={lastUpdatedFormatted} client:load />
     )}
   </article>
 
@@ -57,7 +51,7 @@ const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
     {tocHeadings.length > 0 && (
       <section class="glass-container detail-panel detail-panel-outline">
         <div class="detail-panel-head">
-          <h3 class="detail-panel-title"><PixelIcon name="list" size={16} /> 大纲</h3>
+          <h3 class="detail-panel-title"><PixelIcon name="list" size={16} /> <I18nText k="notes.outline" client:load /></h3>
         </div>
         <div class="detail-outline-scroll">
           <NoteOutlineHost headings={tocHeadings} variant="sidebar" client:load />
@@ -67,7 +61,7 @@ const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
 
     {backlinks.length > 0 && (
       <section class="glass-container detail-panel detail-panel-backlinks">
-        <h3 class="detail-panel-title"><PixelIcon name="link" size={16} /> 反向链接</h3>
+        <h3 class="detail-panel-title"><PixelIcon name="link" size={16} /> <I18nText k="notes.backlinks" client:load /></h3>
         <div class="detail-backlinks-scroll">
           <div class="detail-backlinks">
             {backlinks.map((link) => (

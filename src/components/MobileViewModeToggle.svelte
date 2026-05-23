@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { getMessages, initLocale } from '../lib/i18n/locale.svelte';
 
   const KEY = 'second-brain:mobile-view-mode';
   const READ_CLASS = 'mobile-reading';
@@ -21,6 +22,7 @@
   }
 
   onMount(() => {
+    initLocale();
     const mql = window.matchMedia(MQ);
     isMobile = mql.matches;
 
@@ -43,6 +45,8 @@
       mql.removeListener(onChange);
     };
   });
+
+  const m = $derived(getMessages());
 </script>
 
 {#if ready && isMobile}
@@ -50,10 +54,10 @@
     type="button"
     class="pixel-button mobile-mode-toggle"
     onclick={toggleMode}
-    aria-label="切换移动端阅读模式"
-    title={reading ? '当前：阅读模式' : '当前：紧凑模式'}
+    aria-label={m.mobile.toggle}
+    title={reading ? m.mobile.readingTitle : m.mobile.compactTitle}
   >
-    {reading ? '阅读' : '紧凑'}
+    {reading ? m.mobile.reading : m.mobile.compact}
   </button>
 {/if}
 

@@ -10,15 +10,9 @@ export function getNextSyncAt(lastSyncedAt: string, intervalMinutes: number): Da
   return new Date(next);
 }
 
-/** 笔记页小字：下次同步时间（本地时区） */
+import { formatNextSyncLabel as formatNextSyncLabelForLocale } from './i18n/format';
+
+/** @deprecated Use formatNextSyncLabel from i18n/format.ts with locale */
 export function formatNextSyncLabel(lastSyncedAt: string, intervalMinutes: number): string {
-  const next = getNextSyncAt(lastSyncedAt, intervalMinutes);
-  const text = next.toLocaleString('zh-CN', {
-    month: 'numeric',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-  return `下次同步：${text}`;
+  return formatNextSyncLabelForLocale('zh', lastSyncedAt, intervalMinutes);
 }

@@ -1,10 +1,11 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
+  import { untrack, onMount } from 'svelte';
   import type { MarkdownHeading } from 'astro';
   import { lockBodyScroll, unlockBodyScroll } from '../../lib/body-scroll-lock';
   import { clampFabPosition, loadFabPosition, saveFabPosition } from '../../lib/draggable-fab';
   import PixelIcon from '../PixelIcon.svelte';
   import NoteOutline from './NoteOutline.svelte';
+  import { getMessages, initLocale } from '../../lib/i18n/locale.svelte';
 
   interface Props {
     headings: MarkdownHeading[];
@@ -138,6 +139,9 @@
       if (drawerOpen) unlockBodyScroll();
     };
   });
+
+  onMount(() => initLocale());
+  const m = $derived(getMessages());
 </script>
 
 {#if headings.length > 0}
@@ -154,29 +158,29 @@
       class:is-dragging={fabDragging}
       style:left={fabReady ? `${fabLeft}px` : undefined}
       style:top={fabReady ? `${fabTop}px` : undefined}
-      aria-label="打开文章大纲"
+      aria-label={m.notes.outlineOpen}
       aria-expanded={drawerOpen}
-      title="拖动移动 · 点击打开大纲"
+      title={m.notes.outlineDrag}
       onpointerdown={onFabPointerDown}
       onpointermove={onFabPointerMove}
       onpointerup={onFabPointerUp}
       onpointercancel={onFabPointerUp}
       onclick={toggleDrawer}
     >
-      <PixelIcon name="list" size={16} /> 大纲
+      <PixelIcon name="list" size={16} /> {m.notes.outline}
     </button>
 
     {#if drawerOpen}
       <button
         type="button"
         class="outline-backdrop"
-        aria-label="关闭大纲"
+        aria-label={m.notes.outlineClose}
         onclick={closeDrawer}
       ></button>
-      <aside class="outline-drawer pixel-card glass-container" aria-label="文章大纲">
+      <aside class="outline-drawer pixel-card glass-container" aria-label={m.notes.outlineArticle}>
         <header class="outline-drawer-head">
-          <h3 class="outline-drawer-title"><PixelIcon name="list" size={16} /> 大纲</h3>
-          <button type="button" class="outline-close pixel-button" onclick={closeDrawer} aria-label="关闭">
+          <h3 class="outline-drawer-title"><PixelIcon name="list" size={16} /> {m.notes.outline}</h3>
+          <button type="button" class="outline-close pixel-button" onclick={closeDrawer} aria-label={m.notes.outlineClose}>
             ✕
           </button>
         </header>

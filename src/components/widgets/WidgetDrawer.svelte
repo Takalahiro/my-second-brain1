@@ -14,23 +14,21 @@
     type PixelIconName,
     type WidgetIconKey,
   } from '../../lib/pixel-icons';
+  import { modeFromBg, type WallpaperMode } from '../../lib/wallpaper-mode';
+  import { getDrawerCatalog, type DrawerWidget } from '../../lib/i18n/drawer-catalog';
+  import { getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
 
   type WidgetKey = WidgetIconKey;
   type PaneId = 'home' | 'widgets' | 'wallpaper' | 'desktop';
 
-  interface Widget {
-    id: WidgetKey;
-    name: string;
-    desc: string;
-    pinned?: boolean;
-    keywords?: string[];
-  }
+  type Widget = DrawerWidget;
 
   interface Props {
     enabled: Record<WidgetKey, boolean>;
     bg: {
       sceneId: string;
       useVideo: boolean;
+      usePly: boolean;
       rain: boolean;
       rainDrops: boolean;
       rainDropsLinked?: boolean;
@@ -38,13 +36,14 @@
       brightness: number;
       speed: number;
     };
-    scenes: Array<{ id: string; label: string; hasRain?: boolean; poster?: string | null; hasSakura?: boolean }>;
+    scenes: Array<{ id: string; label: string; hasRain?: boolean; hasPly?: boolean; poster?: string | null; hasSakura?: boolean }>;
     hasSnapshot?: boolean;
     isCleared?: boolean;
     open?: boolean;
     spotlightToken?: number;
     onToggle: (key: WidgetKey, drop?: { x: number; y: number }) => void;
     onPatchBg: (p: Partial<Props['bg']>) => void;
+    onSetWallpaperMode?: (mode: WallpaperMode) => void;
     onClearAll?: () => void;
     onRestore?: () => void;
   }
@@ -58,6 +57,7 @@
     spotlightToken = 0,
     onToggle,
     onPatchBg,
+    onSetWallpaperMode,
     onClearAll,
     onRestore,
   }: Props = $props();
@@ -88,45 +88,24 @@
   };
   let suppressTileClick = false;
 
-  const categories: Array<{ id: Exclude<PaneId, 'home'>; name: string; icon: PixelIconName; desc: string }> = [
-    { id: 'widgets', name: '组件', icon: DRAWER_CATEGORY_ICONS.widgets, desc: '添加与管理桌面小组件' },
-    { id: 'wallpaper', name: '墙纸', icon: DRAWER_CATEGORY_ICONS.wallpaper, desc: '场景、视频与氛围' },
-    { id: 'desktop', name: '桌面', icon: DRAWER_CATEGORY_ICONS.desktop, desc: '清屏与布局恢复' },
-  ];
-
-  const widgetGroups: Array<{ title: string; ids: WidgetKey[] }> = [
-    { title: '桌面', ids: ['background', 'clock'] },
-    { title: '媒体与氛围', ids: ['music', 'whitenoise'] },
-    { title: '效率', ids: ['todo', 'calendar', 'pomodoro', 'notes'] },
-    { title: '信息', ids: ['weather', 'world', 'stats', 'network'] },
-    { title: '可视化', ids: ['graph', 'territory'] },
-    { title: '工具', ids: ['calculator', 'python', 'whiteboard'] },
-  ];
-
-  const items: Widget[] = [
-    { id: 'background', name: '背景', desc: '响应式视频/图片背景', pinned: true, keywords: ['壁纸', '墙纸', '视频'] },
-    { id: 'clock', name: '时钟', desc: '视频背景时锁定右下角', pinned: true, keywords: ['时间'] },
-    { id: 'music', name: '音乐播放器', desc: '可拖拽缩放', keywords: ['音频', '播放'] },
-    { id: 'notes', name: '笔记', desc: '内嵌渲染笔记正文', keywords: ['阅读'] },
-    { id: 'todo', name: '待办清单', desc: '勾选完成 / 划掉取消', keywords: ['任务'] },
-    { id: 'calendar', name: '日历', desc: 'iCal URL 同步事件', keywords: ['日程'] },
-    { id: 'pomodoro', name: '番茄钟', desc: '专注 / 小憩 / 长休', keywords: ['专注'] },
-    { id: 'weather', name: '天气', desc: 'Open-Meteo · 5 天预报', keywords: ['气温'] },
-    { id: 'world', name: '世界时钟', desc: '地图切城市/天气', keywords: ['时区'] },
-    { id: 'stats', name: '学习统计', desc: '笔记 / 字数统计', keywords: ['数据'] },
-    { id: 'network', name: '网络流量', desc: '会话下载 · 实时速率', keywords: ['带宽', '流量', '网络'] },
-    { id: 'graph', name: '关系图谱', desc: '力导向双链网络', keywords: ['双链', '图谱'] },
-    { id: 'territory', name: '文件夹地图', desc: '缩放切块 · 双链弧线', keywords: ['地图'] },
-    { id: 'calculator', name: 'MATLAB 计算器', desc: '表达式 / 绘图', keywords: ['matlab', '计算'] },
-    { id: 'python', name: 'Python', desc: 'Pyodide 在线运行', keywords: ['代码'] },
-    { id: 'whiteboard', name: '白板', desc: 'Excalidraw 手绘', keywords: ['画板'] },
-    { id: 'whitenoise', name: '白噪音', desc: '多轨混音 · 可调混响', keywords: ['雨声', '环境音'] },
-  ];
+  const catalog = $derived(getDrawerCatalog(localeState.current));
+  const m = $derived(getMessages());
+  const categories = $derived(catalog.categories);
+  const widgetGroups = $derived(catalog.widgetGroups);
+  const items = $derived(catalog.items);
 
   const itemMap = $derived(Object.fromEntries(items.map((w) => [w.id, w])) as Record<WidgetKey, Widget>);
   const activeScene = $derived(scenes.find((s) => s.id === bg.sceneId));
   const rainAvailable = $derived(!!activeScene?.hasRain);
+  const plyAvailable = $derived(!!activeScene?.hasPly);
   const sakuraAvailable = $derived(!!activeScene?.hasSakura);
+  const wallpaperMode = $derived(modeFromBg(bg));
+
+  function pickWallpaperMode(mode: WallpaperMode) {
+    if (mode === 'ply' && !plyAvailable) return;
+    if (onSetWallpaperMode) onSetWallpaperMode(mode);
+    else onPatchBg(mode === 'ply' ? { usePly: true, useVideo: false } : mode === 'video' ? { usePly: false, useVideo: true } : { usePly: false, useVideo: false });
+  }
 
   const normalizedQuery = $derived(searchQuery.trim().toLowerCase());
   const spotlightActive = $derived(pane === 'home' && (searchFocused || normalizedQuery.length > 0));
@@ -148,7 +127,7 @@
   });
 
   const paneTitle = $derived(
-    pane === 'home' ? '控制中心' : categories.find((c) => c.id === pane)?.name ?? '设置'
+    pane === 'home' ? m.drawer.controlCenter : categories.find((c) => c.id === pane)?.name ?? m.drawer.settings
   );
 
   function resetDrag() {
@@ -225,6 +204,7 @@
   }
 
   onMount(() => {
+    initLocale();
     slotWidget = loadSlotWidget();
   });
 
@@ -355,7 +335,7 @@
     type="button"
     class="drawer-mask"
     class:is-spotlight={spotlightActive}
-    aria-label="点击关闭控制中心"
+    aria-label={m.drawer.close}
     onclick={() => (spotlightActive ? exitSpotlight() : closeDrawer())}
   ></button>
 {/if}
@@ -366,39 +346,39 @@
   class:is-spotlight={spotlightActive}
   class:is-minimized={panelMinimized}
   class:is-expanded={panelExpanded}
-  aria-label="控制中心"
+  aria-label={m.drawer.controlCenter}
   aria-hidden={!open}
   onkeydown={onDrawerKeydown}
 >
   <div class="mac-window-chrome">
-    <div class="mac-traffic" role="toolbar" aria-label="窗口控制">
-      <button type="button" class="dot red" aria-label="关闭" title="关闭" onclick={onTrafficRed}></button>
+    <div class="mac-traffic" role="toolbar" aria-label={m.drawer.windowControls}>
+      <button type="button" class="dot red" aria-label={m.drawer.closeBtn} title={m.drawer.closeBtn} onclick={onTrafficRed}></button>
       <button
         type="button"
         class="dot yellow"
-        aria-label={panelMinimized ? '还原' : '最小化'}
-        title={panelMinimized ? '还原' : '最小化'}
+        aria-label={panelMinimized ? m.drawer.restore : m.drawer.minimize}
+        title={panelMinimized ? m.drawer.restore : m.drawer.minimize}
         onclick={onTrafficYellow}
       ></button>
       <button
         type="button"
         class="dot green"
-        aria-label={panelExpanded ? '标准大小' : '展开'}
-        title={panelExpanded ? '标准大小' : '展开'}
+        aria-label={panelExpanded ? m.drawer.standardSize : m.drawer.expand}
+        title={panelExpanded ? m.drawer.standardSize : m.drawer.expand}
         onclick={onTrafficGreen}
       ></button>
     </div>
     <div class="mac-titlebar">
       {#if pane !== 'home'}
-        <button type="button" class="mac-back" onclick={goBack} aria-label="返回">
+        <button type="button" class="mac-back" onclick={goBack} aria-label={m.drawer.back}>
           <span class="mac-back-chevron" aria-hidden="true">‹</span>
-          <span>控制中心</span>
+          <span>{m.drawer.home}</span>
         </button>
       {:else}
         <span class="mac-title-spacer" aria-hidden="true"></span>
       {/if}
       <span class="mac-title mac-title-center">{paneTitle}</span>
-      <button type="button" class="mac-close" aria-label="关闭" onclick={closeDrawer}>×</button>
+      <button type="button" class="mac-close" aria-label={m.drawer.closeBtn} onclick={closeDrawer}>×</button>
     </div>
   </div>
 
@@ -412,16 +392,16 @@
               bind:this={searchInput}
               type="search"
               class="mac-search"
-              placeholder="搜索设置与组件  ⌘K"
+              placeholder={m.drawer.searchPlaceholder}
               bind:value={searchQuery}
-              aria-label="搜索设置与组件"
+              aria-label={m.drawer.searchAria}
               onfocus={() => (searchFocused = true)}
               onblur={() => {
                 if (!searchQuery.trim()) searchFocused = false;
               }}
             />
             {#if searchQuery}
-              <button type="button" class="mac-search-clear" aria-label="清除搜索" onclick={() => (searchQuery = '')}>×</button>
+              <button type="button" class="mac-search-clear" aria-label={m.drawer.clearSearch} onclick={() => (searchQuery = '')}>×</button>
             {/if}
           </div>
         </div>
@@ -430,7 +410,7 @@
           <div class="mac-spotlight-panel">
             {#if normalizedQuery}
               {#if searchResults.length === 0}
-                <p class="mac-spotlight-empty">未找到「{searchQuery}」</p>
+                <p class="mac-spotlight-empty">{m.drawer.noResults}「{searchQuery}」</p>
               {:else}
                 <ul class="mac-spotlight-list">
                   {#each searchResults as w, i (w.id)}
@@ -458,7 +438,7 @@
                               suppressTileClick = true;
                               onToggle(w.id);
                             }}
-                            aria-label={`${w.name} 开关`}
+                            aria-label={`${w.name} ${m.drawer.toggleSwitch}`}
                           />
                           <span></span>
                         </label>
@@ -468,9 +448,9 @@
                 </ul>
               {/if}
             {:else}
-              <p class="mac-spotlight-hint">输入关键词搜索组件、设置项…</p>
+              <p class="mac-spotlight-hint">{m.drawer.searchHint}</p>
               <ul class="mac-spotlight-suggest">
-                {#each ['天气', '待办', '音乐', '图谱', '墙纸'] as hint}
+                {#each catalog.searchHints as hint}
                   <li>
                     <button type="button" class="mac-spotlight-chip" onclick={() => (searchQuery = hint)}>
                       {hint}
@@ -507,7 +487,7 @@
             </div>
 
             <section class="mac-group mac-group-compact">
-              <h3 class="mac-group-label">快捷操作</h3>
+              <h3 class="mac-group-label">{m.drawer.quickActions}</h3>
               <ul class="mac-list">
                 <li>
                   <button
@@ -518,15 +498,15 @@
                     onclick={() => { if (!isCleared) onClearAll?.(); }}
                   >
                     <span class="mac-row-icon"><PixelIcon name="clear" size={18} /></span>
-                    <span class="mac-row-title">一键清屏</span>
-                    <span class="mac-row-value">{isCleared ? '已清屏' : '保留背景'}</span>
+                    <span class="mac-row-title">{m.drawer.clearScreen}</span>
+                    <span class="mac-row-value">{isCleared ? m.drawer.cleared : m.drawer.keepWallpaper}</span>
                   </button>
                 </li>
                 {#if hasSnapshot}
                   <li>
                     <button type="button" class="mac-action-row is-accent" onclick={() => onRestore?.()}>
                       <span class="mac-row-icon">↩</span>
-                      <span class="mac-row-title">恢复组件布局</span>
+                      <span class="mac-row-title">{m.drawer.restoreLayout}</span>
                       <span class="mac-row-chevron" aria-hidden="true">›</span>
                     </button>
                   </li>
@@ -538,7 +518,7 @@
       </div>
     {:else if pane === 'widgets'}
       <div class="mac-pane mac-pane-detail">
-        <p class="mac-pane-hint">点击行或开关启用；桌面端可拖到主界面放置。</p>
+        <p class="mac-pane-hint">{m.drawer.paneHint}</p>
         {#each filteredGroups as group (group.title)}
           <section class="mac-group">
             <h3 class="mac-group-label">{group.title}</h3>
@@ -558,7 +538,7 @@
                       (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
                       resetDrag();
                     }}
-                    title={w.pinned ? '点击切换' : '点击切换；桌面端可拖到主界面'}
+                    title={w.pinned ? m.drawer.tapToggle : m.drawer.tapToggleDrag}
                   >
                     <span class="mac-row-icon"><PixelIcon name={WIDGET_ICON_MAP[w.id]} size={18} /></span>
                     <div class="mac-row-text">
@@ -574,7 +554,7 @@
                           suppressTileClick = true;
                           onToggle(w.id);
                         }}
-                        aria-label={`${w.name} 开关`}
+                        aria-label={`${w.name} ${m.drawer.toggleSwitch}`}
                       />
                       <span></span>
                     </label>
@@ -588,7 +568,7 @@
     {:else if pane === 'wallpaper'}
       <div class="mac-pane mac-pane-detail">
         <section class="mac-group">
-          <h3 class="mac-group-label">场景</h3>
+          <h3 class="mac-group-label">{m.drawer.scenes}</h3>
           <div class="mac-wall-grid">
             {#each scenes as s (s.id)}
               <button
@@ -610,13 +590,13 @@
         </section>
 
         <section class="mac-group">
-          <h3 class="mac-group-label">氛围</h3>
+          <h3 class="mac-group-label">{m.drawer.ambience}</h3>
           <ul class="mac-list">
             <li>
               <label class="mac-setting-row mac-setting-toggle">
                 <div class="mac-row-text">
-                  <span class="mac-row-title">跟随天气</span>
-                  <span class="mac-row-sub">实况有雨时自动开启雨滴</span>
+                  <span class="mac-row-title">{m.drawer.followWeather}</span>
+                  <span class="mac-row-sub">{m.drawer.followWeatherSub}</span>
                 </div>
                 <span class="mac-toggle mac-toggle-inline">
                   <input
@@ -631,8 +611,8 @@
             <li>
               <label class="mac-setting-row mac-setting-toggle" class:is-disabled={bg.rainDropsLinked !== false}>
                 <div class="mac-row-text">
-                  <span class="mac-row-title">雨滴飘落</span>
-                  <span class="mac-row-sub">{bg.rainDropsLinked !== false ? '已联动，关闭「跟随天气」后可手动' : '拟真雨丝与玻璃水痕'}</span>
+                  <span class="mac-row-title">{m.drawer.rainDrops}</span>
+                  <span class="mac-row-sub">{bg.rainDropsLinked !== false ? m.drawer.rainLinked : m.drawer.rainManual}</span>
                 </div>
                 <span class="mac-toggle mac-toggle-inline">
                   <input
@@ -648,8 +628,8 @@
             <li>
               <label class="mac-setting-row mac-setting-toggle" class:is-disabled={!sakuraAvailable}>
                 <div class="mac-row-text">
-                  <span class="mac-row-title">樱花飘落</span>
-                  <span class="mac-row-sub">仅 Kyoto 场景</span>
+                  <span class="mac-row-title">{m.drawer.sakura}</span>
+                  <span class="mac-row-sub">{m.drawer.sakuraSub}</span>
                 </div>
                 <span class="mac-toggle mac-toggle-inline">
                   <input
@@ -664,37 +644,57 @@
             </li>
           </ul>
           {#if !sakuraAvailable}
-            <p class="mac-footnote">切换到 Kyoto 墙纸后可开启樱花</p>
+            <p class="mac-footnote">{m.drawer.sakuraFoot}</p>
           {/if}
         </section>
 
         <section class="mac-group">
-          <h3 class="mac-group-label">播放</h3>
+          <h3 class="mac-group-label">{m.drawer.playback}</h3>
+          <div class="mac-segment" role="group" aria-label={m.drawer.playback}>
+            <button
+              type="button"
+              class="mac-segment-btn"
+              class:is-active={wallpaperMode === 'video'}
+              onclick={() => pickWallpaperMode('video')}
+            >
+              {m.drawer.modeVideo}
+            </button>
+            <button
+              type="button"
+              class="mac-segment-btn"
+              class:is-active={wallpaperMode === 'poster'}
+              onclick={() => pickWallpaperMode('poster')}
+            >
+              {m.drawer.modePoster}
+            </button>
+            <button
+              type="button"
+              class="mac-segment-btn"
+              class:is-active={wallpaperMode === 'ply'}
+              class:is-disabled={!plyAvailable}
+              disabled={!plyAvailable}
+              onclick={() => pickWallpaperMode('ply')}
+            >
+              {m.drawer.modePly}
+            </button>
+          </div>
+          {#if !plyAvailable}
+            <p class="mac-footnote">{m.drawer.plyMissing}</p>
+          {:else if wallpaperMode === 'ply'}
+            <p class="mac-footnote">{m.drawer.plyHint}</p>
+          {/if}
           <ul class="mac-list">
             <li>
-              <label class="mac-setting-row mac-setting-toggle">
-                <span class="mac-row-title">使用视频</span>
-                <span class="mac-toggle mac-toggle-inline">
-                  <input
-                    type="checkbox"
-                    checked={bg.useVideo}
-                    onchange={(e) => onPatchBg({ useVideo: (e.currentTarget as HTMLInputElement).checked })}
-                  />
-                  <span></span>
-                </span>
-              </label>
-            </li>
-            <li>
-              <label class="mac-setting-row mac-setting-toggle" class:is-disabled={!rainAvailable}>
+              <label class="mac-setting-row mac-setting-toggle" class:is-disabled={!rainAvailable || wallpaperMode !== 'video'}>
                 <div class="mac-row-text">
-                  <span class="mac-row-title">雨天视频</span>
-                  <span class="mac-row-sub">切换为雨天版背景视频</span>
+                  <span class="mac-row-title">{m.drawer.rainVideo}</span>
+                  <span class="mac-row-sub">{m.drawer.rainVideoSub}</span>
                 </div>
                 <span class="mac-toggle mac-toggle-inline">
                   <input
                     type="checkbox"
                     checked={bg.rain}
-                    disabled={!rainAvailable}
+                    disabled={!rainAvailable || wallpaperMode !== 'video'}
                     onchange={(e) => onPatchBg({ rain: (e.currentTarget as HTMLInputElement).checked })}
                   />
                   <span></span>
@@ -703,16 +703,16 @@
             </li>
           </ul>
           {#if !rainAvailable}
-            <p class="mac-footnote">当前场景不支持雨天视频</p>
+            <p class="mac-footnote">{m.drawer.noRainVideo}</p>
           {/if}
         </section>
 
         <section class="mac-group">
-          <h3 class="mac-group-label">显示</h3>
+          <h3 class="mac-group-label">{m.drawer.display}</h3>
           <ul class="mac-list mac-list-sliders">
             <li class="mac-slider-row">
               <div class="mac-slider-head">
-                <span class="mac-row-title">亮度</span>
+                <span class="mac-row-title">{m.drawer.brightness}</span>
                 <span class="mac-row-value">{Math.round(bg.brightness * 100)}%</span>
               </div>
               <input
@@ -722,13 +722,13 @@
                 max="1.5"
                 step="0.05"
                 value={bg.brightness}
-                aria-label="背景亮度"
+                aria-label={m.drawer.brightnessAria}
                 oninput={(e) => onPatchBg({ brightness: Number((e.currentTarget as HTMLInputElement).value) })}
               />
             </li>
             <li class="mac-slider-row">
               <div class="mac-slider-head">
-                <span class="mac-row-title">播放速度</span>
+                <span class="mac-row-title">{m.drawer.speed}</span>
                 <span class="mac-row-value">{bg.speed.toFixed(2)}×</span>
               </div>
               <input
@@ -738,7 +738,7 @@
                 max="2"
                 step="0.05"
                 value={bg.speed}
-                aria-label="背景播放速度"
+                aria-label={m.drawer.speedAria}
                 oninput={(e) => onPatchBg({ speed: Number((e.currentTarget as HTMLInputElement).value) })}
               />
             </li>
@@ -748,7 +748,7 @@
     {:else if pane === 'desktop'}
       <div class="mac-pane mac-pane-detail">
         <section class="mac-group">
-          <h3 class="mac-group-label">布局</h3>
+          <h3 class="mac-group-label">{m.drawer.layout}</h3>
           <ul class="mac-list">
             <li>
               <button
@@ -760,8 +760,8 @@
               >
                 <span class="mac-row-icon"><PixelIcon name="clear" size={18} /></span>
                 <div class="mac-row-text">
-                  <span class="mac-row-title">一键清屏</span>
-                  <span class="mac-row-sub">关闭全部组件，仅保留背景</span>
+                  <span class="mac-row-title">{m.drawer.clearScreen}</span>
+                  <span class="mac-row-sub">{m.drawer.clearAllSub}</span>
                 </div>
               </button>
             </li>
@@ -770,8 +770,8 @@
                 <button type="button" class="mac-action-row is-accent" onclick={() => onRestore?.()}>
                   <span class="mac-row-icon">↩</span>
                   <div class="mac-row-text">
-                    <span class="mac-row-title">恢复上次布局</span>
-                    <span class="mac-row-sub">还原清屏前的组件状态</span>
+                    <span class="mac-row-title">{m.drawer.restoreLast}</span>
+                    <span class="mac-row-sub">{m.drawer.restoreLastSub}</span>
                   </div>
                   <span class="mac-row-chevron" aria-hidden="true">›</span>
                 </button>
@@ -781,11 +781,11 @@
         </section>
 
         <section class="mac-group">
-          <h3 class="mac-group-label">提示</h3>
+          <h3 class="mac-group-label">{m.drawer.tips}</h3>
           <ul class="mac-list mac-list-info">
-            <li class="mac-info-row">桌面端可将组件拖出面板，放到主界面任意位置。</li>
-            <li class="mac-info-row">视频背景开启时，时钟会固定在右下角。</li>
-            <li class="mac-info-row">音乐：Space 暂停 · ↑↓ 音量 · Shift+←/→ 切歌</li>
+            <li class="mac-info-row">{m.drawer.tipDrag}</li>
+            <li class="mac-info-row">{m.drawer.tipClock}</li>
+            <li class="mac-info-row">{m.drawer.tipMusic}</li>
           </ul>
         </section>
       </div>
@@ -954,6 +954,10 @@
     pointer-events: none;
     transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.24s ease;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', system-ui, sans-serif;
+    --wd-hover: var(--chrome-hover);
+    --wd-subtle: var(--chrome-subtle);
+    --wd-active: var(--chrome-active);
+    --wd-border: var(--chrome-border);
   }
   .mac-settings.is-open {
     transform: translateX(0) scale(1);
@@ -1052,7 +1056,7 @@
     font-size: 0.82rem;
     font-weight: 600;
     letter-spacing: 0.01em;
-    color: rgb(255 255 255 / 0.88);
+    color: var(--chrome-text);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1080,7 +1084,7 @@
     border-radius: 6px;
     justify-self: start;
   }
-  .mac-back:hover { background: rgb(255 255 255 / 0.06); }
+  .mac-back:hover { background: var(--wd-hover); }
   .mac-back-chevron { font-size: 1.15rem; line-height: 1; margin-top: -1px; }
   .mac-close {
     grid-column: 3;
@@ -1089,13 +1093,13 @@
     height: 26px;
     border: 0;
     border-radius: 6px;
-    background: rgb(255 255 255 / 0.06);
-    color: rgb(255 255 255 / 0.7);
+    background: var(--wd-subtle);
+    color: var(--chrome-text-muted);
     cursor: pointer;
     font-size: 1rem;
     line-height: 1;
   }
-  .mac-close:hover { background: rgb(255 255 255 / 0.12); color: #fff; }
+  .mac-close:hover { background: var(--wd-hover); color: var(--chrome-text); }
 
   .mac-body {
     flex: 1;
@@ -1179,7 +1183,7 @@
     margin: 18px 0 12px;
     text-align: center;
     font-size: 0.82rem;
-    color: rgb(255 255 255 / 0.45);
+    color: var(--chrome-text-muted);
   }
   .mac-spotlight-suggest {
     list-style: none;
@@ -1193,7 +1197,7 @@
   .mac-spotlight-chip {
     border: 1px solid rgb(255 255 255 / 0.14);
     background: rgb(255 255 255 / 0.07);
-    color: rgb(255 255 255 / 0.82);
+    color: var(--chrome-text);
     border-radius: 999px;
     padding: 6px 14px;
     font-size: 0.78rem;
@@ -1232,7 +1236,7 @@
     cursor: pointer;
     transition: background 0.12s ease;
   }
-  .mac-spotlight-row:hover { background: rgb(255 255 255 / 0.06); }
+  .mac-spotlight-row:hover { background: var(--wd-hover); }
   .mac-spotlight-row.is-on { background: rgb(180 140 255 / 0.1); }
   .mac-spotlight-row-icon {
     width: 28px;
@@ -1251,7 +1255,7 @@
   .mac-spotlight-row-title { font-size: 0.86rem; font-weight: 600; }
   .mac-spotlight-row-sub {
     font-size: 0.68rem;
-    color: rgb(255 255 255 / 0.45);
+    color: var(--chrome-text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1259,7 +1263,7 @@
   .mac-search-icon {
     position: absolute;
     left: 11px;
-    color: rgb(255 255 255 / 0.42);
+    color: var(--chrome-text-muted);
     font-size: 0.95rem;
     pointer-events: none;
   }
@@ -1275,7 +1279,7 @@
     outline: none;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
-  .mac-search::placeholder { color: rgb(255 255 255 / 0.38); }
+  .mac-search::placeholder { color: var(--chrome-text-muted); }
   .mac-search:focus {
     border-color: rgb(180 140 255 / 0.55);
     box-shadow: 0 0 0 3px rgb(180 140 255 / 0.18);
@@ -1288,7 +1292,7 @@
     border: 0;
     border-radius: 50%;
     background: rgb(255 255 255 / 0.12);
-    color: rgb(255 255 255 / 0.75);
+    color: var(--chrome-text-muted);
     cursor: pointer;
     font-size: 0.85rem;
     line-height: 1;
@@ -1336,7 +1340,7 @@
   }
   .mac-category-desc {
     font-size: 0.62rem;
-    color: rgb(255 255 255 / 0.48);
+    color: var(--chrome-text-muted);
     line-height: 1.25;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -1352,7 +1356,7 @@
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: rgb(255 255 255 / 0.45);
+    color: var(--chrome-text-muted);
   }
 
   .mac-list {
@@ -1388,7 +1392,7 @@
   }
   .mac-widget-row:hover,
   .mac-action-row:hover:not(.is-disabled),
-  .mac-setting-row:hover { background: rgb(255 255 255 / 0.06); }
+  .mac-setting-row:hover { background: var(--wd-hover); }
   .mac-widget-row.is-on { background: rgb(180 140 255 / 0.08); }
   .mac-widget-row.is-dragging { opacity: 0.45; cursor: grabbing; touch-action: none; }
   .mac-action-row.is-disabled { opacity: 0.5; cursor: not-allowed; }
@@ -1415,7 +1419,7 @@
   }
   .mac-row-sub {
     font-size: 0.68rem;
-    color: rgb(255 255 255 / 0.48);
+    color: var(--chrome-text-muted);
     line-height: 1.3;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1423,11 +1427,11 @@
   }
   .mac-row-value {
     font-size: 0.76rem;
-    color: rgb(255 255 255 / 0.45);
+    color: var(--chrome-text-muted);
     flex-shrink: 0;
   }
   .mac-row-chevron {
-    color: rgb(255 255 255 / 0.35);
+    color: var(--chrome-text-muted);
     font-size: 1.1rem;
     flex-shrink: 0;
   }
@@ -1439,11 +1443,42 @@
   .mac-setting-toggle { cursor: pointer; }
   .mac-setting-row.is-disabled { opacity: 0.45; }
 
+  .mac-segment {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background: var(--wd-subtle);
+    border: 1px solid var(--wd-border);
+  }
+  .mac-segment-btn {
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 6px;
+    font-size: 0.78rem;
+    color: var(--chrome-text-muted);
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease;
+  }
+  .mac-segment-btn.is-active {
+    background: var(--wd-active);
+    color: var(--chrome-text);
+    font-weight: 600;
+  }
+  .mac-segment-btn.is-disabled,
+  .mac-segment-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
   .mac-select {
     max-width: 52%;
-    background: rgb(0 0 0 / 0.25);
-    color: #f3ecff;
-    border: 1px solid rgb(255 255 255 / 0.12);
+    background: var(--chrome-subtle);
+    color: var(--chrome-text);
+    border: 1px solid var(--chrome-border);
     border-radius: 8px;
     padding: 5px 8px;
     font-size: 0.78rem;
@@ -1498,7 +1533,7 @@
   .mac-wall-label {
     font-size: 0.74rem;
     font-weight: 600;
-    color: rgb(255 255 255 / 0.88);
+    color: var(--chrome-text);
     padding: 0 2px 2px;
   }
 
@@ -1539,7 +1574,7 @@
     padding: 10px 12px;
     font-size: 0.74rem;
     line-height: 1.45;
-    color: rgb(255 255 255 / 0.55);
+    color: var(--chrome-text-muted);
     border-top: 1px solid rgb(255 255 255 / 0.07);
   }
   .mac-info-row:first-child { border-top: 0; }
@@ -1550,7 +1585,7 @@
     margin: 0;
     font-size: 0.72rem;
     line-height: 1.45;
-    color: rgb(255 255 255 / 0.48);
+    color: var(--chrome-text-muted);
     padding: 0 4px;
   }
 

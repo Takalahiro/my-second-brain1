@@ -1,10 +1,13 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { media, type SceneEntry, type MobileSceneEntry } from '../../lib/media';
+  import { modeFromBg } from '../../lib/wallpaper-mode';
+  import { getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
 
   interface Props {
     sceneId: string;
     useVideo: boolean;
+    usePly: boolean;
     rain: boolean;
     brightness: number;
     speed: number;
@@ -15,6 +18,7 @@
   let {
     sceneId,
     useVideo,
+    usePly,
     rain,
     brightness,
     speed,
@@ -23,11 +27,10 @@
   }: Props = $props();
 
   let isMobile = $state(false);
-  let lowPerf = $state(false);
-  // 首屏先出 poster，浏览器闲下来再加载视频，从工具页回来不会卡主线程
-  let videoReady = $state(false);
+  let lowCpu = $state(false);
+  let plyStatus = $state<'idle' | 'loading' | 'ready' | 'failed'>('idle');
+  let plyMessage = $state('');
 
-  /* ---- 双层 crossfade ---- */
   type Layer = {
     src: string | null;
     poster: string | null;
@@ -41,12 +44,17 @@
   let videoElA: HTMLVideoElement | null = null;
   let videoElB: HTMLVideoElement | null = null;
 
-  const scene = $derived(
-    media.scenes.find((s) => s.id === sceneId) ?? media.scenes[0],
-  );
+  const scene = $derived(media.scenes.find((s) => s.id === sceneId) ?? media.scenes[0]);
   const mobileScene = $derived<MobileSceneEntry | undefined>(
     media.mobile[mobileIndex % Math.max(media.mobile.length, 1)],
   );
+  const wallpaperMode = $derived(modeFromBg({ useVideo, usePly }));
+  const plyActive = $derived(wallpaperMode === 'ply' && !!scene?.ply);
+  const plyHint = $derived.by(() => {
+    if (wallpaperMode !== 'ply') return '';
+    if (!scene?.ply) return m.wallpaper.noPly;
+    return '';
+  });
 
   function chooseVideoSrc(s: SceneEntry | undefined): string | null {
     if (!s) return null;
@@ -54,56 +62,51 @@
     return s.video;
   }
 
-  // 当前期望的 src（根据屏幕断点/性能/开关综合判断）
   const targetSrc = $derived.by<string | null>(() => {
+    if (plyActive) return null;
     if (isMobile && mobileScene) return mobileScene.src;
-    if (!isMobile && useVideo && !lowPerf) return chooseVideoSrc(scene);
-    if (!isMobile && scene?.poster) return scene.poster;
+    if (!isMobile && wallpaperMode === 'video' && !lowCpu) return chooseVideoSrc(scene);
+    if (scene?.poster) return scene.poster;
     return null;
   });
   const targetKind = $derived.by<'video' | 'image' | 'empty'>(() => {
+    if (plyActive) return 'empty';
     if (isMobile && mobileScene) return 'image';
-    if (!isMobile && useVideo && !lowPerf && chooseVideoSrc(scene)) return 'video';
-    if (!isMobile && scene?.poster) return 'image';
+    if (!isMobile && wallpaperMode === 'video' && !lowCpu && chooseVideoSrc(scene)) return 'video';
+    if (scene?.poster) return 'image';
     return 'empty';
   });
   const targetPoster = $derived<string | null>(scene?.poster ?? null);
+  const m = $derived(getMessages());
 
-  /* 响应式断点 */
   onMount(() => {
+    initLocale();
     const mql = window.matchMedia('(max-width: 768px)');
     isMobile = mql.matches;
+    lowCpu = (navigator.hardwareConcurrency ?? 8) <= 4;
     const onChange = (e: MediaQueryListEvent) => (isMobile = e.matches);
-    if (mql.addEventListener) mql.addEventListener('change', onChange);
-    else if ('addListener' in mql) (mql as any).addListener(onChange);
-
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const lowCpu = (navigator.hardwareConcurrency ?? 8) <= 4;
-    lowPerf = reduced || lowCpu;
-
-    const enableVideo = () => {
-      videoReady = true;
-    };
-    if (lowPerf) {
-      videoReady = false;
-    } else if ('requestIdleCallback' in window) {
-      requestIdleCallback(enableVideo, { timeout: 1800 });
-    } else {
-      setTimeout(enableVideo, 400);
-    }
+    mql.addEventListener('change', onChange);
 
     document.addEventListener('touchstart', onDocTouchStart, { passive: true });
     document.addEventListener('touchend', onDocTouchEnd, { passive: true });
 
+    const onVis = () => {
+      [videoElA, videoElB].forEach((el) => {
+        if (!el) return;
+        if (document.hidden) el.pause();
+        else void el.play().catch(() => {});
+      });
+    };
+    document.addEventListener('visibilitychange', onVis);
+
     return () => {
-      if (mql.removeEventListener) mql.removeEventListener('change', onChange);
-      else if ('removeListener' in mql) (mql as any).removeListener(onChange);
+      mql.removeEventListener('change', onChange);
       document.removeEventListener('touchstart', onDocTouchStart);
       document.removeEventListener('touchend', onDocTouchEnd);
+      document.removeEventListener('visibilitychange', onVis);
     };
   });
 
-  /* 当 target 变化时，把新内容载入到非 active 的层，等 canplay/load 之后再切换 */
   let lastTargetSrc: string | null | undefined = undefined;
   let lastTargetKind: 'video' | 'image' | 'empty' | undefined = undefined;
   $effect(() => {
@@ -115,7 +118,6 @@
     void swapInto(src, kind, targetPoster);
   });
 
-  /* 视频速度跟随 */
   $effect(() => {
     [videoElA, videoElB].forEach((el) => {
       if (!el) return;
@@ -125,35 +127,17 @@
     });
   });
 
-  /* 标签页隐藏时暂停视频 */
-  onMount(() => {
-    const onVis = () => {
-      [videoElA, videoElB].forEach((el) => {
-        if (!el) return;
-        if (document.hidden) el.pause();
-        else void el.play().catch(() => {});
-      });
-    };
-    document.addEventListener('visibilitychange', onVis);
-    return () => document.removeEventListener('visibilitychange', onVis);
-  });
-
   async function swapInto(
     src: string | null,
     kind: 'video' | 'image' | 'empty',
     poster: string | null,
   ) {
     if (!src) {
-      // 全清空
-      if (activeKey === 'a') {
-        layerB = { src: null, poster: null, kind: 'empty', visible: false };
-      } else {
-        layerA = { src: null, poster: null, kind: 'empty', visible: false };
-      }
+      layerA = { ...layerA, visible: false };
+      layerB = { ...layerB, visible: false };
       return;
     }
 
-    // 第一次初始化：直接放在 active 层，避免黑屏
     const aEmpty = layerA.kind === 'empty';
     const bEmpty = layerB.kind === 'empty';
     if (aEmpty && bEmpty) {
@@ -162,33 +146,16 @@
       return;
     }
 
-    // 选择非 active 层装新内容
     const targetKey: 'a' | 'b' = activeKey === 'a' ? 'b' : 'a';
-    if (targetKey === 'a') {
-      layerA = { src, poster, kind, visible: false };
-    } else {
-      layerB = { src, poster, kind, visible: false };
-    }
+    if (targetKey === 'a') layerA = { src, poster, kind, visible: false };
+    else layerB = { src, poster, kind, visible: false };
 
     await tick();
 
-    // 等待新内容可见再切（视频等 canplay，图片等 load）
-    const el =
-      targetKey === 'a'
-        ? kind === 'video'
-          ? videoElA
-          : null
-        : kind === 'video'
-        ? videoElB
-        : null;
+    const el = targetKey === 'a' ? videoElA : videoElB;
+    if (kind === 'video' && el) await waitForVideoReady(el);
+    else if (kind === 'image') await waitForImage(src);
 
-    if (kind === 'video' && el) {
-      await waitForVideoReady(el);
-    } else if (kind === 'image') {
-      await waitForImage(src);
-    }
-
-    // 切换 active；新层渐入，旧层渐出
     if (targetKey === 'a') {
       layerA = { ...layerA, visible: true };
       layerB = { ...layerB, visible: false };
@@ -201,43 +168,29 @@
 
   function waitForVideoReady(el: HTMLVideoElement) {
     return new Promise<void>((resolve) => {
-      // readyState >= 3 (HAVE_FUTURE_DATA) 即可播放
-      if (el.readyState >= 3) {
-        resolve();
-        return;
-      }
-      const t = setTimeout(() => {
-        cleanup();
-        resolve();
-      }, 1500);
-      const onReady = () => {
-        cleanup();
-        resolve();
-      };
-      const cleanup = () => {
-        clearTimeout(t);
-        el.removeEventListener('canplay', onReady);
-        el.removeEventListener('loadeddata', onReady);
-      };
-      el.addEventListener('canplay', onReady, { once: true });
-      el.addEventListener('loadeddata', onReady, { once: true });
-    });
-  }
-  function waitForImage(src: string) {
-    return new Promise<void>((resolve) => {
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => resolve();
-      img.src = src;
-      const t = setTimeout(() => resolve(), 1500);
-      img.onload = () => {
+      if (el.readyState >= 3) return resolve();
+      const t = setTimeout(resolve, 1500);
+      const done = () => {
         clearTimeout(t);
         resolve();
       };
+      el.addEventListener('canplay', done, { once: true });
+      el.addEventListener('loadeddata', done, { once: true });
     });
   }
 
-  /* 手机端切换 */
+  function waitForImage(src: string) {
+    return new Promise<void>((resolve) => {
+      const img = new Image();
+      const t = setTimeout(resolve, 1500);
+      img.onload = img.onerror = () => {
+        clearTimeout(t);
+        resolve();
+      };
+      img.src = src;
+    });
+  }
+
   function nextMobile() {
     const len = media.mobile.length;
     if (len === 0) return;
@@ -257,15 +210,10 @@
   let swipeStartY = 0;
   let swipeTracking = false;
 
-  function isMobileViewport() {
-    return window.matchMedia('(max-width: 768px)').matches;
-  }
-
   function onDocTouchStart(e: TouchEvent) {
-    if (!isMobileViewport() || media.mobile.length <= 1) return;
+    if (!isMobile || media.mobile.length <= 1) return;
     if (e.touches.length !== 1) return;
-    const el = e.target as HTMLElement | null;
-    if (el?.closest(SWIPE_SKIP)) return;
+    if ((e.target as HTMLElement | null)?.closest(SWIPE_SKIP)) return;
     swipeStartX = e.touches[0].clientX;
     swipeStartY = e.touches[0].clientY;
     swipeTracking = true;
@@ -282,54 +230,106 @@
     if (dx < 0) nextMobile();
     else prevMobile();
   }
+
+  function onPlyStatus(status: 'loading' | 'ready' | 'failed', message?: string) {
+    plyStatus = status;
+    plyMessage = message ?? '';
+  }
+
+  $effect(() => {
+    if (!plyActive) return;
+    layerA = { src: null, poster: null, kind: 'empty', visible: false };
+    layerB = { src: null, poster: null, kind: 'empty', visible: false };
+    lastTargetSrc = undefined;
+    lastTargetKind = undefined;
+  });
+
+  $effect(() => {
+    if (typeof document === 'undefined') return;
+    document.body.classList.toggle('ply-wallpaper-active', plyActive);
+    return () => document.body.classList.remove('ply-wallpaper-active');
+  });
+
+  function plyLoadErrorMessage(err: unknown): string {
+    const msg = err instanceof Error ? err.message : String(err);
+    return msg.includes('fetch') || msg.includes('Importing a module')
+      ? m.notes.threeModuleError
+      : (localeState.current === 'en' ? `Splat module failed: ${msg}` : `点云模块加载失败：${msg}`);
+  }
 </script>
 
-<div class="bg-root" style="--bg-bright: {brightness}" aria-hidden="true">
-  <!-- 双层 crossfade：分开两个块，方便 bind:this -->
-  <div class="bg-cell {layerA.visible ? 'is-show' : ''}">
-    {#if layerA.kind === 'video' && layerA.src}
-      <video
-        bind:this={videoElA}
-        class="bg-media"
-        src={layerA.src}
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="auto"
-        poster={layerA.poster ?? ''}
-      ></video>
-    {:else if layerA.kind === 'image' && layerA.src}
-      <img class="bg-media" src={layerA.src} alt="" loading="eager" />
-    {/if}
-  </div>
-  <div class="bg-cell {layerB.visible ? 'is-show' : ''}">
-    {#if layerB.kind === 'video' && layerB.src}
-      <video
-        bind:this={videoElB}
-        class="bg-media"
-        src={layerB.src}
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="auto"
-        poster={layerB.poster ?? ''}
-      ></video>
-    {:else if layerB.kind === 'image' && layerB.src}
-      <img class="bg-media" src={layerB.src} alt="" loading="eager" />
-    {/if}
-  </div>
+<div
+  class="bg-root"
+  class:ply-active={plyActive}
+  style="--bg-bright: {brightness}"
+  aria-hidden="true"
+>
+  {#if !plyActive}
+    <div class="bg-cell {layerA.visible ? 'is-show' : ''}">
+      {#if layerA.kind === 'video' && layerA.src}
+        <video
+          bind:this={videoElA}
+          class="bg-media"
+          src={layerA.src}
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="auto"
+          poster={layerA.poster ?? ''}
+        ></video>
+      {:else if layerA.kind === 'image' && layerA.src}
+        <img class="bg-media" src={layerA.src} alt="" loading="eager" />
+      {/if}
+    </div>
+    <div class="bg-cell {layerB.visible ? 'is-show' : ''}">
+      {#if layerB.kind === 'video' && layerB.src}
+        <video
+          bind:this={videoElB}
+          class="bg-media"
+          src={layerB.src}
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="auto"
+          poster={layerB.poster ?? ''}
+        ></video>
+      {:else if layerB.kind === 'image' && layerB.src}
+        <img class="bg-media" src={layerB.src} alt="" loading="eager" />
+      {/if}
+    </div>
+  {/if}
 
-  {#if layerA.kind === 'empty' && layerB.kind === 'empty'}
+  {#if plyActive && scene?.ply}
+    {#key scene.ply}
+      {#await import('./BackgroundPlyLayer.svelte')}
+        <!-- loading banner handled below -->
+      {:then { default: PlyLayer }}
+        <PlyLayer plyUrl={scene.ply} poster={scene.poster} {brightness} {speed} onStatus={onPlyStatus} />
+      {:catch err}
+        <div class="bg-ply-banner is-error">{plyLoadErrorMessage(err)}</div>
+      {/await}
+    {/key}
+  {/if}
+
+  {#if plyActive && plyStatus === 'loading'}
+    <div class="bg-ply-banner">{m.wallpaper.loading}</div>
+  {:else if plyActive && plyStatus === 'failed'}
+    <div class="bg-ply-banner is-error">{plyMessage || m.wallpaper.loadFailed}</div>
+  {:else if plyHint}
+    <div class="bg-ply-banner is-warn">{plyHint}</div>
+  {/if}
+
+  {#if !plyActive && layerA.kind === 'empty' && layerB.kind === 'empty'}
     <div class="bg-fallback"></div>
   {/if}
 
-  <div class="bg-grad" aria-hidden="true"></div>
+  <div class="bg-grad"></div>
 
   {#if isMobile && media.mobile.length > 1}
     <div class="bg-mobile-controls">
-      <button type="button" class="dot-prev" onclick={prevMobile} aria-label="上一张">‹</button>
+      <button type="button" class="dot-prev" onclick={prevMobile} aria-label={m.wallpaper.prevSlide}>‹</button>
       <ul class="dots">
         {#each media.mobile as m, i (m.id)}
           <li>
@@ -342,7 +342,7 @@
           </li>
         {/each}
       </ul>
-      <button type="button" class="dot-next" onclick={nextMobile} aria-label="下一张">›</button>
+      <button type="button" class="dot-next" onclick={nextMobile} aria-label={m.wallpaper.nextSlide}>›</button>
     </div>
   {/if}
 </div>
@@ -356,13 +356,15 @@
     pointer-events: none;
     background: var(--bg-primary);
   }
-  /* 两层叠在一起做 crossfade */
+  .bg-root.ply-active {
+    background: #05070d;
+  }
   .bg-cell {
     position: absolute;
     inset: 0;
+    z-index: 0;
     opacity: 0;
     transition: opacity 0.7s ease;
-    will-change: opacity;
   }
   .bg-cell.is-show {
     opacity: 1;
@@ -374,27 +376,50 @@
     height: 100%;
     object-fit: cover;
     filter: brightness(var(--bg-bright, 1));
-    /* 关键：不要做任何 scale 动画，避免切换时"突然缩放" */
-    transform: none !important;
   }
   .bg-fallback {
     position: absolute;
     inset: 0;
     background: linear-gradient(160deg, var(--bg-primary), var(--bg-secondary));
   }
+  .bg-ply-banner {
+    position: absolute;
+    left: 50%;
+    bottom: 18%;
+    transform: translateX(-50%);
+    z-index: 4;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    color: rgb(255 255 255 / 0.92);
+    background: rgb(0 0 0 / 0.5);
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
+  }
+  .bg-ply-banner.is-error { background: rgb(120 40 50 / 0.6); }
+  .bg-ply-banner.is-warn { background: rgb(110 80 20 / 0.6); }
   .bg-grad {
     position: absolute;
     inset: 0;
-    background:
-      linear-gradient(180deg, rgb(0 0 0 / 0.18), rgb(0 0 0 / 0) 30%, rgb(0 0 0 / 0) 70%, rgb(0 0 0 / 0.3));
+    z-index: 3;
     pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgb(0 0 0 / 0.2),
+      rgb(0 0 0 / 0) 35%,
+      rgb(0 0 0 / 0) 75%,
+      rgb(0 0 0 / 0.28)
+    );
   }
-  :global(.dark) .bg-grad {
-    background:
-      linear-gradient(180deg, rgb(0 0 0 / 0.35), rgb(0 0 0 / 0) 30%, rgb(0 0 0 / 0) 70%, rgb(0 0 0 / 0.5));
+  .bg-root.ply-active .bg-grad {
+    background: linear-gradient(
+      180deg,
+      rgb(0 0 0 / 0.15),
+      rgb(0 0 0 / 0) 40%,
+      rgb(0 0 0 / 0) 80%,
+      rgb(0 0 0 / 0.2)
+    );
   }
-
-  /* 手机端切换 */
   .bg-mobile-controls {
     position: absolute;
     left: 0;
@@ -405,18 +430,16 @@
     justify-content: center;
     gap: 8px;
     pointer-events: auto;
+    z-index: 4;
   }
   .dots {
     display: inline-flex;
-    align-items: center;
     gap: 6px;
     list-style: none;
     margin: 0;
     padding: 6px 10px;
     background: rgb(0 0 0 / 0.32);
     border-radius: 999px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
   }
   .dot {
     width: 8px;
@@ -426,7 +449,6 @@
     background: rgb(255 255 255 / 0.55);
     padding: 0;
     cursor: pointer;
-    transition: transform 0.2s ease, background 0.2s ease;
   }
   .dot.is-active {
     background: rgb(255 255 255 / 0.95);
@@ -442,8 +464,5 @@
     border-radius: 50%;
     cursor: pointer;
     font-size: 1.1rem;
-    line-height: 1;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
   }
 </style>

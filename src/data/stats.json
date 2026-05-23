@@ -1,12 +1,17 @@
 {
-  "generatedAt": "2026-05-23T03:39:01.629Z",
-  "totalNotes": 126,
-  "totalWords": 250102,
+  "generatedAt": "2026-05-23T09:48:03.314Z",
+  "totalNotes": 128,
+  "totalWords": 251766,
   "byFolder": [
     {
       "name": "计算机",
       "count": 111,
       "words": 189317
+    },
+    {
+      "name": "MATH",
+      "count": 6,
+      "words": 20768
     },
     {
       "name": "DATA1001",
@@ -17,11 +22,6 @@
       "name": "INFO1110",
       "count": 4,
       "words": 5248
-    },
-    {
-      "name": "MATH",
-      "count": 4,
-      "words": 19104
     },
     {
       "name": "INFO1111",
@@ -93,7 +93,7 @@
     {
       "month": "2026-05",
       "label": "5月",
-      "count": 126
+      "count": 128
     }
   ],
   "topTags": [],
@@ -432,7 +432,7 @@
     },
     {
       "date": "2026-05-23",
-      "count": 1
+      "count": 3
     }
   ]
 }

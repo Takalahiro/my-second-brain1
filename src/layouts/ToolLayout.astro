@@ -1,6 +1,6 @@
 ---
 import '../styles/globals.css';
-import SiteNavBar from '../components/SiteNavBar.astro';
+import SiteNavBar from '../components/SiteNavBar.svelte';
 
 interface Props {
   title?: string;
@@ -56,6 +56,11 @@ const {
       if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {
         document.documentElement.setAttribute('data-font', font);
       }
+      const loc = localStorage.getItem('second-brain:locale');
+      if (loc === 'en') {
+        document.documentElement.lang = 'en';
+        document.documentElement.dataset.locale = 'en';
+      }
     </script>
     <script is:inline>
       (function () {
@@ -83,7 +88,7 @@ const {
     </script>
   </head>
   <body class="min-h-screen transition-colors tool-body">
-    <SiteNavBar variant="tool" currentPath={Astro.url.pathname} />
+    <SiteNavBar client:load variant="tool" currentPath={Astro.url.pathname} />
     <main class:list={['tool-main', fullWidth && 'tool-main--full']}>
       <slot />
     </main>

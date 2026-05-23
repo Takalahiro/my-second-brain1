@@ -12,6 +12,7 @@
     computeLinkedRainDrops,
     readCachedWeatherCode,
   } from '../../lib/weather-rain';
+  import { patchFromMode, type WallpaperMode } from '../../lib/wallpaper-mode';
 
   interface Props {
     backgroundDefault?: boolean;
@@ -26,6 +27,7 @@
   type BgState = {
     sceneId: string;
     useVideo: boolean;
+    usePly: boolean;
     rain: boolean;
     rainDrops: boolean;
     // true 时雨滴跟着天气 / 雨天视频自动开
@@ -66,6 +68,7 @@
   let bg = $state<BgState>({
     sceneId: media.scenes[0]?.id ?? 'usyd',
     useVideo: true,
+    usePly: false,
     rain: false,
     rainDrops: false,
     rainDropsLinked: true,
@@ -112,6 +115,7 @@
           bg = {
             sceneId: typeof s.bg.sceneId === 'string' ? s.bg.sceneId : bg.sceneId,
             useVideo: s.bg.useVideo !== false,
+            usePly: !!s.bg.usePly,
             rain: !!s.bg.rain,
             rainDrops: !!s.bg.rainDrops,
             rainDropsLinked: s.bg.rainDropsLinked !== false,
@@ -360,6 +364,9 @@
   }
   function patchBg(p: Partial<BgState>) {
     const next = { ...bg, ...p };
+    if (p.usePly === true) next.useVideo = false;
+    if (p.useVideo === true) next.usePly = false;
+    if (next.usePly && next.useVideo) next.useVideo = false;
     if (p.sceneId && p.sceneId !== 'kyoto') next.sakura = false;
     if (p.rainDrops !== undefined && p.rainDropsLinked === undefined) {
       next.rainDropsLinked = false;
@@ -380,7 +387,14 @@
     bg = next;
     persist();
   }
-  function setMobileIndex(idx: number) { bg = { ...bg, mobileIndex: idx }; persist(); }
+  function setMobileIndex(idx: number) {
+    bg = { ...bg, mobileIndex: idx };
+    persist();
+  }
+
+  function setWallpaperMode(mode: WallpaperMode) {
+    patchBg(patchFromMode(mode));
+  }
 
   // 一键清屏：背景留着，其它全关，当前状态存快照
   function clearAll() {
@@ -438,9 +452,11 @@
     id: s.id,
     label: s.label,
     hasRain: s.hasRain,
+    hasPly: s.hasPly,
     poster: s.poster,
     hasSakura: s.id === 'kyoto',
   }));
+
 </script>
 
 {#if desktopMode}
@@ -474,15 +490,14 @@
         <LazyWidget
           show={true}
           loader={widgetLoaders.background}
-          props={{
-            sceneId: bg.sceneId,
-            useVideo: bg.useVideo,
-            rain: bg.rain,
-            brightness: bg.brightness,
-            speed: bg.speed,
-            mobileIndex: bg.mobileIndex,
-            onMobileIndexChange: setMobileIndex,
-          }}
+          sceneId={bg.sceneId}
+          useVideo={bg.useVideo}
+          usePly={bg.usePly}
+          rain={bg.rain}
+          brightness={bg.brightness}
+          speed={bg.speed}
+          mobileIndex={bg.mobileIndex}
+          onMobileIndexChange={setMobileIndex}
         />
         <LazyWidget
           show={true}
@@ -569,6 +584,7 @@
         {isCleared}
         onToggle={(key, drop) => toggleEnabled(key, drop)}
         onPatchBg={patchBg}
+        onSetWallpaperMode={setWallpaperMode}
         onClearAll={clearAll}
         onRestore={restoreAll}
       />
@@ -579,15 +595,14 @@
     <LazyWidget
       show={true}
       loader={widgetLoaders.background}
-      props={{
-        sceneId: bg.sceneId,
-        useVideo: bg.useVideo,
-        rain: bg.rain,
-        brightness: bg.brightness,
-        speed: bg.speed,
-        mobileIndex: bg.mobileIndex,
-        onMobileIndexChange: setMobileIndex,
-      }}
+      sceneId={bg.sceneId}
+      useVideo={bg.useVideo}
+      usePly={bg.usePly}
+      rain={bg.rain}
+      brightness={bg.brightness}
+      speed={bg.speed}
+      mobileIndex={bg.mobileIndex}
+      onMobileIndexChange={setMobileIndex}
     />
     <LazyWidget
       show={true}
@@ -683,6 +698,7 @@
       {isCleared}
       onToggle={(key, drop) => toggleEnabled(key, drop)}
       onPatchBg={patchBg}
+      onSetWallpaperMode={setWallpaperMode}
       onClearAll={clearAll}
       onRestore={restoreAll}
     />

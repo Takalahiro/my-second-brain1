@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-23T03:39:01.581Z",
+  "generatedAt": "2026-05-23T09:48:03.264Z",
   "scenes": [
     {
       "id": "usyd",
@@ -7,7 +7,11 @@
       "poster": "/picture/scenes/usyd.png",
       "video": "/video/usyd.mp4",
       "videoRain": "/video/usyd%20rain.mp4",
-      "hasRain": true
+      "hasRain": true,
+      "ply": "/ply/usyd.sog",
+      "hasPly": true,
+      "sog": "/ply/usyd.sog",
+      "hasSog": true
     },
     {
       "id": "kyoto",
@@ -15,7 +19,11 @@
       "poster": "/picture/scenes/kyoto.png",
       "video": "/video/kyoto.mp4",
       "videoRain": null,
-      "hasRain": false
+      "hasRain": false,
+      "ply": "/ply/kyoto.sog",
+      "hasPly": true,
+      "sog": "/ply/kyoto.sog",
+      "hasSog": true
     },
     {
       "id": "shanghai",
@@ -23,7 +31,11 @@
       "poster": "/picture/scenes/shanghai.png",
       "video": "/video/shanghai.mp4",
       "videoRain": "/video/shanghai%20rain.mp4",
-      "hasRain": true
+      "hasRain": true,
+      "ply": "/ply/shanghai.sog",
+      "hasPly": true,
+      "sog": "/ply/shanghai.sog",
+      "hasSog": true
     },
     {
       "id": "sydney",
@@ -31,7 +43,11 @@
       "poster": "/picture/scenes/sydney.png",
       "video": "/video/sydney.mp4",
       "videoRain": null,
-      "hasRain": false
+      "hasRain": false,
+      "ply": "/ply/sydney.sog",
+      "hasPly": true,
+      "sog": "/ply/sydney.sog",
+      "hasSog": true
     },
     {
       "id": "tokyo",
@@ -39,7 +55,11 @@
       "poster": "/picture/scenes/tokyo.png",
       "video": "/video/tokyo.mp4",
       "videoRain": "/video/tokyo%20rain.mp4",
-      "hasRain": true
+      "hasRain": true,
+      "ply": "/ply/tokyo.sog",
+      "hasPly": true,
+      "sog": "/ply/tokyo.sog",
+      "hasSog": true
     }
   ],
   "mobile": [

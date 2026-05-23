@@ -31,7 +31,7 @@ const backlinkItems = backlinks.map((b) => ({
     tags={note.data.tags ?? []}
     headings={headings}
     backlinks={backlinkItems}
-    lastUpdatedText={lastUpdated ? `最后更新 · ${formatLastUpdated(lastUpdated)}` : null}
+    lastUpdatedFormatted={lastUpdated ? formatLastUpdated(lastUpdated) : null}
   >
     <Content />
   </NoteDetailLayout>

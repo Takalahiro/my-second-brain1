@@ -45,6 +45,7 @@
 | 关系图谱 | Cytoscape.js、自研多视图布局 |
 | 矩阵 / 表达式 | `mathjs`、`fraction.js` |
 | 手写数字 CNN | TensorFlow.js、Three.js（3D 可视化） |
+| **3DGS 点云壁纸** | `@mkkellogg/gaussian-splats-3d`、Three.js；构建期 `media-manifest.json` |
 | 公式 OCR | `@huggingface/transformers`（FormulaNet）、Web Worker |
 | 符号求解 | Pyodide + SymPy（`formula-solver.py`） |
 | Python IDE | Pyodide + `sys.settrace` + Python `ast` |
@@ -127,6 +128,7 @@ my-second-brain/
 ├── obsidian-vault/        # git submodule — 笔记源
 ├── public/
 │   ├── models/mnist/      # TF.js 权重
+│   ├── ply/               # 3DGS 场景（*.sog 入库；*.ply ~63MiB 部署时放入，见 .gitignore）
 │   └── _headers           # Cloudflare 缓存
 ├── scripts/               # 构建与 vault 维护
 ├── src/
@@ -135,7 +137,7 @@ my-second-brain/
 │   ├── components/        # UI 组件
 │   ├── lib/               # 业务逻辑、ML、Markdown 插件
 │   └── data/              # 构建期生成的 JSON
-└── docs/                  # Vault 同步等文档
+└── docs/                  # Vault 同步、双链报告、技术报表等
 ```
 
 ---
@@ -221,6 +223,68 @@ FormulaNet 从 Hugging Face **运行时下载**（不入 git）；SymPy 经 Pyod
 
 构建期 `build-wikilinks.mjs` 扫描全部 `[[wikilink]]`，输出 `wikilinks.json`（节点 + 边）。`GraphExplorer` 提供力导向、径向、聚类等多种视图，数据纯前端渲染。
 
+### 7. 3D Gaussian Splatting 壁纸（桌面背景 · 点云模式）
+
+将 **3DGS 场景作为全站沉浸式背景**，而非独立 3D 查看器：与视频 / 静态海报并列，由 `WidgetHost` → `BackgroundLayer` 统一调度。
+
+```
+public/ply/{scene}.ply   # ~63 MiB，gitignore，部署时放入
+public/ply/{scene}.sog   # 压缩清单索引（~10 MiB）
+  → build-media-manifest.mjs → media-manifest.json
+  → BackgroundPlyLayer（lazy import）
+  → gs3-wallpaper.ts（@mkkellogg/gaussian-splats-3d Viewer 封装）
+  → CSS 后期：径向羽化 / 柔焦 / 缓入 / visionOS 毛玻璃联动
+```
+
+| 设计点 | 说明 |
+|--------|------|
+| 三模壁纸 | `video` / `poster` / `ply` 互斥切换，状态持久化到 `localStorage` |
+| 固定机位 | 无轨道环绕；全量 PLY 解析完成后才显示，避免渐进加载时的画面漂移 |
+| 视差 | 陀螺仪跟随（移动端）+ 极轻微鼠标视差（桌面），增益分离 |
+| 体积策略 | 大 PLY 不入库；manifest 指向 `.sog`，运行时按需映射 `.ply` |
+| 分包 | `wallpaper-three` chunk 按需加载 Three.js + gs3，不污染首屏 |
+
+相关源码：`src/lib/wallpaper/gs3-wallpaper.ts`、`spatial-camera.ts`、`src/styles/gs-wallpaper.css`。
+
+---
+
+## 致谢
+
+### 开源库与工具
+
+本项目站在众多优秀开源项目之上，特别感谢：
+
+| 项目 | 用途 | 链接 |
+|------|------|------|
+| [Astro](https://astro.build/) | 静态站点与 Islands 架构 | [License](https://github.com/withastro/astro/blob/main/LICENSE) |
+| [Svelte](https://svelte.dev/) | 桌面小组件与交互 UI | MIT |
+| [Three.js](https://threejs.org/) | 3D 渲染基础（图谱可视化、3DGS 壁纸） | MIT |
+| [@mkkellogg/gaussian-splats-3d](https://github.com/mkkellogg/GaussianSplats3D) | **3D Gaussian Splatting 椭球溅射渲染**（点云壁纸主渲染器） | MIT |
+| [antimatter15/splat](https://github.com/antimatter15/splat) | 早期 WebGL splat 方案探索（仓库内 `am15/` 参考实现） | 上游许可 |
+| [PlayCanvas splat-transform](https://github.com/playcanvas/splat-transform) | PLY → SOG 离线转换脚本 | 上游许可 |
+| [fflate](https://github.com/101arrowz/fflate) | SOG 压缩包解码（备用加载路径） | MIT |
+| [Cytoscape.js](https://js.cytoscape.org/) | 关系图谱 | MIT / LGPL |
+| [TensorFlow.js](https://www.tensorflow.org/js) | MNIST LeNet 浏览器推理 | Apache 2.0 |
+| [@huggingface/transformers](https://github.com/huggingface/transformers.js) | FormulaNet 公式 OCR | Apache 2.0 |
+| [Pyodide](https://pyodide.org/) | 浏览器内 Python / SymPy | MPL 2.0 |
+| [KaTeX](https://katex.org/) | 数学公式渲染 | MIT |
+| [Mermaid](https://mermaid.js.org/) | 图表渲染 | MIT |
+| [Lucide](https://lucide.dev/) | 图标 | ISC |
+| [Tailwind CSS](https://tailwindcss.com/) | 样式 | MIT |
+
+笔记内容来自 Obsidian 工作流；vault 为独立 git submodule。
+
+### 架构与设计灵感
+
+| 灵感来源 | 在本项目中的体现 |
+|----------|------------------|
+| **Apple Vision Pro 环境壁纸**（Mt. Hood / Yosemite 等） | 3DGS 固定沉浸机位、径向羽化、电影感柔焦与缓入 |
+| **visionOS 空间照片 / 液态玻璃** | 点云模式下 `body.ply-wallpaper-active` 联动全站毛玻璃材质 |
+| **Obsidian 双链知识库** | WikiLink、Callout、构建期双链图 |
+| **经典桌面 OS 小组件层** | `WidgetHost` 可拖拽、持久化、Rain / 樱花 / 白噪音等氛围层 |
+
+详细架构与设计说明见 **[docs/TECHNICAL_REPORT.md](docs/TECHNICAL_REPORT.md)**。
+
 ---
 
 ## 路由
@@ -268,6 +332,8 @@ Vault 同步详见 [docs/VAULT_SYNC.md](docs/VAULT_SYNC.md)。
 | 资产 | 来源 | 说明 |
 |------|------|------|
 | MNIST LeNet | `public/models/mnist/` | 入库，~879 KB |
+| 3DGS PLY | `public/ply/*.ply` | **不入库**（~63 MiB/场景），部署时上传 |
+| 3DGS SOG | `public/ply/*.sog` | 入库索引，~10 MiB/场景 |
 | FormulaNet | Hugging Face CDN | 运行时下载，~77 MiB |
 | SymPy | Pyodide CDN | 首次求解 ~10–20 MB |
 
@@ -315,10 +381,14 @@ Vault 同步详见 [docs/VAULT_SYNC.md](docs/VAULT_SYNC.md)。
 | 组件 | 许可 |
 |------|------|
 | 本站代码 | MIT（见 [LICENSE](./LICENSE)） |
+| [Three.js](https://threejs.org/) | MIT |
+| [@mkkellogg/gaussian-splats-3d](https://github.com/mkkellogg/GaussianSplats3D) | MIT |
 | [Lucide](https://lucide.dev/) 图标 | ISC |
 | FormulaNet / Transformers.js | 各自上游许可 |
 | Pyodide / SymPy | 各自上游许可 |
 | `obsidian-vault` 笔记内容 | 以 vault 仓库为准，可能与代码许可不同 |
+
+完整致谢见上文 [致谢](#致谢) 章节；架构与设计详见 [docs/TECHNICAL_REPORT.md](docs/TECHNICAL_REPORT.md)。
 
 ---
 

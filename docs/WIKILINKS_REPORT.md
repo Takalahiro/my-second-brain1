@@ -1,18 +1,18 @@
 # 双链 (Wikilinks) 检查报告
 
-> 生成时间：2026-05-23T03:39:01.731Z
+> 生成时间：2026-05-23T09:48:03.421Z
 
 ## 概览
 
 | 指标 | 数值 |
 |---|---|
-| 笔记总数 | 126 |
+| 笔记总数 | 128 |
 | 双链总数 | 188 |
 | ✓ 解析成功 | 92 |
 | ✗ 悬空链接 | 96 |
 | 带 alias 链接 | 2 |
 | 含 #heading 链接 | 7 |
-| 孤岛笔记 (无入也无出) | 74 |
+| 孤岛笔记 (无入也无出) | 76 |
 | 同名冲突链接 | 0 |
 
 ## 🔥 热点 Top 20（按总度数 入+出）
@@ -141,7 +141,7 @@
 | `计算机/_Overview 总览/Computer science foundation note.md` | `[[:space:]]` | `:space:` |
 | `计算机/_Overview 总览/Computer science foundation note.md` | `[[:alpha:]]` | `:alpha:` |
 
-## 🏝 孤岛笔记（74 条）
+## 🏝 孤岛笔记（76 条）
 
 这些笔记既没有出链也没有入链，建议补充关联：
 
@@ -149,7 +149,9 @@
 - `INFO1110/foundition/Codereview`
 - `INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）`
 - `MATH/Algebra 代数/Algebra 复习`
+- `MATH/Algebra 代数/题型条件反射`
 - `MATH/Calculus 微积分/Calculus复习`
+- `MATH/Calculus 微积分/题型条件反射`
 - `MATH/Discrete 离散数学/Discrete`
 - `MATH/Statistics 统计学/Statistics`
 - `_Inbox 入口/笔记`

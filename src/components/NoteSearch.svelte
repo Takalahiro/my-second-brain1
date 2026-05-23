@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import PixelIcon from './PixelIcon.svelte';
+  import { getMessages, initLocale } from '../lib/i18n/locale.svelte';
 
   type Note = { slug: string; title: string; description?: string; tags?: string[] };
 
@@ -69,8 +70,11 @@
     panelEl?.querySelector('.ns-item.is-active')?.scrollIntoView({ block: 'nearest' });
   }
 
+  const m = $derived(getMessages());
+
   // 全局 Ctrl/Cmd+K 唤起
   onMount(() => {
+    initLocale();
     const onGlobal = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
@@ -103,15 +107,15 @@
       bind:this={inputEl}
       type="text"
       class="ns-input"
-      placeholder="搜索笔记 / 标签…（⌘K）"
+      placeholder={m.search.placeholder}
       bind:value={query}
       onfocus={onFocus}
       onblur={onBlur}
       onkeydown={onKey}
-      aria-label="搜索"
+      aria-label={m.search.aria}
     />
     {#if query}
-      <button type="button" class="ns-clear" onclick={() => { query = ''; inputEl?.focus(); }} aria-label="清空">×</button>
+      <button type="button" class="ns-clear" onclick={() => { query = ''; inputEl?.focus(); }} aria-label={m.search.clear}>×</button>
     {/if}
     <kbd class="ns-kbd" aria-hidden="true">⌘K</kbd>
   </div>
@@ -119,9 +123,9 @@
   {#if open}
     <div class="ns-panel" bind:this={panelEl} role="listbox">
       {#if !loaded}
-        <div class="ns-empty">载入中…</div>
+        <div class="ns-empty">{m.search.loading}</div>
       {:else if results.length === 0}
-        <div class="ns-empty">没有匹配的笔记</div>
+        <div class="ns-empty">{m.search.empty}</div>
       {:else}
         <ul>
           {#each results as r, i (r.slug)}
@@ -147,7 +151,7 @@
             </li>
           {/each}
         </ul>
-        <footer class="ns-foot">{results.length} 条 · ↑↓ 选择 · Enter 打开 · Esc 关闭</footer>
+        <footer class="ns-foot">{m.search.footer.replace('{n}', String(results.length))}</footer>
       {/if}
     </div>
   {/if}

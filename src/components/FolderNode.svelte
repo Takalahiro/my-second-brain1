@@ -4,6 +4,8 @@
   import { countNotes } from '../lib/folder-tree';
   import PixelIcon from './PixelIcon.svelte';
   import { DEFAULT_NOTE_ICON, folderIconName } from '../lib/pixel-icons';
+  import { formatLocaleDate, formatTotalNotes } from '../lib/i18n/format';
+  import { getMessages, initLocale, localeState } from '../lib/i18n/locale.svelte';
   import Self from './FolderNode.svelte';
 
   interface Props {
@@ -70,18 +72,24 @@
       localStorage.setItem(storageKey, collapsed ? 'closed' : 'open');
     }
   }
+
+  const m = $derived(getMessages());
+  const isRoot = $derived(depth === 0 || node.path === '');
+  const totalLabel = $derived(formatTotalNotes(localeState.current, total));
+
+  onMount(() => initLocale());
 </script>
 
 <div class="folder-block depth-{depth}">
   {#if depth === 0}
     <h1 class="root-title">
-      {#if node.name === '根目录'}
-        <PixelIcon name="notes" size={22} /> 全部笔记
+      {#if isRoot}
+        <PixelIcon name="notes" size={22} /> {m.notes.allNotes}
       {:else}
         {node.name}
       {/if}
     </h1>
-    <p class="root-meta">共 {total} 篇</p>
+    <p class="root-meta">{totalLabel}</p>
   {:else}
     <button type="button" class="folder-row" onclick={toggle} aria-expanded={!collapsed}>
       <span class="folder-caret {collapsed ? 'collapsed' : ''}" aria-hidden="true">›</span>
@@ -101,9 +109,9 @@
                 <span class="note-icon"><PixelIcon name={DEFAULT_NOTE_ICON} size={14} /></span>
                 <span class="note-title">{n.title}</span>
                 {#if n.lastUpdated}
-                  <time class="note-date pixel-digits" title="最后更新">{n.lastUpdated}</time>
+                  <time class="note-date pixel-digits" title={m.notes.lastUpdated}>{n.lastUpdated}</time>
                 {:else if n.date}
-                  <time class="note-date pixel-digits">{n.date.toLocaleDateString('zh-CN')}</time>
+                  <time class="note-date pixel-digits">{formatLocaleDate(localeState.current, n.date)}</time>
                 {/if}
               </a>
             </li>
@@ -127,7 +135,7 @@
       {/if}
 
       {#if node.notes.length === 0 && node.children.length === 0}
-        <p class="empty-folder">（空文件夹）</p>
+        <p class="empty-folder">{m.notes.emptyFolder}</p>
       {/if}
     </div>
   {/if}

@@ -1,10 +1,12 @@
 <script lang="ts">
   import type { FolderNode as TreeNode } from '../../lib/folder-tree';
   import type { PixelIconName } from '../../lib/pixel-icons';
-  import { formatNextSyncLabel } from '../../lib/vault-sync';
+  import { formatNextSyncLabel } from '../../lib/i18n/format';
+  import { getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
   import FolderNode from '../FolderNode.svelte';
   import NoteGrid from './NoteGrid.svelte';
   import PixelIcon from '../PixelIcon.svelte';
+  import { onMount } from 'svelte';
 
   interface Note {
     id: string;
@@ -87,9 +89,17 @@
 
   const nextSyncLabel = $derived(
     syncMeta
-      ? formatNextSyncLabel(syncMeta.lastSyncedAt, syncMeta.syncIntervalMinutes)
+      ? formatNextSyncLabel(localeState.current, syncMeta.lastSyncedAt, syncMeta.syncIntervalMinutes)
       : null
   );
+
+  const m = $derived(getMessages());
+
+  onMount(() => initLocale());
+
+  $effect(() => {
+    if (typeof document !== 'undefined') document.title = m.notes.pageTitle;
+  });
 
   const filtered = $derived.by(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -126,7 +136,7 @@
   <div class="notes-toolbar-title">
     <span class="notes-toolbar-icon"><PixelIcon name="cup" size={18} /></span>
     <div class="notes-toolbar-heading">
-      <h1 class="notes-toolbar-text">Notes</h1>
+      <h1 class="notes-toolbar-text">{m.notes.title}</h1>
       {#if nextSyncLabel}
         <p class="notes-sync-hint">{nextSyncLabel}</p>
       {/if}
@@ -136,7 +146,7 @@
   <div class="notes-toolbar-actions">
     <input
       type="text"
-      placeholder="搜索笔记..."
+      placeholder={m.notes.searchPlaceholder}
       bind:value={searchQuery}
       class="notes-search"
     />
@@ -145,12 +155,12 @@
         type="button"
         class="pixel-button layout-btn {mode === 'widgets' ? 'is-active' : ''}"
         onclick={() => setMode('widgets')}
-      >小组件</button>
+      >{m.notes.modeWidgets}</button>
       <button
         type="button"
         class="pixel-button layout-btn {mode === 'recursive' ? 'is-active' : ''}"
         onclick={() => setMode('recursive')}
-      >折叠</button>
+      >{m.notes.modeTree}</button>
     </div>
   </div>
 </section>
@@ -161,12 +171,12 @@
       type="button"
       class="pixel-button tree-action-btn"
       onclick={expandAllFolders}
-    >一键展开</button>
+    >{m.notes.expandAll}</button>
     <button
       type="button"
       class="pixel-button tree-action-btn"
       onclick={collapseAllFolders}
-    >一键折叠</button>
+    >{m.notes.collapseAll}</button>
   </section>
 {/if}
 
@@ -184,7 +194,7 @@
   </section>
 {:else}
   {#if filtered.length === 0}
-    <p class="notes-empty">没有匹配的笔记。</p>
+    <p class="notes-empty">{m.notes.empty}</p>
   {:else}
     {#each filtered as category (category.title)}
       <NoteGrid

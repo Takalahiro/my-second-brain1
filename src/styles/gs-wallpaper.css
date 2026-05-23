@@ -1,0 +1,84 @@
+/* Vision Pro 风 3DGS 壁纸后期与内容玻璃 */
+
+.ply-layer.gs-wallpaper {
+  isolation: isolate;
+}
+
+/* 2 · 径向羽化遮罩 */
+.ply-layer.gs-wallpaper.is-ready::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.4) 80%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+}
+
+/* 3 · 5 · 6 · DOF 柔焦 + 缓入 + HDR 暖调 */
+.ply-layer.gs-wallpaper.is-ready :global(canvas),
+.ply-layer.gs-wallpaper.is-ready .ply-poster {
+  animation: gs-fade-in 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.ply-layer.gs-wallpaper.is-ready :global(canvas) {
+  filter: blur(0.3px) saturate(1.1) brightness(0.95) contrast(1.05) hue-rotate(-5deg)
+    sepia(0.05);
+}
+
+.ply-layer.gs-wallpaper.is-ready .ply-poster {
+  filter: blur(0.3px) saturate(1.1) brightness(0.95) contrast(1.05) hue-rotate(-5deg)
+    sepia(0.05);
+}
+
+@keyframes gs-fade-in {
+  from {
+    opacity: 0;
+    filter: blur(20px) brightness(0.5) saturate(0.9);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0.3px) saturate(1.1) brightness(0.95) contrast(1.05) hue-rotate(-5deg)
+      sepia(0.05);
+  }
+}
+
+/* 4 · 点云模式下内容层 visionOS 液态玻璃 */
+body.ply-wallpaper-active .glass-container,
+body.ply-wallpaper-active .pixel-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+body.ply-wallpaper-active.dark .glass-container,
+body.ply-wallpaper-active[data-theme='dark'] .glass-container,
+body.ply-wallpaper-active.dark .pixel-card,
+body.ply-wallpaper-active[data-theme='dark'] .pixel-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.ply-wallpaper-active .mac-menu-bar {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ply-layer.gs-wallpaper.is-ready :global(canvas),
+  .ply-layer.gs-wallpaper.is-ready .ply-poster {
+    animation: none;
+    filter: blur(0.3px) saturate(1.05) brightness(0.96) contrast(1.03);
+  }
+}

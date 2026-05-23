@@ -2,6 +2,7 @@
   import NoteCard from './NoteCard.svelte';
   import PixelIcon from '../PixelIcon.svelte';
   import { DEFAULT_FOLDER_ICON, type PixelIconName } from '../../lib/pixel-icons';
+  import { getMessages } from '../../lib/i18n/locale.svelte';
 
   interface Note {
     id: string;
@@ -36,6 +37,8 @@
     folderIcon = DEFAULT_FOLDER_ICON,
     viewMode = 'grid',
   }: Props = $props();
+
+  const m = $derived(getMessages());
 </script>
 
 <section class="mb-10">
@@ -48,7 +51,7 @@
   {/if}
 
   {#if folders.length > 0}
-    <h3 class="sub-title">目录</h3>
+    <h3 class="sub-title">{m.notes.folders}</h3>
     <div class="folders-stack">
       {#each folders as folder (folder.id)}
         <div class="folder-item" style={`--depth:${folder.depth ?? 0}`}>
@@ -67,7 +70,7 @@
   {/if}
 
   {#if notes.length > 0}
-    <h3 class="sub-title">笔记</h3>
+    <h3 class="sub-title">{m.notes.notesSection}</h3>
     <div class="notes-grid" class:is-list={viewMode === 'list'}>
       {#each notes as note (note.id)}
         <NoteCard

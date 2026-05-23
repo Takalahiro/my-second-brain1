@@ -1,9 +1,11 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { getMessages, initLocale } from '../lib/i18n/locale.svelte';
 
   let isDark = $state(false);
 
   onMount(() => {
+    initLocale();
     isDark = document.documentElement.classList.contains('dark');
   });
 
@@ -17,6 +19,8 @@
       localStorage.setItem('theme', 'light');
     }
   }
+
+  const m = $derived(getMessages());
 </script>
 
 <button
@@ -26,8 +30,8 @@
   onclick={toggle}
   role="switch"
   aria-checked={isDark}
-  aria-label={isDark ? '切换到浅色模式' : '切换到深色模式'}
-  title={isDark ? '浅色模式' : '深色模式'}
+  aria-label={isDark ? m.theme.toLight : m.theme.toDark}
+  title={isDark ? m.theme.light : m.theme.dark}
 >
   <span class="theme-switch-shell">
     <span class="theme-switch-track">
