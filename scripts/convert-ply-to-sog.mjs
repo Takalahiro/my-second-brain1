@@ -52,7 +52,9 @@ async function main() {
     }
   }
 
-  console.log('完成后请运行: node scripts/build-media-manifest.mjs');
+  console.log('完成后请运行:');
+  console.log('  node scripts/convert-sog-to-compressed-ply.mjs');
+  console.log('  node scripts/build-media-manifest.mjs');
 }
 
 main();

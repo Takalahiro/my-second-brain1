@@ -21,10 +21,17 @@ function resolveUrl(url: string): string {
   return `${base.replace(/\/$/, '')}${url.startsWith('/') ? url : `/${url}`}`;
 }
 
-/** manifest 可能指向 .sog，库需要 .ply / .ksplat / .splat */
+/** 解析 manifest 中的点云 URL（不再把 .sog 重映射到未部署的 .ply） */
 export function splatAssetUrl(url: string): string {
-  const resolved = resolveUrl(url);
-  return resolved.replace(/\.sog(\?.*)?$/i, '.ply$1');
+  return resolveUrl(url);
+}
+
+function sceneFormatFromUrl(url: string): GaussianSplats3D.SceneFormat {
+  const path = url.split('?')[0].toLowerCase();
+  if (path.endsWith('.ksplat')) return GaussianSplats3D.SceneFormat.KSplat;
+  if (path.endsWith('.splat')) return GaussianSplats3D.SceneFormat.Splat;
+  // PlayCanvas 压缩 PLY / INRIA PLY 均由 PlyLoader 按 header 自动识别
+  return GaussianSplats3D.SceneFormat.Ply;
 }
 
 /** MLSharp 导出 PLY 需绕 X 轴翻转 180° */
@@ -131,7 +138,7 @@ export function createGS3Wallpaper(host: HTMLElement, opts: GS3WallpaperOptions)
     abortActiveLoad();
     const path = splatAssetUrl(opts.url);
     const loadPromise = viewer.addSplatScene(path, {
-      format: GaussianSplats3D.SceneFormat.Ply,
+      format: sceneFormatFromUrl(path),
       splatAlphaRemovalThreshold: 5,
       showLoadingUI: false,
       progressiveLoad: false,

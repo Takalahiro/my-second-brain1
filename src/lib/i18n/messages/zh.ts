@@ -177,7 +177,7 @@ export const zh = {
     modeVideo: '视频',
     modePoster: '海报',
     modePly: '点云',
-    plyMissing: '未检测到点云，请将 *.sog 或 *.ply 放入 public/ply/ 后重新构建',
+    plyMissing: '未检测到点云，请将 *.compressed.ply / *.sog 放入 public/ply/ 后重新构建',
     plyHint: '点云模式 · 桌面端 · 首次加载约 15–40 秒',
     rainVideo: '雨天视频',
     rainVideoSub: '切换为雨天版背景视频',

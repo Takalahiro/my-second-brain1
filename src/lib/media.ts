@@ -14,6 +14,8 @@ export interface SceneEntry {
   hasPly: boolean;
   sog: string | null;
   hasSog: boolean;
+  compressedPly: string | null;
+  hasCompressedPly: boolean;
 }
 
 export interface MobileSceneEntry {

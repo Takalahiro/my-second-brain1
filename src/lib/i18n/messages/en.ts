@@ -179,7 +179,7 @@ export const en: Messages = {
     modeVideo: 'Video',
     modePoster: 'Poster',
     modePly: 'Splats',
-    plyMissing: 'No splat file — add *.sog or *.ply under public/ply/ and rebuild',
+    plyMissing: 'No splat file — add *.compressed.ply or *.sog under public/ply/ and rebuild',
     plyHint: 'Splat mode · desktop · first load ~15–40s',
     rainVideo: 'Rainy video',
     rainVideoSub: 'Switch to rainy background video',

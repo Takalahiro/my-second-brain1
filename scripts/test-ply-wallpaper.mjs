@@ -14,7 +14,7 @@ async function main() {
   page.on('console', (msg) => logs.push(`[${msg.type()}] ${msg.text()}`));
   page.on('pageerror', (err) => logs.push(`[pageerror] ${err.message}`));
 
-  await page.goto(BASE, { waitUntil: 'networkidle', timeout: 60000 });
+  await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 60000 });
 
   await page.evaluate(() => {
     const raw = localStorage.getItem('second-brain:widgets');
@@ -36,7 +36,7 @@ async function main() {
     localStorage.setItem('second-brain:widgets', JSON.stringify(s));
   });
 
-  await page.reload({ waitUntil: 'networkidle', timeout: 60000 });
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 60000 });
   page.setDefaultTimeout(180_000);
 
   // wait for am15 PLY parse + first sort (full 1.18M gaussians)
@@ -65,7 +65,7 @@ async function main() {
 
   const plyFetch = await page.evaluate(async () => {
     try {
-      const r = await fetch('/ply/kyoto.ply', { method: 'HEAD' });
+      const r = await fetch('/ply/kyoto.compressed.ply', { method: 'HEAD' });
       return { status: r.status, len: r.headers.get('content-length') };
     } catch (e) {
       return { error: String(e) };

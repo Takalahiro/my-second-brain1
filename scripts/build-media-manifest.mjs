@@ -18,6 +18,7 @@ const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.avif']);
 const AUDIO_EXT = new Set(['.mp3', '.ogg', '.flac', '.wav', '.m4a']);
 const PLY_EXT = new Set(['.ply']);
 const SOG_EXT = new Set(['.sog']);
+const COMPRESSED_PLY_SUFFIX = '.compressed.ply';
 
 function listDir(dir, allow) {
   if (!existsSync(dir)) return [];
@@ -50,8 +51,16 @@ const videoFiles = listDir(join(PUBLIC, 'video'), VIDEO_EXT);
 const sceneFiles = listDir(join(PUBLIC, 'picture', 'scenes'), IMAGE_EXT);
 const mobileFiles = listDir(join(PUBLIC, 'picture', 'mobile'), IMAGE_EXT);
 const musicFiles = listDir(join(PUBLIC, 'music'), AUDIO_EXT);
-const plyFiles = listDir(join(PUBLIC, 'ply'), PLY_EXT);
+const plyFiles = listDir(join(PUBLIC, 'ply'), PLY_EXT).filter(
+  (n) => !n.toLowerCase().endsWith(COMPRESSED_PLY_SUFFIX),
+);
 const sogFiles = listDir(join(PUBLIC, 'ply'), SOG_EXT);
+const compressedPlyFiles = existsSync(join(PUBLIC, 'ply'))
+  ? readdirSync(join(PUBLIC, 'ply'), { withFileTypes: true })
+      .filter((d) => d.isFile() && d.name.toLowerCase().endsWith(COMPRESSED_PLY_SUFFIX))
+      .map((d) => d.name)
+      .sort((a, b) => a.localeCompare(b, 'zh-Hans'))
+  : [];
 
 function findVideo(scene, rain = false) {
   const target = rain ? `${scene} rain` : scene;
@@ -78,7 +87,17 @@ function findSog(scene) {
   return hit ? publicUrl(`ply/${hit}`) : null;
 }
 
+function findCompressedPly(scene) {
+  const hit = compressedPlyFiles.find((f) => {
+    const stem = f.slice(0, -COMPRESSED_PLY_SUFFIX.length).toLowerCase();
+    return stem === scene.toLowerCase();
+  });
+  return hit ? publicUrl(`ply/${hit}`) : null;
+}
+
 function findPly(scene) {
+  const compressed = findCompressedPly(scene);
+  if (compressed) return compressed;
   const sog = findSog(scene);
   if (sog) return sog;
   const hit = plyFiles.find((f) => {
@@ -99,6 +118,8 @@ const scenes = SCENES.map((id) => ({
   hasPly: !!findPly(id),
   sog: findSog(id),
   hasSog: !!findSog(id),
+  compressedPly: findCompressedPly(id),
+  hasCompressedPly: !!findCompressedPly(id),
 }));
 
 const mobile = mobileFiles.map((name, idx) => ({
