@@ -11,7 +11,6 @@
   type TabId = 'matrix' | 'calculus' | 'discrete' | 'statistics' | 'expr';
   let tab = $state<TabId>('matrix');
 
-  // Vite 需要在构建期静态分析 lazy 路径；裸 import('.svelte') 在 Astro dev 下会 404 源文件
   const labModules = import.meta.glob<{ default: Component }>([
     './matrix/MatrixLab.svelte',
     './calculus/CalculusLab.svelte',
@@ -25,6 +24,22 @@
     discrete: './discrete/DiscreteLab.svelte',
     statistics: './statistics/StatisticsLab.svelte',
   };
+
+  const TAB_HINTS: Record<TabId, string> = {
+    matrix: '输入矩阵 → 选运算 → ▶ 逐步演示',
+    calculus: '按键拼公式 → 调参数 → ▶ 看割线/矩形/Taylor',
+    discrete: '真值表 · 集合 · 组合 · 图论',
+    statistics: '分布 · 假设检验 · 概率',
+    expr: '像 MATLAB 一样输入表达式，Enter 执行',
+  };
+
+  const EXPR_PRESETS = [
+    { label: 'sin(π/2)', expr: 'sin(pi/2)' },
+    { label: '2×2 行列式', expr: 'det([1,2;3,4])' },
+    { label: '2×2 逆矩阵', expr: 'inv([1,2;3,4])' },
+    { label: 'e²', expr: 'e^2' },
+    { label: '√2', expr: 'sqrt(2)' },
+  ];
 
   function loadLab(id: Exclude<TabId, 'expr'>) {
     const loader = labModules[labPaths[id]];
@@ -196,22 +211,22 @@
     <header class="mc-head">
       <div>
         <h1>MATLAB 计算器</h1>
-        <p class="mc-sub">矩阵 · 微积分 · 离散数学 · 统计学 · 表达式</p>
+        <p class="mc-sub">{TAB_HINTS[tab]}</p>
       </div>
-      <nav class="mc-tabs">
-        <button type="button" class:active={tab === 'matrix'} onclick={() => (tab = 'matrix')}>
+      <nav class="mc-tabs" aria-label="计算器模块">
+        <button type="button" class:active={tab === 'matrix'} onclick={() => (tab = 'matrix')} title="矩阵逐步可视化">
           矩阵
         </button>
-        <button type="button" class:active={tab === 'calculus'} onclick={() => (tab = 'calculus')}>
+        <button type="button" class:active={tab === 'calculus'} onclick={() => (tab = 'calculus')} title="导数 / 积分 / Taylor">
           微积分
         </button>
-        <button type="button" class:active={tab === 'discrete'} onclick={() => (tab = 'discrete')}>
+        <button type="button" class:active={tab === 'discrete'} onclick={() => (tab = 'discrete')} title="真值表 / 集合 / 组合 / 图">
           离散数学
         </button>
-        <button type="button" class:active={tab === 'statistics'} onclick={() => (tab = 'statistics')}>
+        <button type="button" class:active={tab === 'statistics'} onclick={() => (tab = 'statistics')} title="分布 / 检验 / 概率">
           统计学
         </button>
-        <button type="button" class:active={tab === 'expr'} onclick={() => (tab = 'expr')}>
+        <button type="button" class:active={tab === 'expr'} onclick={() => (tab = 'expr')} title="快速算式与绘图">
           表达式
         </button>
       </nav>
@@ -236,10 +251,19 @@
           class="mc-input"
           bind:value={expr}
           onkeydown={onKey}
-          placeholder="输入表达式，Enter 计算"
+          placeholder="例如 sin(pi/2) 或 det([1,2;3,4])，按 Enter 计算"
           autocomplete="off"
+          aria-label="表达式输入"
         />
         <button type="button" class="mc-run" onclick={submit}>执行</button>
+        <button type="button" class="mc-clear" onclick={() => { expr = ''; lastResult = null; }} title="清空">清空</button>
+      </div>
+
+      <div class="mc-presets">
+        <span class="mc-presets-label">快捷示例</span>
+        {#each EXPR_PRESETS as p}
+          <button type="button" class="mc-preset" onclick={() => { expr = p.expr; submit(); }}>{p.label}</button>
+        {/each}
       </div>
 
       {#if lastResult}
@@ -416,6 +440,40 @@
     font-size: 0.82rem;
   }
   .mc-run.small { padding: 5px 12px; font-size: 0.76rem; }
+  .mc-clear {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.78rem;
+  }
+
+  .mc-presets {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .mc-presets-label {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    margin-right: 2px;
+  }
+  .mc-preset {
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: inherit;
+    font-size: 0.68rem;
+    cursor: pointer;
+  }
+  .mc-preset:hover {
+    background: rgb(180 140 255 / 0.18);
+    border-color: rgb(180 140 255 / 0.35);
+  }
 
   .mc-result {
     padding: 10px 12px;

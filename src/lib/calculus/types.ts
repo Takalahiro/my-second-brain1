@@ -14,7 +14,7 @@ export type CalcVizStep = {
 };
 
 export type CalcStepSequence = {
-  mode: 'derivative' | 'integral' | 'taylor';
+  mode: 'derivative' | 'integral' | 'taylor' | 'course';
   steps: CalcVizStep[];
   resultText: string;
   resultLatex: string;

@@ -1,0 +1,21 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import TeachingHub from '../components/teaching/TeachingHub.svelte';
+---
+
+<ToolLayout title="教学 · My Second Brain" description="数学 · 微积分复习：分步讲解与公式推导">
+  <TeachingHub client:only="svelte">
+    <div class="teaching-fallback" slot="fallback">
+      <p>教学模块加载中…</p>
+    </div>
+  </TeachingHub>
+</ToolLayout>
+
+<style>
+  .teaching-fallback {
+    min-height: 50vh;
+    display: grid;
+    place-items: center;
+    color: var(--text-secondary);
+  }
+</style>

@@ -71,6 +71,13 @@ export function buildTaylorSteps(
 
   steps.push(
     step({
+      title: '你要做什么？',
+      explanation: `用多项式在 x=${a} 附近逼近 f(x)=${expr}。适合理解「局部像抛物线/直线」——步骤播放器会一阶一阶加上去。`,
+      latex: '',
+      phase: 'intro',
+      viz: { taylorOrder: 0 },
+    }),
+    step({
       title: 'Taylor 展开式',
       explanation: `在 x=a=${a} 附近，用各阶导数构造多项式逼近 f(x)。`,
       latex: `f(x)=\\sum_{k=0}^{n}\\frac{f^{(k)}(a)}{k!}(x-a)^k + R_n(x)`,
@@ -174,6 +181,13 @@ export function buildDerivativeSteps(expr: string, x0: number): CalcStepSequence
 
   const steps: CalcVizStep[] = [
     step({
+      title: '你要做什么？',
+      explanation: `求 f(x)=${expr} 在 x=${x0} 处的导数（切线斜率）。图上绿点是切点，黄线是割线，h 越来越小时割线 → 切线。`,
+      latex: '',
+      phase: 'intro',
+      viz: { highlightX: x0 },
+    }),
+    step({
       title: '导数定义',
       explanation: '导数是割线斜率在 h→0 时的极限。',
       latex: `f'(${x0})=\\lim_{h\\to0}\\frac{f(${x0}+h)-f(${x0})}{h}`,
@@ -229,6 +243,12 @@ export function buildIntegralSteps(
   stepId = 0;
   const ns = [2, 4, 8, 16, 32];
   const steps: CalcVizStep[] = [
+    step({
+      title: '你要做什么？',
+      explanation: `估算 ∫_${a}^{${b}} f(x)dx，f(x)=${expr}。把区间分成 n 个小矩形，n 越大越准——播放器会展示 n=2,4,8… 的变化。`,
+      latex: '',
+      phase: 'intro',
+    }),
     step({
       title: '定积分与黎曼和',
       explanation: '将区间分成 n 个小矩形，面积之和逼近 ∫f(x)dx。',

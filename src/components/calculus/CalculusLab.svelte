@@ -11,6 +11,7 @@
     taylorCoeffsAt,
   } from '../../lib/calculus/steps';
   import type { CalcStepSequence } from '../../lib/calculus/types';
+  import { stablePlotBounds } from '../../lib/calculus/plot-bounds';
   import {
     evalFn,
     numericalDerivative,
@@ -19,13 +20,12 @@
     type RiemannMode,
   } from '../../lib/calculus/engine';
   import {
-    autoYBounds,
     drawCurve,
     drawGrid,
-    drawPulsePoint,
     makeMappers,
     setupCanvas,
     DEFAULT_PAD,
+    type PlotBounds,
   } from '../../lib/plot/canvas2d';
 
   type Mode = 'derivative' | 'integral' | 'taylor';
@@ -46,9 +46,19 @@
   let playerStep = $state(0);
 
   let canvas: HTMLCanvasElement | null = null;
-  let pulseNow = $state(0);
 
   const currentViz = $derived(sequence?.steps[playerStep]?.viz ?? {});
+
+  const plotBounds = $derived.by((): PlotBounds => {
+    return stablePlotBounds(mode, expr, xMin, xMax, {
+      x0,
+      aInt,
+      bInt,
+      riemannMode,
+      taylorCenter,
+      taylorOrder,
+    });
+  });
 
   function runSteps() {
     if (mode === 'derivative') sequence = buildDerivativeSteps(expr, x0);
@@ -57,32 +67,49 @@
     playerStep = 0;
   }
 
+  function switchMode(next: Mode) {
+    if (mode === next) return;
+    mode = next;
+    runSteps();
+  }
+
+  function drawStaticPoint(ctx: CanvasRenderingContext2D, x: number, y: number, color: string, r = 5) {
+    ctx.beginPath();
+    ctx.arc(x, y, r + 3, 0, Math.PI * 2);
+    ctx.fillStyle = `${color}33`;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
   function draw() {
     if (!canvas) return;
     const { ctx, cw, ch } = setupCanvas(canvas);
+    const bounds = plotBounds;
+    const { toX, toY } = makeMappers(cw, ch, bounds, DEFAULT_PAD);
+    const pts = sampleFn(expr, xMin, xMax, 300);
+
+    drawGrid(ctx, cw, ch, bounds);
+    drawCurve(ctx, pts.map((p) => p.x), pts.map((p) => p.y), cw, ch, bounds, {
+      stroke: mode === 'taylor' ? '#7ec8ff' : '#b48cff',
+      width: 2.5,
+    });
 
     if (mode === 'taylor') {
       const order = currentViz.taylorOrder ?? taylorOrder;
       const coeffs = taylorCoeffsAt(expr, taylorCenter, order);
       const poly = (x: number) => evalTaylorPoly(coeffs, taylorCenter, x);
-      const pts = sampleFn(expr, xMin, xMax, 300);
       const polyPts = pts.map((p) => ({ x: p.x, y: poly(p.x) }));
-      const yAll = [...pts.map((p) => p.y), ...polyPts.map((p) => p.y)].filter(Number.isFinite);
-      const { yMin, yMax } = autoYBounds(yAll);
-      const bounds = { xMin, xMax, yMin, yMax };
-      const { toX, toY } = makeMappers(cw, ch, bounds, DEFAULT_PAD);
-
-      drawGrid(ctx, cw, ch, bounds);
-      drawCurve(ctx, pts.map((p) => p.x), pts.map((p) => p.y), cw, ch, bounds, { stroke: '#7ec8ff', width: 2.5 });
       drawCurve(ctx, polyPts.map((p) => p.x), polyPts.map((p) => p.y), cw, ch, bounds, {
         stroke: '#00ff9d',
         width: 2,
         dash: [6, 4],
       });
 
-      // 展开中心 a
       const ya = evalFn(expr, taylorCenter);
-      drawPulsePoint(ctx, toX(taylorCenter), toY(ya), '#ffd56a', 6, pulseNow);
+      drawStaticPoint(ctx, toX(taylorCenter), toY(ya), '#ffd56a', 6);
       ctx.fillStyle = '#ffd56a';
       ctx.font = '10px sans-serif';
       ctx.fillText(`a=${taylorCenter}`, toX(taylorCenter) + 8, toY(ya) - 8);
@@ -91,8 +118,8 @@
       if (Number.isFinite(hx)) {
         const yf = evalFn(expr, hx);
         const yp = poly(hx);
-        drawPulsePoint(ctx, toX(hx), toY(yf), '#7ec8ff', 5, pulseNow);
-        drawPulsePoint(ctx, toX(hx), toY(yp), '#00ff9d', 4, pulseNow);
+        drawStaticPoint(ctx, toX(hx), toY(yf), '#7ec8ff', 5);
+        drawStaticPoint(ctx, toX(hx), toY(yp), '#00ff9d', 4);
         ctx.setLineDash([4, 3]);
         ctx.strokeStyle = 'rgba(255,255,255,0.25)';
         ctx.beginPath();
@@ -104,23 +131,10 @@
       return;
     }
 
-    const pts = sampleFn(expr, xMin, xMax, 300);
-    const yAll = [...pts.map((p) => p.y)];
-    const bounds = { xMin, xMax, yMin: 0, yMax: 1 };
-
     if (mode === 'derivative') {
       const h = currentViz.derivH ?? 0.5;
       const y0v = evalFn(expr, x0);
-      yAll.push(y0v);
-      if (h > 0) yAll.push(evalFn(expr, x0 + h));
-      const { yMin, yMax } = autoYBounds(yAll);
-      Object.assign(bounds, { yMin, yMax });
-      const { toX, toY } = makeMappers(cw, ch, bounds, DEFAULT_PAD);
-
-      drawGrid(ctx, cw, ch, bounds);
-      drawCurve(ctx, pts.map((p) => p.x), pts.map((p) => p.y), cw, ch, bounds, { stroke: '#b48cff', width: 2.5 });
-
-      drawPulsePoint(ctx, toX(x0), toY(y0v), '#00ff9d', 6, pulseNow);
+      drawStaticPoint(ctx, toX(x0), toY(y0v), '#00ff9d', 6);
 
       if (h > 0) {
         const y1 = evalFn(expr, x0 + h);
@@ -132,7 +146,7 @@
         ctx.lineTo(toX(x0 + h), toY(y1));
         ctx.stroke();
         ctx.setLineDash([]);
-        drawPulsePoint(ctx, toX(x0 + h), toY(y1), '#ffd56a', 4, pulseNow);
+        drawStaticPoint(ctx, toX(x0 + h), toY(y1), '#ffd56a', 4);
       }
 
       const slope = h > 0 ? (evalFn(expr, x0 + h) - y0v) / h : numericalDerivative(expr, x0);
@@ -146,17 +160,8 @@
       return;
     }
 
-    // integral
     const n = currentViz.riemannN ?? 8;
     const riemann = riemannSum(expr, aInt, bInt, n, riemannMode);
-    for (const r of riemann.rects) yAll.push(r.y1);
-    const { yMin, yMax } = autoYBounds(yAll);
-    Object.assign(bounds, { yMin, yMax });
-    const { toX, toY } = makeMappers(cw, ch, bounds, DEFAULT_PAD);
-
-    drawGrid(ctx, cw, ch, bounds);
-    drawCurve(ctx, pts.map((p) => p.x), pts.map((p) => p.y), cw, ch, bounds, { stroke: '#b48cff', width: 2.5 });
-
     for (const r of riemann.rects) {
       const x0p = toX(r.x0);
       const x1p = toX(r.x1);
@@ -181,25 +186,16 @@
     void taylorOrder;
     void taylorCenter;
     void taylorEvalAt;
-    void sequence;
     void playerStep;
+    void plotBounds;
+    draw();
   });
 
   onMount(() => {
     runSteps();
     const ro = new ResizeObserver(() => draw());
     if (canvas) ro.observe(canvas);
-    let raf = 0;
-    const tick = (t: number) => {
-      pulseNow = t;
-      draw();
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-    };
+    return () => ro.disconnect();
   });
 </script>
 
@@ -207,11 +203,11 @@
   <aside class="cl-sidebar">
     <section class="cl-section">
       <h2>微积分可视化</h2>
-      <p class="cl-intro">用按钮输入公式与数字，无需手写 MATLAB 语法</p>
+      <p class="cl-intro">① 选模式 → ② 输入公式 → ③ 调参数 → ④ ▶ 逐步演示</p>
       <div class="cl-modes">
-        <button type="button" class:active={mode === 'taylor'} onclick={() => { mode = 'taylor'; sequence = null; runSteps(); }}>Taylor · 余项</button>
-        <button type="button" class:active={mode === 'derivative'} onclick={() => { mode = 'derivative'; sequence = null; runSteps(); }}>导数 · 切线</button>
-        <button type="button" class:active={mode === 'integral'} onclick={() => { mode = 'integral'; sequence = null; runSteps(); }}>定积分 · 黎曼和</button>
+        <button type="button" class:active={mode === 'taylor'} onclick={() => switchMode('taylor')}>Taylor · 余项</button>
+        <button type="button" class:active={mode === 'derivative'} onclick={() => switchMode('derivative')}>导数 · 切线</button>
+        <button type="button" class:active={mode === 'integral'} onclick={() => switchMode('integral')}>定积分 · 黎曼和</button>
       </div>
     </section>
 
@@ -219,51 +215,57 @@
       <FormulaKeypad bind:value={expr} />
     </section>
 
-    <section class="cl-section">
+    <section class="cl-section cl-params">
       <div class="cl-row">
         <NumberSpin bind:value={xMin} step={0.5} label="x 最小" />
         <NumberSpin bind:value={xMax} step={0.5} label="x 最大" />
       </div>
 
-      {#if mode === 'derivative'}
-        <NumberSpin bind:value={x0} step={0.1} label="切点 x₀" />
-      {:else if mode === 'integral'}
-        <div class="cl-row">
-          <NumberSpin bind:value={aInt} step={0.1} label="积分下限 a" />
-          <NumberSpin bind:value={bInt} step={0.1} label="积分上限 b" />
+      <div class="cl-mode-fields">
+        <div class="cl-mode-panel" class:visible={mode === 'derivative'}>
+          <NumberSpin bind:value={x0} step={0.1} label="切点 x₀" />
         </div>
-        <div class="cl-riemann-modes">
-          {#each [['left','左端点'], ['mid','中点'], ['right','右端点'], ['trap','梯形']] as [id, lbl]}
-            <button type="button" class:active={riemannMode === id} onclick={() => (riemannMode = id as RiemannMode)}>{lbl}</button>
-          {/each}
+        <div class="cl-mode-panel" class:visible={mode === 'integral'}>
+          <div class="cl-row">
+            <NumberSpin bind:value={aInt} step={0.1} label="积分下限 a" />
+            <NumberSpin bind:value={bInt} step={0.1} label="积分上限 b" />
+          </div>
+          <div class="cl-riemann-modes">
+            {#each [['left','左端点'], ['mid','中点'], ['right','右端点'], ['trap','梯形']] as [id, lbl]}
+              <button type="button" class:active={riemannMode === id} onclick={() => (riemannMode = id as RiemannMode)}>{lbl}</button>
+            {/each}
+          </div>
         </div>
-      {:else}
-        <NumberSpin bind:value={taylorCenter} step={0.1} label="展开中心 a" />
-        <NumberSpin bind:value={taylorEvalAt} step={0.1} label="验证点 x" />
-        <label class="cl-range">Taylor 阶数 n = {taylorOrder}
-          <input type="range" min="1" max="8" bind:value={taylorOrder} />
-        </label>
-      {/if}
+        <div class="cl-mode-panel" class:visible={mode === 'taylor'}>
+          <NumberSpin bind:value={taylorCenter} step={0.1} label="展开中心 a" />
+          <NumberSpin bind:value={taylorEvalAt} step={0.1} label="验证点 x" />
+          <label class="cl-range">Taylor 阶数 n = {taylorOrder}
+            <input type="range" min="1" max="8" bind:value={taylorOrder} />
+          </label>
+        </div>
+      </div>
 
       <button type="button" class="cl-run" onclick={runSteps}>▶ 开始逐步演示</button>
     </section>
   </aside>
 
   <main class="cl-main">
-    <canvas bind:this={canvas} class="cl-canvas"></canvas>
-    <div class="cl-legend">
-      {#if mode === 'derivative'}
-        <span><i style="background:#b48cff"></i> y=f(x)</span>
-        <span><i style="background:#ffd56a"></i> 割线</span>
-        <span><i style="background:#00ff9d"></i> 切线</span>
-      {:else if mode === 'integral'}
-        <span><i style="background:#b48cff"></i> f(x)</span>
-        <span><i style="background:#00ff9d"></i> 黎曼矩形</span>
-      {:else}
-        <span><i style="background:#7ec8ff"></i> 原函数</span>
-        <span><i style="background:#00ff9d"></i> Pₙ(x)</span>
-        <span><i style="background:#ffd56a"></i> 展开点 a</span>
-      {/if}
+    <div class="cl-viz-frame">
+      <canvas bind:this={canvas} class="cl-canvas" width="640" height="320"></canvas>
+      <div class="cl-legend">
+        {#if mode === 'derivative'}
+          <span><i style="background:#b48cff"></i> y=f(x)</span>
+          <span><i style="background:#ffd56a"></i> 割线</span>
+          <span><i style="background:#00ff9d"></i> 切线</span>
+        {:else if mode === 'integral'}
+          <span><i style="background:#b48cff"></i> f(x)</span>
+          <span><i style="background:#00ff9d"></i> 黎曼矩形</span>
+        {:else}
+          <span><i style="background:#7ec8ff"></i> 原函数</span>
+          <span><i style="background:#00ff9d"></i> Pₙ(x)</span>
+          <span><i style="background:#ffd56a"></i> 展开点 a</span>
+        {/if}
+      </div>
     </div>
     <div class="cl-player-wrap">
       <CalcStepPlayer {sequence} bind:playerStep />
@@ -296,6 +298,24 @@
   .cl-modes button.active { background: rgb(126 200 255 / 0.15); border-color: rgb(126 200 255 / 0.4); }
   .cl-row { display: flex; gap: 8px; margin-bottom: 8px; }
   .cl-row > :global(*) { flex: 1; }
+  .cl-mode-fields {
+    position: relative;
+    min-height: 132px;
+    margin-bottom: 4px;
+  }
+  .cl-mode-panel {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+  }
+  .cl-mode-panel.visible {
+    position: relative;
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
   .cl-range { display: block; font-size: 0.72rem; color: var(--text-secondary); margin: 8px 0; }
   .cl-range input { width: 100%; margin-top: 4px; }
   .cl-riemann-modes { display: flex; gap: 4px; margin: 8px 0; flex-wrap: wrap; }
@@ -310,19 +330,42 @@
     cursor: pointer; font-size: 0.82rem;
   }
   .cl-main {
-    padding: 12px; border-radius: 16px; border: 1px solid var(--border-color);
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
     background: radial-gradient(ellipse 80% 60% at 50% 0%, rgb(126 200 255 / 0.08), transparent 55%), var(--bg-secondary);
-    display: flex; flex-direction: column; gap: 8px; min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 420px;
   }
-  .cl-canvas { flex: 1; min-height: 280px; width: 100%; border-radius: 12px; }
-  .cl-legend { display: flex; gap: 16px; font-size: 0.72rem; color: var(--text-secondary); padding: 0 8px; flex-wrap: wrap; }
+  .cl-viz-frame {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid rgb(126 200 255 / 0.12);
+    background: rgb(0 0 0 / 0.15);
+  }
+  .cl-canvas {
+    display: block;
+    width: 100%;
+    height: 320px;
+    border-radius: 10px;
+  }
+  .cl-legend { display: flex; gap: 16px; font-size: 0.72rem; color: var(--text-secondary); padding: 0 4px; flex-wrap: wrap; }
   .cl-legend span { display: flex; align-items: center; gap: 6px; }
   .cl-legend i { width: 12px; height: 12px; border-radius: 3px; display: block; }
   .cl-player-wrap {
-    padding: 12px; border-radius: 12px;
+    flex: 1;
+    min-height: 200px;
+    padding: 12px;
+    border-radius: 12px;
     border: 1px solid rgb(126 200 255 / 0.15);
     background: rgb(126 200 255 / 0.05);
-    max-height: 280px; overflow: auto;
+    overflow: auto;
   }
   @media (max-width: 960px) { .calc-lab { grid-template-columns: 1fr; } .cl-sidebar { max-height: none; } }
 </style>

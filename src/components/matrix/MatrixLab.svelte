@@ -59,6 +59,11 @@
   <aside class="ml-sidebar">
     <section class="ml-section ml-section-input">
       <h2>① 输入矩阵</h2>
+      <p class="ml-tip">直接点格子改数字。下方可一键填入常用示例。</p>
+      <div class="ml-presets">
+        <button type="button" onclick={() => { rowsA = 2; colsA = 2; matrixA = [[2, 1], [1, 1]]; }}>2×2 求逆示例</button>
+        <button type="button" onclick={() => { rowsA = 3; colsA = 3; matrixA = identity(3); }}>3×3 单位阵</button>
+      </div>
       <MatrixGrid label="A" bind:rows={rowsA} bind:cols={colsA} bind:data={matrixA} />
       {#if currentOp.needsB}
         <MatrixGrid label="B" bind:rows={rowsB} bind:cols={colsB} bind:data={matrixB} />
@@ -107,8 +112,9 @@
       </div>
       <button type="button" class="ml-run" onclick={run} disabled={running}>
         <span class="ml-run-icon">{running ? '…' : '▶'}</span>
-        {running ? '正在生成步骤…' : `可视化 ${OPERATION_LABELS[op] ?? op}`}
+        {running ? '正在生成步骤…' : `第 4 步：▶ 逐步演示 ${OPERATION_LABELS[op] ?? op}`}
       </button>
+      <p class="ml-tip-bottom">按上方 ①→④ 顺序操作，点 ▶ 即可逐步演示。</p>
       {#if error}
         <p class="ml-err">{error}</p>
       {/if}
@@ -143,11 +149,44 @@
     box-shadow: 0 4px 20px rgb(0 0 0 / 0.08);
   }
   .ml-section h2 {
-    margin: 0 0 12px;
+    margin: 0 0 8px;
     font-size: 0.78rem;
     font-weight: 700;
     color: var(--text-secondary);
     letter-spacing: 0.04em;
+  }
+  .ml-tip {
+    margin: 0 0 10px;
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    line-height: 1.45;
+  }
+  .ml-tip-bottom {
+    margin: 10px 0 0;
+    font-size: 0.68rem;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+  .ml-tip-bottom a {
+    color: #9dccff;
+  }
+  .ml-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .ml-presets button {
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    font-size: 0.68rem;
+    cursor: pointer;
+    color: inherit;
+  }
+  .ml-presets button:hover {
+    background: rgb(180 140 255 / 0.15);
   }
   .ml-section-input {
     background:

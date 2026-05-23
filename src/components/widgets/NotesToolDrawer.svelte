@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { untrack } from 'svelte';
   import { clampFabPosition, loadFabPosition, saveFabPosition } from '../../lib/draggable-fab';
   import PixelIcon from '../PixelIcon.svelte';
@@ -21,6 +22,7 @@
 
   let open = $state(false);
   let dragKey = $state<ToolKey | null>(null);
+  let tileDidMove = false;
   let dragGhost: HTMLDivElement | null = null;
 
   const FAB_POS_KEY = 'second-brain:notes-tool-btn-pos';
@@ -74,6 +76,10 @@
     if (typeof window === 'undefined') return;
     window.addEventListener('resize', onFabResize, { passive: true });
     return () => window.removeEventListener('resize', onFabResize);
+  });
+
+  onMount(() => {
+    if (fabEl) initFabPos();
   });
 
   $effect(() => {
@@ -159,25 +165,56 @@
     }
   }
 
+  function openTool(key: ToolKey) {
+    if (!enabled[key]) onToggle(key);
+  }
+
   function onTilePointerDown(e: PointerEvent, w: ToolItem) {
     dragKey = w.id;
+    tileDidMove = false;
+    const sx = e.clientX;
+    const sy = e.clientY;
     ensureGhost(w.name);
     moveGhost(e.clientX, e.clientY);
-    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
+    const el = e.currentTarget as HTMLElement;
+    el.setPointerCapture?.(e.pointerId);
+    const onMove = (ev: PointerEvent) => {
+      if (Math.abs(ev.clientX - sx) > 4 || Math.abs(ev.clientY - sy) > 4) tileDidMove = true;
+      moveGhost(ev.clientX, ev.clientY);
+    };
+    const onUp = (ev: PointerEvent) => {
+      el.removeEventListener('pointermove', onMove);
+      el.removeEventListener('pointerup', onUp);
+      el.removeEventListener('pointercancel', onUp);
+      try {
+        el.releasePointerCapture?.(ev.pointerId);
+      } catch {
+        /* ignore */
+      }
+      onTilePointerUp(ev, w);
+    };
+    el.addEventListener('pointermove', onMove);
+    el.addEventListener('pointerup', onUp);
+    el.addEventListener('pointercancel', onUp);
     e.preventDefault();
-  }
-  function onTilePointerMove(e: PointerEvent) {
-    if (!dragKey) return;
-    moveGhost(e.clientX, e.clientY);
   }
   function onTilePointerUp(e: PointerEvent, w: ToolItem) {
     if (!dragKey) return;
-    (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
-    const target = document.elementFromPoint(e.clientX, e.clientY);
-    const onDrawer = !!target?.closest('.notes-tool-drawer, .notes-tool-btn');
-    if (!onDrawer) onToggle(w.id, { x: e.clientX, y: e.clientY });
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    if (tileDidMove) {
+      const target = document.elementFromPoint(e.clientX, e.clientY);
+      const onDrawer = !!target?.closest('.notes-tool-drawer, .notes-tool-btn');
+      if (!onDrawer) onToggle(w.id, { x: e.clientX, y: e.clientY });
+    } else {
+      openTool(w.id);
+    }
     clearGhost();
     dragKey = null;
+    tileDidMove = false;
   }
 </script>
 
@@ -209,7 +246,7 @@
     <h2>笔记工具</h2>
     <button type="button" class="ntd-x" onclick={() => (open = false)}>×</button>
   </header>
-  <p class="ntd-hint">拖到笔记页任意位置即可打开；可拖动、缩放、旋转</p>
+  <p class="ntd-hint">点击工具卡片打开 · 拖到页面可指定位置 · 开关可隐藏窗口</p>
   <ul class="ntd-list">
     {#each items as w (w.id)}
       <li>
@@ -218,12 +255,11 @@
           role="button"
           tabindex="0"
           onpointerdown={(e) => onTilePointerDown(e, w)}
-          onpointermove={onTilePointerMove}
-          onpointerup={(e) => onTilePointerUp(e, w)}
-          onpointercancel={(e) => {
-            (e.currentTarget as HTMLElement).releasePointerCapture?.(e.pointerId);
-            clearGhost();
-            dragKey = null;
+          onkeydown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openTool(w.id);
+            }
           }}
         >
           <span class="ntd-icon" aria-hidden="true"><PixelIcon name={w.icon} size={18} /></span>
@@ -231,15 +267,18 @@
             <div class="ntd-name">{w.name}</div>
             <div class="ntd-desc">{w.desc}</div>
           </div>
-          <label class="switch" data-no-drag>
-            <input
-              type="checkbox"
-              checked={enabled[w.id]}
-              onchange={() => onToggle(w.id)}
-              aria-label={`${w.name} 开关`}
-            />
-            <span></span>
-          </label>
+          <div class="ntd-actions" data-no-drag>
+            <button type="button" class="ntd-open" onclick={() => openTool(w.id)}>打开</button>
+            <label class="switch">
+              <input
+                type="checkbox"
+                checked={enabled[w.id]}
+                onchange={() => onToggle(w.id)}
+                aria-label={`${w.name} 开关`}
+              />
+              <span></span>
+            </label>
+          </div>
         </div>
       </li>
     {/each}
@@ -351,6 +390,24 @@
     cursor: grab;
     user-select: none;
     touch-action: none;
+  }
+  .ntd-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .ntd-open {
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--chrome-border);
+    background: rgb(180 140 255 / 0.15);
+    color: inherit;
+    font-size: 0.65rem;
+    cursor: pointer;
+  }
+  .ntd-open:hover {
+    background: rgb(180 140 255 / 0.28);
   }
   .ntd-tile.is-on {
     border-color: rgb(180 140 255 / 0.55);

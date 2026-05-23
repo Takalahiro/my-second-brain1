@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-22T05:32:51.642Z",
+  "generatedAt": "2026-05-23T03:39:01.629Z",
   "totalNotes": 126,
-  "totalWords": 246936,
+  "totalWords": 250102,
   "byFolder": [
     {
       "name": "计算机",
@@ -21,7 +21,7 @@
     {
       "name": "MATH",
       "count": 4,
-      "words": 15938
+      "words": 19104
     },
     {
       "name": "INFO1111",
@@ -98,10 +98,6 @@
   ],
   "topTags": [],
   "heatmap": [
-    {
-      "date": "2026-02-28",
-      "count": 0
-    },
     {
       "date": "2026-03-01",
       "count": 0
@@ -432,7 +428,11 @@
     },
     {
       "date": "2026-05-22",
-      "count": 2
+      "count": 1
+    },
+    {
+      "date": "2026-05-23",
+      "count": 1
     }
   ]
 }

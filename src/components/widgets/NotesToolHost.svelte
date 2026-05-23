@@ -4,6 +4,7 @@
   import CalculatorWidget from './CalculatorWidget.svelte';
   import WhiteboardWidget from './WhiteboardWidget.svelte';
   import NotesToolDrawer from './NotesToolDrawer.svelte';
+  import { isNotesContextPath } from '../../lib/notes-context';
 
   const STORAGE_KEY = 'second-brain:notes-tools';
 
@@ -25,9 +26,7 @@
   };
 
   function checkPath() {
-    onNotesPage =
-      typeof location !== 'undefined' &&
-      (location.pathname === '/notes' || location.pathname.startsWith('/notes/'));
+    onNotesPage = typeof location !== 'undefined' && isNotesContextPath(location.pathname);
   }
 
   onMount(() => {
@@ -49,9 +48,12 @@
 
     window.addEventListener('popstate', checkPath);
     window.addEventListener('hashchange', checkPath);
+    // Astro View Transitions / 软导航
+    document.addEventListener('astro:page-load', checkPath);
     return () => {
       window.removeEventListener('popstate', checkPath);
       window.removeEventListener('hashchange', checkPath);
+      document.removeEventListener('astro:page-load', checkPath);
     };
   });
 

@@ -11,6 +11,7 @@ export type SiteNavLink = {
 // 全站导航——主界面菜单栏和内容页顶栏共用这份列表
 export const SITE_NAV_LINKS: SiteNavLink[] = [
   { href: '/notes', label: '笔记', title: '笔记浏览', icon: 'notes' },
+  { href: '/teaching', label: '教学', title: '数学 · 微积分复习', icon: 'book' },
   { href: '/python', label: 'Python', title: 'Python IDE', icon: 'python' },
   { href: '/matlab', label: 'MATLAB', title: 'MATLAB 计算器', icon: 'matlab' },
   { href: '/digits', label: NEURAL_LAB.navLabel, title: NEURAL_LAB.navTitle, icon: 'digits' },
