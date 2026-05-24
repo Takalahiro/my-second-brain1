@@ -1,5 +1,10 @@
 import pyTracerSetup from './py-tracer.py?raw';
 
+import type { TraceModuleKind } from './step-category';
+
+export type { TraceModuleKind } from './step-category';
+export { MODULE_META, MODULE_ORDER, inferStepCategory, moduleStats } from './step-category';
+
 export type PythonTraceStep = {
   id?: number;
   line: number;
@@ -7,6 +12,8 @@ export type PythonTraceStep = {
   explanation: string;
   func: string;
   event: 'line' | 'call' | 'return' | 'exception';
+  /** 细粒度语义分模块（与 py-tracer _classify_category 同步） */
+  category?: TraceModuleKind;
   depth?: number;
   collapsed?: number;
   /** 仅 AST 静态分析、未实际执行 */
@@ -33,45 +40,6 @@ export const EVENT_LABELS: Record<PythonTraceStep['event'], string> = {
   exception: '异常',
 };
 
-/** 追踪步骤所属模块（与 event 一一对应，UI 分栏用） */
-export type TraceModuleKind = PythonTraceStep['event'];
-
-export const MODULE_META: Record<
-  TraceModuleKind,
-  { label: string; short: string; desc: string; color: string; bg: string }
-> = {
-  call: {
-    label: '调用模块',
-    short: '调用',
-    desc: '进入函数 / 方法 / 魔法方法',
-    color: '#7ec8ff',
-    bg: 'rgb(126 200 255 / 0.12)',
-  },
-  line: {
-    label: '执行模块',
-    short: '执行',
-    desc: '逐行运行语句（赋值、循环、运算等）',
-    color: '#7fe6c4',
-    bg: 'rgb(127 230 196 / 0.12)',
-  },
-  return: {
-    label: '返回模块',
-    short: '返回',
-    desc: '函数返回与构造完成',
-    color: '#ffd56a',
-    bg: 'rgb(255 213 106 / 0.12)',
-  },
-  exception: {
-    label: '异常模块',
-    short: '异常',
-    desc: '运行时错误与堆栈位置',
-    color: '#ff9d9d',
-    bg: 'rgb(255 157 157 / 0.12)',
-  },
-};
-
-export const MODULE_ORDER: TraceModuleKind[] = ['call', 'line', 'return', 'exception'];
-
 /** 当前 AST 已覆盖的语句/表达式类型（与 py-tracer.py 同步，供文档与 UI 参考） */
 export const AST_COVERAGE = [
   'import / from ... import',
@@ -91,6 +59,7 @@ export const AST_COVERAGE = [
   'call/return 事件：构造方法、实例方法、魔法方法、推导式内部',
   '无法运行 / 语法错误时：逐行静态 AST 回退（每行均有解释）',
   'async for / async with 独立解析',
+  '分模块：静态 / 导入 / 定义 / 赋值 / 控制流 / 异步 / 调用 / OOP / 魔法 / 表达式 / 进入 / 返回 / 异常 等',
 ] as const;
 
 export const SAMPLE_CODE = `# OOP + 魔法方法 + 进阶语法 示例

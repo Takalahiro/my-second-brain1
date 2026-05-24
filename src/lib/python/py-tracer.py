@@ -417,6 +417,68 @@ def _build_line_stmt_map(code):
     return _build_line_stmt_map_incremental(code)
 
 
+def _classify_category(event, explanation, func, static=False):
+    """细粒度语义模块（与前端 step-category.ts 同步）"""
+    if static:
+        if '空行' in explanation or '注释' in explanation:
+            return 'meta'
+        # 静态步骤也按语句语义分栏（仅未执行标注在 merge 文案里）
+        return _classify_category(event, explanation, func, static=False)
+    if event == 'exception':
+        return 'exception'
+    if event == 'return':
+        if func == '__init__' or '构造' in explanation:
+            return 'construct'
+        if func.startswith('__') and func.endswith('__'):
+            return 'magic'
+        return 'return'
+    if event == 'call':
+        if func == '__init__' or '构造' in explanation:
+            return 'construct'
+        if func.startswith('__') and func.endswith('__'):
+            return 'magic'
+        if func in ('<listcomp>', '<dictcomp>', '<setcomp>', '<genexpr>'):
+            return 'comp'
+        return 'call'
+    e = explanation
+    if '导入' in e:
+        return 'import'
+    if '定义' in e and any(k in e for k in ('函数', '类', '构造方法', 'async def', 'def ')):
+        return 'define'
+    if any(k in e for k in ('赋值', '增强赋值', '海象', '类型注解', 'del 删除')):
+        return 'assign'
+    if any(k in e for k in ('global', 'nonlocal', 'pass', '注释', '空行', '跳过')):
+        return 'meta'
+    if any(k in e for k in ('for 循环', 'while', 'if 条件', 'try 块', 'except', 'match', 'break', 'continue', 'assert')):
+        return 'control'
+    if any(k in e for k in ('await', 'async ', 'yield')):
+        return 'async'
+    if '调用' in e:
+        if 'print' in e:
+            return 'io'
+        if '魔法方法' in e or '__' in e:
+            return 'magic'
+        return 'invoke'
+    if '魔法方法' in e or ('__' in e and '方法' in e):
+        return 'magic'
+    if any(k in e for k in ('实例', 'self', '属性')):
+        return 'oop'
+    if any(k in e for k in ('运算', '比较', '布尔', '三元', '推导式', 'lambda', '字面量', '下标', '读取', '字符串')):
+        return 'expr'
+    return 'expr'
+
+
+def _with_category(step):
+    s = dict(step)
+    s['category'] = _classify_category(
+        s.get('event', 'line'),
+        s.get('explanation', ''),
+        s.get('func', '<module>'),
+        s.get('static', False),
+    )
+    return s
+
+
 def build_static_line_steps(code):
     """不执行代码：为每一行生成 AST 解释步骤"""
     lines = code.splitlines() if code else ['']
@@ -444,7 +506,7 @@ def build_static_line_steps(code):
             if syntax_err and ln == syntax_err.lineno:
                 expl = f'语法错误: {syntax_err.msg} — {expl}'
 
-        steps.append({
+        steps.append(_with_category({
             'line': ln,
             'source': src,
             'explanation': expl,
@@ -452,12 +514,12 @@ def build_static_line_steps(code):
             'event': 'line',
             'depth': 0,
             'static': True,
-        })
+        }))
 
     if syntax_err:
         eln = syntax_err.lineno or 1
         esrc = lines[eln - 1] if 1 <= eln <= len(lines) else ''
-        steps.append({
+        steps.append(_with_category({
             'line': eln,
             'source': esrc,
             'explanation': f'语法错误: {syntax_err.msg}',
@@ -465,7 +527,7 @@ def build_static_line_steps(code):
             'event': 'exception',
             'depth': 0,
             'static': True,
-        })
+        }))
 
     return steps
 
@@ -591,7 +653,7 @@ def run_traced(code):
             repeat_count = 1
         if len(steps) >= _MAX_STEPS:
             if not steps or '截断' not in steps[-1].get('explanation', ''):
-                steps.append({
+                trunc = _with_category({
                     'line': step.get('line', 1),
                     'source': '',
                     'explanation': f'步骤过多（>{_MAX_STEPS}），追踪已截断',
@@ -600,11 +662,12 @@ def run_traced(code):
                     'depth': 0,
                 })
                 step_id += 1
-                steps[-1]['id'] = step_id
+                trunc['id'] = step_id
+                steps.append(trunc)
             return
         step_id += 1
         step['id'] = step_id
-        steps.append(step)
+        steps.append(_with_category(step))
 
     def tracer(frame, event, arg):
         if frame.f_code.co_filename != '<user_exec>':

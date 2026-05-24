@@ -6,7 +6,8 @@
     moduleStats,
   } from '../../lib/python/trace-model';
   import type { PythonTraceStep } from '../../lib/python/tracer';
-  import { EVENT_LABELS, MODULE_META, type TraceModuleKind } from '../../lib/python/tracer';
+  import { EVENT_LABELS } from '../../lib/python/tracer';
+  import { MODULE_META, MODULE_ORDER, type TraceModuleKind } from '../../lib/python/step-category';
 
   interface Props {
     steps: PythonTraceStep[];
@@ -19,9 +20,7 @@
   type LayoutMode = 'columns' | 'stack';
 
   let layout = $state<LayoutMode>('columns');
-  let visibleKinds = $state<Set<TraceModuleKind>>(
-    new Set(['call', 'line', 'return', 'exception']),
-  );
+  let visibleKinds = $state<Set<TraceModuleKind>>(new Set(MODULE_ORDER));
 
   const buckets = $derived(buildModuleBuckets(steps));
   const frames = $derived(buildInvocationFrames(steps));
@@ -68,8 +67,8 @@
       </button>
     </div>
     <div class="pmf-filters">
-      {#each Object.entries(MODULE_META) as [kind, meta]}
-        {@const k = kind as TraceModuleKind}
+      {#each MODULE_ORDER as k}
+        {@const meta = MODULE_META[k]}
         {@const count = stats[k]}
         {#if count > 0}
           <button
@@ -77,6 +76,7 @@
             class="pmf-chip"
             class:on={visibleKinds.has(k)}
             style="--chip-color: {meta.color}"
+            title={meta.desc}
             onclick={() => toggleKind(k)}
           >
             {meta.short} {count}
@@ -106,7 +106,8 @@
                   onclick={() => pick(index)}
                 >
                   <span class="pmf-card-meta">
-                    <span class="pmf-tag">{EVENT_LABELS[step.event]}</span>
+                    <span class="pmf-tag" data-cat={bucket.kind}>{MODULE_META[bucket.kind].short}</span>
+                    <span class="pmf-tag pmf-tag--evt">{EVENT_LABELS[step.event]}</span>
                     <span class="pmf-ln">L{step.line}</span>
                     {#if step.func && step.func !== '<module>'}
                       <span class="pmf-fn">{step.func}()</span>
@@ -240,10 +241,16 @@
 
   .pmf-columns {
     display: grid;
-    grid-template-columns: repeat(var(--cols, 2), minmax(180px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(var(--cols, 2), minmax(160px, 1fr));
+    gap: 8px;
     min-height: 100%;
     align-items: start;
+  }
+
+  @media (min-width: 1400px) {
+    .pmf-columns {
+      grid-template-columns: repeat(var(--cols, 2), minmax(140px, 1fr));
+    }
   }
 
   .pmf-col {
@@ -344,13 +351,15 @@
     border-radius: 999px;
     font-size: 0.58rem;
     font-weight: 700;
-    background: rgb(180 140 255 / 0.2);
-    color: #d4c0ff;
+    background: color-mix(in srgb, var(--mod-color) 22%, transparent);
+    color: var(--mod-color);
   }
 
-  .pmf-card[data-event='call'] .pmf-tag { background: rgb(126 200 255 / 0.2); color: #9dccff; }
-  .pmf-card[data-event='return'] .pmf-tag { background: rgb(255 213 106 / 0.2); color: #ffd56a; }
-  .pmf-card[data-event='exception'] .pmf-tag { background: rgb(255 120 120 / 0.2); color: #ff9d9d; }
+  .pmf-tag--evt {
+    background: rgb(255 255 255 / 0.08);
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
 
   .pmf-ln,
   .pmf-fn,

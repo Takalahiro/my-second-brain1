@@ -1,8 +1,14 @@
 import { highlightPython } from './highlight';
 import type { PythonTraceStep } from './tracer';
-import { MODULE_META, MODULE_ORDER, type TraceModuleKind } from './tracer';
+import {
+  MODULE_META,
+  MODULE_ORDER,
+  inferStepCategory,
+  type TraceModuleKind,
+} from './step-category';
 
 export type { TraceModuleKind };
+export { inferStepCategory, moduleStats } from './step-category';
 
 export type LineTraceState = 'idle' | 'pending' | 'executed' | 'active' | 'error' | 'static';
 
@@ -127,7 +133,8 @@ export function buildModuleBuckets(steps: PythonTraceStep[]): TraceModuleBucket[
   for (const kind of MODULE_ORDER) map.set(kind, []);
 
   steps.forEach((step, index) => {
-    map.get(step.event)?.push({ index, step });
+    const kind = inferStepCategory(step);
+    map.get(kind)?.push({ index, step });
   });
 
   return MODULE_ORDER.map((kind) => {
@@ -179,7 +186,7 @@ export function buildInvocationFrames(steps: PythonTraceStep[]): TraceInvocation
   }
 
   steps.forEach((step, index) => {
-    const seg: TraceFlowSegment = { kind: step.event, index, step };
+    const seg: TraceFlowSegment = { kind: inferStepCategory(step), index, step };
 
     if (step.event === 'call') {
       const frame: TraceInvocationFrame = {
@@ -212,8 +219,3 @@ export function buildInvocationFrames(steps: PythonTraceStep[]): TraceInvocation
   return out;
 }
 
-export function moduleStats(steps: PythonTraceStep[]): Record<TraceModuleKind, number> {
-  const counts: Record<TraceModuleKind, number> = { call: 0, line: 0, return: 0, exception: 0 };
-  for (const s of steps) counts[s.event] += 1;
-  return counts;
-}
