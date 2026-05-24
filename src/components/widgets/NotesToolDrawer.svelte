@@ -23,6 +23,7 @@
   let open = $state(false);
   let dragKey = $state<ToolKey | null>(null);
   let tileDidMove = false;
+  let suppressTileClick = false;
   let dragGhost: HTMLDivElement | null = null;
 
   const FAB_POS_KEY = 'second-brain:notes-tool-btn-pos';
@@ -170,6 +171,7 @@
   }
 
   function onTilePointerDown(e: PointerEvent, w: ToolItem) {
+    if ((e.target as HTMLElement).closest('.ntd-actions, [data-no-drag]')) return;
     dragKey = w.id;
     tileDidMove = false;
     const sx = e.clientX;
@@ -209,6 +211,9 @@
       const target = document.elementFromPoint(e.clientX, e.clientY);
       const onDrawer = !!target?.closest('.notes-tool-drawer, .notes-tool-btn');
       if (!onDrawer) onToggle(w.id, { x: e.clientX, y: e.clientY });
+      suppressTileClick = true;
+    } else if (suppressTileClick) {
+      suppressTileClick = false;
     } else {
       openTool(w.id);
     }
@@ -268,12 +273,31 @@
             <div class="ntd-desc">{w.desc}</div>
           </div>
           <div class="ntd-actions" data-no-drag>
-            <button type="button" class="ntd-open" onclick={() => openTool(w.id)}>打开</button>
-            <label class="switch">
+            <button
+              type="button"
+              class="ntd-open"
+              onclick={(e) => {
+                e.stopPropagation();
+                openTool(w.id);
+              }}
+              onpointerdown={(e) => e.stopPropagation()}
+            >
+              打开
+            </button>
+            <label
+              class="switch"
+              data-no-drag
+              onclick={(e) => e.stopPropagation()}
+              onpointerdown={(e) => e.stopPropagation()}
+            >
               <input
                 type="checkbox"
                 checked={enabled[w.id]}
-                onchange={() => onToggle(w.id)}
+                onclick={(e) => {
+                  e.stopPropagation();
+                  suppressTileClick = true;
+                  onToggle(w.id);
+                }}
                 aria-label={`${w.name} 开关`}
               />
               <span></span>

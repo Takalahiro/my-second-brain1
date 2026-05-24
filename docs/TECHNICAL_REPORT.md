@@ -1,8 +1,18 @@
 # My Second Brain — 技术报表
 
 > **文档类型：** 架构与设计技术报表  
-> **适用范围：** my-second-brain 全站（SSG 知识库 + 桌面小组件 + 3DGS 壁纸 + 浏览器内计算工具）  
-> **最后更新：** 2026-05-23
+> **适用范围：** my-second-brain 全站（SSG 知识库 + 桌面小组件 + 3DGS / HUD 壁纸 + 浏览器内计算工具）  
+> **当前版本：** 1.3.0  
+> **最后更新：** 2026-05-20
+
+---
+
+## 版本记录
+
+| 版本 | 日期 | 摘要 |
+|------|------|------|
+| **1.3.0** | 2026-05-20 | NASA-punk **HUD 皮肤**（Canvas 实时壁纸、任务状态条、日全食 intro、CLI 搜索样式）；笔记页 **NotesToolHost**（Python / MATLAB / 白板）；修复笔记工具开关双触发导致无法显示 |
+| 1.2.0 | 2026-05-15 | 3DGS 环境壁纸、媒体 manifest、vault 同步与 git mtime 等（见下文各节） |
 
 ---
 
@@ -24,11 +34,13 @@
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  UI 层：WidgetHost / 笔记页 / 工具页 (/python, /digits…) │
+│  UI 层：WidgetHost / NotesToolHost / 笔记页 / 工具页      │
 ├─────────────────────────────────────────────────────────┤
-│  状态层：localStorage (second-brain:widgets)             │
+│  皮肤层：data-ui (mac | glass | pixel | hud)             │
 ├─────────────────────────────────────────────────────────┤
-│  壁纸层：BackgroundLayer (video | poster | 3DGS ply)     │  z-index: -1
+│  状态层：localStorage (widgets / notes-tools / ui-skin)  │
+├─────────────────────────────────────────────────────────┤
+│  壁纸层：BackgroundLayer (video | poster | 3DGS | HUD)   │  z-index: -1
 ├─────────────────────────────────────────────────────────┤
 │  构建期数据：wikilinks.json / stats.json / media-manifest│
 ├─────────────────────────────────────────────────────────┤
@@ -77,6 +89,37 @@ Astro Content Layer 读取 vault 内 Markdown，经 Unified remark/rehype 链输
 | 目标 | 阅读、双链、大纲 | 氛围、工具、快捷入口 |
 
 同一域名下完成「读笔记」与「用桌面」，避免传统主题仅换皮、无 OS 感的问题。
+
+### 3.3 笔记页工具层（NotesToolHost）
+
+笔记相关路由（`/notes/*`、`/folder/*`、`/tags/*`）在 `BaseLayout` 挂载 **NotesToolHost**，与首页 `WidgetHost` 独立：
+
+| 工具 | 组件 | 持久化键 |
+|------|------|----------|
+| Python | `PythonWidget` | `second-brain:notes-tools` + `second-brain:python-layout` |
+| MATLAB | `CalculatorWidget` | `second-brain:notes-tools` + `second-brain:calc-layout` |
+| 白板 | `WhiteboardWidget` | `second-brain:notes-tools` + `second-brain:whiteboard-layout` |
+
+- 入口：右下角可拖拽 FAB → `NotesToolDrawer` 侧栏；
+- 开关状态写入 `second-brain:notes-tools`，与桌面 `second-brain:widgets` **不共享**（MATLAB 在桌面侧键名为 `calculator`）；
+- 卡片可拖出到页面指定浮窗位置；开关与「打开」按钮需 **阻止 tile 级 pointer 冒泡**，避免一次点击触发两次 `toggle`（v1.3.0 修复）。
+
+### 3.4 UI 皮肤与 HUD 任务 chrome（v1.3.0）
+
+`src/features/ui/` 提供可切换皮肤，持久化键 `second-brain:ui-skin`，DOM 标记 `html[data-ui='hud']`：
+
+| 能力 | 模块 |
+|------|------|
+| 皮肤注册 / 应用 | `registry.ts`, `apply-ui.ts`, `UiSkinPicker.svelte` |
+| HUD 响应式 hook | `hud-mode.svelte.ts` → `useHudMode()` |
+| Canvas 实时壁纸 | `HudWallpaper.svelte`, `hud-wallpaper-engine.ts`（星场、星云、流星、视差、glitch） |
+| 顶栏任务条 | `HudMissionStatus.svelte`（T+ / 信号格 / RA·DEC，每秒整行刷新） |
+| 完整菜单栏 | `MacMenuBar.svelte` 双层布局：22px 状态条 + 44px 原菜单（导航、语言、主题、时钟等全部保留） |
+| 滚动高度计 | `HudScrollIndicator.svelte` |
+| 回主界面 intro | `HudEclipseIntro.astro`（日全食加载动画） |
+| CLI 搜索样式 | `hud-mission-chrome.css` → 搜索框 `MSB://CMD>` 前缀 |
+
+HUD 模式下 `WidgetHost` 使用 `HudWallpaper` 替代普通 `BackgroundLayer`；小组件功能不被 HUD 样式隐藏，仅叠加 mission chrome 视觉。
 
 ---
 
@@ -299,6 +342,12 @@ iOS 13+ 需用户手势触发 `DeviceOrientationEvent.requestPermission()`；已
 | `src/lib/wallpaper/gs3-wallpaper.ts` | gs3 Viewer 封装 |
 | `src/lib/wallpaper/spatial-camera.ts` | 陀螺仪 / 鼠标视差 |
 | `src/lib/wallpaper-mode.ts` | 三模互斥 |
+| `src/components/widgets/NotesToolHost.svelte` | 笔记页 Python / MATLAB / 白板 |
+| `src/components/widgets/NotesToolDrawer.svelte` | 笔记工具 FAB 与侧栏 |
+| `src/features/ui/` | UI 皮肤与 HUD 模式 |
+| `src/components/wallpaper/HudWallpaper.svelte` | HUD Canvas 壁纸 |
+| `src/lib/hud-wallpaper-engine.ts` | HUD 壁纸渲染引擎 |
+| `src/styles/ui/hud-mission-chrome.css` | HUD 任务 chrome 样式 |
 | `src/styles/gs-wallpaper.css` | 壁纸 CSS 后期 |
 | `scripts/build-media-manifest.mjs` | 媒体清单 |
 | `scripts/convert-ply-to-sog.mjs` | PLY 转换 |
