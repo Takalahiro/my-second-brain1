@@ -1,0 +1,114 @@
+/* 浅色模式对比度修复（毛玻璃 / 拟物） */
+
+html:not(.dark)[data-ui='glass'] {
+  --glass-bg: rgb(255 255 255 / 0.78);
+  --glass-bg-hover: rgb(255 255 255 / 0.9);
+  --glass-bg-strong: rgb(255 255 255 / 0.86);
+  --glass-border: rgb(26 39 68 / 0.18);
+  --border-color: rgb(26 39 68 / 0.14);
+
+  --neo-surface: rgb(255 255 255 / 0.72);
+  --neo-track: rgb(26 39 68 / 0.18);
+  --neo-thumb: #ffffff;
+
+  --chrome-bg-top: rgb(255 255 255 / 0.82);
+  --chrome-bg-bottom: rgb(248 250 255 / 0.78);
+  --chrome-border: rgb(26 39 68 / 0.16);
+  --chrome-subtle: rgb(26 39 68 / 0.06);
+  --chrome-hover: rgb(26 39 68 / 0.07);
+  --chrome-active: rgb(26 39 68 / 0.11);
+  --chrome-text-muted: rgb(26 39 68 / 0.58);
+  --chrome-dropdown-bg: rgb(255 255 255 / 0.94);
+
+  --widget-border: rgb(26 39 68 / 0.16);
+  --widget-header-bg: rgb(26 39 68 / 0.05);
+
+  --shadow-normal: 0 12px 40px rgb(60 100 180 / 0.14), 0 0 0 1px rgb(26 39 68 / 0.08);
+  --neo-raised: 0 10px 32px rgb(60 100 180 / 0.12), 0 0 0 1px rgb(26 39 68 / 0.1);
+}
+
+html:not(.dark)[data-ui='glass'] .mac-traffic .dot {
+  border: 1px solid rgb(26 39 68 / 0.18) !important;
+}
+
+html:not(.dark)[data-ui='glass'] .mac-traffic .red {
+  background: #ff5f57 !important;
+}
+
+html:not(.dark)[data-ui='glass'] .mac-traffic .yellow {
+  background: #febc2e !important;
+}
+
+html:not(.dark)[data-ui='glass'] .mac-traffic .green {
+  background: #28c840 !important;
+}
+
+html:not(.dark)[data-ui='glass'] .mac-traffic:hover .dot {
+  color: rgb(0 0 0 / 0.55);
+}
+
+html:not(.dark)[data-ui='glass'] .mac-chrome .dot {
+  border: 1px solid rgb(26 39 68 / 0.18) !important;
+}
+
+html:not(.dark)[data-ui='glass'] .mac-chrome .close {
+  background: #ff5f57 !important;
+}
+
+html:not(.dark)[data-ui='glass'] .mac-chrome .min {
+  background: #febc2e !important;
+}
+
+html:not(.dark)[data-ui='glass'] .mac-chrome .max {
+  background: #28c840 !important;
+}
+
+html:not(.dark)[data-ui='glass'] .mac-chrome:hover .glyph {
+  color: rgb(0 0 0 / 0.55);
+}
+
+html:not(.dark)[data-ui='glass'] .mac-toggle span {
+  background: rgb(26 39 68 / 0.12);
+  border: 1px solid rgb(26 39 68 / 0.16);
+}
+
+html:not(.dark)[data-ui='mac'],
+html:not(.dark):not([data-ui]) {
+  --glass-border: rgb(0 0 0 / 0.1);
+  --chrome-border: rgb(0 0 0 / 0.1);
+  --chrome-subtle: rgb(0 0 0 / 0.04);
+  --border-color: rgb(0 0 0 / 0.1);
+  --widget-border: rgb(0 0 0 / 0.1);
+}
+
+html:not(.dark)[data-ui='glass'] .floating-widget,
+html:not(.dark)[data-ui='glass'] .mac-settings,
+html:not(.dark)[data-ui='glass'] .site-nav-shell {
+  background: rgb(255 255 255 / 0.78);
+  border: 1px solid rgb(26 39 68 / 0.14);
+}
+
+html:not(.dark)[data-ui='glass'] .site-nav-brand,
+html:not(.dark)[data-ui='glass'] .site-nav-link {
+  background: rgb(255 255 255 / 0.72);
+  border: 1px solid rgb(26 39 68 / 0.12);
+  color: var(--text-primary);
+}
+
+html:not(.dark)[data-ui='glass'] .ui-skin-card.is-active {
+  border-color: rgb(26 39 68 / 0.22);
+  box-shadow: 0 0 0 2px var(--ui-accent-soft), var(--shadow-normal);
+}
+
+html:not(.dark)[data-ui='hud'] {
+  --chrome-text-muted: #3d5278;
+  --glass-border: #0f1f3d;
+  --widget-border: #0f1f3d;
+}
+
+html:not(.dark)[data-ui='hud'] .floating-widget,
+html:not(.dark)[data-ui='hud'] .mac-settings,
+html:not(.dark)[data-ui='hud'] .site-nav-shell {
+  background: rgb(245 242 235 / 0.94);
+  border: 1px solid #0f1f3d;
+}

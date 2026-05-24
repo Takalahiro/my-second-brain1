@@ -8,6 +8,7 @@
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import PixelIcon from '../PixelIcon.svelte';
   import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
+  import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
 
   interface Props {
     onClose?: () => void;
@@ -253,6 +254,7 @@
   const ringR = $derived(ringSize / 2 - 10);
   const ringCirc = $derived(2 * Math.PI * ringR);
   const ringOffset = $derived(ringCirc * (1 - progress));
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized, compactMax: 280, expandedMin: 480 }));
 
   const touchOpts = $derived(
     makeWidgetTouchBindings(
@@ -273,7 +275,7 @@
 
 <section
   bind:this={rootEl}
-  class="pomo-widget phase-{phase} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
+  class="pomo-widget {tierClass(tier)} phase-{phase} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style={rotationStyle(rotation, (maximized ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${minimized ? 'auto' : height + 'px'};`) + ` --w-bg-alpha: ${bgAlpha};`)}
   aria-label="番茄钟"
   use:widgetTouchGestures={touchOpts}
@@ -311,6 +313,11 @@
 
   {#if !minimized}
     <div class="pw-body">
+      <div class="pw-hud-lamps" aria-hidden="true">
+        <span class="pw-lamp {phase === 'focus' ? (running ? 'on' : 'off') : 'off'}">{phase === 'focus' && running ? '◉' : '○'} FOCUS</span>
+        <span class="pw-lamp {phase === 'short' ? (running ? 'on' : 'off') : 'off'}">{phase === 'short' && running ? '◉' : '○'} SHORT</span>
+        <span class="pw-lamp {phase === 'long' ? (running ? 'on' : 'off') : 'off'}">{phase === 'long' && running ? '◉' : '○'} LONG</span>
+      </div>
       <div class="pw-tabs" data-no-drag>
         <button type="button" class:active={phase === 'focus'} onclick={() => setPhase('focus')}>专注 {focusMin}m</button>
         <button type="button" class:active={phase === 'short'} onclick={() => setPhase('short')}>小憩 {shortMin}m</button>

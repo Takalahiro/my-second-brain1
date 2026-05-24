@@ -1,9 +1,16 @@
 <script lang="ts">
   // 弧线和弦图：节点沿底边一字排，按 folder 上色；链接画成上方贝塞尔弧；孤岛也在底边但没有弧
   import type { RawLink, WikiData, RawNode, GraphSettings } from './graph-data';
-  import { folderColor, noteHref } from './graph-data';
+  import { noteHref } from './graph-data';
   import { ZP_MIN, ZP_MAX, clamp } from './use-zoom-pan';
   import ZoomControls from './ZoomControls.svelte';
+  import GraphHudNode from './GraphHudNode.svelte';
+  import {
+    hudLinkStroke,
+    hudNodeCoreColor,
+    resolveGraphColor,
+  } from './graph-hud-theme';
+  import { useGraphHudTheme } from '../../features/ui/hud-mode.svelte';
 
   interface Props {
     data: WikiData;
@@ -12,6 +19,8 @@
     onSelect?: (id: string | null) => void;
   }
   let { data, folderFocus, settings, onSelect }: Props = $props();
+
+  const hudTheme = useGraphHudTheme();
 
   let hoveredId = $state<string | null>(null);
   let selectedId = $state<string | null>(null);
@@ -63,7 +72,7 @@
           node: n,
           x: cx,
           folder: g.folder,
-          color: folderColor(g.folder, folders),
+          color: resolveGraphColor(g.folder, folders, hudTheme.hud),
           orphan: n.inDegree + n.outDegree === 0,
         });
       });
@@ -158,6 +167,7 @@
   viewBox="0 0 {VB_W} {VB_H}"
   preserveAspectRatio="xMidYMid meet"
   class="g-svg"
+  class:g-svg--hud={hudTheme.hud}
   onwheel={onWheel}
   onpointerdown={onPanDown}
   onpointermove={onPanMove}
@@ -165,22 +175,33 @@
   onpointercancel={onPanUp}
 >
   <defs>
-    <linearGradient id="av-bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0e0620" />
-      <stop offset="60%" stop-color="#1a1132" />
-      <stop offset="100%" stop-color="#06030f" />
-    </linearGradient>
-    <linearGradient id="av-arc" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="rgb(180 140 255 / 0.7)" />
-      <stop offset="100%" stop-color="rgb(255 208 230 / 0.15)" />
-    </linearGradient>
-    <linearGradient id="av-arc-hi" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#ffd0e6" />
-      <stop offset="100%" stop-color="#b48cff" />
-    </linearGradient>
-    <pattern id="av-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M 40 0 L 0 0 0 40" stroke="rgba(255,255,255,0.04)" fill="none" />
-    </pattern>
+    {#if hudTheme.hud}
+      <linearGradient id="av-bg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0b1426" />
+        <stop offset="55%" stop-color="#08101e" />
+        <stop offset="100%" stop-color="#050a14" />
+      </linearGradient>
+      <pattern id="av-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+        <path d="M 32 0 L 0 0 0 32" fill="none" stroke="rgba(245,242,235,0.05)" />
+      </pattern>
+    {:else}
+      <linearGradient id="av-bg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#0e0620" />
+        <stop offset="60%" stop-color="#1a1132" />
+        <stop offset="100%" stop-color="#06030f" />
+      </linearGradient>
+      <linearGradient id="av-arc" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgb(180 140 255 / 0.7)" />
+        <stop offset="100%" stop-color="rgb(255 208 230 / 0.15)" />
+      </linearGradient>
+      <linearGradient id="av-arc-hi" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#ffd0e6" />
+        <stop offset="100%" stop-color="#b48cff" />
+      </linearGradient>
+      <pattern id="av-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" stroke="rgba(255,255,255,0.04)" fill="none" />
+      </pattern>
+    {/if}
   </defs>
 
   <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#av-bg)" opacity={settings.bgDim} />
@@ -189,7 +210,7 @@
   <g transform={`translate(${panX} ${panY}) scale(${zoom})`}>
 
   <!-- baseline -->
-  <line x1={PAD - 10} y1={BASE_Y} x2={VB_W - PAD + 10} y2={BASE_Y} stroke="rgb(255 255 255 / 0.16)" stroke-width="1" />
+  <line x1={PAD - 10} y1={BASE_Y} x2={VB_W - PAD + 10} y2={BASE_Y} stroke={hudTheme.hud ? 'rgba(245,242,235,0.22)' : 'rgb(255 255 255 / 0.16)'} stroke-width="1" />
 
   <!-- 弧线 -->
   <g opacity={settings.edgeOpacity}>
@@ -200,7 +221,7 @@
         {@const hi = highlightSet && highlightSet.has(l.source) && highlightSet.has(l.target)}
         {@const dim = (folderFocus && a.folder !== folderFocus && b.folder !== folderFocus) || (highlightSet && !hi)}
         <path d={arcPath(a, b)} fill="none"
-              stroke={hi ? 'url(#av-arc-hi)' : (dim ? 'rgba(255,255,255,0.04)' : 'url(#av-arc)')}
+              stroke={hudTheme.hud ? hudLinkStroke(!!dim, !!hi) : (hi ? 'url(#av-arc-hi)' : (dim ? 'rgba(255,255,255,0.04)' : 'url(#av-arc)'))}
               stroke-width={(hi ? 1.4 : (dim ? 0.4 : 0.8)) * settings.edgeScale}
               stroke-linecap="round" />
       {/if}
@@ -218,9 +239,9 @@
           x={x0} y={BASE_Y + 10}
           width={Math.max(8, x1 - x0)}
           height="16"
-          rx="6"
+          rx={hudTheme.hud ? 0 : 6}
           fill={p.color}
-          fill-opacity={folderFocus && folderFocus !== p.folder ? 0.18 : 0.7}
+          fill-opacity={folderFocus && folderFocus !== p.folder ? 0.18 : (hudTheme.hud ? 0.45 : 0.7)}
         />
         <text
           x={(x0 + x1) / 2}
@@ -241,6 +262,7 @@
       {@const r = nodeR(p)}
       {@const dim = isDim(p.node.id)}
       {@const showLabel = settings.showLabels === 'always' || (settings.showLabels === 'hover' && focusId === p.node.id)}
+      {@const starColor = resolveGraphColor(p.folder, folders, hudTheme.hud)}
       <g
         data-nid={p.node.id}
         class="g-node {selectedId === p.node.id ? 'is-sel' : ''} {dim ? 'is-dim' : ''} {p.orphan ? 'is-orphan' : ''} {settings.clickToOpen ? 'is-link' : ''}"
@@ -249,14 +271,27 @@
         onclick={() => onNodeClick(p.node.id)}
         ondblclick={() => (location.href = noteHref(p.node.id))}
       >
-        <circle cx={p.x} cy={BASE_Y} r={r} fill={p.color}
-                stroke={p.orphan ? 'rgb(255 255 255 / 0.45)' : 'none'}
-                stroke-width="0.6"
-                stroke-dasharray={p.orphan ? '1.4,1.4' : ''}>
-          <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
-        </circle>
+        {#if hudTheme.hud}
+          <GraphHudNode
+            x={p.x}
+            y={BASE_Y}
+            r={r}
+            color={starColor}
+            core={hudNodeCoreColor(p.node, starColor)}
+            orphan={p.orphan}
+            selected={selectedId === p.node.id}
+          />
+        {:else}
+          <circle cx={p.x} cy={BASE_Y} r={r} fill={p.color}
+                  stroke={p.orphan ? 'rgb(255 255 255 / 0.45)' : 'none'}
+                  stroke-width="0.6"
+                  stroke-dasharray={p.orphan ? '1.4,1.4' : ''}>
+            <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
+          </circle>
+        {/if}
+        <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
         {#if showLabel}
-          <line x1={p.x} y1={BASE_Y - r - 2} x2={p.x} y2={BASE_Y - r - 18} stroke={p.color} stroke-width="1" />
+          <line x1={p.x} y1={BASE_Y - r - 2} x2={p.x} y2={BASE_Y - r - 18} stroke={starColor} stroke-width="1" />
           <text x={p.x} y={BASE_Y - r - 22} text-anchor="middle" class="g-label">{p.node.title}</text>
         {/if}
       </g>

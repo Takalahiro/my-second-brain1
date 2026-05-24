@@ -1,0 +1,573 @@
+/* NASA-punk · 三档尺寸：小(MIN) / 标准(STD) / 大(FULL 仪表盘) */
+
+html[data-ui='hud'] {
+  --hud-tier-min: 'MIN';
+  --hud-tier-std: 'STD';
+  --hud-tier-full: 'FULL';
+}
+
+/* ── 尺寸角标（拖动缩放自动切换） ── */
+
+html[data-ui='hud'] :is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+)::after {
+  z-index: 5;
+}
+
+/* ═══════════════════════════════════════
+   小 · MIN — 极简 NASA 读数
+   ═══════════════════════════════════════ */
+
+html[data-ui='hud'] .widget-tier-compact {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* 去掉角标 bracket、grav 环、任务章 */
+html[data-ui='hud'] .widget-tier-compact:is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+)::before {
+  content: '◇ MIN';
+  inset: auto;
+  top: 5px;
+  left: 7px;
+  width: auto;
+  height: auto;
+  background: none;
+  z-index: 6;
+  font-size: 0.52rem;
+  letter-spacing: 0.12em;
+  color: var(--hud-navy-muted, #3d5278);
+  pointer-events: none;
+}
+
+html.dark[data-ui='hud'] .widget-tier-compact:is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+)::before {
+  color: #9aafc9;
+}
+
+html[data-ui='hud'] .widget-tier-expanded > :is([class*='-header'], [class*='-bar'], .fw-header, .clock-bar) {
+  border-top: 2px solid var(--hud-red, #c8102e);
+  box-shadow: inset 0 2px 0 rgb(200 16 46 / 0.08);
+}
+
+html[data-ui='hud'] .widget-tier-compact:is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+)::after {
+  display: none;
+}
+
+html[data-ui='hud'] .widget-tier-compact > :is([class*='-header'], [class*='-bar'], .fw-header, .clock-bar)::after {
+  display: none;
+}
+
+html[data-ui='hud'] .widget-tier-compact :is([class*='-body'], .fw-body, .clock-body) {
+  padding: 5px 8px 6px !important;
+  background-image: none !important;
+}
+
+html[data-ui='hud'] .widget-tier-compact :is(
+  .settings-btn,
+  .cal-settings-btn,
+  .pw-settings-btn,
+  .sw-cog,
+  .ww-settings-btn,
+  .mp-actions .icon-btn,
+  .cd-hint,
+  .pw-hud-lamps,
+  .mp-hud-wave,
+  .tw-star-hud,
+  .ww-tier,
+  .sw-mode-tag,
+  .tw-sub,
+  .cal-bg-cfg,
+  .clock-settings
+) {
+  display: none !important;
+}
+
+/* 时钟 · 纯读数 */
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-bar {
+  padding: 4px 8px !important;
+  min-height: 0;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-title {
+  font-size: 0.52rem !important;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-body {
+  padding: 4px 8px 6px !important;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-time,
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .neon-time,
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .nixie-row {
+  font-size: clamp(1rem, 8vw, 1.6rem) !important;
+  letter-spacing: 0.06em !important;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-meta {
+  margin-top: 4px !important;
+  font-size: 0.52rem !important;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-altimeter .alt-face {
+  padding: 4px 6px;
+  border: 0;
+  background: transparent;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-altimeter .hud-readout-label,
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-altimeter .hud-bar-line,
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-altimeter .alt-ticks {
+  display: none;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-compact .clock-altimeter .hud-readout-lg {
+  font-size: clamp(1rem, 10vw, 1.5rem) !important;
+}
+
+/* 天气 · 温度 + 一行 */
+html[data-ui='hud'] .weather-widget.widget-tier-compact .ww-daily,
+html[data-ui='hud'] .weather-widget.widget-tier-compact .ww-foot,
+html[data-ui='hud'] .weather-widget.widget-tier-compact .ww-cur-icon,
+html[data-ui='hud'] .weather-widget.widget-tier-compact .ww-cur-wind {
+  display: none !important;
+}
+
+html[data-ui='hud'] .weather-widget.widget-tier-compact .ww-current {
+  padding: 6px 8px !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+html[data-ui='hud'] .weather-widget.widget-tier-compact .ww-cur-temp {
+  font-size: 1.6rem !important;
+}
+
+html[data-ui='hud'] .weather-widget.widget-tier-compact .ww-place {
+  font-size: 0.58rem !important;
+}
+
+/* 日历 · 仅任务列表 */
+html[data-ui='hud'] .cal-widget.widget-tier-compact .cal-toolbar,
+html[data-ui='hud'] .cal-widget.widget-tier-compact .cal-grid,
+html[data-ui='hud'] .cal-widget.widget-tier-compact .cal-bg-cfg,
+html[data-ui='hud'] .cal-widget.widget-tier-compact .cal-cfg {
+  display: none !important;
+}
+
+html[data-ui='hud'] .cal-widget.widget-tier-compact .cal-upcoming {
+  max-height: none;
+  flex: 1;
+  border-top: 0;
+  padding-top: 4px;
+}
+
+html[data-ui='hud'] .cal-widget.widget-tier-compact .cal-up-head {
+  font-size: 0.55rem;
+  margin-bottom: 4px;
+}
+
+html[data-ui='hud'] .cal-widget.widget-tier-compact .cal-mission-mark,
+html[data-ui='hud'] .cal-widget.widget-tier-compact .cal-hud-mark {
+  display: inline !important;
+}
+
+/* 音乐 · 迷你通讯条 */
+html[data-ui='hud'] .music-cd.widget-tier-compact .cd-tonearm,
+html[data-ui='hud'] .music-cd.widget-tier-compact .vprog-area,
+html[data-ui='hud'] .music-cd.widget-tier-compact .cd-controls .mode,
+html[data-ui='hud'] .music-cd.widget-tier-compact .cd-vol {
+  display: none !important;
+}
+
+html[data-ui='hud'] .music-cd.widget-tier-compact .cd-stage {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 4px 8px !important;
+}
+
+html[data-ui='hud'] .music-cd.widget-tier-compact .cd-wrap {
+  width: 64px !important;
+  height: 64px !important;
+}
+
+html[data-ui='hud'] .music-cd.widget-tier-compact .mp-title-area {
+  flex: 1;
+  min-width: 0;
+}
+
+html[data-ui='hud'] .music-cd.widget-tier-compact .mp-artist {
+  display: none;
+}
+
+html[data-ui='hud'] .music-cd.widget-tier-compact .mp-title {
+  font-size: 0.62rem !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 番茄钟 · 倒计时核心 */
+html[data-ui='hud'] .pomo-widget.widget-tier-compact .pw-tabs,
+html[data-ui='hud'] .pomo-widget.widget-tier-compact .pw-cycle,
+html[data-ui='hud'] .pomo-widget.widget-tier-compact .pw-cfg,
+html[data-ui='hud'] .pomo-widget.widget-tier-compact .pw-second {
+  display: none !important;
+}
+
+html[data-ui='hud'] .pomo-widget.widget-tier-compact .pw-ring-wrap {
+  transform: scale(0.72);
+  margin: -8px 0;
+}
+
+html[data-ui='hud'] .pomo-widget.widget-tier-compact .pw-controls {
+  padding-top: 0 !important;
+}
+
+/* 白噪音 · 通道指示灯 */
+html[data-ui='hud'] .wn-widget.widget-tier-compact .wn-mixers {
+  display: none !important;
+}
+
+html[data-ui='hud'] .wn-widget.widget-tier-compact .wn-tracks input[type='range'] {
+  display: none !important;
+}
+
+html[data-ui='hud'] .wn-widget.widget-tier-compact .wn-track {
+  padding: 3px 6px !important;
+}
+
+html[data-ui='hud'] .wn-widget.widget-tier-compact .wn-tag {
+  display: none;
+}
+
+/* 统计 · KPI 单行 */
+html[data-ui='hud'] .stats-widget.widget-tier-compact .sw-grid,
+html[data-ui='hud'] .stats-widget.widget-tier-compact .sw-cfg,
+html[data-ui='hud'] .stats-widget.widget-tier-compact .sw-meta {
+  display: none !important;
+}
+
+html[data-ui='hud'] .stats-widget.widget-tier-compact .sw-kpis {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 4px !important;
+}
+
+html[data-ui='hud'] .stats-widget.widget-tier-compact .kpi {
+  padding: 6px !important;
+}
+
+html[data-ui='hud'] .stats-widget.widget-tier-compact .kpi-num {
+  font-size: 1rem !important;
+}
+
+/* 地图 / 图谱 · 画布优先 */
+html[data-ui='hud'] :is(.territory-widget, .graph-widget, .world-widget).widget-tier-compact :is(.tw-sub, .gw-toolbar, .ww-sub) {
+  display: none !important;
+}
+
+html[data-ui='hud'] .world-widget.widget-tier-compact .ww-list {
+  display: none !important;
+}
+
+/* 笔记 / 待办 / 网络 */
+html[data-ui='hud'] :is(.notes-widget, .todo-widget, .network-widget).widget-tier-compact :is(.nw-sidebar, .tw-sidebar, .nw-filter) {
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════
+   标准 · STD — 沿用 hud-widgets 默认
+   ═══════════════════════════════════════ */
+
+html[data-ui='hud'] .widget-tier-medium {
+  /* 无额外覆盖 = 当前 NASA-punk 标准 */
+}
+
+/* ═══════════════════════════════════════
+   大 · FULL — 飞行器仪表盘
+   ═══════════════════════════════════════ */
+
+html[data-ui='hud'] .widget-tier-expanded {
+  outline-offset: 5px !important;
+  box-shadow:
+    inset 0 0 0 1px rgb(200 16 46 / 0.12),
+    inset 0 0 24px rgb(5 10 20 / 0.06) !important;
+}
+
+html[data-ui='hud'] .widget-tier-expanded:is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+)::after {
+  width: 200px;
+  height: 200px;
+  opacity: 0.22;
+}
+
+html[data-ui='hud'] .widget-tier-expanded :is([class*='-body'], .fw-body, .clock-body) {
+  background-image:
+    var(--hud-widget-scan),
+    linear-gradient(var(--hud-widget-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hud-widget-grid) 1px, transparent 1px),
+    radial-gradient(circle at 50% 0%, rgb(200 16 46 / 0.06), transparent 55%) !important;
+  background-size: 100% 18px, 14px 14px, 14px 14px, 100% 40% !important;
+}
+
+/* 仪表边框 + 刻度尺 */
+html[data-ui='hud'] .widget-tier-expanded :is([class*='-body'], .fw-body, .clock-body)::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 1;
+  border: 1px solid rgb(200 16 46 / 0.35);
+  box-shadow:
+    inset 0 0 0 4px rgb(15 31 61 / 0.04),
+    inset 0 0 0 5px rgb(200 16 46 / 0.08);
+}
+
+html[data-ui='hud'] .widget-tier-expanded :is([class*='-body'], .fw-body, .clock-body)::after {
+  content: '▼ ALT · TELEMETRY · FULL ▼';
+  position: absolute;
+  bottom: 4px;
+  right: 8px;
+  font-size: 0.48rem;
+  letter-spacing: 0.14em;
+  color: var(--hud-navy-muted, #3d5278);
+  opacity: 0.65;
+  pointer-events: none;
+  z-index: 1;
+}
+
+html.dark[data-ui='hud'] .widget-tier-expanded :is([class*='-body'], .fw-body, .clock-body)::after {
+  color: #9aafc9;
+}
+
+/* 时钟 · 高度表 + 双列遥测 */
+html[data-ui='hud'] .pixel-clock.widget-tier-expanded .clock-body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px 14px !important;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-expanded.style-altimeter .clock-body {
+  grid-template-columns: 1fr;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-expanded .clock-time,
+html[data-ui='hud'] .pixel-clock.widget-tier-expanded .neon-time,
+html[data-ui='hud'] .pixel-clock.widget-tier-expanded .nixie-row,
+html[data-ui='hud'] .pixel-clock.widget-tier-expanded .clock-altimeter .hud-readout-lg {
+  font-size: clamp(2.4rem, 10vw, 4rem) !important;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-expanded .clock-meta {
+  grid-column: 1 / -1;
+  border-top: 1px solid rgb(15 31 61 / 0.15);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+html[data-ui='hud'] .pixel-clock.widget-tier-expanded .clock-altimeter .alt-ticks {
+  font-size: 0.62rem;
+}
+
+/* 天气 · 行星卡 + 预报带 */
+html[data-ui='hud'] .weather-widget.widget-tier-expanded .ww-body {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 10px;
+}
+
+html[data-ui='hud'] .weather-widget.widget-tier-expanded .ww-current {
+  border: 1px solid var(--hud-red, #c8102e) !important;
+  background: rgb(5 10 20 / 0.05) !important;
+  padding: 14px 16px !important;
+}
+
+html[data-ui='hud'] .weather-widget.widget-tier-expanded .ww-cur-temp {
+  font-size: 3.6rem !important;
+}
+
+html[data-ui='hud'] .weather-widget.widget-tier-expanded .ww-daily li {
+  padding: 8px 10px !important;
+}
+
+/* 日历 · 月历 + 任务双栏 */
+html[data-ui='hud'] .cal-widget.widget-tier-expanded .cal-grid {
+  flex: 1;
+}
+
+html[data-ui='hud'] .cal-widget.widget-tier-expanded .cal-upcoming {
+  max-height: 38%;
+  border-top: 2px solid var(--hud-red, #c8102e);
+  background: rgb(5 10 20 / 0.04);
+}
+
+html[data-ui='hud'] .cal-widget.widget-tier-expanded .cal-month-grid {
+  grid-auto-rows: minmax(48px, 1fr);
+}
+
+/* 音乐 · 通讯甲板 */
+html[data-ui='hud'] .music-cd.widget-tier-expanded .mp-hud-wave {
+  display: flex !important;
+  height: 48px !important;
+}
+
+html[data-ui='hud'] .music-cd.widget-tier-expanded .cd-stage {
+  min-height: 200px;
+}
+
+html[data-ui='hud'] .music-cd.widget-tier-expanded .vprog-area {
+  min-height: 160px;
+}
+
+/* 番茄钟 · 状态灯 + 大表盘 */
+html[data-ui='hud'] .pomo-widget.widget-tier-expanded .pw-hud-lamps {
+  display: flex !important;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgb(15 31 61 / 0.2);
+}
+
+html[data-ui='hud'] .pomo-widget.widget-tier-expanded .pw-ring-wrap {
+  padding: 12px 0;
+}
+
+html[data-ui='hud'] .pomo-widget.widget-tier-expanded .pw-time {
+  font-size: 2.8rem !important;
+}
+
+html[data-ui='hud'] .pomo-widget.widget-tier-expanded .pw-controls {
+  gap: 12px !important;
+}
+
+/* 白噪音 · 调音台 */
+html[data-ui='hud'] .wn-widget.widget-tier-expanded .wn-body {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+}
+
+html[data-ui='hud'] .wn-widget.widget-tier-expanded .wn-mixers {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgb(15 31 61 / 0.2);
+}
+
+html[data-ui='hud'] .wn-widget.widget-tier-expanded .wn-track.is-on {
+  box-shadow: inset 3px 0 0 var(--hud-red, #c8102e);
+}
+
+/* 统计 · 飞行记录仪面板 */
+html[data-ui='hud'] .stats-widget.widget-tier-expanded .sw-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+html[data-ui='hud'] .stats-widget.widget-tier-expanded .sw-kpis {
+  border: 1px solid var(--hud-red, #c8102e);
+  padding: 8px;
+  background: rgb(5 10 20 / 0.04);
+}
+
+html[data-ui='hud'] .stats-widget.widget-tier-expanded .sw-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+html[data-ui='hud'] .stats-widget.widget-tier-expanded .card {
+  min-height: 140px;
+}
+
+html[data-ui='hud'] .stats-widget.widget-tier-expanded .card-trend {
+  grid-column: 1 / -1;
+}
+
+/* 地图 · 星图 HUD */
+html[data-ui='hud'] .territory-widget.widget-tier-expanded .tw-star-hud {
+  display: block !important;
+  padding: 10px 12px;
+  font-size: 0.62rem;
+}
+
+html[data-ui='hud'] .territory-widget.widget-tier-expanded .tw-body {
+  border-top: 2px solid var(--hud-red, #c8102e);
+}
+
+/* 世界时钟 · 地图 + 列表 */
+html[data-ui='hud'] .world-widget.widget-tier-expanded .ww-body {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  grid-template-rows: auto 1fr;
+  gap: 0;
+}
+
+html[data-ui='hud'] .world-widget.widget-tier-expanded .ww-main {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+html[data-ui='hud'] .world-widget.widget-tier-expanded .ww-map-card {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+html[data-ui='hud'] .world-widget.widget-tier-expanded .ww-list {
+  grid-column: 2;
+  grid-row: 1 / -1;
+  border-left: 1px solid rgb(15 31 61 / 0.2);
+  align-self: stretch;
+  overflow: auto;
+}
+
+/* 图谱 · 控制台 */
+html[data-ui='hud'] .graph-widget.widget-tier-expanded .gw-canvas {
+  min-height: 320px;
+}
+
+html[data-ui='hud'] .graph-widget.widget-tier-expanded .gw-detail {
+  border-width: 2px !important;
+}
+
+/* 浮动工具 · 双栏 */
+html[data-ui='hud'] .floating-widget.widget-tier-expanded .fw-body {
+  padding: 12px 14px !important;
+}
+
+/* HUD 尺寸标签文字替换 */
+html[data-ui='hud'] .ww-tier,
+html[data-ui='hud'] .sw-mode-tag {
+  font-size: 0;
+}
+
+html[data-ui='hud'] .weather-widget.widget-tier-compact .ww-tier::after { content: '小'; font-size: 0.58rem; }
+html[data-ui='hud'] .weather-widget.widget-tier-medium .ww-tier::after { content: '标准'; font-size: 0.58rem; }
+html[data-ui='hud'] .weather-widget.widget-tier-expanded .ww-tier::after { content: '大'; font-size: 0.58rem; }
+
+html[data-ui='hud'] .stats-widget.widget-tier-compact .sw-mode-tag::after { content: '小'; font-size: 0.58rem; }
+html[data-ui='hud'] .stats-widget.widget-tier-medium .sw-mode-tag::after { content: '标准'; font-size: 0.58rem; }
+html[data-ui='hud'] .stats-widget.widget-tier-expanded .sw-mode-tag::after { content: '大'; font-size: 0.58rem; }

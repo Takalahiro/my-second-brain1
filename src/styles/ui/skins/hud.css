@@ -1,0 +1,600 @@
+/* hud — Constellation / NASA-punk：星图导航 · 驾驶舱 HUD · 引力驱动界面 */
+
+html[data-ui='hud'] {
+  --hud-paper: #f5f2eb;
+  --hud-navy: #0f1f3d;
+  --hud-navy-muted: #3d5278;
+  --hud-ink: #12243b;
+  --hud-red: #c8102e;
+  --hud-red-soft: rgb(200 16 46 / 0.12);
+  --hud-star: rgb(15 31 61 / 0.55);
+  --hud-star-bright: #c8102e;
+  --hud-ring: rgb(15 31 61 / 0.14);
+  --hud-constellation: rgb(15 31 61 / 0.2);
+
+  --radius-card: 0;
+  --radius-button: 0;
+  --radius-small: 0;
+
+  --bg-primary: var(--hud-paper);
+  --bg-secondary: #ebe6da;
+  --text-primary: var(--hud-navy);
+  --text-secondary: var(--hud-navy-muted);
+  --border-color: var(--hud-navy);
+
+  --ui-accent: var(--hud-red);
+  --ui-accent-soft: var(--hud-red-soft);
+  --ui-accent-text: var(--hud-red);
+
+  --font-body-current: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-heading-current: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+
+  --app-icon-stroke-width: 1;
+  --app-icon-stroke-linecap: square;
+  --app-icon-stroke-linejoin: miter;
+
+  --border-thin: 1px;
+  --border-thick: 1px;
+
+  --shadow-soft: none;
+  --shadow-normal: none;
+  --shadow-hover: none;
+  --shadow-active: none;
+  --shadow-pixel: none;
+
+  --neo-surface: var(--hud-paper);
+  --neo-track: #ddd8cc;
+  --neo-thumb: var(--hud-paper);
+  --neo-raised: none;
+  --neo-raised-hover: none;
+  --neo-pressed: none;
+  --neo-inset: inset 0 0 0 1px var(--hud-navy);
+
+  --glass-bg: var(--hud-paper);
+  --glass-bg-hover: #faf8f3;
+  --glass-bg-strong: #f0ece3;
+  --glass-border: var(--hud-navy);
+
+  --chrome-bg-top: var(--hud-paper);
+  --chrome-bg-bottom: #ebe6da;
+  --chrome-border: var(--hud-navy);
+  --chrome-shadow: none;
+  --chrome-hover: rgb(15 31 61 / 0.06);
+  --chrome-active: rgb(15 31 61 / 0.1);
+  --chrome-subtle: rgb(15 31 61 / 0.04);
+  --chrome-text: var(--hud-navy);
+  --chrome-text-muted: var(--hud-navy-muted);
+  --chrome-dropdown-bg: var(--hud-paper);
+
+  --widget-bg-rgb: 245 242 235;
+  --widget-fg: var(--hud-navy);
+  --widget-fg-muted: var(--hud-navy-muted);
+  --widget-border: var(--hud-navy);
+  --widget-header-bg: #ebe6da;
+  --widget-shadow: none;
+
+  --motion-base: 0.14s;
+  --motion-fast: 0.08s;
+  --motion-ease: linear;
+
+  letter-spacing: 0.08em;
+}
+
+/* 驾驶舱深色模式 */
+html.dark[data-ui='hud'] {
+  --hud-paper: #0b1426;
+  --hud-ink: #f5f2eb;
+  --hud-star: rgb(245 242 235 / 0.75);
+  --hud-star-bright: #ff4d6a;
+  --hud-ring: rgb(245 242 235 / 0.12);
+  --hud-constellation: rgb(245 242 235 / 0.18);
+  --hud-navy-muted: #9aafc9;
+
+  --bg-primary: #0b1426;
+  --bg-secondary: #101d36;
+  --text-primary: #f5f2eb;
+  --text-secondary: #9aafc9;
+  --border-color: rgb(245 242 235 / 0.72);
+
+  --neo-surface: #101d36;
+  --neo-track: #1a2d4f;
+  --neo-thumb: #f5f2eb;
+  --neo-inset: inset 0 0 0 1px rgb(245 242 235 / 0.55);
+
+  --glass-bg: #0b1426;
+  --glass-bg-hover: #101d36;
+  --glass-border: rgb(245 242 235 / 0.55);
+
+  --chrome-bg-top: #0b1426;
+  --chrome-bg-bottom: #101d36;
+  --chrome-border: rgb(245 242 235 / 0.55);
+  --chrome-subtle: rgb(245 242 235 / 0.06);
+  --chrome-text: #f5f2eb;
+  --chrome-text-muted: #9aafc9;
+
+  --widget-bg-rgb: 11 20 38;
+  --widget-fg: #f5f2eb;
+  --widget-fg-muted: #9aafc9;
+  --widget-border: rgb(245 242 235 / 0.55);
+  --widget-header-bg: #101d36;
+
+  --shadow-normal: none;
+  --shadow-hover: none;
+  --shadow-active: none;
+  --chrome-shadow: none;
+}
+
+/* 星图 / 星野背景层 */
+html[data-ui='hud']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(circle, var(--hud-star) 0.55px, transparent 0.65px),
+    linear-gradient(33deg, transparent 48%, var(--hud-constellation) 49%, var(--hud-constellation) 50%, transparent 51%),
+    linear-gradient(-24deg, transparent 62%, var(--hud-constellation) 63%, var(--hud-constellation) 64%, transparent 65%),
+    linear-gradient(108deg, transparent 38%, var(--hud-constellation) 39%, var(--hud-constellation) 40%, transparent 41%);
+  background-size: 38px 38px, 100% 100%, 100% 100%, 100% 100%;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+}
+
+html[data-ui='hud']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, var(--hud-star-bright) 0, transparent 2px),
+    radial-gradient(1px 1px at 78% 22%, var(--hud-star) 0, transparent 1.5px),
+    radial-gradient(1px 1px at 44% 72%, var(--hud-star) 0, transparent 1.5px),
+    radial-gradient(1.2px 1.2px at 88% 68%, var(--hud-star-bright) 0, transparent 2px),
+    radial-gradient(1px 1px at 24% 84%, var(--hud-star) 0, transparent 1.5px),
+    radial-gradient(ellipse 90% 70% at 50% 50%, transparent 55%, rgb(15 31 61 / 0.08) 100%);
+}
+
+html.dark[data-ui='hud']::after {
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, var(--hud-star-bright) 0, transparent 2px),
+    radial-gradient(1px 1px at 78% 22%, var(--hud-star) 0, transparent 1.5px),
+    radial-gradient(1px 1px at 44% 72%, var(--hud-star) 0, transparent 1.5px),
+    radial-gradient(1.2px 1.2px at 88% 68%, var(--hud-star-bright) 0, transparent 2px),
+    radial-gradient(1px 1px at 24% 84%, var(--hud-star) 0, transparent 1.5px),
+    radial-gradient(ellipse 85% 65% at 50% 45%, transparent 40%, rgb(0 0 0 / 0.45) 100%);
+}
+
+html[data-ui='hud'] body {
+  position: relative;
+  z-index: 1;
+  background-color: transparent;
+  background-image:
+    linear-gradient(var(--hud-ring) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hud-ring) 1px, transparent 1px);
+  background-size: 24px 24px;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+/* [ BRACKETED LABELS ] */
+html[data-ui='hud'] :is(
+  .mac-group-label,
+  .mac-pane-hint,
+  .ui-skin-hint,
+  .fw-title,
+  .mac-row-title,
+  .mac-category-name,
+  .site-nav-link-text,
+  .ui-skin-name
+)::before {
+  content: '[ ';
+  color: var(--hud-red);
+  font-weight: 700;
+}
+
+html[data-ui='hud'] :is(
+  .mac-group-label,
+  .mac-pane-hint,
+  .ui-skin-hint,
+  .fw-title,
+  .mac-row-title,
+  .mac-category-name,
+  .site-nav-link-text,
+  .ui-skin-name
+)::after {
+  content: ' ]';
+  color: var(--hud-red);
+  font-weight: 700;
+}
+
+html[data-ui='hud'] .mac-title::before {
+  content: '[ ';
+  color: var(--hud-red);
+  font-weight: 700;
+}
+
+html[data-ui='hud'] .mac-title::after {
+  content: ' ]';
+  color: var(--hud-red);
+  font-weight: 700;
+}
+
+html[data-ui='hud'] .mac-row-sub,
+html[data-ui='hud'] .mac-spotlight-row-sub,
+html[data-ui='hud'] .ui-skin-desc {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+}
+
+/* 驾驶舱 HUD 角标 */
+html[data-ui='hud'] :is(.floating-widget, .site-nav-shell) {
+  isolation: isolate;
+}
+
+html[data-ui='hud'] .mac-settings {
+  isolation: isolate;
+}
+
+html[data-ui='hud'] :is(.mac-settings, .floating-widget, .site-nav-shell)::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    linear-gradient(var(--hud-red), var(--hud-red)) left top / 14px 1px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) left top / 1px 14px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) right top / 14px 1px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) right top / 1px 14px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) left bottom / 14px 1px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) left bottom / 1px 14px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) right bottom / 14px 1px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) right bottom / 1px 14px no-repeat;
+}
+
+/* 引力驱动环 · Grav drive */
+html[data-ui='hud'] :is(.mac-settings, .floating-widget)::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  width: 140px;
+  height: 140px;
+  right: -36px;
+  bottom: -48px;
+  border-radius: 50%;
+  border: 1px solid var(--hud-navy);
+  opacity: 0.16;
+  box-shadow:
+    0 0 0 18px transparent,
+    0 0 0 19px var(--hud-ring),
+    0 0 0 36px transparent,
+    0 0 0 37px var(--hud-ring),
+    0 0 0 54px transparent,
+    0 0 0 55px var(--hud-ring);
+}
+
+html.dark[data-ui='hud'] :is(.mac-settings, .floating-widget)::after {
+  border-color: rgb(245 242 235 / 0.35);
+}
+
+/* 任务章 · Mission patch */
+html[data-ui='hud'] .mac-window-chrome {
+  position: relative;
+  border-bottom: 1px solid var(--hud-navy);
+  background: var(--hud-paper);
+}
+
+html[data-ui='hud'] .mac-window-chrome::after {
+  content: '';
+  position: absolute;
+  right: 42px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--hud-navy);
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 32% 38%, var(--hud-red) 2.5px, transparent 3px),
+    radial-gradient(circle at 68% 52%, var(--hud-navy) 3.5px, transparent 4px),
+    radial-gradient(circle at 48% 72%, var(--hud-navy-muted) 1.5px, transparent 2px),
+    radial-gradient(circle at 50% 50%, transparent 8px, var(--hud-navy) 8.5px, transparent 9px);
+}
+
+html[data-ui='hud'] .fw-header {
+  position: relative;
+}
+
+html[data-ui='hud'] .fw-header::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--hud-navy);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.75;
+  background:
+    radial-gradient(circle at 35% 40%, var(--hud-red) 2px, transparent 2.5px),
+    radial-gradient(circle at 62% 58%, var(--hud-navy) 2.5px, transparent 3px);
+}
+
+/* 面板基础 */
+html[data-ui='hud'] :is(
+  .mac-settings,
+  .floating-widget,
+  .site-nav-shell,
+  .pixel-card,
+  .glass-container,
+  .site-nav-brand,
+  .site-nav-link,
+  .ui-skin-card,
+  .pixel-button
+) {
+  border: 1px solid var(--hud-navy);
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: rgb(245 242 235 / 0.94);
+}
+
+html.dark[data-ui='hud'] :is(
+  .mac-settings,
+  .floating-widget,
+  .site-nav-shell,
+  .pixel-card,
+  .glass-container,
+  .site-nav-brand,
+  .site-nav-link,
+  .ui-skin-card,
+  .pixel-button
+) {
+  background: rgb(11 20 38 / 0.92);
+}
+
+html[data-ui='hud'] .mac-settings,
+html[data-ui='hud'] .floating-widget {
+  outline: 1px solid rgb(15 31 61 / 0.25);
+  outline-offset: 4px;
+}
+
+html.dark[data-ui='hud'] .mac-settings,
+html.dark[data-ui='hud'] .floating-widget {
+  outline-color: rgb(245 242 235 / 0.15);
+}
+
+/* 窗口控制 · cockpit keys */
+html[data-ui='hud'] .mac-traffic .dot {
+  width: auto;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 0;
+  border: 1px solid var(--hud-navy);
+  background: var(--hud-paper) !important;
+  color: var(--hud-navy);
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: none;
+}
+
+html[data-ui='hud'] .mac-traffic .red,
+html[data-ui='hud'] .mac-traffic .yellow,
+html[data-ui='hud'] .mac-traffic .green {
+  background: var(--hud-paper) !important;
+}
+
+html[data-ui='hud'] .mac-traffic:hover .dot,
+html[data-ui='hud'] .mac-traffic .dot:hover {
+  color: var(--hud-red);
+  border-color: var(--hud-red);
+  filter: none;
+  transform: none;
+}
+
+html[data-ui='hud'] .mac-chrome .dot {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy);
+  background: var(--hud-paper) !important;
+  box-shadow: none;
+}
+
+html[data-ui='hud'] .mac-chrome .close,
+html[data-ui='hud'] .mac-chrome .min,
+html[data-ui='hud'] .mac-chrome .max {
+  background: var(--hud-paper) !important;
+}
+
+html[data-ui='hud'] .mac-chrome:hover .glyph {
+  color: var(--hud-red);
+}
+
+html[data-ui='hud'] .mac-back {
+  color: var(--hud-red);
+  border-radius: 0;
+  letter-spacing: 0.1em;
+}
+
+html[data-ui='hud'] .mac-back:hover {
+  background: var(--hud-red-soft);
+}
+
+html[data-ui='hud'] .mac-toggle span {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy);
+  background: var(--neo-track);
+  box-shadow: none;
+}
+
+html[data-ui='hud'] .mac-toggle span::before {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy);
+}
+
+html[data-ui='hud'] .mac-toggle input:checked + span {
+  background: var(--hud-red-soft);
+  border-color: var(--hud-red);
+}
+
+html[data-ui='hud'] .mac-toggle input:checked + span::before {
+  background: var(--hud-red);
+  border-color: var(--hud-red);
+}
+
+/* Grav drive 分段控件 */
+html[data-ui='hud'] .mac-segment {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy);
+  background: transparent;
+  box-shadow: none;
+  gap: 0;
+  padding: 0;
+}
+
+html[data-ui='hud'] .mac-segment-btn {
+  border-radius: 0;
+  border: 0;
+  border-right: 1px solid var(--hud-navy);
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+  font-weight: 600;
+}
+
+html[data-ui='hud'] .mac-segment-btn:last-child {
+  border-right: 0;
+}
+
+html[data-ui='hud'] .mac-segment-btn.is-active {
+  background: var(--hud-red);
+  color: var(--hud-paper);
+}
+
+html[data-ui='hud'] .mac-category-tile,
+html[data-ui='hud'] .mac-action-row,
+html[data-ui='hud'] .mac-widget-row,
+html[data-ui='hud'] .mac-wall-card {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy);
+  box-shadow: none;
+  background: rgb(245 242 235 / 0.88);
+}
+
+html.dark[data-ui='hud'] .mac-category-tile,
+html.dark[data-ui='hud'] .mac-action-row,
+html.dark[data-ui='hud'] .mac-widget-row,
+html.dark[data-ui='hud'] .mac-wall-card {
+  background: rgb(16 29 54 / 0.88);
+}
+
+html[data-ui='hud'] .mac-category-tile:hover,
+html[data-ui='hud'] .mac-action-row:hover {
+  background: var(--hud-red-soft);
+  border-color: var(--hud-red);
+}
+
+html[data-ui='hud'] .ui-skin-card.is-active {
+  border-color: var(--hud-red);
+  background: var(--hud-red-soft);
+}
+
+html[data-ui='hud'] .theme-switch {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy);
+  box-shadow: none;
+  background: var(--hud-paper);
+}
+
+html[data-ui='hud'] .theme-switch-track,
+html[data-ui='hud'] .theme-switch-thumb {
+  border-radius: 0;
+}
+
+html[data-ui='hud'] .theme-switch-track {
+  border: 1px solid var(--hud-navy);
+}
+
+html[data-ui='hud'] .floating-widget {
+  border-radius: 0;
+}
+
+html[data-ui='hud'] .fw-title {
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+html[data-ui='hud'] .site-nav-link.is-active {
+  border-color: var(--hud-red);
+  color: var(--hud-red);
+  background: var(--hud-red-soft);
+}
+
+html[data-ui='hud'] :is(.mac-list, .mac-spotlight-list) {
+  border: 1px solid var(--hud-navy);
+  border-radius: 0;
+}
+
+html[data-ui='hud'] .mac-close,
+html[data-ui='hud'] .mac-back {
+  border-radius: 0;
+}
+
+html[data-ui='hud'] .mac-close {
+  border: 1px solid var(--hud-navy);
+}
+
+html[data-ui='hud'] .mac-search {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy);
+  background: var(--hud-paper);
+  letter-spacing: 0.08em;
+}
+
+html[data-ui='hud'] .mac-search::placeholder {
+  color: var(--hud-navy-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+html[data-ui='hud'] .mac-search:focus {
+  outline: 1px solid var(--hud-red);
+  outline-offset: 2px;
+}
+
+html[data-ui='hud'] .mac-footnote {
+  border-left: 2px solid var(--hud-red);
+  padding-left: 8px;
+  letter-spacing: 0.06em;
+}
+
+html[data-ui='hud'] .mac-slider {
+  accent-color: var(--hud-red);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-ui='hud'] :is(.mac-settings, .floating-widget)::after {
+    animation: hud-grav-spin 48s linear infinite;
+  }
+}
+
+@keyframes hud-grav-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui='hud'] :is(.mac-settings, .floating-widget)::after {
+    animation: none;
+  }
+}

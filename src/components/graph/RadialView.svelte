@@ -1,9 +1,17 @@
 <script lang="ts">
   // 圆环辐射：按 folder 分扇区，节点按度数从外往里排；孤岛塞最内圈并加描边
   import type { RawLink, RawNode, WikiData, GraphSettings } from './graph-data';
-  import { folderColor, noteHref } from './graph-data';
+  import { noteHref } from './graph-data';
   import { ZP_MIN, ZP_MAX, clamp } from './use-zoom-pan';
   import ZoomControls from './ZoomControls.svelte';
+  import GraphHudNode from './GraphHudNode.svelte';
+  import {
+    HUD_GRAPH,
+    hudLinkStroke,
+    hudNodeCoreColor,
+    resolveGraphColor,
+  } from './graph-hud-theme';
+  import { useGraphHudTheme } from '../../features/ui/hud-mode.svelte';
 
   interface Props {
     data: WikiData;
@@ -12,6 +20,8 @@
     onSelect?: (id: string | null) => void;
   }
   let { data, folderFocus, settings, onSelect }: Props = $props();
+
+  const hudTheme = useGraphHudTheme();
 
   const VB = 1000;
   const cx = 500, cy = 500;
@@ -57,7 +67,7 @@
       const arr = (byFolder.get(f) || []).slice();
       arr.sort((a, b) => (b.inDegree + b.outDegree) - (a.inDegree + a.outDegree));
       const start = -Math.PI / 2 + i * (sector + gap);
-      const color = folderColor(f, folders);
+      const color = resolveGraphColor(f, folders, hudTheme.hud);
 
       // 拆出孤岛
       const orphans = arr.filter((n) => n.inDegree + n.outDegree === 0);
@@ -170,6 +180,7 @@
   viewBox="0 0 {VB} {VB}"
   preserveAspectRatio="xMidYMid meet"
   class="g-svg"
+  class:g-svg--hud={hudTheme.hud}
   onwheel={onWheel}
   onpointerdown={onPanDown}
   onpointermove={onPanMove}
@@ -177,27 +188,41 @@
   onpointercancel={onPanUp}
 >
   <defs>
-    <radialGradient id="rv-bg" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#3b234b" stop-opacity="0.9" />
-      <stop offset="60%" stop-color="#1a1024" stop-opacity="0.95" />
-      <stop offset="100%" stop-color="#0a0418" stop-opacity="1" />
-    </radialGradient>
-    <radialGradient id="rv-glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#fff" stop-opacity="0.7" />
-      <stop offset="100%" stop-color="#fff" stop-opacity="0" />
-    </radialGradient>
-    <linearGradient id="rv-link" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="rgb(255 208 230 / 0.55)" />
-      <stop offset="100%" stop-color="rgb(180 140 255 / 0.55)" />
-    </linearGradient>
+    {#if hudTheme.hud}
+      <radialGradient id="rv-bg" cx="50%" cy="48%" r="58%">
+        <stop offset="0%" stop-color="#101d36" stop-opacity="0.95" />
+        <stop offset="60%" stop-color="#0b1426" stop-opacity="0.98" />
+        <stop offset="100%" stop-color="#050a14" stop-opacity="1" />
+      </radialGradient>
+      <pattern id="rv-hud-grid" width="36" height="36" patternUnits="userSpaceOnUse">
+        <path d="M 36 0 L 0 0 0 36" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5" />
+      </pattern>
+    {:else}
+      <radialGradient id="rv-bg" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#3b234b" stop-opacity="0.9" />
+        <stop offset="60%" stop-color="#1a1024" stop-opacity="0.95" />
+        <stop offset="100%" stop-color="#0a0418" stop-opacity="1" />
+      </radialGradient>
+      <radialGradient id="rv-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff" stop-opacity="0.7" />
+        <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient id="rv-link" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="rgb(255 208 230 / 0.55)" />
+        <stop offset="100%" stop-color="rgb(180 140 255 / 0.55)" />
+      </linearGradient>
+    {/if}
   </defs>
 
   <rect x="0" y="0" width={VB} height={VB} fill="url(#rv-bg)" opacity={settings.bgDim} />
+  {#if hudTheme.hud}
+    <rect x="0" y="0" width={VB} height={VB} fill="url(#rv-hud-grid)" opacity={settings.bgDim * 0.85} />
+  {/if}
 
   <g transform={`translate(${panX} ${panY}) scale(${zoom})`}>
 
   <!-- 同心圆刻度 -->
-  <g fill="none" stroke="rgba(255,255,255,0.06)">
+  <g fill="none" stroke={hudTheme.hud ? 'rgba(245,242,235,0.08)' : 'rgba(255,255,255,0.06)'}>
     {#each [80, 140, 220, 300, 380, 440] as r}
       <circle cx={cx} cy={cy} r={r} />
     {/each}
@@ -212,17 +237,19 @@
       {@const a1 = a0 + sec}
       {@const lx = cx + Math.cos((a0 + a1) / 2) * (rOuter + 40)}
       {@const ly = cy + Math.sin((a0 + a1) / 2) * (rOuter + 40)}
+      {@const sectorColor = resolveGraphColor(f, folders, hudTheme.hud)}
       <path
         d={`M ${cx} ${cy} L ${cx + Math.cos(a0) * (rOuter + 16)} ${cy + Math.sin(a0) * (rOuter + 16)} A ${rOuter + 16} ${rOuter + 16} 0 0 1 ${cx + Math.cos(a1) * (rOuter + 16)} ${cy + Math.sin(a1) * (rOuter + 16)} Z`}
-        fill={folderColor(f, folders)}
-        fill-opacity={folderFocus === f ? 0.18 : (folderFocus ? 0.04 : 0.08)}
-        stroke={folderColor(f, folders)}
-        stroke-opacity="0.25"
+        fill={sectorColor}
+        fill-opacity={folderFocus === f ? 0.18 : (folderFocus ? 0.04 : (hudTheme.hud ? 0.06 : 0.08))}
+        stroke={sectorColor}
+        stroke-opacity={hudTheme.hud ? 0.35 : 0.25}
         stroke-width="0.6"
       />
       <text x={lx} y={ly} text-anchor="middle" alignment-baseline="middle"
-            fill={folderColor(f, folders)} font-size="14" font-weight="700"
-            opacity={folderFocus && folderFocus !== f ? 0.3 : 1}>{f}</text>
+            fill={sectorColor} font-size="14" font-weight="700"
+            opacity={folderFocus && folderFocus !== f ? 0.3 : 1}
+            style={hudTheme.hud ? 'letter-spacing:0.08em;text-transform:uppercase' : ''}>{f}</text>
     {/each}
   </g>
 
@@ -233,9 +260,10 @@
       {@const b = placedMap.get(l.target)}
       {#if a && b}
         {@const dim = (folderFocus && a.folder !== folderFocus && b.folder !== folderFocus) || (highlightSet && !(highlightSet.has(l.source) && highlightSet.has(l.target)))}
+        {@const hi = highlightSet && highlightSet.has(l.source) && highlightSet.has(l.target)}
         <path d={edgePath(a, b)} fill="none"
-              stroke={dim ? 'rgba(255,255,255,0.04)' : 'url(#rv-link)'}
-              stroke-width={(dim ? 0.4 : 0.9) * settings.edgeScale}
+              stroke={hudTheme.hud ? hudLinkStroke(!!dim, !!hi) : (dim ? 'rgba(255,255,255,0.04)' : 'url(#rv-link)')}
+              stroke-width={(dim ? 0.4 : (hi ? 1.1 : 0.9)) * settings.edgeScale}
               stroke-linecap="round" />
       {/if}
     {/each}
@@ -247,36 +275,50 @@
       {@const r = nodeR(p)}
       {@const dim = isDim(p.node.id)}
       {@const showLabel = settings.showLabels === 'always' || (settings.showLabels === 'hover' && focusId === p.node.id)}
-      <g
-        data-nid={p.node.id}
-        class="g-node {selectedId === p.node.id ? 'is-sel' : ''} {dim ? 'is-dim' : ''} {p.orphan ? 'is-orphan' : ''} {settings.clickToOpen ? 'is-link' : ''}"
-        onmouseenter={() => (hoveredId = p.node.id)}
-        onmouseleave={() => (hoveredId = null)}
-        onclick={() => onNodeClick(p.node.id)}
-        ondblclick={() => (location.href = noteHref(p.node.id))}
-      >
-        {#if !p.orphan}
-          <circle cx={p.x} cy={p.y} r={r * 2.8} fill="url(#rv-glow)" />
-        {/if}
-        <circle cx={p.x} cy={p.y} r={r} fill={p.color}
-                stroke={p.orphan ? 'rgb(255 255 255 / 0.45)' : 'none'}
-                stroke-width="0.6"
-                stroke-dasharray={p.orphan ? '1.5,1.5' : ''}>
+        {@const starColor = resolveGraphColor(p.folder, folders, hudTheme.hud)}
+        <g
+          data-nid={p.node.id}
+          class="g-node {selectedId === p.node.id ? 'is-sel' : ''} {dim ? 'is-dim' : ''} {p.orphan ? 'is-orphan' : ''} {settings.clickToOpen ? 'is-link' : ''}"
+          onmouseenter={() => (hoveredId = p.node.id)}
+          onmouseleave={() => (hoveredId = null)}
+          onclick={() => onNodeClick(p.node.id)}
+          ondblclick={() => (location.href = noteHref(p.node.id))}
+        >
+          {#if hudTheme.hud}
+            <GraphHudNode
+              x={p.x}
+              y={p.y}
+              r={r}
+              color={starColor}
+              core={hudNodeCoreColor(p.node, starColor)}
+              orphan={p.orphan}
+              selected={selectedId === p.node.id}
+            />
+          {:else}
+            {#if !p.orphan}
+              <circle cx={p.x} cy={p.y} r={r * 2.8} fill="url(#rv-glow)" />
+            {/if}
+            <circle cx={p.x} cy={p.y} r={r} fill={p.color}
+                    stroke={p.orphan ? 'rgb(255 255 255 / 0.45)' : 'none'}
+                    stroke-width="0.6"
+                    stroke-dasharray={p.orphan ? '1.5,1.5' : ''}>
+              <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
+            </circle>
+          {/if}
           <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
-        </circle>
-        {#if showLabel}
-          <text x={p.x} y={p.y - r - 6} text-anchor="middle" class="g-label">{p.node.title}</text>
-        {/if}
-      </g>
+          {#if showLabel}
+            <text x={p.x} y={p.y - r - 6} text-anchor="middle" class="g-label">{p.node.title}</text>
+          {/if}
+        </g>
     {/each}
   </g>
 
   <!-- 中心 KPI -->
   <g transform={`translate(${cx} ${cy})`}>
-    <circle r="86" fill="rgb(0 0 0 / 0.55)" stroke="rgba(255,255,255,0.12)" />
-    <text y="-10" text-anchor="middle" fill="#fff" font-size="42" font-weight="800">{data.nodes.length}</text>
-    <text y="14" text-anchor="middle" fill="#d0c4f0" font-size="11" letter-spacing="2">笔记节点</text>
-    <text y="34" text-anchor="middle" fill="#9d8fc0" font-size="10">{data.links.length} 条双链</text>
+    <circle r="86" fill={hudTheme.hud ? 'rgb(5 10 20 / 0.72)' : 'rgb(0 0 0 / 0.55)'} stroke={hudTheme.hud ? 'rgba(245,242,235,0.18)' : 'rgba(255,255,255,0.12)'} />
+    <text y="-10" text-anchor="middle" fill={hudTheme.hud ? HUD_GRAPH.label : '#fff'} font-size="42" font-weight="800">{data.nodes.length}</text>
+    <text y="14" text-anchor="middle" fill={hudTheme.hud ? HUD_GRAPH.labelMuted : '#d0c4f0'} font-size="11" letter-spacing="2">{hudTheme.hud ? 'NODES' : '笔记节点'}</text>
+    <text y="34" text-anchor="middle" fill={hudTheme.hud ? HUD_GRAPH.telemetry : '#9d8fc0'} font-size="10">{data.links.length} {hudTheme.hud ? 'LINKS' : '条双链'}</text>
   </g>
 
   </g>

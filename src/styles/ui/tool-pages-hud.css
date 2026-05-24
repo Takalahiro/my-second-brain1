@@ -1,0 +1,771 @@
+/* NASA-punk 工具页：关系图谱 · MATLAB · Python */
+
+html[data-ui='hud'] .site-main {
+  max-width: none;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+/* ── 任务条 ── */
+html[data-ui='hud'] .hud-mission-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.94);
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+html.dark[data-ui='hud'] .hud-mission-bar {
+  background: rgb(11 20 38 / 0.94);
+  border-color: rgb(245 242 235 / 0.55);
+}
+
+html[data-ui='hud'] .hud-mission-id {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--hud-navy, #0f1f3d);
+}
+
+html[data-ui='hud'] .hud-mission-id::before {
+  content: '[ ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .hud-mission-id::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .hud-mission-status {
+  font-size: 0.62rem;
+  color: var(--hud-navy-muted, #3d5278);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-ui='hud'] .hud-mission-status::before {
+  content: 'STATUS · ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .hud-mission-patch {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 38%, var(--hud-red, #c8102e) 2px, transparent 2.5px),
+    radial-gradient(circle at 62% 58%, var(--hud-navy, #0f1f3d) 2.5px, transparent 3px);
+}
+
+/* ═══════════════════════════════════════
+   关系图谱 · STAR MAP CONSOLE
+   ═══════════════════════════════════════ */
+
+html[data-ui='hud'] .graph-page.is-hud-mission {
+  gap: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.88);
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission {
+  background: rgb(11 20 38 / 0.88);
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-head {
+  margin: 0;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.96);
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-head h1 {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-head h1::before {
+  content: '[ ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-head h1::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-sub {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-link {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  box-shadow: none;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(235 230 220 / 0.5);
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-stats {
+  background: rgb(16 29 54 / 0.6);
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-stats .kpi {
+  flex: 1 1 25%;
+  min-width: 120px;
+  border-radius: 0;
+  border: 0;
+  border-right: 1px solid var(--hud-navy, #0f1f3d);
+  background: transparent;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-stats .kpi:last-child {
+  border-right: 0;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-stats .kpi strong {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--hud-navy, #0f1f3d);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-stats .kpi span {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.58rem;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-stats .kpi span::before {
+  content: 'TEL · ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-tabs {
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.92);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-tab {
+  border-radius: 0;
+  border: 0;
+  border-right: 1px solid var(--hud-navy, #0f1f3d);
+  padding: 10px 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+  font-weight: 600;
+  box-shadow: none;
+  transform: none;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-tab:hover {
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12));
+  transform: none;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-tab.is-active {
+  background: var(--hud-red, #c8102e);
+  color: var(--hud-paper, #f5f2eb);
+  border-color: var(--hud-navy, #0f1f3d);
+  box-shadow: none;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-folders {
+  padding: 8px 12px;
+  margin: 0;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.75);
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-folders button {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.62rem;
+  box-shadow: none;
+  transform: none;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-folders button.active {
+  border-color: var(--hud-red, #c8102e);
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12));
+  box-shadow: none;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-folders .dot {
+  border-radius: 0;
+  width: 6px;
+  height: 6px;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-canvas-row {
+  padding: 10px;
+  gap: 10px;
+  background:
+    radial-gradient(circle at 18% 22%, rgb(200 16 46 / 0.06) 0, transparent 42%),
+    radial-gradient(circle at 82% 78%, rgb(15 31 61 / 0.08) 0, transparent 45%);
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-canvas {
+  --graph-canvas-bg: #0b1426;
+  background:
+    radial-gradient(1px 1px at 12% 18%, rgb(245 242 235 / 0.45) 0, transparent 1.5px),
+    radial-gradient(1px 1px at 72% 34%, rgb(200 16 46 / 0.35) 0, transparent 1.5px),
+    radial-gradient(1px 1px at 48% 68%, rgb(245 242 235 / 0.3) 0, transparent 1.5px),
+    linear-gradient(rgb(245 242 235 / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(245 242 235 / 0.04) 1px, transparent 1px),
+    #0b1426;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px, auto;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  border-radius: 0;
+  outline: 1px solid rgb(15 31 61 / 0.35);
+  outline-offset: 4px;
+  min-height: 520px;
+  aspect-ratio: auto;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .gp-detail {
+  border-radius: 0;
+  border: 1px solid var(--hud-red, #c8102e);
+  background: rgb(245 242 235 / 0.96);
+  color: var(--hud-navy, #0f1f3d);
+  backdrop-filter: none;
+  box-shadow: none;
+  outline: 1px solid var(--hud-navy, #0f1f3d);
+  outline-offset: 2px;
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-detail {
+  background: rgb(11 20 38 / 0.96);
+  color: #f5f2eb;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .det-head h3::before {
+  content: '[ TARGET · ';
+  color: var(--hud-red, #c8102e);
+  font-size: 0.72rem;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .det-head h3::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+  font-size: 0.72rem;
+}
+
+html[data-ui='hud'] .graph-page.is-hud-mission .det-btn.primary {
+  border-radius: 0;
+  background: var(--hud-red, #c8102e);
+  color: var(--hud-paper, #f5f2eb);
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ═══════════════════════════════════════
+   MATLAB · ORBITAL MATH LAB
+   ═══════════════════════════════════════ */
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission {
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.88);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-head {
+  margin: 0;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-head h1 {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-head h1::before {
+  content: '[ ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-head h1::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-tabs button {
+  border-radius: 0;
+  border: 0;
+  border-right: 1px solid var(--hud-navy, #0f1f3d);
+  background: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 0.66rem;
+  font-weight: 600;
+  padding: 10px 8px;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-tabs button:last-child {
+  border-right: 0;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-tabs button.active {
+  background: var(--hud-red, #c8102e);
+  color: var(--hud-paper, #f5f2eb);
+  border-color: var(--hud-navy, #0f1f3d);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-body {
+  padding: 10px;
+  gap: 10px;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(320px, 1.05fr);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-command,
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-viz,
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-lab-loading,
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-lab-error,
+html[data-ui='hud'] .matlab-calc.is-hud-mission .hud-lab-frame {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.94);
+  box-shadow: none;
+  outline: 1px solid rgb(15 31 61 / 0.2);
+  outline-offset: 3px;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .hud-lab-frame {
+  margin: 10px;
+  padding: 10px;
+  min-height: 0;
+  flex: 1;
+  overflow: auto;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .hud-lab-frame-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--hud-navy-muted, #3d5278);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .hud-lab-frame-head strong {
+  color: var(--hud-navy, #0f1f3d);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .hud-lab-frame-head strong::before {
+  content: '[ MODULE · ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .hud-lab-frame-head strong::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-prompt {
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-input {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: #0b1426;
+  color: #f5f2eb;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-run {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: var(--hud-red, #c8102e);
+  color: var(--hud-paper, #f5f2eb);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-clear,
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-preset,
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-key {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-viz-head {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-viz-head::before {
+  content: '[ TELEMETRY · ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-viz-head::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-canvas {
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  border-radius: 0;
+  background: #0b1426;
+}
+
+html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-result {
+  border-left: 2px solid var(--hud-red, #c8102e);
+  background: rgb(11 20 38 / 0.06);
+}
+
+/* ═══════════════════════════════════════
+   Python · FLIGHT COMPUTER
+   ═══════════════════════════════════════ */
+
+html[data-ui='hud'] .py-ide.is-hud-mission {
+  gap: 0;
+  padding: 0;
+  height: calc(100vh - 72px);
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.88);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-head {
+  margin: 0;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.96);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-head h1 {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-head h1::before {
+  content: '[ ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-head h1::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-sub {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.66rem;
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-presets {
+  padding: 8px 12px;
+  margin: 0;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(235 230 220 / 0.45);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-presets button {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.62rem;
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-workspace {
+  padding: 10px;
+  gap: 10px;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(280px, 1.2fr) minmax(200px, 0.8fr);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-editor-pane {
+  grid-row: 1;
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  outline: 1px solid rgb(15 31 61 / 0.25);
+  outline-offset: 3px;
+  background: rgb(245 242 235 / 0.94);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-side {
+  grid-row: 2;
+  flex-direction: row;
+  gap: 10px;
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-steps-pane,
+html[data-ui='hud'] .py-ide.is-hud-mission .py-output-pane {
+  flex: 1;
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.94);
+  box-shadow: none;
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-pane-tabs button {
+  border-radius: 0;
+  border: 1px solid transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.62rem;
+  font-weight: 600;
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-pane-tabs button.active {
+  background: var(--hud-red, #c8102e);
+  color: var(--hud-paper, #f5f2eb);
+  border-color: var(--hud-navy, #0f1f3d);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-btn {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: transparent;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-btn.primary {
+  background: var(--hud-red, #c8102e);
+  color: var(--hud-paper, #f5f2eb);
+  border-color: var(--hud-navy, #0f1f3d);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-badge {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.62rem;
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-badge.ok {
+  color: var(--hud-red, #c8102e);
+  border-color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-lbl::before {
+  content: '[ ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-lbl::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-stdout {
+  background: #0b1426;
+  color: #f5f2eb;
+  border-top: 1px solid var(--hud-navy, #0f1f3d);
+}
+
+html[data-ui='hud'] .py-ide.is-hud-mission .py-line-badge {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12));
+  color: var(--hud-red, #c8102e);
+  text-transform: uppercase;
+}
+
+@media (max-width: 960px) {
+  html[data-ui='hud'] .py-ide.is-hud-mission .py-workspace {
+    grid-template-rows: auto auto;
+  }
+
+  html[data-ui='hud'] .py-ide.is-hud-mission .py-side {
+    flex-direction: column;
+  }
+
+  html[data-ui='hud'] .graph-page.is-hud-mission .gp-stats .kpi {
+    flex: 1 1 50%;
+    border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  }
+}
+
+@media (max-width: 768px) {
+  html[data-ui='hud'] .matlab-calc.is-hud-mission .mc-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── HUD 驾驶舱深色：MATLAB / Python 米白 → NASA 黑 ── */
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission {
+  background: rgb(11 20 38 / 0.92);
+  border-color: rgb(245 242 235 / 0.35);
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-head,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-head {
+  background: rgb(11 20 38 / 0.96);
+  border-color: rgb(245 242 235 / 0.35);
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-head h1,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-head h1 {
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-tabs {
+  border-color: rgb(245 242 235 / 0.35);
+  background: rgb(5 10 20 / 0.85);
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-tabs button {
+  border-color: rgb(245 242 235 / 0.35);
+  color: #9aafc9;
+  background: transparent;
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-tabs button.active {
+  color: #050a14;
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-command,
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-viz,
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-lab-loading,
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-lab-error,
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .hud-lab-frame,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-editor-pane,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-steps-pane,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-output-pane {
+  background: rgb(5 10 20 / 0.92);
+  border-color: rgb(245 242 235 / 0.35);
+  color: #f5f2eb;
+  outline-color: rgb(245 242 235 / 0.12);
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .hud-lab-frame-head {
+  background: rgb(11 20 38 / 0.96);
+  border-color: rgb(245 242 235 / 0.35);
+  color: #9aafc9;
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-input,
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-clear,
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-preset,
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-key,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-presets button,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-btn,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-pane-tabs button {
+  background: rgb(11 20 38 / 0.88);
+  border-color: rgb(245 242 235 / 0.35);
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-input {
+  background: rgb(5 10 20 / 0.95);
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-run,
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-btn.primary {
+  color: #050a14;
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-viz-head {
+  color: #9aafc9;
+}
+
+html.dark[data-ui='hud'] .matlab-calc.is-hud-mission .mc-result {
+  background: rgb(11 20 38 / 0.65);
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-presets {
+  background: rgb(11 20 38 / 0.88);
+  border-color: rgb(245 242 235 / 0.35);
+}
+
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-sub {
+  color: #9aafc9;
+}
+
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-badge {
+  background: rgb(11 20 38 / 0.88);
+  border-color: rgb(245 242 235 / 0.35);
+  color: #9aafc9;
+}
+
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-stdout {
+  background: #050a14;
+  border-color: rgb(245 242 235 / 0.35);
+}
+
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-pane-tabs button.active {
+  color: #050a14;
+}
+
+html.dark[data-ui='hud'] .py-ide.is-hud-mission .py-line-badge {
+  background: rgb(255 77 106 / 0.14);
+  border-color: rgb(245 242 235 / 0.35);
+}

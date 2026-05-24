@@ -38,6 +38,7 @@ import {
   Network,
   NotebookText,
   Orbit,
+  Palette,
   PenLine,
   Presentation,
   Puzzle,
@@ -109,6 +110,7 @@ const UI_ICONS: Record<PixelIconName, readonly UiIconNode[]> = {
   digits: Binary,
   whiteboard: Presentation,
   list: List,
+  palette: Palette,
 };
 
 export function getUiIconNodes(name: PixelIconName): readonly UiIconNode[] {

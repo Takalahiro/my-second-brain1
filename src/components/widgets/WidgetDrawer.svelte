@@ -17,9 +17,10 @@
   import { modeFromBg, type WallpaperMode } from '../../features/wallpaper/state/mode';
   import { getDrawerCatalog, type DrawerWidget } from '../../lib/i18n/drawer-catalog';
   import { getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
+  import UiSkinPicker from '../../features/ui/components/UiSkinPicker.svelte';
 
   type WidgetKey = WidgetIconKey;
-  type PaneId = 'home' | 'widgets' | 'wallpaper' | 'desktop';
+  type PaneId = 'home' | 'widgets' | 'wallpaper' | 'desktop' | 'ui';
 
   type Widget = DrawerWidget;
 
@@ -787,6 +788,13 @@
             <li class="mac-info-row">{m.drawer.tipClock}</li>
             <li class="mac-info-row">{m.drawer.tipMusic}</li>
           </ul>
+        </section>
+      </div>
+    {:else if pane === 'ui'}
+      <div class="mac-pane mac-pane-detail">
+        <section class="mac-group">
+          <h3 class="mac-group-label">{m.drawer.uiSwitch}</h3>
+          <UiSkinPicker />
         </section>
       </div>
     {/if}

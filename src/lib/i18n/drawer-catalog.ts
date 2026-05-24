@@ -2,7 +2,7 @@ import type { PixelIconName, WidgetIconKey } from '../pixel-icons';
 import { DRAWER_CATEGORY_ICONS } from '../pixel-icons';
 import type { Locale } from './types';
 
-export type DrawerPaneId = 'home' | 'widgets' | 'wallpaper' | 'desktop';
+export type DrawerPaneId = 'home' | 'widgets' | 'wallpaper' | 'desktop' | 'ui';
 export type DrawerCategoryId = Exclude<DrawerPaneId, 'home'>;
 
 export type DrawerWidget = {
@@ -25,6 +25,7 @@ const zhCatalog: Catalog = {
     { id: 'widgets', name: '组件', icon: DRAWER_CATEGORY_ICONS.widgets, desc: '添加与管理桌面小组件' },
     { id: 'wallpaper', name: '墙纸', icon: DRAWER_CATEGORY_ICONS.wallpaper, desc: '场景、视频与氛围' },
     { id: 'desktop', name: '桌面', icon: DRAWER_CATEGORY_ICONS.desktop, desc: '清屏与布局恢复' },
+    { id: 'ui', name: 'UI 切换', icon: DRAWER_CATEGORY_ICONS.ui, desc: '界面风格与视觉主题' },
   ],
   widgetGroups: [
     { title: '桌面', ids: ['background', 'clock'] },
@@ -53,7 +54,7 @@ const zhCatalog: Catalog = {
     { id: 'whiteboard', name: '白板', desc: 'Excalidraw 手绘', keywords: ['画板'] },
     { id: 'whitenoise', name: '白噪音', desc: '多轨混音 · 可调混响', keywords: ['雨声', '环境音'] },
   ],
-  searchHints: ['天气', '待办', '音乐', '图谱', '墙纸'],
+  searchHints: ['天气', '待办', '音乐', '图谱', '墙纸', 'UI', '外观', 'HUD'],
 };
 
 const enCatalog: Catalog = {
@@ -61,6 +62,7 @@ const enCatalog: Catalog = {
     { id: 'widgets', name: 'Widgets', icon: DRAWER_CATEGORY_ICONS.widgets, desc: 'Add and manage desktop widgets' },
     { id: 'wallpaper', name: 'Wallpaper', icon: DRAWER_CATEGORY_ICONS.wallpaper, desc: 'Scenes, video & atmosphere' },
     { id: 'desktop', name: 'Desktop', icon: DRAWER_CATEGORY_ICONS.desktop, desc: 'Clear screen & restore layout' },
+    { id: 'ui', name: 'UI style', icon: DRAWER_CATEGORY_ICONS.ui, desc: 'Interface skins & visual theme' },
   ],
   widgetGroups: [
     { title: 'Desktop', ids: ['background', 'clock'] },
@@ -89,7 +91,7 @@ const enCatalog: Catalog = {
     { id: 'whiteboard', name: 'Whiteboard', desc: 'Excalidraw sketching', keywords: ['draw'] },
     { id: 'whitenoise', name: 'White noise', desc: 'Multi-track mix · reverb', keywords: ['rain', 'ambient'] },
   ],
-  searchHints: ['weather', 'todo', 'music', 'graph', 'wallpaper'],
+  searchHints: ['weather', 'todo', 'music', 'graph', 'wallpaper', 'UI', 'appearance', 'HUD'],
 };
 
 const catalogs: Record<Locale, Catalog> = { zh: zhCatalog, en: enCatalog };

@@ -1,0 +1,887 @@
+/* NASA-punk · 主界面桌面小组件 · 航天器 HUD / 仪表盘 / 游戏任务 UI */
+
+html[data-ui='hud'] {
+  --hud-widget-shell: rgb(245 242 235 / 0.94);
+  --hud-widget-body: rgb(245 242 235 / 0.88);
+  --hud-widget-grid: rgb(15 31 61 / 0.07);
+  --hud-widget-scan: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgb(200 16 46 / 0.03) 48%,
+    rgb(200 16 46 / 0.06) 50%,
+    rgb(200 16 46 / 0.03) 52%,
+    transparent 100%
+  );
+}
+
+html.dark[data-ui='hud'] {
+  --hud-widget-shell: rgb(11 20 38 / 0.94);
+  --hud-widget-body: rgb(5 10 20 / 0.88);
+  --hud-widget-grid: rgb(245 242 235 / 0.05);
+  --hud-widget-scan: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgb(255 77 106 / 0.04) 48%,
+    rgb(255 77 106 / 0.08) 50%,
+    rgb(255 77 106 / 0.04) 52%,
+    transparent 100%
+  );
+}
+
+/* ── 小组件外壳：驾驶舱面板 ── */
+
+html[data-ui='hud'] :is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+) {
+  position: fixed !important;
+  isolation: isolate;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--hud-widget-shell) !important;
+  color: var(--hud-navy, #0f1f3d) !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  box-shadow: none !important;
+  outline: 1px solid rgb(15 31 61 / 0.22);
+  outline-offset: 3px;
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+html.dark[data-ui='hud'] :is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+) {
+  color: #f5f2eb !important;
+  border-color: rgb(245 242 235 / 0.42) !important;
+  outline-color: rgb(245 242 235 / 0.12);
+}
+
+html[data-ui='hud'] :is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+).is-active-drag {
+  outline-color: var(--hud-red, #c8102e);
+  box-shadow: none !important;
+}
+
+/* HUD 角标 bracket corners */
+html[data-ui='hud'] :is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+)::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  pointer-events: none;
+  z-index: 4;
+  background:
+    linear-gradient(var(--hud-red), var(--hud-red)) left top / 12px 1px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) left top / 1px 12px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) right top / 12px 1px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) right top / 1px 12px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) left bottom / 12px 1px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) left bottom / 1px 12px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) right bottom / 12px 1px no-repeat,
+    linear-gradient(var(--hud-red), var(--hud-red)) right bottom / 1px 12px no-repeat;
+}
+
+/* Grav-drive 装饰环 */
+html[data-ui='hud'] :is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+)::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  width: 120px;
+  height: 120px;
+  right: -32px;
+  bottom: -42px;
+  border-radius: 50%;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  opacity: 0.14;
+  box-shadow:
+    0 0 0 14px transparent,
+    0 0 0 15px var(--hud-ring, rgb(15 31 61 / 0.14)),
+    0 0 0 28px transparent,
+    0 0 0 29px var(--hud-ring, rgb(15 31 61 / 0.14));
+}
+
+html.dark[data-ui='hud'] :is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+)::after {
+  border-color: rgb(245 242 235 / 0.28);
+}
+
+/* ── 顶栏：仪器抬头显示器 ── */
+
+html[data-ui='hud'] :is(
+  [class$='-widget'],
+  .floating-widget,
+  .pixel-clock,
+  .music-cd
+) > :is([class*='-header'], [class*='-bar'], .fw-header, .clock-bar) {
+  position: relative;
+  border-radius: 0 !important;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: rgb(235 230 220 / 0.55) !important;
+  cursor: grab;
+  padding-inline: 10px 36px !important;
+}
+
+html.dark[data-ui='hud'] :is(
+  [class$='-widget'],
+  .floating-widget,
+  .pixel-clock,
+  .music-cd
+) > :is([class*='-header'], [class*='-bar'], .fw-header, .clock-bar) {
+  background: rgb(16 29 54 / 0.75) !important;
+  border-bottom-color: rgb(245 242 235 / 0.35) !important;
+}
+
+/* 任务章 mission patch */
+html[data-ui='hud'] :is(
+  [class$='-widget'],
+  .floating-widget,
+  .pixel-clock,
+  .music-cd
+) > :is([class*='-header'], [class*='-bar'], .fw-header)::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.8;
+  background:
+    radial-gradient(circle at 35% 40%, var(--hud-red, #c8102e) 2px, transparent 2.5px),
+    radial-gradient(circle at 62% 58%, var(--hud-navy, #0f1f3d) 2.5px, transparent 3px);
+}
+
+html.dark[data-ui='hud'] :is(
+  [class$='-widget'],
+  .floating-widget,
+  .pixel-clock,
+  .music-cd
+) > :is([class*='-header'], [class*='-bar'], .fw-header)::after {
+  border-color: rgb(245 242 235 / 0.45);
+}
+
+/* [ BRACKET MODULE TITLES ] */
+html[data-ui='hud'] :is(
+  .fw-title,
+  .cal-title,
+  .pw-title,
+  .sw-title,
+  .gw-title,
+  .wn-title,
+  .clock-title,
+  .mp-title,
+  .tw-title,
+  .ww-title,
+  .nw-title
+) {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  font-size: 0.68rem !important;
+  color: var(--hud-navy, #0f1f3d) !important;
+}
+
+html.dark[data-ui='hud'] :is(
+  .fw-title,
+  .cal-title,
+  .pw-title,
+  .sw-title,
+  .gw-title,
+  .wn-title,
+  .clock-title,
+  .mp-title,
+  .tw-title,
+  .ww-title,
+  .nw-title
+) {
+  color: #f5f2eb !important;
+}
+
+html[data-ui='hud'] :is(
+  .fw-title,
+  .cal-title,
+  .pw-title,
+  .sw-title,
+  .gw-title,
+  .wn-title,
+  .clock-title,
+  .mp-title,
+  .tw-title,
+  .ww-title,
+  .nw-title
+)::before {
+  content: '[ ';
+  color: var(--hud-red, #c8102e);
+  font-weight: 700;
+}
+
+html[data-ui='hud'] :is(
+  .fw-title,
+  .cal-title,
+  .pw-title,
+  .sw-title,
+  .gw-title,
+  .wn-title,
+  .clock-title,
+  .mp-title,
+  .tw-title,
+  .ww-title,
+  .nw-title
+)::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+  font-weight: 700;
+}
+
+/* ── 内容区：遥测网格 + 扫描线 ── */
+
+html[data-ui='hud'] :is(
+  [class$='-widget'],
+  .floating-widget,
+  .pixel-clock,
+  .music-cd
+) :is([class*='-body'], .fw-body, .clock-body) {
+  position: relative;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background-color: var(--hud-widget-body) !important;
+  background-image:
+    var(--hud-widget-scan),
+    linear-gradient(var(--hud-widget-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hud-widget-grid) 1px, transparent 1px) !important;
+  background-size: 100% 28px, 22px 22px, 22px 22px !important;
+}
+
+/* ── 通用控件：驾驶舱按键 ── */
+
+html[data-ui='hud'] :is(
+  [class$='-widget'],
+  .floating-widget,
+  .pixel-clock,
+  .music-cd
+) :is(
+  button:not(.mac-chrome *):not(.rh):not(.rotate-handle):not(.rotate-lock),
+  .settings-btn,
+  .pw-settings-btn,
+  .nw-search,
+  input[type='search'],
+  input[type='text'],
+  select,
+  textarea
+) {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: transparent !important;
+  color: inherit !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+  box-shadow: none !important;
+}
+
+html.dark[data-ui='hud'] :is(
+  [class$='-widget'],
+  .floating-widget,
+  .pixel-clock,
+  .music-cd
+) :is(
+  button:not(.mac-chrome *):not(.rh):not(.rotate-handle):not(.rotate-lock),
+  .settings-btn,
+  .pw-settings-btn,
+  input,
+  select,
+  textarea
+) {
+  border-color: rgb(245 242 235 / 0.35) !important;
+  background: rgb(5 10 20 / 0.55) !important;
+  color: #f5f2eb !important;
+}
+
+html[data-ui='hud'] :is(
+  [class$='-widget'],
+  .floating-widget,
+  .pixel-clock,
+  .music-cd
+) :is(
+  button:not(.mac-chrome *):not(.rh):not(.rotate-handle):not(.rotate-lock):hover,
+  .settings-btn:hover,
+  .pw-settings-btn:hover
+) {
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12)) !important;
+  border-color: var(--hud-red, #c8102e) !important;
+  color: var(--hud-red, #c8102e) !important;
+}
+
+html[data-ui='hud'] :is(
+  .pw-tabs,
+  .py-pane-tabs,
+  .mc-tabs,
+  .nw-cfg-tabs
+) {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: transparent !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+html[data-ui='hud'] :is(.pw-tabs button, .py-pane-tabs button, .nw-cfg-tabs button) {
+  border-radius: 0 !important;
+  border-right: 1px solid var(--hud-navy, #0f1f3d) !important;
+}
+
+html[data-ui='hud'] :is(.pw-tabs button.active, .py-pane-tabs button.active, .nw-cfg-tabs button.active) {
+  background: var(--hud-red, #c8102e) !important;
+  color: var(--hud-paper, #f5f2eb) !important;
+}
+
+html[data-ui='hud'] input[type='range'] {
+  accent-color: var(--hud-red, #c8102e);
+}
+
+/* 拖拽/旋转手柄 */
+html[data-ui='hud'] .rh {
+  background: var(--hud-red, #c8102e) !important;
+  opacity: 0.55;
+  border-radius: 0 !important;
+}
+
+html[data-ui='hud'] .rotate-handle {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: var(--hud-paper, #f5f2eb) !important;
+  color: var(--hud-red, #c8102e) !important;
+  box-shadow: none !important;
+}
+
+html.dark[data-ui='hud'] .rotate-handle {
+  background: rgb(11 20 38 / 0.92) !important;
+  border-color: rgb(245 242 235 / 0.45) !important;
+  color: #ff4d6a !important;
+}
+
+/* ═══════════════════════════════════════
+   模块专项 · MODULE TELEMETRY
+   ═══════════════════════════════════════ */
+
+/* 时钟 · CHRONOMETER — 允许缩到很小 */
+html[data-ui='hud'] .pixel-clock {
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+html[data-ui='hud'] .pixel-clock.style-altimeter .clock-meta {
+  display: none;
+}
+
+html[data-ui='hud'] .pixel-clock .clock-time,
+html[data-ui='hud'] .pixel-clock .neon-time,
+html[data-ui='hud'] .pixel-clock .nixie-row {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', monospace !important;
+  letter-spacing: 0.12em;
+}
+
+html[data-ui='hud'] .pixel-clock.style-neon,
+html[data-ui='hud'] .pixel-clock.style-nixie,
+html[data-ui='hud'] .pixel-clock.style-code {
+  background: var(--hud-widget-shell) !important;
+  border-color: var(--hud-navy, #0f1f3d) !important;
+}
+
+html[data-ui='hud'] .pixel-clock .clock-mode,
+html[data-ui='hud'] .pixel-clock .clock-tz {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: transparent !important;
+  text-transform: uppercase;
+  font-size: 0.58rem !important;
+}
+
+html[data-ui='hud'] .pixel-clock .neon-time .neon-tube {
+  color: var(--hud-red, #c8102e) !important;
+  text-shadow: 0 0 8px rgb(200 16 46 / 0.35) !important;
+}
+
+/* 番茄钟 · MISSION TIMER */
+html[data-ui='hud'] .pomo-widget .pw-ring-bg {
+  stroke: rgb(15 31 61 / 0.15) !important;
+}
+
+html.dark[data-ui='hud'] .pomo-widget .pw-ring-bg {
+  stroke: rgb(245 242 235 / 0.12) !important;
+}
+
+html[data-ui='hud'] .pomo-widget.phase-focus .pw-ring-fg {
+  stroke: var(--hud-red, #c8102e) !important;
+  filter: drop-shadow(0 0 6px rgb(200 16 46 / 0.45)) !important;
+}
+
+html[data-ui='hud'] .pomo-widget.phase-short .pw-ring-fg,
+html[data-ui='hud'] .pomo-widget.phase-long .pw-ring-fg {
+  stroke: #9aafc9 !important;
+  filter: drop-shadow(0 0 5px rgb(154 175 201 / 0.4)) !important;
+}
+
+html[data-ui='hud'] .pomo-widget .pw-time {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', monospace !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--hud-navy, #0f1f3d) !important;
+}
+
+html.dark[data-ui='hud'] .pomo-widget .pw-time {
+  color: #f5f2eb !important;
+}
+
+html[data-ui='hud'] .pomo-widget .pw-phase {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.62rem;
+  color: var(--hud-red, #c8102e) !important;
+}
+
+html[data-ui='hud'] .pomo-widget .pw-phase::before {
+  content: 'PHASE · ';
+  opacity: 0.75;
+}
+
+/* 天气 · ENV TELEMETRY */
+html[data-ui='hud'] .weather-widget .ww-cur-temp {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', monospace !important;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--hud-navy, #0f1f3d) !important;
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+html.dark[data-ui='hud'] .weather-widget .ww-cur-temp {
+  color: #f5f2eb !important;
+}
+
+html[data-ui='hud'] .weather-widget .ww-daily li {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: transparent !important;
+}
+
+html[data-ui='hud'] .weather-widget .ww-daily li:first-child {
+  border-color: var(--hud-red, #c8102e) !important;
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12)) !important;
+}
+
+/* 统计 · SYSTEMS DASHBOARD */
+html[data-ui='hud'] .stats-widget .kpi,
+html[data-ui='hud'] .stats-widget .card {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-ui='hud'] .stats-widget .kpi-num {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', monospace !important;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--hud-navy, #0f1f3d) !important;
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+html.dark[data-ui='hud'] .stats-widget .kpi-num {
+  color: #f5f2eb !important;
+}
+
+html[data-ui='hud'] .stats-widget .kpi-label,
+html[data-ui='hud'] .stats-widget .card-head h3 {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.58rem;
+  color: var(--hud-navy-muted, #3d5278) !important;
+}
+
+html[data-ui='hud'] .stats-widget .kpi-label::before,
+html[data-ui='hud'] .stats-widget .card-head h3::before {
+  content: 'TEL · ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .stats-widget .bar-fill {
+  background: var(--hud-red, #c8102e) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-ui='hud'] .stats-widget .bar-track {
+  border-radius: 0 !important;
+  background: rgb(15 31 61 / 0.08) !important;
+}
+
+html[data-ui='hud'] .stats-widget .hm-cell {
+  border-radius: 0 !important;
+}
+
+html[data-ui='hud'] .stats-widget .chart polyline {
+  stroke: var(--hud-red, #c8102e) !important;
+}
+
+/* 图谱 · STAR MAP CONSOLE */
+html[data-ui='hud'] .graph-widget .gw-canvas {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background:
+    radial-gradient(1px 1px at 12% 18%, rgb(245 242 235 / 0.35) 0, transparent 1.5px),
+    radial-gradient(1px 1px at 72% 34%, rgb(200 16 46 / 0.28) 0, transparent 1.5px),
+    linear-gradient(rgb(245 242 235 / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(245 242 235 / 0.04) 1px, transparent 1px),
+    #050a14 !important;
+  background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px, auto !important;
+}
+
+html[data-ui='hud'] .graph-widget .gw-detail {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-red, #c8102e) !important;
+  background: rgb(245 242 235 / 0.96) !important;
+  backdrop-filter: none !important;
+}
+
+html.dark[data-ui='hud'] .graph-widget .gw-detail {
+  background: rgb(11 20 38 / 0.94) !important;
+}
+
+html[data-ui='hud'] .territory-widget .tw-body {
+  background: #050a14 !important;
+}
+
+/* 音乐 · AUDIO TELEMETRY DECK */
+html[data-ui='hud'] .music-cd .cd-disc {
+  border-radius: 50%;
+  border: 2px solid var(--hud-navy, #0f1f3d) !important;
+  box-shadow:
+    0 0 0 4px rgb(15 31 61 / 0.08),
+    0 0 0 5px var(--hud-red, #c8102e) !important;
+}
+
+html[data-ui='hud'] .music-cd .vprog-fill {
+  background: var(--hud-red, #c8102e) !important;
+}
+
+html[data-ui='hud'] .music-orb {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: rgb(245 242 235 / 0.94) !important;
+  box-shadow: none !important;
+  outline: 1px solid rgb(15 31 61 / 0.25);
+  outline-offset: 3px;
+}
+
+html.dark[data-ui='hud'] .music-orb {
+  background: rgb(11 20 38 / 0.94) !important;
+  border-color: rgb(245 242 235 / 0.42) !important;
+  color: var(--hud-red, #c8102e) !important;
+}
+
+/* 笔记 / 待办 / 日历 · DATA PANELS */
+html[data-ui='hud'] :is(.notes-widget, .todo-widget, .cal-widget) :is(.nw-item, .tw-item, .cal-cell) {
+  border-radius: 0 !important;
+  border: 1px solid rgb(15 31 61 / 0.18) !important;
+  background: transparent !important;
+}
+
+html.dark[data-ui='hud'] :is(.notes-widget, .todo-widget, .cal-widget) :is(.nw-item, .tw-item, .cal-cell) {
+  border-color: rgb(245 242 235 / 0.14) !important;
+}
+
+html[data-ui='hud'] .cal-widget .cal-cell.is-today {
+  border-color: var(--hud-red, #c8102e) !important;
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12)) !important;
+}
+
+html[data-ui='hud'] .todo-widget .tw-item.is-done {
+  opacity: 0.55;
+}
+
+html[data-ui='hud'] .todo-widget .tw-item.is-done .tw-text {
+  text-decoration: line-through;
+  color: var(--hud-navy-muted, #3d5278) !important;
+}
+
+html[data-ui='hud'] .notes-widget .nw-item.is-active {
+  border-color: var(--hud-red, #c8102e) !important;
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12)) !important;
+}
+
+/* 网络 · LINK TELEMETRY */
+html[data-ui='hud'] .network-widget .nw-card,
+html[data-ui='hud'] .network-widget .nw-hero {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: transparent !important;
+}
+
+html[data-ui='hud'] .network-widget .nw-hero-val,
+html[data-ui='hud'] .network-widget .nw-card strong {
+  color: var(--hud-red, #c8102e) !important;
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', monospace !important;
+}
+
+html[data-ui='hud'] .network-widget .nw-bar {
+  background: var(--hud-red, #c8102e) !important;
+  border-radius: 0 !important;
+}
+
+html[data-ui='hud'] .net-disc {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: var(--hud-widget-shell) !important;
+  box-shadow: none !important;
+}
+
+/* 白噪音 · AMBIENT SYS */
+html[data-ui='hud'] .wn-widget .wn-row {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+}
+
+html[data-ui='hud'] .wn-widget .wn-track.is-on {
+  border-color: var(--hud-red, #c8102e) !important;
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12)) !important;
+}
+
+/* ═══════════════════════════════════════
+   桌面 chrome · COCKPIT SHELL
+   ═══════════════════════════════════════ */
+
+/* 顶栏状态条 */
+html[data-ui='hud'] .mac-menu-bar {
+  position: relative;
+  border-radius: 0 !important;
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: rgb(245 242 235 / 0.94) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+}
+
+html.dark[data-ui='hud'] .mac-menu-bar {
+  background: rgb(11 20 38 / 0.96) !important;
+  border-bottom-color: rgb(245 242 235 / 0.35) !important;
+  color: #f5f2eb;
+}
+
+html[data-ui='hud'] .mac-menu-bar::before {
+  content: 'SYS · ONLINE';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 50%;
+  translate: 0 -50%;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  color: var(--hud-navy-muted, #3d5278);
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+html[data-ui='hud'] .mac-menu-bar::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--hud-red, #c8102e) 20%,
+    var(--hud-red, #c8102e) 80%,
+    transparent
+  );
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+html[data-ui='hud'] .mac-menu-app-name::before {
+  content: '[ ';
+  color: var(--hud-red, #c8102e);
+  font-weight: 700;
+}
+
+html[data-ui='hud'] .mac-menu-app-name::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+  font-weight: 700;
+}
+
+html[data-ui='hud'] .mac-menu-item,
+html[data-ui='hud'] .mac-menu-touch,
+html[data-ui='hud'] .mac-menu-icon-btn,
+html[data-ui='hud'] .mac-menu-gear {
+  border-radius: 0 !important;
+}
+
+html[data-ui='hud'] .mac-menu-item:hover,
+html[data-ui='hud'] .mac-menu-touch:hover:not(:disabled),
+html[data-ui='hud'] .mac-menu-icon-btn:hover:not(:disabled),
+html[data-ui='hud'] .mac-menu-gear:hover {
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12)) !important;
+  color: var(--hud-red, #c8102e) !important;
+}
+
+html[data-ui='hud'] .mac-menu-dropdown {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: rgb(245 242 235 / 0.98) !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+html.dark[data-ui='hud'] .mac-menu-dropdown {
+  background: rgb(11 20 38 / 0.98) !important;
+  border-color: rgb(245 242 235 / 0.35) !important;
+}
+
+html[data-ui='hud'] .mac-menu-clock {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', monospace !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  font-size: 0.68rem !important;
+}
+
+/* 移动 Dock · LAUNCH BAY */
+html[data-ui='hud'] .mobile-home-dock .dock-inner {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: rgb(245 242 235 / 0.94) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  outline: 1px solid rgb(15 31 61 / 0.2);
+  outline-offset: 2px;
+}
+
+html.dark[data-ui='hud'] .mobile-home-dock .dock-inner {
+  background: rgb(11 20 38 / 0.94) !important;
+  border-color: rgb(245 242 235 / 0.35) !important;
+}
+
+html[data-ui='hud'] .dock-link,
+html[data-ui='hud'] .dock-btn {
+  border-radius: 0 !important;
+}
+
+html[data-ui='hud'] .dock-link:hover,
+html[data-ui='hud'] .dock-btn:hover {
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.12)) !important;
+}
+
+html[data-ui='hud'] .dock-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.52rem;
+}
+
+/* HomeHero · MISSION BRIEFING */
+html[data-ui='hud'] :is(.hero-card, .manual-card) {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: rgb(245 242 235 / 0.96) !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+  outline: 1px solid rgb(15 31 61 / 0.2);
+  outline-offset: 4px;
+  pointer-events: auto;
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  letter-spacing: 0.06em;
+}
+
+html.dark[data-ui='hud'] :is(.hero-card, .manual-card) {
+  background: rgb(11 20 38 / 0.96) !important;
+  border-color: rgb(245 242 235 / 0.35) !important;
+  color: #f5f2eb;
+}
+
+html[data-ui='hud'] .hero-card h1::before,
+html[data-ui='hud'] .manual-card h2::before {
+  content: '[ ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .hero-card h1::after,
+html[data-ui='hud'] .manual-card h2::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .hero-btn,
+html[data-ui='hud'] .home-fab {
+  border-radius: 0 !important;
+  border: 1px solid var(--hud-navy, #0f1f3d) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.68rem;
+  pointer-events: auto;
+}
+
+html[data-ui='hud'] .hero-btn.primary,
+html[data-ui='hud'] .home-fab.is-active {
+  background: var(--hud-red, #c8102e) !important;
+  color: var(--hud-paper, #f5f2eb) !important;
+}
+
+html[data-ui='hud'] .desktop-manual-backdrop {
+  background: rgb(5 10 20 / 0.55) !important;
+  backdrop-filter: none !important;
+}
+
+@media (max-width: 768px) {
+  html[data-ui='hud'] .mac-menu-bar::before {
+    display: none;
+  }
+
+  html[data-ui='hud'] :is(
+    .floating-widget,
+    [class$='-widget'],
+    .pixel-clock,
+    .music-cd
+  )::after {
+    width: 80px;
+    height: 80px;
+    right: -24px;
+    bottom: -28px;
+  }
+}

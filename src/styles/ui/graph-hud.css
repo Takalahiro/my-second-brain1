@@ -1,0 +1,239 @@
+/* 关系图谱 · HUD 星图样式（所有视图） */
+
+html[data-ui='hud'] .g-svg--hud {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+}
+
+html[data-ui='hud'] .g-svg--hud .g-label {
+  fill: #f5f2eb;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  stroke: rgba(5, 10, 20, 0.92);
+  stroke-width: 2.5;
+}
+
+html[data-ui='hud'] .g-svg--hud .g-node.is-dim {
+  opacity: 0.14;
+}
+
+html[data-ui='hud'] .g-svg--hud .g-node.is-orphan {
+  opacity: 0.72;
+}
+
+html[data-ui='hud'] .g-svg--hud .ghn-star.is-sel {
+  filter: drop-shadow(0 0 4px rgb(255 77 106 / 0.65));
+}
+
+/* 缩放控件 */
+html[data-ui='hud'] .gp-canvas .zc-wrap,
+html[data-ui='hud'] .tm-wrap .zc-wrap {
+  gap: 0;
+}
+
+html[data-ui='hud'] .gp-canvas .zc-btn,
+html[data-ui='hud'] .tm-wrap .zc-btn {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(11 20 38 / 0.88);
+  color: #f5f2eb;
+  box-shadow: none;
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', monospace;
+  letter-spacing: 0.08em;
+}
+
+html[data-ui='hud'] .gp-canvas .zc-btn:hover,
+html[data-ui='hud'] .tm-wrap .zc-btn:hover {
+  background: rgb(200 16 46 / 0.18);
+  border-color: var(--hud-red, #c8102e);
+  color: #ff4d6a;
+}
+
+html.dark[data-ui='hud'] .gp-canvas .zc-btn,
+html.dark[data-ui='hud'] .tm-wrap .zc-btn {
+  border-color: rgb(245 242 235 / 0.45);
+  background: rgb(5 10 20 / 0.92);
+}
+
+/* 设置面板 */
+html[data-ui='hud'] .sp-wrap {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.94);
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+html.dark[data-ui='hud'] .sp-wrap {
+  background: rgb(11 20 38 / 0.94);
+  border-color: rgb(245 242 235 / 0.42);
+  color: #f5f2eb;
+}
+
+html[data-ui='hud'] .sp-head h2::before,
+html[data-ui='hud'] .sp-section h3::before {
+  content: '[ ';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .sp-head h2::after,
+html[data-ui='hud'] .sp-section h3::after {
+  content: ' ]';
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .sp-reset,
+html[data-ui='hud'] .sp-seg-btn {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: transparent;
+  box-shadow: none;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.62rem;
+}
+
+html[data-ui='hud'] .sp-seg-btn.is-active {
+  background: var(--hud-red, #c8102e);
+  color: var(--hud-paper, #f5f2eb);
+  border-color: var(--hud-navy, #0f1f3d);
+}
+
+html.dark[data-ui='hud'] .sp-reset,
+html.dark[data-ui='hud'] .sp-seg-btn {
+  border-color: rgb(245 242 235 / 0.42);
+  color: #f5f2eb;
+}
+
+/* 笔记瓦片 */
+html[data-ui='hud'] .gp-canvas .tiles-wrap {
+  background:
+    radial-gradient(1px 1px at 14% 22%, rgb(245 242 235 / 0.35) 0, transparent 1.5px),
+    radial-gradient(1px 1px at 68% 38%, rgb(200 16 46 / 0.28) 0, transparent 1.5px),
+    linear-gradient(rgb(245 242 235 / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(245 242 235 / 0.04) 1px, transparent 1px),
+    #050a14;
+  background-size: 100% 100%, 100% 100%, 28px 28px, 28px 28px, auto;
+}
+
+html[data-ui='hud'] .gp-canvas .tiles-bar {
+  border-bottom: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.92);
+}
+
+html.dark[data-ui='hud'] .gp-canvas .tiles-bar {
+  background: rgb(11 20 38 / 0.94);
+  border-color: rgb(245 242 235 / 0.35);
+}
+
+html[data-ui='hud'] .gp-canvas .tiles-search {
+  border-radius: 0;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(245 242 235 / 0.6);
+  color: var(--hud-navy, #0f1f3d);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+html.dark[data-ui='hud'] .gp-canvas .tiles-search {
+  background: rgb(5 10 20 / 0.85);
+  border-color: rgb(245 242 235 / 0.35);
+  color: #f5f2eb;
+}
+
+html[data-ui='hud'] .gp-canvas .tiles-search:focus {
+  outline: 1px solid var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .gp-canvas .tiles-meta,
+html[data-ui='hud'] .gp-canvas .tiles-empty {
+  color: #9aafc9;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.68rem;
+}
+
+html[data-ui='hud'] .gp-canvas .tg-head {
+  color: #f5f2eb;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+html[data-ui='hud'] .gp-canvas .tg-head .dot {
+  border-radius: 0;
+  width: 6px;
+  height: 6px;
+  box-shadow: none !important;
+}
+
+html[data-ui='hud'] .gp-canvas .tg-count {
+  border-radius: 0;
+  border: 1px solid rgb(245 242 235 / 0.25);
+  background: rgb(11 20 38 / 0.6);
+  color: #9aafc9;
+}
+
+html[data-ui='hud'] .gp-canvas .tile {
+  border-radius: 0;
+  border: 1px solid rgb(245 242 235 / 0.22);
+  background: rgb(11 20 38 / 0.72);
+  box-shadow: none;
+}
+
+html[data-ui='hud'] .gp-canvas .tile:hover {
+  border-color: var(--hud-red, #c8102e);
+  background: rgb(200 16 46 / 0.12);
+}
+
+html[data-ui='hud'] .gp-canvas .tile-title {
+  color: #f5f2eb;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+html[data-ui='hud'] .gp-canvas .tile-tag.orphan {
+  border-radius: 0;
+  border: 1px solid #9aafc9;
+  color: #9aafc9;
+  background: transparent;
+}
+
+/* 领土图 */
+html[data-ui='hud'] .tm-wrap .tm-svg {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', system-ui, sans-serif;
+}
+
+html[data-ui='hud'] .tm-wrap .tm-hud {
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(11 20 38 / 0.88);
+  color: #9aafc9;
+  border-radius: 0;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.62rem;
+}
+
+html[data-ui='hud'] .tm-wrap .tm-tip {
+  border-radius: 0;
+  border: 1px solid var(--hud-red, #c8102e);
+  background: rgb(11 20 38 / 0.94);
+  color: #f5f2eb;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+
+html[data-ui='hud'] .tm-wrap .tm-label,
+html[data-ui='hud'] .tm-wrap .tm-note-label {
+  fill: #f5f2eb;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+html[data-ui='hud'] .tm-wrap.tm-hud-canvas .tm-link-pulse {
+  stroke: #ff4d6a;
+}

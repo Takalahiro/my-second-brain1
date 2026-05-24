@@ -1,0 +1,181 @@
+/* glass — 毛玻璃：高透、大 blur、细线图标、渐变氛围光 */
+
+html[data-ui='glass'] {
+  --radius-card: 28px;
+  --radius-button: 16px;
+  --radius-small: 14px;
+
+  --bg-primary: #dfe8f8;
+  --bg-secondary: rgb(255 255 255 / 0.35);
+  --text-primary: #1a2744;
+  --text-secondary: rgb(26 39 68 / 0.62);
+  --border-color: rgb(255 255 255 / 0.45);
+
+  --ui-accent: #5b8def;
+  --ui-accent-soft: rgb(91 141 239 / 0.22);
+  --ui-accent-text: #4a7fe8;
+
+  --font-body-current: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-heading-current: 'Inter', system-ui, sans-serif;
+
+  --app-icon-stroke-width: 1.15;
+  --app-icon-opacity: 0.9;
+
+  --glass-bg: rgb(255 255 255 / 0.58);
+  --glass-bg-hover: rgb(255 255 255 / 0.72);
+  --glass-bg-strong: rgb(255 255 255 / 0.68);
+  --glass-border: rgb(26 39 68 / 0.16);
+
+  --shadow-soft: 0 8px 32px rgb(80 120 200 / 0.12);
+  --shadow-normal: 0 16px 48px rgb(60 100 180 / 0.14), 0 0 0 1px rgb(255 255 255 / 0.45) inset;
+  --shadow-hover: 0 22px 56px rgb(60 100 180 / 0.18), 0 0 0 1px rgb(255 255 255 / 0.55) inset;
+  --shadow-active: 0 8px 24px rgb(60 100 180 / 0.1);
+
+  --neo-surface: rgb(255 255 255 / 0.38);
+  --neo-track: rgb(255 255 255 / 0.28);
+  --neo-thumb: rgb(255 255 255 / 0.95);
+  --neo-raised: 0 12px 40px rgb(80 120 200 / 0.14), 0 0 0 1px rgb(255 255 255 / 0.5) inset;
+  --neo-raised-hover: 0 18px 52px rgb(80 120 200 / 0.2), 0 0 0 1px rgb(255 255 255 / 0.62) inset;
+  --neo-pressed: inset 0 1px 4px rgb(255 255 255 / 0.35), 0 0 0 1px rgb(255 255 255 / 0.35) inset;
+  --neo-inset: inset 0 2px 8px rgb(80 120 200 / 0.12);
+
+  --chrome-bg-top: rgb(255 255 255 / 0.72);
+  --chrome-bg-bottom: rgb(248 250 255 / 0.65);
+  --chrome-border: rgb(26 39 68 / 0.14);
+  --chrome-shadow: 0 28px 80px rgb(60 100 180 / 0.16), 0 0 0 1px rgb(26 39 68 / 0.08) inset;
+  --chrome-hover: rgb(26 39 68 / 0.06);
+  --chrome-active: rgb(26 39 68 / 0.1);
+  --chrome-subtle: rgb(26 39 68 / 0.05);
+
+  --widget-bg-rgb: 255 255 255;
+  --widget-shadow: 0 24px 64px rgb(60 100 180 / 0.16);
+  --widget-border: rgb(26 39 68 / 0.14);
+  --widget-header-bg: rgb(26 39 68 / 0.05);
+
+  --ui-chrome-blur: 40px;
+  --motion-base: 0.36s;
+}
+
+html.dark[data-ui='glass'] {
+  --bg-primary: #0f1528;
+  --bg-secondary: rgb(255 255 255 / 0.06);
+  --text-primary: #eef3ff;
+  --text-secondary: rgb(220 230 255 / 0.58);
+  --border-color: rgb(255 255 255 / 0.12);
+
+  --glass-bg: rgb(255 255 255 / 0.08);
+  --glass-bg-hover: rgb(255 255 255 / 0.14);
+  --glass-bg-strong: rgb(255 255 255 / 0.1);
+  --glass-border: rgb(255 255 255 / 0.18);
+
+  --neo-surface: rgb(255 255 255 / 0.08);
+  --neo-track: rgb(255 255 255 / 0.12);
+  --neo-thumb: rgb(255 255 255 / 0.92);
+
+  --chrome-bg-top: rgb(255 255 255 / 0.1);
+  --chrome-bg-bottom: rgb(255 255 255 / 0.06);
+  --chrome-shadow: 0 28px 80px rgb(0 0 0 / 0.45), 0 0 0 1px rgb(255 255 255 / 0.12) inset;
+}
+
+html[data-ui='glass'] body {
+  background:
+    radial-gradient(ellipse 90% 60% at 10% 0%, rgb(180 210 255 / 0.55), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 90% 10%, rgb(255 180 230 / 0.42), transparent 45%),
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgb(140 220 255 / 0.35), transparent 50%),
+    var(--bg-primary);
+}
+
+html.dark[data-ui='glass'] body {
+  background:
+    radial-gradient(ellipse 90% 60% at 10% 0%, rgb(80 120 255 / 0.28), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 90% 10%, rgb(180 80 220 / 0.22), transparent 45%),
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgb(40 180 255 / 0.15), transparent 50%),
+    var(--bg-primary);
+}
+
+html[data-ui='glass'] .mac-settings,
+html[data-ui='glass'] .widget-panel,
+html[data-ui='glass'] .site-nav-shell,
+html[data-ui='glass'] .pixel-card,
+html[data-ui='glass'] .glass-container,
+html[data-ui='glass'] .site-nav-brand,
+html[data-ui='glass'] .site-nav-link {
+  backdrop-filter: blur(var(--ui-chrome-blur, 40px)) saturate(1.65);
+  -webkit-backdrop-filter: blur(var(--ui-chrome-blur, 40px)) saturate(1.65);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-normal);
+}
+
+html[data-ui='glass'] .mac-traffic .dot {
+  background: rgb(255 255 255 / 0.35) !important;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+html[data-ui='glass'] .mac-traffic:hover .dot {
+  color: rgb(255 255 255 / 0.85);
+}
+
+html[data-ui='glass'] .mac-traffic .red,
+html[data-ui='glass'] .mac-traffic .yellow,
+html[data-ui='glass'] .mac-traffic .green {
+  background: rgb(255 255 255 / 0.28) !important;
+}
+
+html[data-ui='glass'] .mac-toggle span {
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.22);
+  border: 1px solid rgb(255 255 255 / 0.45);
+}
+
+html[data-ui='glass'] .mac-toggle input:checked + span {
+  background: rgb(91 141 239 / 0.55);
+  border-color: rgb(255 255 255 / 0.55);
+}
+
+html[data-ui='glass'] .mac-back {
+  color: var(--ui-accent-text);
+}
+
+html[data-ui='glass'] .ui-skin-card.is-active {
+  border-color: rgb(255 255 255 / 0.72);
+  box-shadow: 0 0 0 2px var(--ui-accent-soft), var(--shadow-normal);
+}
+
+html[data-ui='glass'] .pixel-button {
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--neo-raised);
+}
+
+html[data-ui='glass'] .theme-switch {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: var(--glass-bg);
+  box-shadow: var(--neo-raised);
+}
+
+html[data-ui='glass'] .floating-widget {
+  border-radius: 28px;
+  background: rgb(var(--widget-bg-rgb) / 0.38);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--ui-chrome-blur, 40px)) saturate(1.65);
+  -webkit-backdrop-filter: blur(var(--ui-chrome-blur, 40px)) saturate(1.65);
+  box-shadow: var(--widget-shadow);
+}
+
+html[data-ui='glass'] .mac-chrome .dot {
+  background: rgb(255 255 255 / 0.28) !important;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  box-shadow: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+html[data-ui='glass'] .mac-chrome:hover .glyph {
+  color: rgb(255 255 255 / 0.85);
+}

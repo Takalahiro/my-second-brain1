@@ -1,0 +1,304 @@
+---
+// NASA-punk · 日全食启动画面（每次进入主界面，仅 HUD 皮肤）
+---
+
+<div id="hud-eclipse-intro" class="hud-eclipse-intro" aria-live="polite" aria-busy="true">
+  <div class="hei-sky" aria-hidden="true">
+    <div class="hei-corona"></div>
+    <div class="hei-moon"></div>
+    <div class="hei-prominence hei-prominence--a"></div>
+    <div class="hei-prominence hei-prominence--b"></div>
+    <div class="hei-stars"></div>
+  </div>
+  <div class="hei-scanlines" aria-hidden="true"></div>
+  <div class="hei-panel">
+    <p class="hei-tag">[ ORBITAL INSERTION ]</p>
+    <p class="hei-title">TOTAL ECLIPSE</p>
+    <p class="hei-sub">MSB://DESKTOP · ACQUIRING SIGNAL</p>
+    <div class="hei-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+      <div class="hei-progress-fill"></div>
+    </div>
+    <p class="hei-hint">RA LOCK · STELLAR ALIGNMENT · T+0</p>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var ui = localStorage.getItem('second-brain:ui-skin');
+    if (ui !== 'hud') return;
+
+    var splash = document.getElementById('hud-eclipse-intro');
+    if (!splash) return;
+
+    document.documentElement.classList.add('hud-eclipse-intro-active');
+
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var minMs = reduced ? 400 : 2200;
+    var maxMs = reduced ? 800 : 4800;
+    var start = Date.now();
+    var done = false;
+
+    function finish() {
+      if (done) return;
+      done = true;
+      splash.classList.add('is-leaving');
+      splash.setAttribute('aria-busy', 'false');
+      document.documentElement.classList.remove('hud-eclipse-intro-active');
+      try {
+        window.dispatchEvent(new CustomEvent('second-brain:desktop-intro-done'));
+      } catch (_) {}
+      window.setTimeout(function () {
+        splash.remove();
+      }, reduced ? 260 : 580);
+    }
+
+    function readyEnough() {
+      return Date.now() - start >= minMs && document.readyState === 'complete';
+    }
+
+    function tick() {
+      if (readyEnough()) finish();
+      else if (Date.now() - start < maxMs) window.setTimeout(tick, 80);
+      else finish();
+    }
+
+    if (document.readyState === 'complete') tick();
+    else window.addEventListener('load', tick, { once: true });
+    window.setTimeout(finish, maxMs);
+  })();
+</script>
+
+<style is:global>
+  html:not(.hud-eclipse-intro-active) #hud-eclipse-intro,
+  html:not([data-ui='hud']) #hud-eclipse-intro {
+    display: none !important;
+  }
+
+  html.hud-eclipse-intro-active .desktop-intro-hide {
+    visibility: hidden;
+  }
+
+  html.hud-eclipse-intro-active #desktop-intro-splash {
+    display: none !important;
+  }
+
+  .hud-eclipse-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    overflow: hidden;
+    background: #050810;
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transition: opacity 0.55s ease, visibility 0.55s ease;
+  }
+
+  .hud-eclipse-intro.is-leaving {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .hei-sky {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 45%, #0a1428 0%, #050810 100%);
+  }
+
+  .hei-corona {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(52vw, 420px);
+    height: min(52vw, 420px);
+    margin: calc(min(52vw, 420px) / -2) 0 0 calc(min(52vw, 420px) / -2);
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgb(255 220 160 / 0) 42%,
+      rgb(255 200 120 / 0.55) 46%,
+      rgb(232 160 64 / 0.35) 52%,
+      rgb(184 200 224 / 0.12) 62%,
+      transparent 72%
+    );
+    animation: hei-corona-pulse 2.8s ease-in-out infinite;
+  }
+
+  .hei-moon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(38vw, 300px);
+    height: min(38vw, 300px);
+    margin: calc(min(38vw, 300px) / -2) 0 0 calc(min(38vw, 300px) / -2);
+    border-radius: 50%;
+    background: #030508;
+    box-shadow: inset 0 0 40px rgb(0 0 0 / 0.9);
+    animation: hei-moon-pass 2.4s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+  }
+
+  .hei-prominence {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 36px;
+    margin-top: calc(min(38vw, 300px) / -2 - 20px);
+    background: linear-gradient(180deg, #e8a040, transparent);
+    transform-origin: bottom center;
+    opacity: 0.7;
+  }
+
+  .hei-prominence--a {
+    transform: rotate(-24deg);
+    animation: hei-flare 1.6s ease-in-out infinite;
+  }
+
+  .hei-prominence--b {
+    transform: rotate(18deg) translateX(12px);
+    animation: hei-flare 1.9s ease-in-out 0.4s infinite;
+  }
+
+  .hei-stars {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+      radial-gradient(1px 1px at 30% 80%, #b8c8e0, transparent),
+      radial-gradient(1.5px 1.5px at 70% 30%, #ffd89b, transparent),
+      radial-gradient(1px 1px at 85% 65%, #fff, transparent),
+      radial-gradient(1px 1px at 50% 10%, #b8c8e0, transparent);
+    opacity: 0.6;
+    animation: hei-stars-dim 2.4s ease forwards;
+  }
+
+  .hei-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.03) 0, transparent 1px, transparent 3px);
+    opacity: 0.4;
+  }
+
+  .hei-panel {
+    position: absolute;
+    left: 50%;
+    bottom: 12%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: min(420px, calc(100vw - 32px));
+  }
+
+  .hei-tag {
+    margin: 0 0 8px;
+    font-size: 0.62rem;
+    color: #e8a040;
+  }
+
+  .hei-title {
+    margin: 0 0 6px;
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    color: #f5f2eb;
+    letter-spacing: 0.32em;
+  }
+
+  .hei-sub {
+    margin: 0 0 16px;
+    font-size: 0.58rem;
+    color: rgb(184 200 224 / 0.75);
+  }
+
+  .hei-progress {
+    height: 3px;
+    background: rgb(184 200 224 / 0.15);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .hei-progress-fill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #e8a040, #b8c8e0);
+    animation: hei-progress 2.2s linear forwards;
+  }
+
+  .hei-hint {
+    margin: 0;
+    font-size: 0.52rem;
+    color: rgb(184 200 224 / 0.55);
+    animation: hei-hint-blink 1.2s step-end infinite;
+  }
+
+  @keyframes hei-moon-pass {
+    0% {
+      transform: translateX(120%);
+    }
+    100% {
+      transform: translateX(-120%);
+    }
+  }
+
+  @keyframes hei-corona-pulse {
+    0%,
+    100% {
+      opacity: 0.85;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.04);
+    }
+  }
+
+  @keyframes hei-flare {
+    0%,
+    100% {
+      opacity: 0.4;
+      height: 28px;
+    }
+    50% {
+      opacity: 0.95;
+      height: 44px;
+    }
+  }
+
+  @keyframes hei-stars-dim {
+    from {
+      opacity: 0.15;
+    }
+    to {
+      opacity: 0.75;
+    }
+  }
+
+  @keyframes hei-progress {
+    to {
+      width: 100%;
+    }
+  }
+
+  @keyframes hei-hint-blink {
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hei-moon,
+    .hei-corona,
+    .hei-prominence,
+    .hei-progress-fill,
+    .hei-hint {
+      animation: none !important;
+    }
+
+    .hei-moon {
+      transform: translateX(0);
+    }
+
+    .hei-progress-fill {
+      width: 100%;
+    }
+  }
+</style>

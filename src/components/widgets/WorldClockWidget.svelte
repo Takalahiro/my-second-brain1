@@ -8,6 +8,7 @@
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import PixelIcon from '../PixelIcon.svelte';
   import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
+  import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
 
   interface Props {
     onClose?: () => void;
@@ -217,11 +218,12 @@
       { minWidth: 380, minHeight: 320, maxWidth: 1100, maxHeight: 900 }
     )
   );
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized, compactMax: 380, expandedMin: 560 }));
 </script>
 
 <section
   bind:this={rootEl}
-  class="world-widget {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
+  class="world-widget {tierClass(tier)} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style={rotationStyle(rotation, (maximized ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${minimized ? 'auto' : height + 'px'};`) + ` --w-bg-alpha: ${bgAlpha};`)}
   aria-label="世界时钟"
   use:widgetTouchGestures={touchOpts}

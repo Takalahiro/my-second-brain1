@@ -4,6 +4,7 @@
   import PythonCodeEditor from './python/PythonCodeEditor.svelte';
   import PythonAnnotatedSource from './python/PythonAnnotatedSource.svelte';
   import PythonModuleFlow from './python/PythonModuleFlow.svelte';
+  import { isHudSkinActive, subscribeHudMode } from '../features/ui/hud-mode.svelte';
   import {
     PY_TRACER_SETUP,
     SAMPLE_CODE,
@@ -33,10 +34,14 @@
   let trace = $state<PythonTraceResult | null>(null);
   let activeStep = $state(0);
   let codeView = $state<CodeView>('edit');
+  let hudMode = $state(false);
   let pyodide: PyodideApi | null = null;
 
   onMount(() => {
+    hudMode = isHudSkinActive();
+    const offHud = subscribeHudMode((v) => { hudMode = v; });
     void initPyodide();
+    return offHud;
   });
 
   async function initPyodide() {
@@ -135,7 +140,14 @@ else:
   ];
 </script>
 
-<div class="py-ide" class:compact>
+<div class="py-ide" class:compact class:is-hud-mission={hudMode}>
+  {#if hudMode && !compact}
+    <div class="hud-mission-bar">
+      <span class="hud-mission-id">FLIGHT COMPUTER · PYTHON</span>
+      <span class="hud-mission-patch" aria-hidden="true"></span>
+      <span class="hud-mission-status">PYODIDE CORE · TRACE TELEMETRY</span>
+    </div>
+  {/if}
   <header class="py-head">
     {#if !compact}
       <div>

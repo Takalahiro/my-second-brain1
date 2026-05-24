@@ -13,12 +13,17 @@
     readCachedWeatherCode,
   } from '../../lib/weather-rain';
   import { patchFromMode, type WallpaperMode } from '../../features/wallpaper/state/mode';
+  import HudWallpaper from '../wallpaper/HudWallpaper.svelte';
+  import HudScrollIndicator from '../desktop/HudScrollIndicator.svelte';
+  import { useHudMode } from '../../features/ui/hud-mode.svelte';
 
   interface Props {
     backgroundDefault?: boolean;
     desktopMode?: boolean;
   }
   let { backgroundDefault = false, desktopMode = false }: Props = $props();
+
+  const hudMode = useHudMode();
 
   const STORAGE_KEY = 'second-brain:widgets';
 
@@ -485,8 +490,13 @@
       />
     {/if}
 
+    {#if hudMode.current}
+      <HudWallpaper />
+      <HudScrollIndicator />
+    {/if}
+
     <div class="mac-desktop-stage">
-      {#if enabled.background}
+      {#if enabled.background && !hudMode.current}
         <LazyWidget
           show={true}
           loader={widgetLoaders.background}

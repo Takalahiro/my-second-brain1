@@ -6,6 +6,8 @@
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
+  import { hudSolidBar, HUD_SEP } from '../../lib/hud-widget-ui';
+  import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
 
   interface Props {
     onClose?: () => void;
@@ -14,7 +16,7 @@
   }
   let { onClose, pinned = false }: Props = $props();
 
-  type Style = 'pixel' | 'neon' | 'nixie' | 'code';
+  type Style = 'pixel' | 'neon' | 'nixie' | 'code' | 'altimeter';
   const STORAGE_KEY = 'second-brain:clock';
   const LAYOUT_KEY = 'second-brain:clock-layout';
 
@@ -32,8 +34,8 @@
   // 只有浮窗模式才需要记位置
   let posX = $state(-1);
   let posY = $state(-1);
-  let width = $state(620);
-  let height = $state(280);
+  let width = $state(260);
+  let height = $state(110);
   let rootEl: HTMLElement | null = null;
   let rotation = $state(0);
   let dragging = $state(false);
@@ -50,7 +52,7 @@
         if (typeof s.showSeconds === 'boolean') showSeconds = s.showSeconds;
         // 老数据里 style 叫 glow，现在统一成 nixie
         const st = s.style === 'glow' ? 'nixie' : s.style;
-        if (st === 'pixel' || st === 'neon' || st === 'nixie' || st === 'code') style = st;
+        if (st === 'pixel' || st === 'neon' || st === 'nixie' || st === 'code' || st === 'altimeter') style = st;
         if (typeof s.sizeScale === 'number') sizeScale = clamp(s.sizeScale, 0.6, 2.4);
         if (typeof s.bgAlpha === 'number') bgAlpha = clamp(s.bgAlpha, 0.05, 0.95);
       }
@@ -61,8 +63,8 @@
         const s = JSON.parse(raw);
         if (typeof s.x === 'number') posX = s.x;
         if (typeof s.y === 'number') posY = s.y;
-        if (typeof s.w === 'number') width = clamp(s.w, 360, 1100);
-        if (typeof s.h === 'number') height = clamp(s.h, 200, 800);
+        if (typeof s.w === 'number') width = clamp(s.w, 120, 1100);
+        if (typeof s.h === 'number') height = clamp(s.h, 72, 800);
         rotation = layoutRotation(s);
       }
     } catch {}
@@ -187,6 +189,17 @@
 
   const timeFontRem = $derived(4.35 * sizeScale);
   const metaFontRem = $derived(0.95 * sizeScale);
+  const altSecondBar = $derived(hudSolidBar(tzNow.s / 59, 12));
+  const altMinuteBar = $derived(hudSolidBar(tzNow.m / 59, 8));
+
+  const tier = $derived.by(() => {
+    if (pinned) {
+      if (sizeScale < 0.85) return 'compact' as const;
+      if (sizeScale > 1.35) return 'expanded' as const;
+      return 'medium' as const;
+    }
+    return getWidgetTier({ width, height, compactMax: 200, expandedMin: 420 });
+  });
 
   // ---- 拖拽 / 缩放（pinned 时全跳过）----
   function onHeaderPointerDown(e: PointerEvent) {
@@ -228,14 +241,14 @@
         clampPos,
         persistLayout,
       },
-      { minWidth: 360, minHeight: 200, maxWidth: 1100, maxHeight: 800 }
+      { minWidth: 120, minHeight: 72, maxWidth: 1100, maxHeight: 800 }
     )
   );
 </script>
 
 <section
   bind:this={rootEl}
-  class="pixel-clock style-{style} {pinned ? 'is-pinned' : 'is-free'} {dragging ? 'is-active-drag' : ''}"
+  class="pixel-clock style-{style} {tierClass(tier)} {pinned ? 'is-pinned' : 'is-free'} {dragging ? 'is-active-drag' : ''}"
   style={rotationStyle(rotation, (pinned ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${height}px;`) + ` --w-bg-alpha: ${bgAlpha};`)}
   aria-label="时钟小组件"
   use:widgetTouchGestures={touchOpts}
@@ -257,7 +270,26 @@
   </header>
 
   <div class="clock-body">
-    {#if style === 'nixie'}
+    {#if style === 'altimeter'}
+      <div class="clock-altimeter hud-readout">
+        <div class="alt-face">
+          <div class="hud-readout-label">ALT · LOCAL TIME</div>
+          <div class="hud-readout-lg">{timeText}</div>
+          <div class="hud-bar-line">{HUD_SEP}</div>
+          <div class="alt-row">
+            <span>BAR {dateText}</span>
+            <span>{hour24 ? '24H' : ampm}</span>
+          </div>
+          {#if externalTz}
+            <div class="alt-row alt-tz">▲ TZ · {externalLabel ?? externalTz}</div>
+          {/if}
+        </div>
+        <div class="alt-ticks">
+          <span>MIN {altMinuteBar}</span>
+          <span>SEC {altSecondBar}</span>
+        </div>
+      </div>
+    {:else if style === 'nixie'}
       <div class="clock-time nixie-row" style={`font-size: ${timeFontRem}rem;`}>
         {#each timeChars as ch}
           {#if ch === ':'}
@@ -280,6 +312,7 @@
       <div class="clock-time" style={`font-size: ${timeFontRem}rem;`}>{timeText}</div>
     {/if}
 
+    {#if style !== 'altimeter'}
     <div class="clock-meta" style={`font-size: ${metaFontRem}rem;`}>
       <button type="button" class="clock-mode" onclick={toggle24}>{hour24 ? '24H' : ampm}</button>
       {#if externalTz}
@@ -287,12 +320,14 @@
       {/if}
       <span class="clock-date">{dateText}</span>
     </div>
+    {/if}
 
     {#if showSettings}
       <div class="clock-settings">
         <div class="cs-row">
           <span class="cs-label">样式</span>
           <div class="cs-styles">
+            <button type="button" class:active={style === 'altimeter'} onclick={() => setStyle('altimeter')}>高度表</button>
             <button type="button" class:active={style === 'pixel'} onclick={() => setStyle('pixel')}>像素</button>
             <button type="button" class:active={style === 'neon'}  onclick={() => setStyle('neon')}>霓虹</button>
             <button type="button" class:active={style === 'nixie'} onclick={() => setStyle('nixie')}>辉光管</button>
@@ -321,7 +356,7 @@
 
   <ResizeHandles
     width={width} height={height} x={posX} y={posY}
-    minWidth={360} minHeight={200}
+    minWidth={120} minHeight={72}
     maxWidth={1100} maxHeight={800}
     disabled={pinned}
     onResize={onResize}
@@ -358,11 +393,10 @@
   .pixel-clock.is-pinned {
     right: max(env(safe-area-inset-right, 0px), 20px);
     bottom: max(env(safe-area-inset-bottom, 0px), 20px);
-    min-width: 600px;
-    max-width: 760px;
+    min-width: 0;
+    max-width: min(760px, calc(100vw - 40px));
   }
-  /* free 靠 inline style 定位置，这里只管 min/max width */
-  .pixel-clock.is-free { min-width: 360px; max-width: 1100px; }
+  .pixel-clock.is-free { min-width: 0; max-width: 1100px; }
   .pixel-clock.is-active-drag { user-select: none; box-shadow: 0 20px 44px rgb(0 0 0 / 0.5); }
 
   .clock-bar {
@@ -372,9 +406,9 @@
     padding: 8px 14px;
     background: var(--widget-header-bg);
     border-bottom: 1px solid rgb(255 255 255 / 0.08);
-    cursor: default;
+    cursor: grab;
   }
-  .pixel-clock.is-free .clock-bar { cursor: grab; }
+  .pixel-clock.is-pinned .clock-bar { cursor: default; }
   .pixel-clock.is-free.is-active-drag .clock-bar { cursor: grabbing; }
   .clock-title { font-size: 0.66rem; letter-spacing: 3px; color: rgb(255 255 255 / 0.55); text-transform: uppercase; flex: 1; }
   .settings-btn {
@@ -388,7 +422,26 @@
   .settings-btn:hover { background: rgb(255 255 255 / 0.18); }
   .settings-btn.is-open { background: linear-gradient(180deg, #ffd0e6, #b48cff); color: #1c0f30; }
 
-  .clock-body { padding: 18px 28px 20px; }
+  .clock-body { padding: 10px 14px 12px; min-height: 0; overflow: auto; }
+
+  .clock-altimeter .alt-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    margin-top: 4px;
+    letter-spacing: 0.06em;
+  }
+  .clock-altimeter .alt-tz { opacity: 0.85; font-size: 0.55rem; }
+  .clock-altimeter .alt-ticks {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.52rem;
+    margin-top: 4px;
+    opacity: 0.8;
+  }
+  .clock-altimeter .hud-readout-lg {
+    font-size: clamp(1.25rem, 12vw, 2.4rem);
+  }
 
   .clock-time {
     font-weight: 700;

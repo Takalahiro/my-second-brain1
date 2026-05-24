@@ -11,6 +11,7 @@
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import PixelIcon from '../PixelIcon.svelte';
   import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
+  import { starCoords } from '../../lib/hud-widget-ui';
 
   interface Props {
     onClose?: () => void;
@@ -70,6 +71,7 @@
   });
 
   const tier = $derived(getWidgetTier({ width, height, minimized, maximized }));
+  const starHud = $derived(starCoords((selectedPath ?? 'vault').split('').reduce((a, c) => a + c.charCodeAt(0), 0)));
 
   async function load() {
     try {
@@ -181,6 +183,15 @@
 
   {#if !minimized}
     <div class="tw-body" data-no-drag>
+      <div class="tw-star-hud hud-readout" aria-hidden="true">
+          <div>[ STAR CHART ]</div>
+          <div>RA · {starHud.ra}</div>
+          <div>DEC · {starHud.dec}</div>
+          <div>SEC · {starHud.sector}</div>
+          {#if selectedPath}
+            <div style="margin-top:4px;opacity:0.85;">LOCK · {selectedPath}</div>
+          {/if}
+      </div>
       {#if loadErr}
         <p class="tw-empty">{loadErr}</p>
       {:else if !data}

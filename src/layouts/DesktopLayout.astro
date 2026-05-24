@@ -1,6 +1,7 @@
 ---
 import '../styles/globals.css';
 import DesktopIntroSplash from '../components/desktop/DesktopIntroSplash.astro';
+import HudEclipseIntro from '../components/desktop/HudEclipseIntro.astro';
 
 interface Props {
   title?: string;
@@ -17,7 +18,7 @@ const {
 ---
 
 <!doctype html>
-<html lang="zh-CN" class="scroll-smooth" data-font="wenkai">
+<html lang="zh-CN" class="scroll-smooth" data-font="wenkai" data-ui="mac">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -41,16 +42,27 @@ const {
         document.documentElement.lang = 'en';
         document.documentElement.dataset.locale = 'en';
       }
+      const ui = localStorage.getItem('second-brain:ui-skin');
+      if (ui && ['mac', 'glass', 'pixel', 'hud'].includes(ui)) {
+        document.documentElement.setAttribute('data-ui', ui);
+      }
+      if (localStorage.getItem('second-brain:ui-debug') === '1') {
+        document.documentElement.classList.add('ui-debug', 'debug');
+      }
     </script>
     {introSplash && (
       <script is:inline>
-        if (!localStorage.getItem('second-brain:desktop-intro-v1')) {
+        var ui = localStorage.getItem('second-brain:ui-skin');
+        if (ui === 'hud') {
+          document.documentElement.classList.add('hud-eclipse-intro-active');
+        } else if (!localStorage.getItem('second-brain:desktop-intro-v1')) {
           document.documentElement.classList.add('desktop-intro-active');
         }
       </script>
     )}
   </head>
   <body class="mac-os-body">
+    {introSplash && <HudEclipseIntro />}
     {introSplash && <DesktopIntroSplash />}
     <slot />
   </body>

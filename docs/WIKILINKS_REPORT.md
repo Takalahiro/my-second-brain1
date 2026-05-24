@@ -1,19 +1,19 @@
 # 双链 (Wikilinks) 检查报告
 
-> 生成时间：2026-05-23T09:48:03.421Z
+> 生成时间：2026-05-24T19:50:46.825Z
 
 ## 概览
 
 | 指标 | 数值 |
 |---|---|
-| 笔记总数 | 128 |
-| 双链总数 | 188 |
-| ✓ 解析成功 | 92 |
+| 笔记总数 | 129 |
+| 双链总数 | 194 |
+| ✓ 解析成功 | 98 |
 | ✗ 悬空链接 | 96 |
-| 带 alias 链接 | 2 |
+| 带 alias 链接 | 4 |
 | 含 #heading 链接 | 7 |
-| 孤岛笔记 (无入也无出) | 76 |
-| 同名冲突链接 | 0 |
+| 孤岛笔记 (无入也无出) | 70 |
+| 同名冲突链接 | 2 |
 
 ## 🔥 热点 Top 20（按总度数 入+出）
 
@@ -23,6 +23,7 @@
 | `基础机器学习 Machine Learning` | 计算机 | 2 | 23 |
 | `Python 技术文档` | 计算机 | 11 | 11 |
 | `Markdown 技术文档` | 计算机 | 5 | 2 |
+| `MATH` | MATH | 0 | 6 |
 | `正则表达式 Regular Expression` | 计算机 | 3 | 3 |
 | `HyperText Markup Language (HTML) 技术文档` | 计算机 | 5 | 0 |
 | `Javascript (ECMA-262 ) 技术文档` | 计算机 | 3 | 2 |
@@ -38,7 +39,6 @@
 | `Chi-square Test` | DATA1001 | 1 | 1 |
 | `图` | 计算机 | 2 | 0 |
 | `Scikit-Learn` | 计算机 | 2 | 0 |
-| `NumPy` | 计算机 | 2 | 0 |
 
 ## ✗ 悬空链接（96 条）
 
@@ -141,19 +141,20 @@
 | `计算机/_Overview 总览/Computer science foundation note.md` | `[[:space:]]` | `:space:` |
 | `计算机/_Overview 总览/Computer science foundation note.md` | `[[:alpha:]]` | `:alpha:` |
 
-## 🏝 孤岛笔记（76 条）
+## ⚠ 同名冲突链接（2 条）
+
+| 源笔记 | 链接 | 候选 |
+|---|---|---|
+| `MATH/MATH.md` | `[[MATH/Algebra 代数/题型条件反射\|题型条件反射]]` | `MATH/Algebra 代数/题型条件反射` / `MATH/Calculus 微积分/题型条件反射` |
+| `MATH/MATH.md` | `[[MATH/Calculus 微积分/题型条件反射\|题型条件反射]]` | `MATH/Algebra 代数/题型条件反射` / `MATH/Calculus 微积分/题型条件反射` |
+
+## 🏝 孤岛笔记（70 条）
 
 这些笔记既没有出链也没有入链，建议补充关联：
 
 - `DATA1001/Structure/REPORT`
 - `INFO1110/foundition/Codereview`
 - `INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）`
-- `MATH/Algebra 代数/Algebra 复习`
-- `MATH/Algebra 代数/题型条件反射`
-- `MATH/Calculus 微积分/Calculus复习`
-- `MATH/Calculus 微积分/题型条件反射`
-- `MATH/Discrete 离散数学/Discrete`
-- `MATH/Statistics 统计学/Statistics`
 - `_Inbox 入口/笔记`
 - `计算机/Computer Graphics 计算机图形学/OpenGL-WebGL`
 - `计算机/Computer Graphics 计算机图形学/光栅化`

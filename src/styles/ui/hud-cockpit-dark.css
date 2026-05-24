@@ -1,0 +1,196 @@
+/* HUD 驾驶舱深色 — 独立于通用 .dark 紫调，仅 html.dark[data-ui='hud'] */
+
+html.dark[data-ui='hud'] {
+  --hud-navy: #f5f2eb;
+  --hud-red: #ff4d6a;
+  --hud-red-soft: rgb(255 77 106 / 0.14);
+
+  --accent-neon-pink: var(--hud-red);
+  --accent-neon-cyan: #9aafc9;
+  --accent-neon-purple: #c8d4e8;
+
+  --tree-panel-bg: rgb(11 20 38 / 0.94);
+  --tree-panel-border: rgb(245 242 235 / 0.22);
+  --tree-row-bg: rgb(16 29 54 / 0.88);
+  --tree-row-hover-bg: rgb(22 38 68 / 0.94);
+  --tree-row-border: rgb(154 175 201 / 0.35);
+  --tree-row-text: #f5f2eb;
+
+  --code-bg: #050a14;
+  --code-fg: #f5f2eb;
+  --code-output-bg: rgb(5 10 20 / 0.72);
+  --code-output-fg: #9aafc9;
+
+  --graph-canvas-bg: #050a14;
+  --graph-canvas-border: rgb(245 242 235 / 0.35);
+  --graph-panel-bg: rgb(11 20 38 / 0.94);
+  --graph-panel-text: #f5f2eb;
+  --graph-panel-muted: #9aafc9;
+
+  color-scheme: dark;
+}
+
+html.dark[data-ui='hud'] body {
+  background-color: #050a14;
+}
+
+html.dark[data-ui='hud']::before {
+  opacity: 0.72;
+}
+
+/* 主题开关 · 驾驶舱 */
+html.dark[data-ui='hud'] .theme-switch {
+  --neo-surface: #101d36;
+  --neo-track: #050a14;
+  --neo-thumb: #f5f2eb;
+  border: 1px solid rgb(245 242 235 / 0.35);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+html.dark[data-ui='hud'] .theme-switch-sun {
+  color: #9aafc9;
+}
+
+/* 站点导航 */
+html.dark[data-ui='hud'] .site-nav-shell,
+html.dark[data-ui='hud'] .site-nav-brand,
+html.dark[data-ui='hud'] .site-nav-link {
+  background: rgb(11 20 38 / 0.94);
+  border-color: rgb(245 242 235 / 0.45);
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .site-nav-link:hover,
+html.dark[data-ui='hud'] .site-nav-link.is-active {
+  background: var(--hud-red-soft);
+  color: #ff4d6a;
+}
+
+/* 控制面板 / 设置 */
+html.dark[data-ui='hud'] .mac-settings,
+html.dark[data-ui='hud'] .floating-widget,
+html.dark[data-ui='hud'] .mac-pane,
+html.dark[data-ui='hud'] .mac-category-tile,
+html.dark[data-ui='hud'] .mac-action-row,
+html.dark[data-ui='hud'] .mac-widget-row,
+html.dark[data-ui='hud'] .mac-wall-card,
+html.dark[data-ui='hud'] .ui-skin-card {
+  background: rgb(11 20 38 / 0.94);
+  border-color: rgb(245 242 235 / 0.42);
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .mac-category-tile:hover,
+html.dark[data-ui='hud'] .mac-action-row:hover,
+html.dark[data-ui='hud'] .ui-skin-card:hover {
+  background: rgb(16 29 54 / 0.96);
+}
+
+html.dark[data-ui='hud'] .ui-skin-card.is-active {
+  border-color: var(--hud-red);
+  background: var(--hud-red-soft);
+}
+
+html.dark[data-ui='hud'] .mac-spotlight-input,
+html.dark[data-ui='hud'] .mac-spotlight-row,
+html.dark[data-ui='hud'] input,
+html.dark[data-ui='hud'] select,
+html.dark[data-ui='hud'] textarea {
+  background: rgb(5 10 20 / 0.85);
+  border: 1px solid rgb(245 242 235 / 0.35);
+  color: #f5f2eb;
+  border-radius: 0;
+}
+
+html.dark[data-ui='hud'] .mac-spotlight-input:focus,
+html.dark[data-ui='hud'] input:focus,
+html.dark[data-ui='hud'] select:focus,
+html.dark[data-ui='hud'] textarea:focus {
+  outline: 1px solid var(--hud-red);
+  outline-offset: 1px;
+}
+
+/* 工具页通用 */
+html.dark[data-ui='hud'] .tool-layout,
+html.dark[data-ui='hud'] .site-main {
+  background: transparent;
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .hud-mission-id,
+html.dark[data-ui='hud'] .hud-mission-status {
+  color: #9aafc9;
+}
+
+html.dark[data-ui='hud'] .hud-mission-patch {
+  border-color: rgb(245 242 235 / 0.55);
+}
+
+/* 桌面 / 小组件 */
+html.dark[data-ui='hud'] .desktop-icon-label,
+html.dark[data-ui='hud'] .dock-label,
+html.dark[data-ui='hud'] .fw-body,
+html.dark[data-ui='hud'] .mac-pane-body {
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .desktop-surface,
+html.dark[data-ui='hud'] .dock-shell {
+  background: transparent;
+}
+
+html.dark[data-ui='hud'] .mac-group-label,
+html.dark[data-ui='hud'] .mac-row-title,
+html.dark[data-ui='hud'] .mac-category-name,
+html.dark[data-ui='hud'] .fw-title {
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .mac-row-sub,
+html.dark[data-ui='hud'] .mac-spotlight-row-sub,
+html.dark[data-ui='hud'] .ui-skin-desc {
+  color: #9aafc9;
+}
+
+html.dark[data-ui='hud'] .mac-segment-btn.is-active {
+  color: #050a14;
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-head,
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-tabs,
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-folders {
+  background: rgb(11 20 38 / 0.94);
+  border-color: rgb(245 242 235 / 0.35);
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-stats .kpi strong {
+  color: #f5f2eb;
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-link {
+  border-color: rgb(245 242 235 / 0.42);
+  color: #9aafc9;
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-link:hover {
+  border-color: var(--hud-red);
+  color: #ff4d6a;
+  background: var(--hud-red-soft);
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-canvas-row {
+  background:
+    radial-gradient(circle at 18% 22%, rgb(255 77 106 / 0.05) 0, transparent 42%),
+    radial-gradient(circle at 82% 78%, rgb(154 175 201 / 0.06) 0, transparent 45%);
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-canvas {
+  outline-color: rgb(245 242 235 / 0.12);
+  border-color: rgb(245 242 235 / 0.35);
+}
+
+html.dark[data-ui='hud'] .graph-page.is-hud-mission .gp-detail {
+  background: rgb(5 10 20 / 0.92);
+  color: #f5f2eb;
+}

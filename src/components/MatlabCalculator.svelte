@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Component } from 'svelte';
+  import { onMount } from 'svelte';
   import { evaluate, plotFunction, CALC_HELP, type CalcResult } from '../lib/calc-engine';
+  import { isHudSkinActive, subscribeHudMode } from '../features/ui/hud-mode.svelte';
 
   interface Props {
     // 紧凑模式（小组件用）
@@ -10,6 +12,15 @@
 
   type TabId = 'matrix' | 'calculus' | 'discrete' | 'statistics' | 'expr';
   let tab = $state<TabId>('matrix');
+  let hudMode = $state(false);
+
+  const TAB_MISSION: Record<TabId, string> = {
+    matrix: 'MATRIX LAB',
+    calculus: 'CALCULUS DECK',
+    discrete: 'DISCRETE SYS',
+    statistics: 'STATS TELEMETRY',
+    expr: 'EXPR CONSOLE',
+  };
 
   type LabId = Exclude<TabId, 'expr'>;
   type LabModule = { default: Component };
@@ -83,6 +94,7 @@
     if (!plotCanvas) return;
     const ctx = plotCanvas.getContext('2d');
     if (!ctx) return;
+    const isHud = document.documentElement.dataset.ui === 'hud';
     const W = plotCanvas.width;
     const H = plotCanvas.height;
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
@@ -92,12 +104,12 @@
     const cw = plotCanvas.clientWidth;
     const ch = plotCanvas.clientHeight;
 
-    ctx.fillStyle = '#0e0816';
+    ctx.fillStyle = isHud ? '#0b1426' : '#0e0816';
     ctx.fillRect(0, 0, cw, ch);
 
     const data = plotFunction(plotExpr, xMin, xMax, 300);
     if ('error' in data) {
-      ctx.fillStyle = '#ff9d9d';
+      ctx.fillStyle = isHud ? '#c8102e' : '#ff9d9d';
       ctx.font = '12px sans-serif';
       ctx.fillText(data.error, 12, 24);
       return;
@@ -117,7 +129,7 @@
     const toY = (y: number) => ch - 24 - ((y - yMin) / (yMax - yMin)) * (ch - 48);
 
     // 网格
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.strokeStyle = isHud ? 'rgba(245,242,235,0.08)' : 'rgba(255,255,255,0.06)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 8; i++) {
       const y = 24 + ((ch - 48) * i) / 8;
@@ -126,7 +138,7 @@
 
     // 零线
     if (yMin < 0 && yMax > 0) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.strokeStyle = isHud ? 'rgba(200,16,46,0.45)' : 'rgba(255,255,255,0.2)';
       ctx.beginPath();
       ctx.moveTo(40, toY(0));
       ctx.lineTo(cw - 8, toY(0));
@@ -144,15 +156,20 @@
       if (!started) { ctx.moveTo(px, py); started = true; }
       else ctx.lineTo(px, py);
     }
-    const grad = ctx.createLinearGradient(40, 0, cw, 0);
-    grad.addColorStop(0, '#ff9ed4');
-    grad.addColorStop(1, '#b48cff');
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 2;
+    if (isHud) {
+      ctx.strokeStyle = '#c8102e';
+      ctx.lineWidth = 1.5;
+    } else {
+      const grad = ctx.createLinearGradient(40, 0, cw, 0);
+      grad.addColorStop(0, '#ff9ed4');
+      grad.addColorStop(1, '#b48cff');
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 2;
+    }
     ctx.stroke();
 
     // 轴标签
-    ctx.fillStyle = '#9d8fc0';
+    ctx.fillStyle = isHud ? '#9aafc9' : '#9d8fc0';
     ctx.font = '10px sans-serif';
     ctx.fillText(plotExpr, 44, 16);
     ctx.fillText(`${xMin.toFixed(1)}`, 42, ch - 6);
@@ -163,9 +180,19 @@
     void plotExpr;
     void xMin;
     void xMax;
+    void hudMode;
     if (plotCanvas && !compact) {
       requestAnimationFrame(drawPlot);
     }
+  });
+
+  onMount(() => {
+    hudMode = isHudSkinActive();
+    const off = subscribeHudMode((v) => {
+      hudMode = v;
+      if (plotCanvas && !compact) requestAnimationFrame(drawPlot);
+    });
+    return off;
   });
 
   $effect(() => {
@@ -204,7 +231,14 @@
   ];
 </script>
 
-<div class="matlab-calc" class:compact>
+<div class="matlab-calc" class:compact class:is-hud-mission={hudMode}>
+  {#if !compact && hudMode}
+    <div class="hud-mission-bar">
+      <span class="hud-mission-id">ORBITAL MATH LAB</span>
+      <span class="hud-mission-patch" aria-hidden="true"></span>
+      <span class="hud-mission-status">GRAV METRICS · TELEMETRY PLOT</span>
+    </div>
+  {/if}
   {#if !compact}
     <header class="mc-head">
       <div>
@@ -237,7 +271,15 @@
     {:else if labError}
       <div class="mc-lab-error" role="alert">模块加载失败：{labError}</div>
     {:else if LabComponent}
-      <LabComponent />
+      <div class="hud-lab-frame">
+        {#if hudMode}
+          <div class="hud-lab-frame-head">
+            <strong>{TAB_MISSION[tab]}</strong>
+            <span>SIGNAL LOCK · MODULE READY</span>
+          </div>
+        {/if}
+        <LabComponent />
+      </div>
     {/if}
   {:else}
   <div class="mc-body">

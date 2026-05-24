@@ -1,0 +1,67 @@
+/* 图标渲染模式：由 data-ui 决定，优先于 data-font */
+
+:global(html[data-ui='pixel']) .app-icon-stroke {
+  display: none;
+}
+
+:global(html[data-ui='pixel']) .app-icon-pixel {
+  display: block;
+}
+
+:global(html[data-ui='mac']) .app-icon-stroke,
+:global(html[data-ui='glass']) .app-icon-stroke,
+:global(html[data-ui='hud']) .app-icon-stroke,
+:global(html:not([data-ui])) .app-icon-stroke {
+  display: block;
+}
+
+:global(html[data-ui='mac']) .app-icon-pixel,
+:global(html[data-ui='glass']) .app-icon-pixel,
+:global(html[data-ui='hud']) .app-icon-pixel,
+:global(html:not([data-ui])) .app-icon-pixel {
+  display: none;
+}
+
+:global(html[data-ui='mac']) .app-icon-stroke,
+:global(html:not([data-ui])) .app-icon-stroke {
+  stroke-width: var(--app-icon-stroke-width, 1.75);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0.5px 0 rgb(0 0 0 / 0.06));
+}
+
+:global(html[data-ui='glass']:not(.dark)) .app-icon-stroke {
+  stroke-width: var(--app-icon-stroke-width, 1.15);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 1;
+  filter: drop-shadow(0 1px 0 rgb(26 39 68 / 0.12));
+}
+
+:global(html.dark[data-ui='glass']) .app-icon-stroke {
+  stroke-width: var(--app-icon-stroke-width, 1.15);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: var(--app-icon-opacity, 0.88);
+  filter: drop-shadow(0 0 8px rgb(140 180 255 / 0.25));
+}
+
+:global(html[data-ui='hud']) .app-icon-stroke {
+  stroke-width: var(--app-icon-stroke-width, 1);
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  filter: none;
+  opacity: 1;
+}
+
+:global(html.dark[data-ui='hud']) .app-icon-stroke {
+  color: var(--text-primary);
+}
+
+:global(html[data-ui='pixel']) .app-icon-pixel {
+  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.35));
+}
+
+:global(html.dark[data-ui='pixel']) .app-icon-pixel {
+  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.65));
+}

@@ -1,0 +1,428 @@
+/* NASA-punk 专属全屏壁纸 · 深空视窗 + 1970s 星图档案 */
+
+.hud-wallpaper {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hud-wp-glitch {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgb(255 255 255 / 0.04) 0,
+      rgb(255 255 255 / 0.04) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(90deg, rgb(232 160 64 / 0.06), transparent 40%, rgb(184 200 224 / 0.05));
+  mix-blend-mode: screen;
+  animation: hud-glitch-flicker 0.08s steps(2) infinite;
+}
+
+.hud-wp-glitch--chart {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgb(26 47 74 / 0.05) 0,
+      rgb(26 47 74 / 0.05) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    linear-gradient(90deg, rgb(200 57 46 / 0.07), transparent 45%, rgb(107 138 184 / 0.06));
+  mix-blend-mode: multiply;
+}
+
+@keyframes hud-glitch-flicker {
+  0% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(2px);
+  }
+
+  100% {
+    transform: translateX(-1px);
+  }
+}
+
+html[data-ui='hud'] .hud-wallpaper {
+  display: block;
+}
+
+.hud-wp {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hud-wp__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── 模式切换 ── */
+html[data-ui='hud'].dark .hud-wp--chart {
+  display: none;
+}
+
+html[data-ui='hud']:not(.dark) .hud-wp--deep {
+  display: none;
+}
+
+/* ═══════════════════════════════════════
+   深色 · 深空视窗 (#0A0E1A)
+   ═══════════════════════════════════════ */
+
+.hud-wp--deep {
+  background: #0a0e1a;
+}
+
+.hud-wp-deep__overlay {
+  position: absolute;
+  inset: 0;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: clamp(0.55rem, 0.9vw, 0.72rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(184 200 224 / 0.72);
+  z-index: 2;
+}
+
+.hud-wp-deep__frame,
+.hud-wp-chart__frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hud-wp-corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: rgb(184 200 224 / 0.55);
+  border-style: solid;
+  transition: opacity 0.12s linear;
+}
+
+.hud-wp-corner--tl {
+  top: max(env(safe-area-inset-top, 0px), 12px);
+  left: max(env(safe-area-inset-left, 0px), 12px);
+  border-width: 1px 0 0 1px;
+}
+
+.hud-wp-corner--tr {
+  top: max(env(safe-area-inset-top, 0px), 12px);
+  right: max(env(safe-area-inset-right, 0px), 12px);
+  border-width: 1px 1px 0 0;
+}
+
+.hud-wp-corner--bl {
+  bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+  left: max(env(safe-area-inset-left, 0px), 12px);
+  border-width: 0 0 1px 1px;
+}
+
+.hud-wp-corner--br {
+  right: max(env(safe-area-inset-right, 0px), 12px);
+  bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+  border-width: 0 1px 1px 0;
+}
+
+.hud-wp-corner--chart {
+  border-color: rgb(200 57 46 / 0.45);
+}
+
+.hud-wp-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  pointer-events: none;
+}
+
+.hud-wp-crosshair::before,
+.hud-wp-crosshair::after {
+  content: '';
+  position: absolute;
+  background: rgb(232 160 64 / 0.45);
+}
+
+.hud-wp-crosshair::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  margin-top: -0.5px;
+}
+
+.hud-wp-crosshair::after {
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  margin-left: -0.5px;
+}
+
+.hud-wp-vscan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(232 160 64 / 0.35), transparent);
+  box-shadow: 0 0 12px rgb(232 160 64 / 0.25);
+}
+
+.hud-wp-chart__vplot,
+.hud-wp-chart__hplot {
+  position: absolute;
+  background: rgb(200 57 46 / 0.22);
+}
+
+.hud-wp-chart__vplot {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+.hud-wp-chart__hplot {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.hud-wp-blink {
+  display: inline-block;
+  margin-left: 0.35em;
+  color: #e8a040;
+  animation: hud-blink 1s step-end infinite;
+}
+
+@keyframes hud-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.hud-wp-deep__tl {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 0px), 18px);
+  left: max(env(safe-area-inset-left, 0px), 22px);
+}
+
+.hud-wp-deep__tr {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 0px), 18px);
+  right: max(env(safe-area-inset-right, 0px), 22px);
+  color: rgb(232 160 64 / 0.75);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-wp-deep__bl {
+  position: absolute;
+  bottom: max(env(safe-area-inset-bottom, 0px), 22px);
+  left: max(env(safe-area-inset-left, 0px), 22px);
+  color: rgb(255 216 155 / 0.65);
+}
+
+.hud-wp-deep__br {
+  position: absolute;
+  right: max(env(safe-area-inset-right, 0px), 22px);
+  bottom: max(env(safe-area-inset-bottom, 0px), 22px);
+  opacity: 0.55;
+}
+
+.hud-wp-deep__scan {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: max(env(safe-area-inset-bottom, 0px), 52px);
+  height: 12px;
+}
+
+.hud-wp-deep__scan-track {
+  position: relative;
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgb(184 200 224 / 0.35) 0,
+    rgb(184 200 224 / 0.35) 1px,
+    transparent 1px,
+    transparent 48px
+  );
+}
+
+.hud-wp-deep__scan-track::before,
+.hud-wp-deep__scan-track::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 7px;
+  background: rgb(184 200 224 / 0.5);
+}
+
+.hud-wp-deep__scan-track::before {
+  left: 0;
+}
+
+.hud-wp-deep__scan-track::after {
+  right: 0;
+}
+
+.hud-wp-deep__scan-cursor {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 9px;
+  margin-left: -1px;
+  background: #e8a040;
+  box-shadow: 0 0 8px rgb(232 160 64 / 0.65);
+}
+
+/* ═══════════════════════════════════════
+   浅色 · 1970s 星图档案 (#F4EDE0)
+   ═══════════════════════════════════════ */
+
+.hud-wp--chart {
+  background: #f4ede0;
+}
+
+.hud-wp-chart__edge-labels {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: clamp(0.5rem, 0.75vw, 0.65rem);
+  letter-spacing: 0.18em;
+  color: rgb(107 138 184 / 0.55);
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hud-wp-chart__edge-labels--top {
+  top: max(env(safe-area-inset-top, 0px), 14px);
+  left: 6%;
+  right: 6%;
+}
+
+.hud-wp-chart__edge-labels--left {
+  flex-direction: column;
+  justify-content: space-between;
+  top: 12%;
+  bottom: 12%;
+  left: max(env(safe-area-inset-left, 0px), 14px);
+  width: auto;
+  height: auto;
+  gap: 0;
+}
+
+.hud-wp-chart__typo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hud-wp-chart__title {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 0px), 36px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  color: #c8392e;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.hud-wp-chart__meta {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 0px), 58px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: clamp(0.45rem, 0.65vw, 0.55rem);
+  letter-spacing: 0.2em;
+  color: rgb(26 47 74 / 0.65);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.hud-wp-chart__footer {
+  position: absolute;
+  bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-size: clamp(0.45rem, 0.7vw, 0.58rem);
+  letter-spacing: 0.24em;
+  color: rgb(26 47 74 / 0.55);
+  text-transform: uppercase;
+}
+
+/* 挂载专属壁纸时，关闭 hud.css 简易星野伪元素 + body 网格 */
+html[data-ui='hud'][data-hud-wallpaper='1']::before,
+html[data-ui='hud'][data-hud-wallpaper='1']::after {
+  display: none;
+}
+
+html[data-ui='hud'][data-hud-wallpaper='1'] body {
+  background-image: none;
+}
+
+/* 竖屏 / 移动端 9:16 裁切优化 */
+@media (max-width: 768px), (orientation: portrait) {
+  .hud-wp-deep__overlay {
+    font-size: clamp(0.48rem, 2.4vw, 0.62rem);
+  }
+
+  .hud-wp-chart__title {
+    font-size: clamp(0.55rem, 2.8vw, 0.72rem);
+    letter-spacing: 0.18em;
+  }
+
+  .hud-wp-chart__edge-labels--top span:nth-child(n + 5) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-wp-deep__scan-cursor,
+  .hud-wp-vscan,
+  .hud-wp-chart__vplot,
+  .hud-wp-chart__hplot,
+  .hud-wp-blink,
+  .hud-wp-glitch {
+    animation: none;
+    display: none;
+  }
+}

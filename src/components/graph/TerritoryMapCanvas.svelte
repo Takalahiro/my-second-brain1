@@ -13,6 +13,9 @@
   } from './territory-map-model';
   import { clamp } from './use-zoom-pan';
   import ZoomControls from './ZoomControls.svelte';
+  import GraphHudNode from './GraphHudNode.svelte';
+  import { HUD_GRAPH } from './graph-hud-theme';
+  import { useGraphHudTheme } from '../../features/ui/hud-mode.svelte';
 
   interface Props {
     data: WikiData;
@@ -20,6 +23,8 @@
     onSelectPath?: (path: string | null) => void;
   }
   let { data, compact = false, onSelectPath }: Props = $props();
+
+  const hudTheme = useGraphHudTheme();
 
   const VB_W = 1200;
   const VB_H = 760;
@@ -141,7 +146,7 @@
   });
 </script>
 
-<div class="tm-wrap" class:compact>
+<div class="tm-wrap" class:compact class:tm-hud-canvas={hudTheme.hud}>
   {#if !compact}
     <div class="tm-hud">
       <span class="tm-lod">{lodLabel(zoom)}</span>
@@ -154,6 +159,7 @@
     viewBox={`0 0 ${VB_W} ${VB_H}`}
     preserveAspectRatio="xMidYMid meet"
     class="tm-svg"
+    class:g-svg--hud={hudTheme.hud}
     onpointerdown={onPointerDown}
     onpointermove={onPointerMove}
     onpointerup={onPointerUp}
@@ -161,20 +167,40 @@
     onwheel={onWheel}
   >
     <defs>
-      <radialGradient id="tm-ocean" cx="48%" cy="42%" r="75%">
-        <stop offset="0%" stop-color="#2a4a6e" />
-        <stop offset="50%" stop-color="#142638" />
-        <stop offset="100%" stop-color="#070e18" />
-      </radialGradient>
-      <linearGradient id="tm-shore" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="rgb(255 255 255 / 0.07)" />
-        <stop offset="100%" stop-color="rgb(0 0 0 / 0.1)" />
-      </linearGradient>
-      <linearGradient id="tm-pulse" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="48" y2="0">
-        <stop offset="0%" stop-color="rgb(255 255 255 / 0)" />
-        <stop offset="45%" stop-color="rgb(255 255 255 / 0.95)" />
-        <stop offset="100%" stop-color="rgb(255 255 255 / 0)" />
-      </linearGradient>
+      {#if hudTheme.hud}
+        <radialGradient id="tm-ocean" cx="48%" cy="42%" r="75%">
+          <stop offset="0%" stop-color="#101d36" />
+          <stop offset="50%" stop-color="#0b1426" />
+          <stop offset="100%" stop-color="#050a14" />
+        </radialGradient>
+        <pattern id="tm-hud-grid" width="36" height="36" patternUnits="userSpaceOnUse">
+          <path d="M 36 0 L 0 0 0 36" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5" />
+        </pattern>
+        <linearGradient id="tm-shore" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgb(245 242 235 / 0.08)" />
+          <stop offset="100%" stop-color="rgb(0 0 0 / 0.15)" />
+        </linearGradient>
+        <linearGradient id="tm-pulse" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="48" y2="0">
+          <stop offset="0%" stop-color="rgb(255 77 106 / 0)" />
+          <stop offset="45%" stop-color="rgb(255 77 106 / 0.95)" />
+          <stop offset="100%" stop-color="rgb(255 77 106 / 0)" />
+        </linearGradient>
+      {:else}
+        <radialGradient id="tm-ocean" cx="48%" cy="42%" r="75%">
+          <stop offset="0%" stop-color="#2a4a6e" />
+          <stop offset="50%" stop-color="#142638" />
+          <stop offset="100%" stop-color="#070e18" />
+        </radialGradient>
+        <linearGradient id="tm-shore" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgb(255 255 255 / 0.07)" />
+          <stop offset="100%" stop-color="rgb(0 0 0 / 0.1)" />
+        </linearGradient>
+        <linearGradient id="tm-pulse" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="48" y2="0">
+          <stop offset="0%" stop-color="rgb(255 255 255 / 0)" />
+          <stop offset="45%" stop-color="rgb(255 255 255 / 0.95)" />
+          <stop offset="100%" stop-color="rgb(255 255 255 / 0)" />
+        </linearGradient>
+      {/if}
       <filter id="tm-link-glow" x="-50%" y="-50%" width="200%" height="200%">
         <feGaussianBlur in="SourceGraphic" stdDeviation="1.2" result="blur" />
         <feMerge>
@@ -185,6 +211,9 @@
     </defs>
 
     <rect width={VB_W} height={VB_H} fill="url(#tm-ocean)" />
+    {#if hudTheme.hud}
+      <rect width={VB_W} height={VB_H} fill="url(#tm-hud-grid)" />
+    {/if}
 
     <g
       transform={`translate(${panX} ${panY}) translate(${VB_W / 2} ${VB_H / 2}) scale(${viewScale}) translate(${-model.worldW / 2} ${-model.worldH / 2})`}
@@ -196,7 +225,7 @@
         width={model.worldW}
         height={model.worldH}
         fill="none"
-        stroke="rgb(255 255 255 / 0.04)"
+        stroke={hudTheme.hud ? 'rgba(245,242,235,0.08)' : 'rgb(255 255 255 / 0.04)'}
         stroke-width="2"
       />
 
@@ -220,7 +249,11 @@
               ondblclick={() => e.href && (location.href = e.href)}
             />
             <g class="tm-visual" class:is-lifted={lifted}>
-              <circle cx={e.cx} cy={e.cy} r={r} fill={e.color} stroke={e.stroke} stroke-width={e.strokeWidth} />
+              {#if hudTheme.hud}
+                <GraphHudNode x={e.cx} y={e.cy} r={r} color={e.color} core={HUD_GRAPH.core} />
+              {:else}
+                <circle cx={e.cx} cy={e.cy} r={r} fill={e.color} stroke={e.stroke} stroke-width={e.strokeWidth} />
+              {/if}
               {#if zoom >= 11 && r > 3}
                 <text x={e.cx} y={e.cy - r - 2} text-anchor="middle" class="tm-note-label" font-size={5}>
                   {e.name.length > 12 ? `${e.name.slice(0, 10)}…` : e.name}
@@ -303,11 +336,11 @@
       {#if zoom >= LOD.link}
         <g class="tm-links">
           {#each visibleLinks as l (l.id)}
-            <path d={l.pathD} fill="none" stroke="rgb(255 255 255 / 0.1)" stroke-width="0.45" />
+            <path d={l.pathD} fill="none" stroke={hudTheme.hud ? 'rgba(154,175,201,0.18)' : 'rgb(255 255 255 / 0.1)'} stroke-width="0.45" />
             <path
               d={l.pathD}
               fill="none"
-              stroke="rgb(255 255 255 / 0.85)"
+              stroke={hudTheme.hud ? HUD_GRAPH.linkHi : 'rgb(255 255 255 / 0.85)'}
               stroke-width="0.9"
               stroke-dasharray="4 22"
               stroke-dashoffset={-linkPhase * 52}

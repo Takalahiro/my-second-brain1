@@ -5,6 +5,14 @@
   import { folderColor, noteHref } from './graph-data';
   import { ZP_MIN, ZP_MAX, clamp } from './use-zoom-pan';
   import ZoomControls from './ZoomControls.svelte';
+  import GraphHudNode from './GraphHudNode.svelte';
+  import {
+    HUD_GRAPH,
+    hudLinkStroke,
+    hudNodeCoreColor,
+    resolveGraphColor,
+  } from './graph-hud-theme';
+  import { useGraphHudTheme } from '../../features/ui/hud-mode.svelte';
   import {
     createForceController,
     reheatForce,
@@ -19,6 +27,8 @@
     onSelect?: (id: string | null) => void;
   }
   let { data, folderFocus, settings, onSelect }: Props = $props();
+
+  const hudTheme = useGraphHudTheme();
 
   type Node = RawNode & { x: number; y: number; vx: number; vy: number; color: string; fixed?: boolean };
 
@@ -208,6 +218,7 @@
   viewBox="-500 -380 1000 760"
   preserveAspectRatio="xMidYMid meet"
   class="g-svg"
+  class:g-svg--hud={hudTheme.hud}
   onpointerdown={onPointerDown}
   onpointermove={onPointerMove}
   onpointerup={onPointerUp}
@@ -215,22 +226,40 @@
   onwheel={onWheel}
 >
   <defs>
-    <radialGradient id="fv-bg" cx="50%" cy="50%" r="55%">
-      <stop offset="0%" stop-color="#3a234a" stop-opacity="0.9" />
-      <stop offset="60%" stop-color="#1a1024" stop-opacity="0.95" />
-      <stop offset="100%" stop-color="#0a0418" stop-opacity="1" />
-    </radialGradient>
-    <radialGradient id="fv-glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#fff" stop-opacity="0.55" />
-      <stop offset="100%" stop-color="#fff" stop-opacity="0" />
-    </radialGradient>
-    <linearGradient id="fv-link" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="rgb(255 208 230 / 0.5)" />
-      <stop offset="100%" stop-color="rgb(180 140 255 / 0.5)" />
-    </linearGradient>
+    {#if hudTheme.hud}
+      <radialGradient id="fv-bg" cx="50%" cy="45%" r="70%">
+        <stop offset="0%" stop-color="#101d36" stop-opacity="0.95" />
+        <stop offset="55%" stop-color="#0b1426" stop-opacity="0.98" />
+        <stop offset="100%" stop-color="#050a14" stop-opacity="1" />
+      </radialGradient>
+      <pattern id="fv-hud-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+        <path d="M 32 0 L 0 0 0 32" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5" />
+      </pattern>
+      <radialGradient id="fv-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#f5f2eb" stop-opacity="0.35" />
+        <stop offset="100%" stop-color="#f5f2eb" stop-opacity="0" />
+      </radialGradient>
+    {:else}
+      <radialGradient id="fv-bg" cx="50%" cy="50%" r="55%">
+        <stop offset="0%" stop-color="#3a234a" stop-opacity="0.9" />
+        <stop offset="60%" stop-color="#1a1024" stop-opacity="0.95" />
+        <stop offset="100%" stop-color="#0a0418" stop-opacity="1" />
+      </radialGradient>
+      <radialGradient id="fv-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff" stop-opacity="0.55" />
+        <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+      </radialGradient>
+      <linearGradient id="fv-link" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="rgb(255 208 230 / 0.5)" />
+        <stop offset="100%" stop-color="rgb(180 140 255 / 0.5)" />
+      </linearGradient>
+    {/if}
   </defs>
 
   <rect x="-500" y="-380" width="1000" height="760" fill="url(#fv-bg)" opacity={settings.bgDim} />
+  {#if hudTheme.hud}
+    <rect x="-500" y="-380" width="1000" height="760" fill="url(#fv-hud-grid)" opacity={settings.bgDim * 0.85} />
+  {/if}
 
   <g transform={`translate(${panX} ${panY}) scale(${zoom})`} data-sim={simFrame}>
     <g opacity={settings.edgeOpacity}>
@@ -239,11 +268,13 @@
         {@const b = nodeMap.get(l.target)}
         {#if a && b}
           {@const dim = (folderFocus && a.folder !== folderFocus && b.folder !== folderFocus) || (highlightSet && !(highlightSet.has(l.source) && highlightSet.has(l.target)))}
+          {@const hi = highlightSet && highlightSet.has(l.source) && highlightSet.has(l.target)}
           <line
             x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-            stroke={dim ? 'rgba(255,255,255,0.05)' : 'url(#fv-link)'}
-            stroke-width={(dim ? 0.5 : 1) * settings.edgeScale}
+            stroke={hudTheme.hud ? hudLinkStroke(!!dim, !!hi) : (dim ? 'rgba(255,255,255,0.05)' : 'url(#fv-link)')}
+            stroke-width={(dim ? 0.5 : (hi ? 1.2 : 1)) * settings.edgeScale}
             stroke-linecap="round"
+            stroke-opacity={hudTheme.hud && hi ? 0.9 : 1}
           />
         {/if}
       {/each}
@@ -254,6 +285,7 @@
         {@const dim = isDim(n.id)}
         {@const orphan = n.inDegree + n.outDegree === 0}
         {@const showLabel = settings.showLabels === 'always' || (settings.showLabels === 'hover' && focusId === n.id)}
+        {@const starColor = resolveGraphColor(n.folder, folders, hudTheme.hud)}
         <g
           data-nid={n.id}
           class="g-node {selectedId === n.id ? 'is-sel' : ''} {dim ? 'is-dim' : ''} {orphan ? 'is-orphan' : ''} {settings.clickToOpen ? 'is-link' : ''}"
@@ -262,14 +294,27 @@
           onclick={() => onClickNode(n.id)}
           ondblclick={() => (location.href = noteHref(n.id))}
         >
-          {#if !orphan}
-            <circle cx={n.x} cy={n.y} r={r * 2.2} fill="url(#fv-glow)" />
+          {#if hudTheme.hud}
+            <GraphHudNode
+              x={n.x}
+              y={n.y}
+              r={r}
+              color={starColor}
+              core={hudNodeCoreColor(n, starColor)}
+              {orphan}
+              selected={selectedId === n.id}
+            />
+          {:else}
+            {#if !orphan}
+              <circle cx={n.x} cy={n.y} r={r * 2.2} fill="url(#fv-glow)" />
+            {/if}
+            <circle cx={n.x} cy={n.y} r={r} fill={n.color} stroke={orphan ? 'rgb(255 255 255 / 0.4)' : 'none'} stroke-width="0.5" stroke-dasharray={orphan ? '1.5,1.5' : ''}>
+              <title>{n.title}（{n.folder}） · 入{n.inDegree}/出{n.outDegree}{orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
+            </circle>
           {/if}
-          <circle cx={n.x} cy={n.y} r={r} fill={n.color} stroke={orphan ? 'rgb(255 255 255 / 0.4)' : 'none'} stroke-width="0.5" stroke-dasharray={orphan ? '1.5,1.5' : ''}>
-            <title>{n.title}（{n.folder}） · 入{n.inDegree}/出{n.outDegree}{orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
-          </circle>
+          <title>{n.title}（{n.folder}） · 入{n.inDegree}/出{n.outDegree}{orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
           {#if showLabel}
-            <text x={n.x} y={n.y - r - 4} text-anchor="middle" class="g-label" fill="#fff">{n.title}</text>
+            <text x={n.x} y={n.y - r - 4} text-anchor="middle" class="g-label" fill={hudTheme.hud ? HUD_GRAPH.label : '#fff'}>{n.title}</text>
           {/if}
         </g>
       {/each}

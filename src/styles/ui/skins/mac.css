@@ -1,0 +1,141 @@
+/* mac — macOS 拟物：SF 字体、交通灯、双层高光阴影、圆角控件 */
+
+html[data-ui='mac'],
+html:not([data-ui]) {
+  --radius-card: 20px;
+  --radius-button: 11px;
+  --radius-small: 10px;
+
+  --bg-primary: #eceef2;
+  --bg-secondary: #e2e5eb;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --border-color: rgb(0 0 0 / 0.1);
+
+  --ui-accent: #007aff;
+  --ui-accent-soft: rgb(0 122 255 / 0.14);
+  --ui-accent-text: #007aff;
+
+  --font-body-current: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'PingFang SC', system-ui, sans-serif;
+  --font-heading-current: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'PingFang SC', system-ui, sans-serif;
+
+  --app-icon-stroke-width: 1.75;
+  --app-icon-stroke-linecap: round;
+  --app-icon-stroke-linejoin: round;
+
+  --glass-bg: rgb(255 255 255 / 0.82);
+  --glass-bg-hover: rgb(255 255 255 / 0.92);
+  --glass-bg-strong: rgb(255 255 255 / 0.88);
+  --glass-border: rgb(0 0 0 / 0.1);
+
+  --shadow-soft: 0 8px 24px rgb(0 0 0 / 0.08);
+  --shadow-normal:
+    0 1px 0 rgb(255 255 255 / 0.85) inset,
+    0 12px 32px rgb(0 0 0 / 0.1),
+    0 0 0 0.5px rgb(0 0 0 / 0.06);
+  --shadow-hover:
+    0 1px 0 rgb(255 255 255 / 0.9) inset,
+    0 18px 40px rgb(0 0 0 / 0.12);
+  --shadow-active: 0 2px 8px rgb(0 0 0 / 0.08);
+
+  --neo-surface: #f5f5f7;
+  --neo-track: #39393d;
+  --neo-thumb: #ffffff;
+  --neo-raised:
+    0 1px 0 rgb(255 255 255 / 0.9) inset,
+    0 4px 14px rgb(0 0 0 / 0.08),
+    0 0 0 0.5px rgb(0 0 0 / 0.04);
+  --neo-raised-hover:
+    0 1px 0 rgb(255 255 255 / 0.95) inset,
+    0 8px 22px rgb(0 0 0 / 0.11);
+  --neo-pressed:
+    inset 0 2px 6px rgb(0 0 0 / 0.12),
+    inset 0 0 0 0.5px rgb(0 0 0 / 0.06);
+  --neo-inset:
+    inset 0 1px 3px rgb(0 0 0 / 0.28),
+    inset 0 0 0 0.5px rgb(0 0 0 / 0.08);
+
+  --chrome-bg-top: rgb(246 246 248 / 0.96);
+  --chrome-bg-bottom: rgb(236 238 242 / 0.92);
+  --chrome-border: rgb(0 0 0 / 0.08);
+  --chrome-shadow:
+    0 24px 64px rgb(0 0 0 / 0.16),
+    0 0 0 0.5px rgb(255 255 255 / 0.65) inset;
+  --chrome-hover: rgb(0 0 0 / 0.05);
+  --chrome-active: rgb(0 0 0 / 0.09);
+
+  --widget-shadow: 0 16px 48px rgb(0 0 0 / 0.14);
+  --widget-border: rgb(0 0 0 / 0.08);
+  --widget-header-bg: rgb(0 0 0 / 0.03);
+
+  --motion-base: 0.32s;
+  --motion-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+html.dark[data-ui='mac'],
+.dark:not([data-ui]) {
+  --bg-primary: #1c1c1e;
+  --bg-secondary: #2c2c2e;
+  --text-primary: #f5f5f7;
+  --text-secondary: #98989d;
+
+  --glass-bg: rgb(44 44 46 / 0.88);
+  --glass-bg-hover: rgb(58 58 60 / 0.94);
+  --glass-border: rgb(255 255 255 / 0.1);
+
+  --neo-surface: #2c2c2e;
+  --neo-track: #636366;
+  --neo-thumb: #f5f5f7;
+
+  --chrome-bg-top: rgb(44 44 46 / 0.96);
+  --chrome-bg-bottom: rgb(28 28 30 / 0.94);
+  --chrome-shadow:
+    0 24px 64px rgb(0 0 0 / 0.55),
+    0 0 0 0.5px rgb(255 255 255 / 0.08) inset;
+}
+
+html[data-ui='mac'] body,
+html:not([data-ui]) body {
+  background:
+    radial-gradient(ellipse 100% 80% at 50% -20%, rgb(255 255 255 / 0.65), transparent 55%),
+    var(--bg-primary);
+}
+
+html[data-ui='mac'] .mac-settings,
+html:not([data-ui]) .mac-settings {
+  border-radius: 22px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', system-ui, sans-serif;
+}
+
+html[data-ui='mac'] .mac-back,
+html:not([data-ui]) .mac-back {
+  color: var(--ui-accent-text);
+}
+
+html[data-ui='mac'] .mac-category-tile,
+html:not([data-ui]) .mac-category-tile,
+html[data-ui='mac'] .site-nav-brand,
+html:not([data-ui]) .site-nav-brand,
+html[data-ui='mac'] .site-nav-link,
+html:not([data-ui]) .site-nav-link {
+  border-radius: var(--radius-button);
+  box-shadow: var(--neo-raised);
+}
+
+html[data-ui='mac'] .mac-toggle span,
+html:not([data-ui]) .mac-toggle span {
+  border-radius: 999px;
+}
+
+html[data-ui='mac'] .ui-skin-card.is-active,
+html:not([data-ui]) .ui-skin-card.is-active {
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 0 2px var(--ui-accent-soft);
+}
+
+html[data-ui='mac'] .floating-widget,
+html:not([data-ui]) .floating-widget {
+  border-radius: 18px;
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
+}

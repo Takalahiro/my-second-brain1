@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=DotGothic16&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=DotGothic16&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
 @import './global.css';
 @import './pixel.css';
 @import './site-nav.css';
 @import './gs-wallpaper.css';
+@import './ui/index.css';
 
 :root {
   /* 浅色 · 简约中性 */
@@ -52,7 +53,7 @@
   --glass-bg: rgb(255 255 255 / 0.72);
   --glass-bg-hover: rgb(255 255 255 / 0.86);
   --glass-bg-strong: rgb(255 255 255 / 0.8);
-  --glass-border: rgb(255 255 255 / 0.55);
+  --glass-border: rgb(0 0 0 / 0.1);
 
   --radius-card: 18px;
   --radius-button: 12px;
@@ -188,17 +189,19 @@ body {
 /* 浅色模式：覆写仍硬编码深色的桌面小组件 */
 :root:not(.dark) :is(
   .floating-widget,
-  .calendar-widget,
+  .cal-widget,
+  .pomo-widget,
   .weather-widget,
   .stats-widget,
   .network-widget,
   .notes-widget,
   .todo-widget,
   .graph-widget,
-  .pomodoro-widget,
-  .white-noise-widget,
-  .world-clock-widget,
-  .music-player,
+  .territory-widget,
+  .wn-widget,
+  .world-widget,
+  .music-cd,
+  .music-orb,
   .pixel-clock
 ) {
   background: rgb(var(--widget-bg-rgb) / var(--w-bg-alpha, 0.82)) !important;
@@ -208,17 +211,19 @@ body {
 }
 
 :root:not(.dark) :is(
-  .calendar-widget,
+  .cal-widget,
+  .pomo-widget,
   .weather-widget,
   .stats-widget,
   .network-widget,
   .notes-widget,
   .todo-widget,
   .graph-widget,
-  .pomodoro-widget,
-  .white-noise-widget,
-  .world-clock-widget,
-  .music-player,
+  .territory-widget,
+  .wn-widget,
+  .world-widget,
+  .music-cd,
+  .music-orb,
   .pixel-clock
 ) :is([class*='-header'], [class*='-bar'], .fw-header) {
   background: var(--widget-header-bg) !important;
@@ -227,17 +232,19 @@ body {
 }
 
 :root:not(.dark) :is(
-  .calendar-widget,
+  .cal-widget,
+  .pomo-widget,
   .weather-widget,
   .stats-widget,
   .network-widget,
   .notes-widget,
   .todo-widget,
   .graph-widget,
-  .pomodoro-widget,
-  .white-noise-widget,
-  .world-clock-widget,
-  .music-player,
+  .territory-widget,
+  .wn-widget,
+  .world-widget,
+  .music-cd,
+  .music-orb,
   .pixel-clock
 ) :is(button, .ww-day-name, .cal-day, .sw-label, .nw-title, .td-text, .mp-title) {
   color: var(--widget-fg) !important;

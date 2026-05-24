@@ -87,14 +87,6 @@
     display: block;
   }
 
-  :global(html:not([data-font='jp-pixel'])) .app-icon-pixel {
-    display: none;
-  }
-
-  :global(html[data-font='jp-pixel']) .app-icon-stroke {
-    display: none;
-  }
-
   .app-icon-stroke {
     stroke-width: var(--app-icon-stroke-width, 2);
     stroke-linecap: var(--app-icon-stroke-linecap, round);

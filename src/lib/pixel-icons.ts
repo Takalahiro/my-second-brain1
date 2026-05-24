@@ -52,7 +52,8 @@ export type PixelIconName =
   | 'matlab'
   | 'digits'
   | 'whiteboard'
-  | 'list';
+  | 'list'
+  | 'palette';
 
 export const PIXEL_ICONS: Record<PixelIconName, readonly PixelRect[]> = {
   notes: [
@@ -435,6 +436,16 @@ export const PIXEL_ICONS: Record<PixelIconName, readonly PixelRect[]> = {
     [3, 10, 6, 1],
     [3, 12, 8, 1],
   ],
+  palette: [
+    [2, 4, 12, 9],
+    [3, 5, 3, 2],
+    [7, 5, 3, 2],
+    [11, 5, 2, 2],
+    [4, 8, 3, 2],
+    [8, 8, 4, 2],
+    [5, 11, 3, 2],
+    [10, 11, 2, 2],
+  ],
 };
 
 export const DEFAULT_NOTE_ICON: PixelIconName = 'note';
@@ -515,6 +526,7 @@ export const DRAWER_CATEGORY_ICONS = {
   widgets: 'puzzle',
   wallpaper: 'frame',
   desktop: 'monitor',
+  ui: 'palette',
 } as const satisfies Record<string, PixelIconName>;
 
 export const GRAPH_VIEW_ICONS = {

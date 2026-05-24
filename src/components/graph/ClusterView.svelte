@@ -3,9 +3,16 @@
   // folder 中心 = 该 folder 里链接最多的笔记，其余按度数顺时针排
   // folder 之间用黄金角螺旋铺开；孤岛挂在外圈淡显示
   import type { RawLink, WikiData, RawNode, GraphSettings } from './graph-data';
-  import { folderColor, noteHref } from './graph-data';
+  import { noteHref } from './graph-data';
   import { ZP_MIN, ZP_MAX, clamp } from './use-zoom-pan';
   import ZoomControls from './ZoomControls.svelte';
+  import GraphHudNode from './GraphHudNode.svelte';
+  import {
+    hudLinkStroke,
+    hudNodeCoreColor,
+    resolveGraphColor,
+  } from './graph-hud-theme';
+  import { useGraphHudTheme } from '../../features/ui/hud-mode.svelte';
 
   interface Props {
     data: WikiData;
@@ -14,6 +21,8 @@
     onSelect?: (id: string | null) => void;
   }
   let { data, folderFocus, settings, onSelect }: Props = $props();
+
+  const hudTheme = useGraphHudTheme();
 
   const VB_W = 1600;
   const VB_H = 1000;
@@ -66,7 +75,7 @@
       const cy = cellH * ri + cellH / 2;
       const radius = Math.min(cellW, cellH) * 0.36;
 
-      const color = folderColor(f, folders);
+      const color = resolveGraphColor(f, folders, hudTheme.hud);
       const center = arr[0];
       const orbiting = arr.slice(1);
 
@@ -193,7 +202,7 @@
         cx: cellW * ci + cellW / 2,
         cy: cellH * ri + cellH / 2,
         r: Math.min(cellW, cellH) * 0.42,
-        color: folderColor(f, folders),
+        color: resolveGraphColor(f, folders, hudTheme.hud),
       };
     });
   });
@@ -204,6 +213,7 @@
   viewBox="0 0 {VB_W} {VB_H}"
   preserveAspectRatio="xMidYMid meet"
   class="g-svg"
+  class:g-svg--hud={hudTheme.hud}
   onwheel={onWheel}
   onpointerdown={onPanDown}
   onpointermove={onPanMove}
@@ -211,26 +221,40 @@
   onpointercancel={onPanUp}
 >
   <defs>
-    <radialGradient id="cv-bg" cx="50%" cy="50%" r="60%">
-      <stop offset="0%" stop-color="#231434" />
-      <stop offset="60%" stop-color="#10081b" />
-      <stop offset="100%" stop-color="#04020a" />
-    </radialGradient>
-    <radialGradient id="cv-glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#fff" stop-opacity="0.7" />
-      <stop offset="100%" stop-color="#fff" stop-opacity="0" />
-    </radialGradient>
+    {#if hudTheme.hud}
+      <radialGradient id="cv-bg" cx="50%" cy="45%" r="65%">
+        <stop offset="0%" stop-color="#101d36" />
+        <stop offset="55%" stop-color="#0b1426" />
+        <stop offset="100%" stop-color="#050a14" />
+      </radialGradient>
+      <pattern id="cv-hud-grid" width="34" height="34" patternUnits="userSpaceOnUse">
+        <path d="M 34 0 L 0 0 0 34" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5" />
+      </pattern>
+    {:else}
+      <radialGradient id="cv-bg" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="#231434" />
+        <stop offset="60%" stop-color="#10081b" />
+        <stop offset="100%" stop-color="#04020a" />
+      </radialGradient>
+      <radialGradient id="cv-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#fff" stop-opacity="0.7" />
+        <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+      </radialGradient>
+    {/if}
   </defs>
 
   <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#cv-bg)" opacity={settings.bgDim} />
+  {#if hudTheme.hud}
+    <rect x="0" y="0" width={VB_W} height={VB_H} fill="url(#cv-hud-grid)" opacity={settings.bgDim * 0.85} />
+  {/if}
 
   <g transform={`translate(${panX} ${panY}) scale(${zoom})`}>
 
   <!-- 文件夹"行星轨道" -->
   <g class="cv-orbits">
     {#each centers as c}
-      <circle cx={c.cx} cy={c.cy} r={c.r * 0.6} fill="none" stroke={c.color} stroke-opacity="0.18" stroke-dasharray="2,4" />
-      <circle cx={c.cx} cy={c.cy} r={c.r} fill="none" stroke={c.color} stroke-opacity="0.14" stroke-dasharray="2,4" />
+      <circle cx={c.cx} cy={c.cy} r={c.r * 0.6} fill="none" stroke={c.color} stroke-opacity={hudTheme.hud ? 0.28 : 0.18} stroke-dasharray="2,4" />
+      <circle cx={c.cx} cy={c.cy} r={c.r} fill="none" stroke={c.color} stroke-opacity={hudTheme.hud ? 0.22 : 0.14} stroke-dasharray="2,4" />
       <text x={c.cx} y={c.cy - c.r - 14} text-anchor="middle" fill={c.color} font-size="14" font-weight="700"
             opacity={folderFocus && folderFocus !== c.folder ? 0.3 : 1}>{c.folder}</text>
     {/each}
@@ -247,19 +271,23 @@
         {@const sameFolder = a.folder === b.folder}
         <line
           x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-          stroke={hi ? '#ffd0e6' : (dim ? 'rgba(255,255,255,0.03)' : (sameFolder ? a.color + '99' : 'url(#cv-cross-grad)'))}
+          stroke={hudTheme.hud
+            ? hudLinkStroke(!!dim, !!hi)
+            : (hi ? '#ffd0e6' : (dim ? 'rgba(255,255,255,0.03)' : (sameFolder ? a.color + '99' : 'url(#cv-cross-grad)')))}
           stroke-width={(hi ? 1.4 : (dim ? 0.3 : (sameFolder ? 0.6 : 0.5))) * settings.edgeScale}
           stroke-linecap="round"
-          stroke-dasharray={sameFolder ? '' : '3,3'}
+          stroke-dasharray={hudTheme.hud ? '' : (sameFolder ? '' : '3,3')}
         />
       {/if}
     {/each}
+    {#if !hudTheme.hud}
     <defs>
       <linearGradient id="cv-cross-grad" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stop-color="rgb(255 208 230 / 0.6)" />
         <stop offset="100%" stop-color="rgb(180 140 255 / 0.6)" />
       </linearGradient>
     </defs>
+    {/if}
   </g>
 
   <!-- 节点 -->
@@ -272,6 +300,7 @@
         || (settings.showLabels === 'hover' && focusId === p.node.id)
         || (settings.showLabels !== 'never' && p.isCenter)
       )}
+      {@const starColor = resolveGraphColor(p.folder, folders, hudTheme.hud)}
       <g
         data-nid={p.node.id}
         class="g-node {selectedId === p.node.id ? 'is-sel' : ''} {dim ? 'is-dim' : ''} {p.orphan ? 'is-orphan' : ''} {p.isCenter ? 'is-center' : ''} {settings.clickToOpen ? 'is-link' : ''}"
@@ -280,13 +309,27 @@
         onclick={() => onNodeClick(p.node.id)}
         ondblclick={() => (location.href = noteHref(p.node.id))}
       >
-        <circle cx={p.x} cy={p.y} r={r * (p.isCenter ? 1.8 : 2.4)} fill="url(#cv-glow)" />
-        <circle cx={p.x} cy={p.y} r={r} fill={p.color}
-                stroke={p.isCenter ? '#fff' : (p.orphan ? 'rgb(255 255 255 / 0.45)' : 'none')}
-                stroke-width={p.isCenter ? 1.2 : 0.6}
-                stroke-dasharray={p.orphan && !p.isCenter ? '1.5,1.5' : ''}>
-          <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{p.isCenter ? ' · 中心' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
-        </circle>
+        {#if hudTheme.hud}
+          <GraphHudNode
+            x={p.x}
+            y={p.y}
+            r={r}
+            color={starColor}
+            core={hudNodeCoreColor(p.node, starColor)}
+            orphan={p.orphan}
+            center={p.isCenter}
+            selected={selectedId === p.node.id}
+          />
+        {:else}
+          <circle cx={p.x} cy={p.y} r={r * (p.isCenter ? 1.8 : 2.4)} fill="url(#cv-glow)" />
+          <circle cx={p.x} cy={p.y} r={r} fill={p.color}
+                  stroke={p.isCenter ? '#fff' : (p.orphan ? 'rgb(255 255 255 / 0.45)' : 'none')}
+                  stroke-width={p.isCenter ? 1.2 : 0.6}
+                  stroke-dasharray={p.orphan && !p.isCenter ? '1.5,1.5' : ''}>
+            <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{p.isCenter ? ' · 中心' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
+          </circle>
+        {/if}
+        <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{p.isCenter ? ' · 中心' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
         {#if showLabel}
           <text x={p.x} y={p.y + r + 14} text-anchor="middle" class="g-label">{p.node.title}</text>
         {/if}

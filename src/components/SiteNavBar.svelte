@@ -22,6 +22,7 @@
   const siteNavLabel = $derived(m.nav.siteNav);
   const toolsLabel = $derived(m.nav.tools);
   const homeLabel = $derived(m.nav.home);
+  const isHome = $derived(currentPath === '/');
 
   function isActive(href: string) {
     if (href === '/') return currentPath === '/';
@@ -36,9 +37,16 @@
     aria-label={siteNavLabel}
   >
     <div class="site-nav-top">
-      <a href="/" class="site-nav-brand" aria-label={homeLabel}>
+      <a
+        href="/"
+        class="site-nav-brand"
+        class:site-nav-brand--compact={!isHome}
+        aria-label={homeLabel}
+      >
         <img src="/logo.png" alt="" class="site-nav-logo" width="28" height="28" />
-        <span class="site-nav-brand-text">My Second Brain</span>
+        {#if isHome}
+          <span class="site-nav-brand-text">{m.nav.title}</span>
+        {/if}
       </a>
 
       {#if variant === 'site'}
@@ -101,6 +109,28 @@
     color: inherit;
     font-weight: 600;
     min-width: 0;
+  }
+  .site-nav-brand--compact {
+    --nav-control-h: 42px;
+    width: var(--nav-control-h);
+    height: var(--nav-control-h);
+    justify-content: center;
+    gap: 0;
+    flex-shrink: 0;
+    background: var(--neo-surface);
+    box-shadow: var(--neo-raised);
+    border-radius: 14px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: box-shadow 0.2s ease, transform 0.18s ease;
+  }
+  .site-nav-brand--compact:hover {
+    box-shadow: var(--neo-raised-hover);
+    transform: translateY(-1px);
+  }
+  .site-nav-brand--compact:active {
+    transform: scale(0.97);
+    box-shadow: var(--neo-pressed);
   }
   .site-nav-logo {
     border-radius: 6px;
@@ -169,9 +199,6 @@
     overflow: visible;
   }
   @media (max-width: 720px) {
-    .site-nav-brand-text {
-      display: none;
-    }
     .site-nav-top {
       gap: 0.35rem;
     }

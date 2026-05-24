@@ -7,6 +7,8 @@
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
   import { widgetTouchGestures } from '../../lib/widget-touch-gestures';
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
+  import { signalWaveBars } from '../../lib/hud-widget-ui';
+  import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
 
   interface Props {
     onClose?: () => void;
@@ -398,6 +400,8 @@
 
   // CD 尺寸（给右侧竖向进度条留出 56px 空间）
   const cdSize = $derived(Math.min(width - 56 - 56, height - 220));
+  const waveBars = $derived(signalWaveBars(currentIndex * 997 + Math.floor(progress * 100), playing ? 20 : 12));
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized, compactMax: 300, expandedMin: 520 }));
 
   function onResize({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
     posX = x; posY = y; width = w; height = h; clampPos();
@@ -450,7 +454,7 @@
   {:else}
     <section
       bind:this={rootEl}
-      class="music-cd {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''}"
+      class="music-cd {tierClass(tier)} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''}"
       style={rotationStyle(rotation, (maximized ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${height}px;`) + ` --mp-bg-alpha: ${bgAlpha};`)}
       aria-label="CD 音乐机"
       use:widgetTouchGestures={touchOpts}
@@ -476,6 +480,11 @@
       </header>
 
       <div class="cd-stage">
+        <div class="mp-hud-wave" aria-hidden="true">
+          {#each waveBars as h}
+            <span style="height:{Math.round(h * 100)}%;opacity:{playing ? 0.85 : 0.4};"></span>
+          {/each}
+        </div>
         <!-- 左：CD 转盘 -->
         <div
           class="cd-area"

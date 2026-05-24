@@ -1,0 +1,163 @@
+/**
+ * UI 文本 / 容器溢出安全网
+ * - 工具类：.ui-label · .ui-annotation · .ui-card · .ui-card-text
+ * - 兼容别名：.label · .annotation · .card（建议仅在 UI 容器内使用）
+ * - Debug：html.ui-debug 或 html.debug（localStorage: second-brain:ui-debug=1）
+ */
+
+/* ── 文本：换行 + 多行截断 ── */
+:where(
+  .ui-label,
+  .ui-annotation,
+  .ui-card-text,
+  .label,
+  .annotation,
+  .mac-row-title,
+  .mac-row-sub,
+  .mac-category-name,
+  .mac-category-desc,
+  .mac-wall-label,
+  .mac-spotlight-row-title,
+  .mac-spotlight-row-sub,
+  .mac-title,
+  .mac-group-label,
+  .mac-footnote,
+  .mac-pane-hint,
+  .mac-empty,
+  .mac-row-value,
+  .ui-skin-name,
+  .ui-skin-desc,
+  .ui-skin-hint,
+  .fw-title,
+  .site-nav-link-text,
+  .ns-it-title,
+  .ns-it-path,
+  .mp-title,
+  .mp-artist,
+  .td-text,
+  .wn-name,
+  .nw-title,
+  .cal-event-title,
+  .note-card-title,
+  .toc-label
+) {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-width: 0;
+}
+
+/* 单行优先的副标题 / 数值 */
+:where(
+  .mac-row-sub,
+  .mac-spotlight-row-sub,
+  .mac-row-value,
+  .ui-skin-desc,
+  .mp-artist,
+  .ns-it-path
+) {
+  -webkit-line-clamp: 1;
+}
+
+/* ── 容器：flex/grid 子项宽度约束 ── */
+:where(
+  .ui-card,
+  .card,
+  .mac-settings,
+  .mac-body,
+  .mac-pane,
+  .mac-list,
+  .mac-list li,
+  .mac-action-row,
+  .mac-widget-row,
+  .mac-setting-row,
+  .mac-row-text,
+  .mac-category-tile,
+  .mac-category-grid,
+  .mac-wall-card,
+  .mac-wall-grid,
+  .mac-spotlight-row,
+  .mac-spotlight-row-text,
+  .mac-segment,
+  .mac-segment-btn,
+  .ui-skin-card,
+  .ui-skin-text,
+  .ui-skin-grid,
+  .floating-widget,
+  .fw-header,
+  .fw-body,
+  .site-nav-shell,
+  .site-nav-primary,
+  .site-nav-actions,
+  .site-nav-link,
+  .site-nav-brand,
+  .pixel-card,
+  .glass-container,
+  .note-search,
+  .ns-it-main,
+  .ns-input-wrap
+) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* 卡片容器本身不做 line-clamp，只防横向撑破 */
+:where(.ui-card, .card, .pixel-card, .mac-category-tile, .mac-wall-card, .ui-skin-card) {
+  overflow: hidden;
+}
+
+/* flex 行内文本列 */
+:where(
+  .mac-row-text,
+  .mac-spotlight-row-text,
+  .ui-skin-text,
+  .site-nav-link,
+  .fw-title
+) {
+  flex: 1 1 0;
+}
+
+/* ── Debug：溢出排查红框 ── */
+html.ui-debug *,
+html.debug * {
+  outline: 1px solid rgb(255 0 0 / 0.3) !important;
+}
+
+html.ui-debug :where(
+  .mac-settings,
+  .floating-widget,
+  .mac-row-text,
+  .mac-category-tile,
+  .site-nav-shell,
+  .fw-body,
+  .ui-card,
+  .card
+),
+html.debug :where(
+  .mac-settings,
+  .floating-widget,
+  .mac-row-text,
+  .mac-category-tile,
+  .site-nav-shell,
+  .fw-body,
+  .ui-card,
+  .card
+) {
+  outline: 1px solid rgb(255 0 0 / 0.55) !important;
+}
+
+html.ui-debug :where(.mac-row-text, .ui-skin-text, .ns-it-main) > *,
+html.debug :where(.mac-row-text, .ui-skin-text, .ns-it-main) > * {
+  outline: 1px dashed rgb(255 120 0 / 0.45) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.ui-debug *,
+  html.debug * {
+    outline-width: 1px;
+  }
+}

@@ -1,0 +1,446 @@
+/* NASA-punk 小组件 · 任务面板内部结构 */
+
+html[data-ui='hud'] .hud-mission-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+html[data-ui='hud'] .hud-readout {
+  font-family: 'Barlow Condensed', 'IBM Plex Sans', monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+html[data-ui='hud'] .hud-readout-lg {
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+html[data-ui='hud'] .hud-readout-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--hud-red, #c8102e);
+  margin-bottom: 2px;
+}
+
+html[data-ui='hud'] .hud-bar-line {
+  font-family: 'Barlow Condensed', 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--hud-navy, #0f1f3d);
+}
+
+html.dark[data-ui='hud'] .hud-bar-line {
+  color: #9aafc9;
+}
+
+html[data-ui='hud'] .hud-status-lights {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+html[data-ui='hud'] .hud-status-lights .lit {
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .hud-status-lights .dim {
+  color: var(--hud-navy-muted, #3d5278);
+  opacity: 0.65;
+}
+
+/* 高度表 */
+html[data-ui='hud'] .clock-altimeter {
+  display: grid;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+html[data-ui='hud'] .clock-altimeter .alt-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.52rem;
+  color: var(--hud-navy-muted, #3d5278);
+  letter-spacing: 0.06em;
+}
+
+html[data-ui='hud'] .clock-altimeter .alt-face {
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  padding: 10px 12px;
+  background: rgb(5 10 20 / 0.06);
+}
+
+html.dark[data-ui='hud'] .clock-altimeter .alt-face {
+  border-color: rgb(245 242 235 / 0.35);
+  background: rgb(5 10 20 / 0.45);
+}
+
+/* 行星天气卡 */
+html[data-ui='hud'] .ww-planet-card {
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+  background: rgb(5 10 20 / 0.04);
+}
+
+html.dark[data-ui='hud'] .ww-planet-card {
+  border-color: rgb(245 242 235 / 0.35);
+  background: rgb(5 10 20 / 0.35);
+}
+
+html[data-ui='hud'] .ww-planet-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+html[data-ui='hud'] .ww-planet-temp {
+  font-size: 2rem;
+  font-weight: 800;
+  font-family: 'Barlow Condensed', monospace;
+}
+
+/* 任务日程 */
+html[data-ui='hud'] .cal-mission-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+html[data-ui='hud'] .cal-mission-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: baseline;
+  padding: 6px 8px;
+  border: 1px solid rgb(15 31 61 / 0.2);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+}
+
+html.dark[data-ui='hud'] .cal-mission-item {
+  border-color: rgb(245 242 235 / 0.18);
+}
+
+html[data-ui='hud'] .cal-mission-item.is-urgent {
+  border-color: var(--hud-red, #c8102e);
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.1));
+}
+
+html[data-ui='hud'] .cal-mission-mark {
+  color: var(--hud-red, #c8102e);
+  font-weight: 700;
+  min-width: 1.2em;
+}
+
+html[data-ui='hud'] .cal-mission-countdown {
+  font-family: 'Barlow Condensed', monospace;
+  font-size: 0.62rem;
+  color: var(--hud-red, #c8102e);
+  letter-spacing: 0.08em;
+}
+
+/* 通讯波形 */
+html[data-ui='hud'] .mp-signal-deck {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: stretch;
+}
+
+html[data-ui='hud'] .mp-waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 72px;
+  padding: 8px;
+  border: 1px solid var(--hud-navy, #0f1f3d);
+  background: rgb(5 10 20 / 0.08);
+}
+
+html.dark[data-ui='hud'] .mp-waveform {
+  border-color: rgb(245 242 235 / 0.35);
+  background: rgb(5 10 20 / 0.5);
+}
+
+html[data-ui='hud'] .mp-waveform span {
+  flex: 1;
+  min-width: 3px;
+  background: var(--hud-red, #c8102e);
+  opacity: 0.85;
+  border-radius: 0;
+}
+
+html[data-ui='hud'] .mp-comm-readout {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+}
+
+/* 星图坐标 */
+html[data-ui='hud'] .tw-star-hud {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  padding: 6px 10px;
+  border: 1px solid var(--hud-red, #c8102e);
+  background: rgb(11 20 38 / 0.88);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+html[data-ui='hud'] .tw-star-hud div {
+  font-family: 'Barlow Condensed', monospace;
+  color: #9aafc9;
+}
+
+/* 调音台通道 */
+html[data-ui='hud'] .wn-mixer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+html[data-ui='hud'] .wn-channel {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid rgb(15 31 61 / 0.25);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+html.dark[data-ui='hud'] .wn-channel {
+  border-color: rgb(245 242 235 / 0.22);
+}
+
+html[data-ui='hud'] .wn-channel.is-on {
+  border-color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .wn-channel-led {
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+html[data-ui='hud'] .wn-channel-led.on {
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .wn-channel-led.off {
+  color: var(--hud-navy-muted, #3d5278);
+  opacity: 0.7;
+}
+
+html[data-ui='hud'] .wn-channel-bar {
+  font-family: 'Barlow Condensed', monospace;
+  font-size: 0.62rem;
+  color: #9aafc9;
+  min-width: 4.5em;
+  text-align: right;
+}
+
+/* 飞行记录仪 */
+html[data-ui='hud'] .sw-flight-log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+html[data-ui='hud'] .sw-log-entry {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  padding: 5px 8px;
+  border-left: 2px solid var(--hud-red, #c8102e);
+  font-size: 0.64rem;
+  letter-spacing: 0.05em;
+  background: rgb(5 10 20 / 0.04);
+}
+
+html.dark[data-ui='hud'] .sw-log-entry {
+  background: rgb(5 10 20 / 0.35);
+}
+
+html[data-ui='hud'] .sw-log-ts {
+  font-family: 'Barlow Condensed', monospace;
+  color: #9aafc9;
+  font-size: 0.58rem;
+}
+
+/* 番茄钟状态灯 */
+html[data-ui='hud'] .pw-status-deck {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+html[data-ui='hud'] .pw-lamp-row {
+  display: flex;
+  gap: 14px;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+html[data-ui='hud'] .pw-lamp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+html[data-ui='hud'] .pw-lamp.on {
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .pw-lamp.off {
+  color: var(--hud-navy-muted, #3d5278);
+  opacity: 0.55;
+}
+
+/* ── 叠加式 HUD 装饰（不替换原功能） ── */
+
+.mp-hud-wave,
+.pw-hud-lamps,
+.tw-star-hud {
+  display: none;
+}
+
+html[data-ui='hud'] .cal-hud-mark,
+html[data-ui='hud'] .cal-hud-countdown {
+  display: inline !important;
+}
+
+html[data-ui='hud'] .cal-hud-plain {
+  display: none !important;
+}
+
+html[data-ui='hud'] .cal-upcoming li.cal-mission-urgent {
+  border-color: var(--hud-red, #c8102e) !important;
+  background: var(--hud-red-soft, rgb(200 16 46 / 0.1)) !important;
+}
+
+html[data-ui='hud'] .cal-hud-mark {
+  color: var(--hud-red, #c8102e);
+  font-weight: 700;
+  min-width: 1.1em;
+}
+
+html[data-ui='hud'] .cal-hud-countdown {
+  font-family: 'Barlow Condensed', monospace;
+  letter-spacing: 0.06em;
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .mp-hud-wave {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 34px;
+  padding: 2px 12px 0;
+  border-bottom: 1px solid rgb(15 31 61 / 0.2);
+}
+
+html[data-ui='hud'] .mp-hud-wave span {
+  flex: 1;
+  min-width: 2px;
+  max-width: 6px;
+  background: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .pw-hud-lamps {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 4px 8px 0;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+}
+
+html[data-ui='hud'] .pw-hud-lamps .pw-lamp.on {
+  color: var(--hud-red, #c8102e);
+}
+
+html[data-ui='hud'] .wn-track .wn-name::before {
+  content: '○ ';
+  opacity: 0.65;
+}
+
+html[data-ui='hud'] .wn-track.is-on .wn-name::before {
+  content: '◉ ';
+  color: var(--hud-red, #c8102e);
+  opacity: 1;
+}
+
+html[data-ui='hud'] .tw-star-hud {
+  display: block;
+}
+
+html[data-ui='hud'] .pixel-clock .clock-bar {
+  cursor: grab !important;
+}
+
+html[data-ui='hud'] .pixel-clock.is-active-drag .clock-bar {
+  cursor: grabbing !important;
+}
+
+/* 控制面板固定 + 可滚动 */
+html[data-ui='hud'] .mac-settings {
+  position: fixed !important;
+  right: max(env(safe-area-inset-right, 0px), 12px) !important;
+  left: auto !important;
+  top: max(env(safe-area-inset-top, 0px), 58px) !important;
+  bottom: max(env(safe-area-inset-bottom, 0px), 16px) !important;
+  transform: translateX(calc(100% + 20px)) scale(0.96);
+  touch-action: auto;
+}
+
+html[data-ui='hud'] .mac-settings.is-open {
+  transform: translateX(0) scale(1) !important;
+}
+
+html[data-ui='hud'] .mac-settings .mac-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  position: relative;
+  z-index: 1;
+}
+
+html[data-ui='hud'] .mac-settings::before,
+html[data-ui='hud'] .mac-settings::after {
+  pointer-events: none !important;
+}

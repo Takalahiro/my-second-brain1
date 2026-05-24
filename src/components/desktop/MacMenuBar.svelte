@@ -6,6 +6,8 @@
   import MenuBarRainGlass from './MenuBarRainGlass.svelte';
   import SiteLogo from '../SiteLogo.svelte';
   import PixelIcon from '../PixelIcon.svelte';
+  import HudMissionStatus from './HudMissionStatus.svelte';
+  import { useHudMode } from '../../features/ui/hud-mode.svelte';
   import { getSiteNavLinks, getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
 
   interface Props {
@@ -39,6 +41,7 @@
   let menuOpen = $state(false);
   let now = $state(new Date());
   let coarsePointer = $state(false);
+  const hudMode = useHudMode();
 
   const menuTime = $derived(
     now.toLocaleString(localeState.current === 'en' ? 'en-US' : 'zh-CN', {
@@ -99,7 +102,13 @@
   ></button>
 {/if}
 
-<header class="mac-menu-bar" class:has-rain-glass={rainDrops} aria-label={m.menu.systemMenu}>
+{#if hudMode.current}
+  <div class="hud-status-strip" aria-hidden="false">
+    <HudMissionStatus />
+  </div>
+{/if}
+
+<header class="mac-menu-bar" class:has-rain-glass={rainDrops} class:has-hud-strip={hudMode.current} aria-label={m.menu.systemMenu}>
   <MenuBarRainGlass active={rainDrops} />
   <div class="mac-menu-left">
     <div class="mac-menu-apple">
@@ -348,7 +357,6 @@
     cursor: not-allowed;
   }
   .mac-menu-app-name {
-    font-weight: 700;
     font-size: 0.88rem;
     letter-spacing: 0.01em;
     color: var(--chrome-text);

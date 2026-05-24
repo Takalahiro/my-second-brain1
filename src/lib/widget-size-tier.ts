@@ -7,6 +7,19 @@ export const TIER_LABEL: Record<WidgetTier, string> = {
   expanded: '宽屏',
 };
 
+/** NASA-punk HUD 三档尺寸标签 */
+export const HUD_TIER_LABEL: Record<WidgetTier, string> = {
+  compact: '小',
+  medium: '标准',
+  expanded: '大',
+};
+
+export const HUD_TIER_CODE: Record<WidgetTier, string> = {
+  compact: 'MIN',
+  medium: 'STD',
+  expanded: 'FULL',
+};
+
 export type WidgetTierInput = {
   width: number;
   height: number;

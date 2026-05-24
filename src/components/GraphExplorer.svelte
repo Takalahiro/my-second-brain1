@@ -6,6 +6,7 @@
   } from './graph/graph-data';
   import { GRAPH_VIEW_ICONS, type PixelIconName } from '../lib/pixel-icons';
   import PixelIcon from './PixelIcon.svelte';
+  import { isHudSkinActive, subscribeHudMode } from '../features/ui/hud-mode.svelte';
   import ForceView from './graph/ForceView.svelte';
   import RadialView from './graph/RadialView.svelte';
   import ArcView from './graph/ArcView.svelte';
@@ -27,6 +28,7 @@
   ];
 
   let view = $state<ViewKey>('force');
+  let hudMode = $state(false);
   let data = $state<WikiData | null>(null);
   let loadErr = $state<string | null>(null);
   let folderFocus = $state<string | null>(null);
@@ -43,19 +45,23 @@
   }
 
   onMount(() => {
+    hudMode = isHudSkinActive();
+    const off = subscribeHudMode((v) => { hudMode = v; });
     try {
       const raw = localStorage.getItem('second-brain:graph-view');
       if (raw && tabs.find((t) => t.id === raw)) view = raw as ViewKey;
     } catch {}
     settings = loadSettings();
     void load();
+    return off;
   });
 
   async function load() {
     try {
       data = await loadWiki();
     } catch (e) {
-      loadErr = '尚未生成 wikilinks.json，请运行 pnpm prepare:vault';
+      console.error('[GraphExplorer] loadWiki failed', e);
+      loadErr = e instanceof Error ? e.message : '尚未生成 wikilinks.json，请运行 pnpm prepare:vault';
     }
   }
 
@@ -90,7 +96,14 @@
   });
 </script>
 
-<section class="graph-page">
+<section class="graph-page" class:is-hud-mission={hudMode}>
+  {#if hudMode}
+    <div class="hud-mission-bar">
+      <span class="hud-mission-id">KNOWLEDGE STAR MAP</span>
+      <span class="hud-mission-patch" aria-hidden="true"></span>
+      <span class="hud-mission-status">WIKILINK SCAN · CONSTELLATION NAV</span>
+    </div>
+  {/if}
   <header class="gp-head">
     <div>
       <h1>关系图谱</h1>

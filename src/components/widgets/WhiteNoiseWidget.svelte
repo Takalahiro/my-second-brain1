@@ -9,6 +9,7 @@
   import { VOICE_TRACKS, type VoiceTrack } from '../../lib/voice-tracks';
   import PixelIcon from '../PixelIcon.svelte';
   import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
+  import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
 
   interface Props { onClose?: () => void; globalMuted?: boolean; }
   let { onClose, globalMuted = false }: Props = $props();
@@ -319,11 +320,12 @@
       { minWidth: 300, minHeight: 320, maxWidth: 720, maxHeight: 800 }
     )
   );
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized, compactMax: 300, expandedMin: 500 }));
 </script>
 
 <section
   bind:this={rootEl}
-  class="wn-widget {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''}"
+  class="wn-widget {tierClass(tier)} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''}"
   style={rotationStyle(rotation, (maximized ? '' : `left:${posX}px;top:${posY}px;width:${width}px;height:${minimized ? 'auto' : height + 'px'};`) + ` --w-bg-alpha:${bgAlpha};`)}
   aria-label="白噪音"
   use:widgetTouchGestures={touchOpts}

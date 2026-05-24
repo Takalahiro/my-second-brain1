@@ -1,17 +1,17 @@
 {
-  "generatedAt": "2026-05-23T09:48:03.314Z",
-  "totalNotes": 128,
-  "totalWords": 251766,
+  "generatedAt": "2026-05-24T19:50:46.682Z",
+  "totalNotes": 129,
+  "totalWords": 253327,
   "byFolder": [
     {
       "name": "计算机",
       "count": 111,
-      "words": 189317
+      "words": 190837
     },
     {
       "name": "MATH",
-      "count": 6,
-      "words": 20768
+      "count": 7,
+      "words": 20809
     },
     {
       "name": "DATA1001",
@@ -93,19 +93,11 @@
     {
       "month": "2026-05",
       "label": "5月",
-      "count": 128
+      "count": 129
     }
   ],
   "topTags": [],
   "heatmap": [
-    {
-      "date": "2026-03-01",
-      "count": 0
-    },
-    {
-      "date": "2026-03-02",
-      "count": 0
-    },
     {
       "date": "2026-03-03",
       "count": 0
@@ -420,7 +412,7 @@
     },
     {
       "date": "2026-05-20",
-      "count": 122
+      "count": 121
     },
     {
       "date": "2026-05-21",
@@ -428,11 +420,19 @@
     },
     {
       "date": "2026-05-22",
-      "count": 1
+      "count": 0
     },
     {
       "date": "2026-05-23",
-      "count": 3
+      "count": 4
+    },
+    {
+      "date": "2026-05-24",
+      "count": 2
+    },
+    {
+      "date": "2026-05-25",
+      "count": 0
     }
   ]
 }

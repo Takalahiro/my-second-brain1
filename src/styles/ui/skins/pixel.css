@@ -1,0 +1,309 @@
+/* pixel — 像素复古：8-bit 色板、硬边、块面图标、扫描线 */
+
+html[data-ui='pixel'] {
+  --radius-card: 0;
+  --radius-button: 0;
+  --radius-small: 0;
+
+  --bg-primary: #d8e0d0;
+  --bg-secondary: #c8d0c0;
+  --text-primary: #1a1c2c;
+  --text-secondary: #3a4466;
+  --border-color: #1a1c2c;
+
+  --ui-accent: #38b764;
+  --ui-accent-soft: rgb(56 183 100 / 0.35);
+  --ui-accent-text: #248a46;
+
+  --font-body-current: 'Pixelify Sans', 'DotGothic16', monospace;
+  --font-heading-current: 'Pixelify Sans', 'DotGothic16', monospace;
+
+  --glass-bg: #e0e8d8;
+  --glass-bg-hover: #eef4e8;
+  --glass-bg-strong: #d0d8c8;
+  --glass-border: #1a1c2c;
+
+  --shadow-soft: 3px 3px 0 #1a1c2c;
+  --shadow-normal: 4px 4px 0 #1a1c2c;
+  --shadow-hover: 6px 6px 0 #1a1c2c;
+  --shadow-active: 2px 2px 0 #1a1c2c;
+  --shadow-pixel: 0 0 0 3px #1a1c2c;
+
+  --neo-surface: #e8f0e0;
+  --neo-track: #566c86;
+  --neo-thumb: #ffffff;
+  --neo-raised: 4px 4px 0 #1a1c2c;
+  --neo-raised-hover: 5px 5px 0 #1a1c2c;
+  --neo-pressed: inset 2px 2px 0 #1a1c2c;
+  --neo-inset: inset 3px 3px 0 rgb(26 28 44 / 0.45);
+
+  --border-thin: 3px;
+  --border-thick: 4px;
+
+  --chrome-bg-top: #e0e8d8;
+  --chrome-bg-bottom: #d0d8c8;
+  --chrome-border: #1a1c2c;
+  --chrome-shadow: 6px 6px 0 #1a1c2c;
+  --chrome-hover: rgb(26 28 44 / 0.08);
+  --chrome-active: rgb(26 28 44 / 0.14);
+  --chrome-subtle: #c8d4bc;
+
+  --widget-bg-rgb: 224 232 216;
+  --widget-shadow: 5px 5px 0 #1a1c2c;
+  --widget-border: #1a1c2c;
+  --widget-header-bg: #c8d4bc;
+  --widget-fg: #1a1c2c;
+  --widget-fg-muted: #3a4466;
+
+  --motion-base: 0.08s;
+  --motion-fast: 0.05s;
+  --motion-ease: steps(2, jump-none);
+
+  --code-bg: #1a1c2c;
+  --code-fg: #9bbc0f;
+  --code-output-bg: #262b44;
+  --code-output-fg: #9bbc0f;
+
+  --graph-canvas-bg: #566c86;
+  --graph-canvas-border: #1a1c2c;
+}
+
+html.dark[data-ui='pixel'] {
+  --bg-primary: #1a1c2c;
+  --bg-secondary: #262b44;
+  --text-primary: #e0f8cf;
+  --text-secondary: #9bbc0f;
+
+  --glass-bg: #262b44;
+  --glass-bg-hover: #333c57;
+  --glass-border: #e0f8cf;
+
+  --neo-surface: #262b44;
+  --neo-track: #566c86;
+  --neo-thumb: #e0f8cf;
+
+  --chrome-bg-top: #262b44;
+  --chrome-bg-bottom: #1a1c2c;
+  --chrome-border: #e0f8cf;
+  --chrome-shadow: 6px 6px 0 #000000;
+  --chrome-subtle: #333c57;
+
+  --widget-bg-rgb: 38 43 68;
+  --widget-fg: #e0f8cf;
+  --widget-fg-muted: #9bbc0f;
+  --widget-border: #e0f8cf;
+  --widget-header-bg: #333c57;
+  --widget-shadow: 5px 5px 0 #000000;
+
+  --shadow-normal: 4px 4px 0 #000000;
+  --shadow-hover: 6px 6px 0 #000000;
+  --neo-raised: 4px 4px 0 #000000;
+}
+
+html[data-ui='pixel'] {
+  image-rendering: pixelated;
+}
+
+html[data-ui='pixel']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99999;
+  opacity: 0.06;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgb(0 0 0 / 0.55) 2px,
+    rgb(0 0 0 / 0.55) 4px
+  );
+}
+
+html[data-ui='pixel'] body {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 15px,
+      rgb(26 28 44 / 0.04) 15px,
+      rgb(26 28 44 / 0.04) 16px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 15px,
+      rgb(26 28 44 / 0.04) 15px,
+      rgb(26 28 44 / 0.04) 16px
+    ),
+    var(--bg-primary);
+}
+
+html[data-ui='pixel'] .mac-settings,
+html[data-ui='pixel'] .widget-panel,
+html[data-ui='pixel'] .site-nav-shell,
+html[data-ui='pixel'] .pixel-card,
+html[data-ui='pixel'] .glass-container,
+html[data-ui='pixel'] .site-nav-brand,
+html[data-ui='pixel'] .site-nav-link,
+html[data-ui='pixel'] .ui-skin-card {
+  border: var(--border-thick) solid var(--chrome-border);
+  border-radius: 0;
+  box-shadow: var(--shadow-normal);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-ui='pixel'] .mac-traffic {
+  gap: 6px;
+}
+
+html[data-ui='pixel'] .mac-traffic .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  border: 2px solid var(--chrome-border);
+  background: var(--chrome-subtle) !important;
+  color: var(--text-primary);
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 10px;
+}
+
+html[data-ui='pixel'] .mac-traffic:hover .dot,
+html[data-ui='pixel'] .mac-traffic .dot:hover {
+  color: var(--text-primary);
+  filter: none;
+  transform: none;
+  background: var(--ui-accent) !important;
+}
+
+html[data-ui='pixel'] .mac-traffic .red,
+html[data-ui='pixel'] .mac-traffic .yellow,
+html[data-ui='pixel'] .mac-traffic .green {
+  background: var(--chrome-subtle) !important;
+}
+
+html[data-ui='pixel'] .mac-toggle span {
+  border-radius: 0;
+  border: 2px solid var(--chrome-border);
+  background: var(--neo-track);
+}
+
+html[data-ui='pixel'] .mac-toggle input:checked + span {
+  background: var(--ui-accent);
+  border-color: var(--chrome-border);
+}
+
+html[data-ui='pixel'] .mac-toggle span::after {
+  border-radius: 0;
+}
+
+html[data-ui='pixel'] .mac-back {
+  color: var(--ui-accent-text);
+  border-radius: 0;
+  border: 2px solid transparent;
+}
+
+html[data-ui='pixel'] .mac-back:hover {
+  border-color: var(--chrome-border);
+  background: var(--chrome-subtle);
+}
+
+html[data-ui='pixel'] .theme-switch,
+html[data-ui='pixel'] .theme-switch-thumb {
+  border-radius: 0;
+}
+
+html[data-ui='pixel'] .theme-switch-track {
+  border-radius: 0;
+  border: 2px solid var(--chrome-border);
+}
+
+html[data-ui='pixel'] .pixel-button {
+  border-radius: 0;
+  border: var(--border-thin) solid var(--chrome-border);
+  box-shadow: var(--neo-raised);
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+html[data-ui='pixel'] .pixel-button:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-hover);
+}
+
+html[data-ui='pixel'] .pixel-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-active);
+}
+
+html[data-ui='pixel'] .ui-skin-card.is-active {
+  border-color: var(--ui-accent);
+  box-shadow: var(--shadow-hover);
+  background: var(--ui-accent-soft);
+}
+
+html[data-ui='pixel'] .mac-segment {
+  border-radius: 0;
+  border: var(--border-thin) solid var(--chrome-border);
+}
+
+html[data-ui='pixel'] .mac-segment-btn {
+  border-radius: 0;
+}
+
+html[data-ui='pixel'] .mac-segment-btn.is-active {
+  background: var(--ui-accent);
+  color: #fff;
+}
+
+html[data-ui='pixel'] .floating-widget {
+  border-radius: 0;
+  border: var(--border-thick) solid var(--widget-border);
+  background: rgb(var(--widget-bg-rgb) / 0.98);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: var(--widget-shadow);
+}
+
+html[data-ui='pixel'] .mac-chrome .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  border: 2px solid var(--chrome-border);
+  background: var(--chrome-subtle) !important;
+  box-shadow: none;
+}
+
+html[data-ui='pixel'] .mac-chrome:hover .glyph {
+  color: var(--text-primary);
+}
+
+:global(html[data-ui='pixel']) .app-icon-pixel {
+  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.35));
+}
+
+:global(html.dark[data-ui='pixel']) .app-icon-pixel {
+  filter: drop-shadow(2px 2px 0 rgb(0 0 0 / 0.65));
+}
+
+/* 像素风：强制去除一切圆角（覆盖组件内 scoped 样式） */
+html[data-ui='pixel'] :where(*, *::before, *::after) {
+  border-radius: 0 !important;
+}
+
+/* 像素风：浅色模式确保描边可见 */
+html:not(.dark)[data-ui='pixel'] {
+  --chrome-text-muted: #3a4466;
+  --chrome-subtle: #c8d4bc;
+}
+
+html[data-ui='pixel'] .mac-toggle span::before {
+  border-radius: 0 !important;
+}
+
+html[data-ui='pixel'] .mac-toggle input:checked + span::before {
+  transform: translateX(16px);
+}
+

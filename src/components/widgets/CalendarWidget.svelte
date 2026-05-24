@@ -8,6 +8,8 @@
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import PixelIcon from '../PixelIcon.svelte';
   import { WIDGET_ICON_MAP } from '../../lib/pixel-icons';
+  import { hudCountdown, isUrgentEvent } from '../../lib/hud-widget-ui';
+  import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
 
   interface Props {
     onClose?: () => void;
@@ -45,6 +47,7 @@
   let rotation = $state(0);
   let dragging = $state(false);
   let dragStart = { x: 0, y: 0, px: 0, py: 0 };
+  let nowMs = $state(Date.now());
 
   onMount(() => {
     try {
@@ -83,7 +86,11 @@
 
     const onResize = () => clampPos();
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    const tick = window.setInterval(() => { nowMs = Date.now(); }, 30_000);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      clearInterval(tick);
+    };
   });
 
   function clamp(v: number, min: number, max: number) { return Math.max(min, Math.min(max, v)); }
@@ -221,7 +228,7 @@
 
   const upcoming = $derived.by<CalEvent[]>(() => {
     const now = Date.now();
-    return events.filter((e) => e.end >= now).slice(0, 6);
+    return events.filter((e) => e.end >= now).sort((a, b) => a.start - b.start).slice(0, 6);
   });
 
   function prevMonth() {
@@ -241,6 +248,7 @@
     cursorYM = { y: d.getFullYear(), m: d.getMonth() };
   }
   const monthLabel = $derived(`${cursorYM.y} 年 ${cursorYM.m + 1} 月`);
+  const tier = $derived(getWidgetTier({ width, height, minimized, maximized, compactMax: 320, expandedMin: 520 }));
 
   function onHeaderPointerDown(e: PointerEvent) {
     if (maximized) return;
@@ -308,7 +316,7 @@
 
 <section
   bind:this={rootEl}
-  class="cal-widget {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
+  class="cal-widget {tierClass(tier)} {dragging ? 'is-active-drag' : ''} {maximized ? 'is-maximized' : ''} {minimized ? 'is-minimized' : ''}"
   style={rotationStyle(rotation, (maximized ? '' : `left: ${posX}px; top: ${posY}px; width: ${width}px; height: ${minimized ? 'auto' : height + 'px'};`) + ` --w-bg-alpha: ${bgAlpha};`)}
   aria-label="日历"
   use:widgetTouchGestures={touchOpts}
@@ -407,9 +415,14 @@
       {:else}
         <ul>
           {#each upcoming as e (e.id)}
-            <li>
+            {@const urgent = isUrgentEvent(e.start, nowMs)}
+            <li class:cal-mission-urgent={urgent}>
+              <span class="cal-hud-mark" aria-hidden="true">{urgent ? '◢' : '▶'}</span>
               <span class="cal-up-title">{e.title}</span>
-              <span class="cal-up-time">{fmtRange(e)}</span>
+              <span class="cal-up-time">
+                <span class="cal-hud-countdown">{urgent ? hudCountdown(e.start, nowMs) : fmtRange(e)}</span>
+                <span class="cal-hud-plain">{fmtRange(e)}</span>
+              </span>
             </li>
           {/each}
         </ul>
@@ -646,8 +659,10 @@
     padding: 5px 8px;
     font-size: 0.76rem;
   }
+  .cal-hud-mark,
+  .cal-hud-countdown { display: none; }
   .cal-up-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #ece4ff; }
-  .cal-up-time { color: #cbb9e6; font-size: 0.7rem; }
+  .cal-up-time { color: #cbb9e6; font-size: 0.7rem; flex-shrink: 0; }
 
   @media (max-width: 768px) {
     .cal-widget:not(.is-maximized) {

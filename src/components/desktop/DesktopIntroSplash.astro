@@ -50,6 +50,8 @@ const INTRO_KEY = 'second-brain:desktop-intro-v1';
 
 <script is:inline define:vars={{ INTRO_KEY }}>
   (function () {
+    var ui = localStorage.getItem('second-brain:ui-skin');
+    if (ui === 'hud') return;
     if (localStorage.getItem(INTRO_KEY)) return;
 
     var splash = document.getElementById('desktop-intro-splash');
@@ -96,7 +98,9 @@ const INTRO_KEY = 'second-brain:desktop-intro-v1';
 </script>
 
 <style is:global>
-  html:not(.desktop-intro-active) #desktop-intro-splash {
+  html:not(.desktop-intro-active) #desktop-intro-splash,
+  html[data-ui='hud'] #desktop-intro-splash,
+  html.hud-eclipse-intro-active #desktop-intro-splash {
     display: none !important;
   }
 
