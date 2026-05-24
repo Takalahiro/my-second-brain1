@@ -8,13 +8,9 @@ export type WebcamTiltTrackerOptions = {
 };
 
 export type WebcamTiltTracker = {
-  /** 当前平滑后的倾斜；无跟踪时返回 {0,0} */
   getTilt: () => SpatialTilt;
-  /** 是否已检测到头部/运动 */
   hasTracking: () => boolean;
-  /** 摄像头流已开启（含等待首帧检测） */
   isActive: () => boolean;
-  /** 需用户手势后调用（浏览器摄像头策略） */
   requestStart: () => Promise<'granted' | 'denied' | 'unsupported'>;
   dispose: () => void;
 };
@@ -41,9 +37,18 @@ function getFaceDetector(): FaceDetectorLike | null {
   }
 }
 
+function tiltFromCenter(cx: number, cy: number, w: number, h: number, maxTilt: number): SpatialTilt {
+  const nx = clamp(((cx / w) - 0.5) * 2, -1, 1);
+  const ny = clamp(((cy / h) - 0.5) * 2, -1, 1);
+  return {
+    pitch: clamp(-ny * maxTilt, -maxTilt, maxTilt),
+    roll: clamp(-nx * maxTilt, -maxTilt, maxTilt),
+  };
+}
+
 export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): WebcamTiltTracker {
   const maxTilt = opts.maxTilt ?? 0.14;
-  const detectIntervalMs = opts.detectIntervalMs ?? 48;
+  const detectIntervalMs = opts.detectIntervalMs ?? 40;
 
   let disposed = false;
   let stream: MediaStream | null = null;
@@ -55,11 +60,23 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
   let lastDetectAt = 0;
   let active = false;
   let tracking = false;
-  let baseline: { x: number; y: number } | null = null;
   let rawTilt: SpatialTilt = { ...ZERO };
   let smoothTilt: SpatialTilt = { ...ZERO };
   let prevGray: Uint8ClampedArray | null = null;
   let startPromise: Promise<'granted' | 'denied' | 'unsupported'> | null = null;
+
+  function ensureCanvas(w: number, h: number) {
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.setAttribute('aria-hidden', 'true');
+      canvas.style.cssText =
+        'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;top:-9999px';
+      document.body.appendChild(canvas);
+      ctx = canvas.getContext('2d', { willReadFrequently: true });
+    }
+    if (canvas.width !== w) canvas.width = w;
+    if (canvas.height !== h) canvas.height = h;
+  }
 
   function stopStream() {
     if (stream) {
@@ -68,7 +85,6 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
     }
     active = false;
     tracking = false;
-    baseline = null;
     prevGray = null;
     rawTilt = { ...ZERO };
   }
@@ -84,9 +100,10 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
 
   function sampleMotionTilt(w: number, h: number): SpatialTilt | null {
     if (!ctx || !video || video.readyState < 2) return null;
+    ensureCanvas(w, h);
     ctx.drawImage(video, 0, 0, w, h);
     const { data } = ctx.getImageData(0, 0, w, h);
-    if (!prevGray || prevGray.length !== data.length) {
+    if (!prevGray || prevGray.length !== w * h) {
       prevGray = new Uint8ClampedArray(w * h);
       for (let i = 0, p = 0; i < data.length; i += 4, p++) {
         prevGray[p] = (data[i] + data[i + 1] + data[i + 2]) / 3;
@@ -103,7 +120,7 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
         const p = y * w + x;
         const lum = (data[i] + data[i + 1] + data[i + 2]) / 3;
         const d = Math.abs(lum - prevGray[p]);
-        if (d > 18) {
+        if (d > 12) {
           sumX += x;
           sumY += y;
           mass += 1;
@@ -111,16 +128,8 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
         prevGray[p] = lum;
       }
     }
-    if (mass < 24) return null;
-    const cx = sumX / mass;
-    const cy = sumY / mass;
-    if (!baseline) {
-      baseline = { x: cx, y: cy };
-      return { ...ZERO };
-    }
-    const nx = clamp(((cx - baseline.x) / (w * 0.22)) * maxTilt, -maxTilt, maxTilt);
-    const ny = clamp(((cy - baseline.y) / (h * 0.22)) * maxTilt, -maxTilt, maxTilt);
-    return { pitch: -ny, roll: nx };
+    if (mass < 16) return null;
+    return tiltFromCenter(sumX / mass, sumY / mass, w, h, maxTilt);
   }
 
   async function detectFaceTilt(): Promise<SpatialTilt | null> {
@@ -129,36 +138,23 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
     const h = video.videoHeight;
     if (!w || !h) return null;
 
+    const sampleW = 160;
+    const sampleH = 120;
+
     if (detector) {
       try {
-        const faces = await detector.detect(video);
+        ensureCanvas(sampleW, sampleH);
+        ctx!.drawImage(video, 0, 0, sampleW, sampleH);
+        const faces = await detector.detect(canvas!);
         const box = faces[0]?.boundingBox;
-        if (!box) return null;
-        const cx = box.x + box.width / 2;
-        const cy = box.y + box.height / 2;
-        if (!baseline) {
-          baseline = { x: cx, y: cy };
-          return { ...ZERO };
-        }
-        const nx = clamp(((cx - baseline.x) / (w * 0.25)) * maxTilt, -maxTilt, maxTilt);
-        const ny = clamp(((cy - baseline.y) / (h * 0.25)) * maxTilt, -maxTilt, maxTilt);
-        return { pitch: -ny, roll: nx };
+        if (!box) return sampleMotionTilt(sampleW, sampleH);
+        return tiltFromCenter(box.x + box.width / 2, box.y + box.height / 2, sampleW, sampleH, maxTilt);
       } catch {
-        return sampleMotionTilt(w, h);
+        return sampleMotionTilt(sampleW, sampleH);
       }
     }
 
-    if (!canvas) {
-      canvas = document.createElement('canvas');
-      canvas.width = 160;
-      canvas.height = 120;
-      canvas.setAttribute('aria-hidden', 'true');
-      canvas.style.cssText =
-        'position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;left:-9999px;top:-9999px';
-      document.body.appendChild(canvas);
-      ctx = canvas.getContext('2d', { willReadFrequently: true });
-    }
-    return sampleMotionTilt(160, 120);
+    return sampleMotionTilt(sampleW, sampleH);
   }
 
   const tick = async () => {
@@ -168,8 +164,8 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
 
     const now = performance.now();
     if (now - lastDetectAt < detectIntervalMs) {
-      smoothTilt.pitch += (rawTilt.pitch - smoothTilt.pitch) * 0.12;
-      smoothTilt.roll += (rawTilt.roll - smoothTilt.roll) * 0.12;
+      smoothTilt.pitch += (rawTilt.pitch - smoothTilt.pitch) * 0.14;
+      smoothTilt.roll += (rawTilt.roll - smoothTilt.roll) * 0.14;
       return;
     }
     lastDetectAt = now;
@@ -182,8 +178,8 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
       tracking = false;
       rawTilt = { ...ZERO };
     }
-    smoothTilt.pitch += (rawTilt.pitch - smoothTilt.pitch) * 0.18;
-    smoothTilt.roll += (rawTilt.roll - smoothTilt.roll) * 0.18;
+    smoothTilt.pitch += (rawTilt.pitch - smoothTilt.pitch) * 0.22;
+    smoothTilt.roll += (rawTilt.roll - smoothTilt.roll) * 0.22;
   };
 
   async function startInternal(): Promise<'granted' | 'denied' | 'unsupported'> {
@@ -219,14 +215,13 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
 
     await new Promise<void>((resolve, reject) => {
       if (!video) return reject();
-      video.onloadedmetadata = () => {
-        void video?.play().then(resolve).catch(reject);
-      };
+      const done = () => void video?.play().then(resolve).catch(reject);
+      video.onloadedmetadata = done;
+      if (video.readyState >= 1) done();
       video.onerror = () => reject();
     });
 
     detector = getFaceDetector();
-    baseline = null;
     active = true;
     tracking = false;
     lastDetectAt = 0;
@@ -252,7 +247,7 @@ export function createWebcamTiltTracker(opts: WebcamTiltTrackerOptions = {}): We
   opts.signal?.addEventListener('abort', onAbort, { once: true });
 
   return {
-    getTilt: () => (active ? smoothTilt : ZERO),
+    getTilt: () => (tracking ? smoothTilt : ZERO),
     hasTracking: () => tracking,
     isActive: () => active,
     requestStart,

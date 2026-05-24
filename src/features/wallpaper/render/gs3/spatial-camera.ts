@@ -34,8 +34,11 @@ const POINTER_FALLBACK_POS = { roll: 0.1, pitch: 0.06 };
 const POINTER_FALLBACK_LOOK = { roll: 0.018, pitch: 0.01 };
 const DEFAULT_BREATH = { x: 0.004, y: 0.002, z: 0.003 };
 
+import { isMobileWallpaperDevice } from '../../device/is-mobile';
+
 function prefersFinePointer(): boolean {
   if (typeof window === 'undefined') return false;
+  if (isMobileWallpaperDevice()) return false;
   return window.matchMedia('(pointer: fine)').matches;
 }
 
@@ -89,9 +92,10 @@ export function createSpatialMotionController(opts: SpatialMotionOptions) {
     }
 
     refreshWebcamState();
+    const webcamTracking = webcam?.hasTracking() ?? false;
 
     const useGyro = hasDeviceTilt && !desktopInput;
-    const useWebcam = webcamActive && desktopInput && !webcamDenied;
+    const useWebcam = webcamTracking && desktopInput && !webcamDenied;
     const target = useGyro
       ? tilt
       : useWebcam
@@ -134,8 +138,9 @@ export function createSpatialMotionController(opts: SpatialMotionOptions) {
 
   const onPointer = (e: PointerEvent) => {
     if (disposed || reducedMotion || !enablePointerFallback) return;
+    if (desktopInput && !webcamDenied && !webcamActive) tryStartWebcam();
     refreshWebcamState();
-    if (webcamActive && !webcamDenied) return;
+    if ((webcam?.hasTracking() ?? false) && !webcamDenied) return;
     if (!desktopInput && hasDeviceTilt) return;
     const nx = (e.clientX / window.innerWidth - 0.5) * 2;
     const ny = (e.clientY / window.innerHeight - 0.5) * 2;
@@ -161,7 +166,7 @@ export function createSpatialMotionController(opts: SpatialMotionOptions) {
   };
 
   const onPointerLeave = () => {
-    if (disposed || reducedMotion || !desktopInput || webcamActive) return;
+    if (disposed || reducedMotion || !desktopInput || (webcam?.hasTracking() ?? false)) return;
     pointerTilt = { pitch: 0, roll: 0 };
   };
 
@@ -193,12 +198,14 @@ export function createSpatialMotionController(opts: SpatialMotionOptions) {
     if (disposed || reducedMotion) return;
     const unlock = () => {
       if (!desktopInput) void requestOrientationPermission();
-      tryStartWebcam();
+      else tryStartWebcam();
     };
-    window.addEventListener('click', unlock, { once: true, passive: true });
-    window.addEventListener('touchstart', unlock, { once: true, passive: true });
+    window.addEventListener('click', unlock, { passive: true });
+    window.addEventListener('pointerdown', unlock, { passive: true });
+    window.addEventListener('touchstart', unlock, { passive: true });
     if (!desktopInput) {
       window.addEventListener('deviceorientation', onOrient, { passive: true });
+      void requestOrientationPermission();
     }
     if (enablePointerFallback) {
       window.addEventListener('pointermove', onPointer, { passive: true });

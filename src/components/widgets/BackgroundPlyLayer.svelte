@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { createGS3Wallpaper, type GS3WallpaperStatus } from '../../features/wallpaper/render/gs3/gs3-wallpaper';
-  import { isMobileUa } from '../../features/wallpaper/device/is-mobile';
+  import { isMobileWallpaperDevice } from '../../features/wallpaper/device/is-mobile';
 
   type PlyLoadStatus = 'loading' | 'ready' | 'failed';
 
@@ -19,7 +19,13 @@
   let ready = $state(false);
   let failed = $state(false);
   let failMessage = $state('');
-  let mobile = $state(false);
+  let mobile = $state(
+    typeof window !== 'undefined' ? isMobileWallpaperDevice() : false,
+  );
+  let lowPower = $state(
+    typeof navigator !== 'undefined' ? (navigator.hardwareConcurrency ?? 8) <= 4 : false,
+  );
+  const useWebgl = $derived(!mobile || !lowPower);
 
   let engine: { dispose: () => void | Promise<void> } | null = null;
   let loadGen = 0;
@@ -34,16 +40,19 @@
   }
 
   onMount(() => {
-    mobile = isMobileUa();
-    if (mobile) {
-      report('ready');
-      return;
-    }
+    mobile = isMobileWallpaperDevice();
+    lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
+    const mql = window.matchMedia('(max-width: 768px)');
+    const onChange = () => {
+      mobile = isMobileWallpaperDevice();
+    };
+    mql.addEventListener('change', onChange);
     return () => {
       loadGen++;
       abortCtrl?.abort();
       void engine?.dispose();
       engine = null;
+      mql.removeEventListener('change', onChange);
     };
   });
 
@@ -51,7 +60,10 @@
     const el = host;
     const url = plyUrl;
     const spd = speed;
-    if (!el || mobile || !url) return;
+    if (!el || !url || !useWebgl) {
+      if (!useWebgl && poster) report('ready');
+      return;
+    }
 
     loadGen++;
     const gen = loadGen;
@@ -64,7 +76,7 @@
 
     void (async () => {
       await disposeChain;
-      if (!active || gen !== loadGen || !el || mobile || !url) return;
+      if (!active || gen !== loadGen || !el || !url) return;
 
       engine = createGS3Wallpaper(el, {
         url,
@@ -90,13 +102,14 @@
 
 <div
   class="ply-layer gs-wallpaper"
-  class:is-ready={ready || mobile}
+  class:is-ready={ready}
   class:is-failed={failed}
+  class:has-poster={!!poster}
   bind:this={host}
   aria-hidden="true"
 >
-  {#if mobile && poster}
-    <img class="ply-poster" src={poster} alt="" />
+  {#if poster}
+    <img class="ply-poster" class:is-visible={!ready && !failed} src={poster} alt="" />
   {/if}
   {#if failed && failMessage}
     <div class="ply-error">{failMessage}</div>
@@ -114,7 +127,9 @@
     overflow: hidden;
     background: #121212;
   }
-  .ply-layer.is-ready {
+  .ply-layer.is-ready,
+  .ply-layer.is-failed,
+  .ply-layer.has-poster:not(.is-ready):not(.is-failed) {
     opacity: 1;
   }
   /* 加载完成前隐藏 canvas，避免渐进解析时的画面漂移 */
@@ -133,9 +148,20 @@
   .ply-poster {
     position: absolute;
     inset: 0;
+    z-index: 1;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+  .ply-poster.is-visible {
+    opacity: 1;
+  }
+  .ply-layer.is-ready .ply-poster {
+    opacity: 0;
+    pointer-events: none;
   }
   .ply-error {
     position: absolute;
