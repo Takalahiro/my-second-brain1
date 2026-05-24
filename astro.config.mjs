@@ -55,6 +55,8 @@ export default defineConfig({
             if (
               id.includes('BackgroundPlyLayer') ||
               id.includes('gs3-wallpaper') ||
+              id.includes('webcam-tilt-tracker') ||
+              id.includes('spatial-camera') ||
               id.includes('gaussian-splats-3d') ||
               id.includes('node_modules/three')
             ) {
