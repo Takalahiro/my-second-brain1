@@ -1,4 +1,4 @@
-/** 壁纸点云专用 Three 入口 — 静态 import，由 BackgroundPlyLayer 按需懒加载 */
+// three 包一层，legacy 代码用的
 import * as THREE from 'three';
 
 export { THREE };

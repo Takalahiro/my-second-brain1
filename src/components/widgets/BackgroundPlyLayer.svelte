@@ -1,10 +1,7 @@
 <script lang="ts">
-  /**
-   * 3DGS 壁纸层 — @mkkellogg/gaussian-splats-3d 椭球溅射渲染
-   */
   import { onMount } from 'svelte';
-  import { createGS3Wallpaper, type GS3WallpaperStatus } from '../../lib/wallpaper/gs3-wallpaper';
-  import { isMobileUa } from '../../lib/wallpaper/is-mobile-ua';
+  import { createGS3Wallpaper, type GS3WallpaperStatus } from '../../features/wallpaper/render/gs3/gs3-wallpaper';
+  import { isMobileUa } from '../../features/wallpaper/device/is-mobile';
 
   type PlyLoadStatus = 'loading' | 'ready' | 'failed';
 

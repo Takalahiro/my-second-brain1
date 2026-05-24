@@ -1,6 +1,4 @@
-/**
- * 3D Gaussian Splatting PLY → 流式降采样（3DGS 标准格式）
- */
+// 自己写的 ply/sog 解析，后来改用 gs3 就没用了
 
 export type GaussianSplatCloud = {
   positions: Float32Array;

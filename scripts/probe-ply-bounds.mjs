@@ -26,9 +26,7 @@ for (const line of header.split('\n')) {
   }
 }
 
-const dataOff = buf.indexOf('end_header') + 'end_header'.length;
-while (dataOff < buf.length && (buf[dataOff] === 0x0d || buf[dataOff] === 0x0a)) {}
-let start = dataOff;
+let start = buf.indexOf('end_header') + 'end_header'.length;
 while (start < buf.length && (buf[start] === 0x0d || buf[start] === 0x0a)) start++;
 
 const step = Math.max(1, Math.floor(count / 5000));

@@ -1,7 +1,4 @@
-/**
- * PlayCanvas SOG v2 → GaussianSplatCloud（浏览器端解压 + WebP 解码）
- * @see https://developer.playcanvas.com/user-manual/gaussian-splatting/formats/sog/
- */
+// sog v2 浏览器解压，没接进 gs3，暂时搁这
 import { unzipSync } from 'fflate';
 import type { GaussianSplatCloud, PlyLoadResult } from './gaussian-ply';
 import { resolvePlyUrl } from './gaussian-ply';

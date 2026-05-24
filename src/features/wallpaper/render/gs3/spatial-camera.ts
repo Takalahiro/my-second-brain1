@@ -15,30 +15,24 @@ export type SpatialMotionOptions = {
   speed?: number;
   base: SpatialCameraBase;
   signal?: AbortSignal;
-  /** 默认关闭呼吸，仅陀螺仪/鼠标微视差 */
   enableBreath?: boolean;
   breath?: { x: number; y: number; z: number };
-  /** 无陀螺仪时用鼠标位置模拟（桌面） */
   enablePointerFallback?: boolean;
 };
 
-/** 桌面鼠标跟随：极轻微 */
 const POINTER_SENSITIVITY = 0.004;
 const POINTER_MAX_TILT = 0.006;
-/** 陀螺仪应用到机位的增益 */
 const GYRO_POS = { roll: 0.85, pitch: 0.55 };
 const GYRO_LOOK = { roll: 0.18, pitch: 0.12 };
-/** 鼠标应用到机位的增益（比陀螺仪弱很多） */
 const POINTER_POS = { roll: 0.1, pitch: 0.06 };
 const POINTER_LOOK = { roll: 0.018, pitch: 0.01 };
-
 const DEFAULT_BREATH = { x: 0.004, y: 0.002, z: 0.003 };
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v));
 }
 
-/** 三频 sin/cos 叠加，模拟自然头部微摆 */
+// 机位轻微晃，不然壁纸太死板
 export function sampleBreathOffset(t: number, speed: number, amp = DEFAULT_BREATH) {
   const s = speed;
   return {
@@ -125,7 +119,9 @@ export function createSpatialMotionController(opts: SpatialMotionOptions) {
     try {
       const state = await req();
       if (state === 'granted') window.addEventListener('deviceorientation', onOrient, { passive: true });
-    } catch {}
+    } catch {
+      // ios 拒绝权限就不管了
+    }
   }
 
   function start() {

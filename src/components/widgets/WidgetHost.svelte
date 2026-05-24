@@ -12,7 +12,7 @@
     computeLinkedRainDrops,
     readCachedWeatherCode,
   } from '../../lib/weather-rain';
-  import { patchFromMode, type WallpaperMode } from '../../lib/wallpaper-mode';
+  import { patchFromMode, type WallpaperMode } from '../../features/wallpaper/state/mode';
 
   interface Props {
     backgroundDefault?: boolean;

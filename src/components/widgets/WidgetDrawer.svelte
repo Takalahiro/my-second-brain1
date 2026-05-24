@@ -14,7 +14,7 @@
     type PixelIconName,
     type WidgetIconKey,
   } from '../../lib/pixel-icons';
-  import { modeFromBg, type WallpaperMode } from '../../lib/wallpaper-mode';
+  import { modeFromBg, type WallpaperMode } from '../../features/wallpaper/state/mode';
   import { getDrawerCatalog, type DrawerWidget } from '../../lib/i18n/drawer-catalog';
   import { getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
 

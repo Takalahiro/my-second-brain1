@@ -6,8 +6,8 @@
    * 用法见 BackgroundLayer 或下方示例。
    */
   import { onMount } from 'svelte';
-  import { createAm15Wallpaper, type GSWallpaperStatus } from '../../lib/wallpaper/am15/renderer';
-  import { isMobileUa } from '../../lib/wallpaper/is-mobile-ua';
+  import { createAm15Wallpaper, type GSWallpaperStatus } from '../../features/wallpaper/legacy/am15/renderer';
+  import { isMobileUa } from '../../features/wallpaper/device/is-mobile';
 
   interface Props {
     /** PLY 路径，如 /ply/kyoto.ply 或 manifest 里的 scene.ply（.sog 会自动换 .ply） */

@@ -1,7 +1,4 @@
-/**
- * antimatter15/splat WebGL2 壁纸渲染器 (MIT)
- * 无交互 · 自动环绕 · visibilitychange 暂停
- */
+// 旧版 webgl2 渲染，现在主站用 gs3 了，留着当参考
 import {
   defaultOrbitMatrix,
   getProjectionMatrix,
@@ -29,7 +26,7 @@ function resolveUrl(url: string): string {
   return `${base.replace(/\/$/, '')}${url.startsWith('/') ? url : `/${url}`}`;
 }
 
-/** manifest 可能指向 .sog，am15 渲染器需要原始 .ply */
+// am15 只吃原始 ply，sog 要自己在本地转
 export function plyUrlForAm15(url: string): string {
   return url.replace(/\.sog(\?.*)?$/i, '.ply$1');
 }

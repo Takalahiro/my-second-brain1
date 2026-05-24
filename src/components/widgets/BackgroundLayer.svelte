@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
   import { media, type SceneEntry, type MobileSceneEntry } from '../../lib/media';
-  import { modeFromBg } from '../../lib/wallpaper-mode';
+  import { modeFromBg } from '../../features/wallpaper/state/mode';
   import { getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
 
   interface Props {

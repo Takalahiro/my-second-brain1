@@ -1,7 +1,4 @@
-/**
- * @mkkellogg/gaussian-splats-3d 壁纸渲染器
- * 固定机位 + 陀螺仪视差 · 全量加载后显示
- */
+// 3dgs 壁纸，用的 mkkellogg 那个库
 import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
 import * as THREE from 'three';
 import { createSpatialMotionController } from './spatial-camera';
@@ -21,7 +18,6 @@ function resolveUrl(url: string): string {
   return `${base.replace(/\/$/, '')}${url.startsWith('/') ? url : `/${url}`}`;
 }
 
-/** 解析 manifest 中的点云 URL（不再把 .sog 重映射到未部署的 .ply） */
 export function splatAssetUrl(url: string): string {
   return resolveUrl(url);
 }
@@ -30,11 +26,10 @@ function sceneFormatFromUrl(url: string): GaussianSplats3D.SceneFormat {
   const path = url.split('?')[0].toLowerCase();
   if (path.endsWith('.ksplat')) return GaussianSplats3D.SceneFormat.KSplat;
   if (path.endsWith('.splat')) return GaussianSplats3D.SceneFormat.Splat;
-  // PlayCanvas 压缩 PLY / INRIA PLY 均由 PlyLoader 按 header 自动识别
   return GaussianSplats3D.SceneFormat.Ply;
 }
 
-/** MLSharp 导出 PLY 需绕 X 轴翻转 180° */
+// mlsharp 导出的模型方向不对，要翻一下
 const ML_SHARP_ROTATION: [number, number, number, number] = (() => {
   const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
   return [q.x, q.y, q.z, q.w];
