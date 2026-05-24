@@ -9,6 +9,8 @@ export type PythonTraceStep = {
   event: 'line' | 'call' | 'return' | 'exception';
   depth?: number;
   collapsed?: number;
+  /** 仅 AST 静态分析、未实际执行 */
+  static?: boolean;
 };
 
 export type PythonTraceResult = {
@@ -87,6 +89,8 @@ export const AST_COVERAGE = [
   '列表/字典/集合推导式与生成器表达式',
   'lambda、match/case（3.10+）',
   'call/return 事件：构造方法、实例方法、魔法方法、推导式内部',
+  '无法运行 / 语法错误时：逐行静态 AST 回退（每行均有解释）',
+  'async for / async with 独立解析',
 ] as const;
 
 export const SAMPLE_CODE = `# OOP + 魔法方法 + 进阶语法 示例

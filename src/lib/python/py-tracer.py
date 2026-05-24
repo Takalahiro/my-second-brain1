@@ -237,18 +237,22 @@ def _explain_statement(node, source_line):
         if isinstance(node, ast.Delete):
             targets = ', '.join(ast.unparse(t) for t in node.targets)
             return f'del 删除 {targets}'
+        if isinstance(node, ast.AsyncFor):
+            return f'async for 循环: 遍历 {ast.unparse(node.target)} in {ast.unparse(node.iter)}'
         if isinstance(node, ast.For):
-            async_kw = 'async ' if isinstance(node, ast.AsyncFor) else ''
-            it = ast.unparse(node.iter)
-            return f'{async_kw}for 循环: 遍历 {ast.unparse(node.target)} in {it}'
+            return f'for 循环: 遍历 {ast.unparse(node.target)} in {ast.unparse(node.iter)}'
         if isinstance(node, ast.While):
-            return 'while 循环条件判断'
+            orelse = '（含 else 分支）' if node.orelse else ''
+            return f'while 循环条件判断{orelse}'
         if isinstance(node, ast.If):
-            return f'if 条件分支: {ast.unparse(node.test)[:48]}'
+            orelse = '（含 else/elif）' if node.orelse else ''
+            return f'if 条件分支: {ast.unparse(node.test)[:48]}{orelse}'
+        if isinstance(node, ast.AsyncWith):
+            items = ', '.join(ast.unparse(i) for i in node.items)
+            return f'async with 异步上下文管理器: {items}'
         if isinstance(node, ast.With):
             items = ', '.join(ast.unparse(i) for i in node.items)
-            async_kw = 'async ' if isinstance(node, ast.AsyncWith) else ''
-            return f'{async_kw}with 上下文管理器: {items}'
+            return f'with 上下文管理器: {items}'
         if isinstance(node, ast.Try):
             handlers = len(node.handlers)
             return f'try 块（{handlers} 个 except / else / finally）'
@@ -308,35 +312,197 @@ def _explain_statement(node, source_line):
             return 'match 模式匹配（structural pattern matching）'
         if isinstance(node, ast.MatchCase):
             return f'match 分支 case {ast.unparse(node.pattern)[:40]}'
+        if isinstance(node, ast.TypeAlias):
+            return f'类型别名 type {node.name.name} = {ast.unparse(node.value)[:48]}'
+        if isinstance(node, ast.TypeVar):
+            return f'类型变量 TypeVar({node.name})'
+        if hasattr(ast, 'TypeVarTuple') and isinstance(node, ast.TypeVarTuple):
+            return f'类型变量组 TypeVarTuple({node.name})'
+        if hasattr(ast, 'ParamSpec') and isinstance(node, ast.ParamSpec):
+            return f'参数规范 ParamSpec({node.name})'
+        if isinstance(node, ast.JoinedStr):
+            return 'f-string 格式化字符串'
+        if isinstance(node, ast.Starred):
+            return f'解包 *{ast.unparse(node.value)}'
+        if isinstance(node, ast.Constant):
+            v = node.value
+            if isinstance(v, str):
+                return '字符串常量'
+            if v is Ellipsis:
+                return 'Ellipsis ...'
+            return f'常量 {repr(v)[:40]}'
+        if isinstance(node, ast.UnaryOp):
+            op = type(node.op).__name__
+            return f'一元运算 {op}: {ast.unparse(node.operand)[:48]}'
+        if isinstance(node, ast.Slice):
+            return f'切片 {ast.unparse(node)}'
     except Exception:
         pass
     s = source_line.strip()
     return f'执行语句: {s[:72]}' if s else '执行代码'
 
 
-def _build_line_stmt_map(code):
-    """整文件 AST → 行号到语句节点（多行语句也能解释）"""
-    try:
-        tree = ast.parse(code)
-    except SyntaxError:
+def _explain_node(node, source_line):
+    """语句或表达式节点 → 人话"""
+    if node is None:
+        return f'执行: {source_line.strip()[:72]}' if source_line.strip() else '执行代码'
+    if isinstance(node, ast.stmt):
+        return _explain_statement(node, source_line)
+    if isinstance(node, ast.Expr):
+        return _explain_statement(node, source_line)
+    wrapped = ast.Expr(value=node)
+    return _explain_statement(wrapped, source_line)
+
+
+def _stmt_span(node):
+    end = getattr(node, 'end_lineno', None) or node.lineno
+    return end - node.lineno, node.lineno
+
+
+def _line_map_from_tree(tree):
+    """每行映射到跨度最小的语句节点（多行块语句按行覆盖）"""
+    stmts = [n for n in ast.walk(tree) if isinstance(n, ast.stmt)]
+    if not stmts:
         return {}
+    max_ln = max((getattr(n, 'end_lineno', None) or n.lineno) for n in stmts)
     result = {}
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.stmt):
+    for ln in range(1, max_ln + 1):
+        hits = [
+            n for n in stmts
+            if n.lineno <= ln <= (getattr(n, 'end_lineno', None) or n.lineno)
+        ]
+        if not hits:
             continue
-        start = node.lineno
-        end = getattr(node, 'end_lineno', None) or start
-        span = end - start
-        for ln in range(start, end + 1):
-            prev = result.get(ln)
-            if prev is None:
-                result[ln] = node
-                continue
-            prev_end = getattr(prev, 'end_lineno', None) or prev.lineno
-            prev_span = prev_end - prev.lineno
-            if span <= prev_span:
-                result[ln] = node
+        result[ln] = min(hits, key=_stmt_span)
     return result
+
+
+def _build_line_stmt_map_incremental(code):
+    """语法错误时尽量解析已完整的前缀；其余行逐行 fallback"""
+    lines = code.splitlines()
+    result = {}
+    try:
+        return _line_map_from_tree(ast.parse(code))
+    except SyntaxError:
+        buf = []
+        for line in lines:
+            buf.append(line)
+            try:
+                result.update(_line_map_from_tree(ast.parse('\n'.join(buf))))
+            except SyntaxError:
+                break
+    for ln, src in enumerate(lines, 1):
+        if ln in result:
+            continue
+        stripped = src.strip()
+        if not stripped or stripped.startswith('#'):
+            continue
+        try:
+            tree = ast.parse(stripped, mode='exec')
+            if tree.body:
+                result[ln] = tree.body[0]
+                continue
+        except SyntaxError:
+            pass
+        try:
+            tree = ast.parse(stripped, mode='eval')
+            if tree.body:
+                result[ln] = tree.body
+        except SyntaxError:
+            pass
+    return result
+
+
+def _build_line_stmt_map(code):
+    return _build_line_stmt_map_incremental(code)
+
+
+def build_static_line_steps(code):
+    """不执行代码：为每一行生成 AST 解释步骤"""
+    lines = code.splitlines() if code else ['']
+    line_map = _build_line_stmt_map_incremental(code)
+    syntax_err = None
+    try:
+        ast.parse(code)
+    except SyntaxError as e:
+        syntax_err = e
+
+    steps = []
+    for ln in range(1, len(lines) + 1):
+        src = lines[ln - 1]
+        stripped = src.strip()
+        if not stripped:
+            expl = '空行（无执行）'
+        elif stripped.startswith('#'):
+            expl = '注释行（解释器跳过）'
+        else:
+            node = line_map.get(ln)
+            if node is not None:
+                expl = _explain_node(node, src)
+            else:
+                expl = _explain_line(code, ln, line_map)
+            if syntax_err and ln == syntax_err.lineno:
+                expl = f'语法错误: {syntax_err.msg} — {expl}'
+
+        steps.append({
+            'line': ln,
+            'source': src,
+            'explanation': expl,
+            'func': '<static>',
+            'event': 'line',
+            'depth': 0,
+            'static': True,
+        })
+
+    if syntax_err:
+        eln = syntax_err.lineno or 1
+        esrc = lines[eln - 1] if 1 <= eln <= len(lines) else ''
+        steps.append({
+            'line': eln,
+            'source': esrc,
+            'explanation': f'语法错误: {syntax_err.msg}',
+            'func': '<static>',
+            'event': 'exception',
+            'depth': 0,
+            'static': True,
+        })
+
+    return steps
+
+
+def _event_sort_key(step):
+    order = {'line': 0, 'call': 1, 'return': 2, 'exception': 3}
+    return (step.get('line', 0), order.get(step.get('event'), 9), step.get('id', 0))
+
+
+def _merge_static_runtime(static_steps, runtime_steps):
+    """运行时步骤为主；未执行到的行补上静态分析"""
+    if not runtime_steps:
+        out = []
+        for i, st in enumerate(static_steps, 1):
+            s = dict(st)
+            s['id'] = i
+            if s.get('event') == 'line' and s.get('static'):
+                s['explanation'] = s['explanation'] + '（仅静态分析，未运行）'
+            out.append(s)
+        return out
+
+    runtime_line_hits = {s['line'] for s in runtime_steps if s['event'] in ('line', 'exception')}
+    merged = [dict(s, static=False) for s in runtime_steps]
+    for st in static_steps:
+        if st['line'] in runtime_line_hits:
+            continue
+        if st.get('event') != 'line':
+            continue
+        copy = dict(st)
+        copy['explanation'] = copy['explanation'] + '（静态分析：程序未执行到此行）'
+        merged.append(copy)
+    merged.sort(key=_event_sort_key)
+    out = []
+    for i, s in enumerate(merged, 1):
+        s['id'] = i
+        out.append(s)
+    return out
 
 
 def _frame_depth(frame):
@@ -362,7 +528,7 @@ def _explain_line(code, lineno, line_map=None):
         line_map = _build_line_stmt_map(code)
     node = line_map.get(lineno)
     if node is not None:
-        return _explain_statement(node, src)
+        return _explain_node(node, src)
     try:
         tree = ast.parse(stripped)
         if tree.body:
@@ -398,11 +564,12 @@ _LOOP_REPEAT_CAP = 8
 
 def run_traced(code):
     lines = code.splitlines()
+    static_steps = build_static_line_steps(code)
     steps = []
     stdout_buf = io.StringIO()
     err = None
     step_id = 0
-    line_map = _build_line_stmt_map(code)
+    line_map = _build_line_stmt_map_incremental(code)
 
     # 同 (line, event, func, explanation) 重复计数，避免死循环刷爆步骤
     repeat_key = None
@@ -489,40 +656,47 @@ def run_traced(code):
         return tracer
 
     ns = {'__name__': '__main__'}
+    compile_err = None
     try:
         compiled = compile(code, '<user_exec>', 'exec')
-        sys.settrace(tracer)
+    except SyntaxError as e:
+        compile_err = f'SyntaxError: {e}'
+        err = compile_err
+    else:
         try:
-            with redirect_stdout(stdout_buf):
-                exec(compiled, ns, ns)
-        finally:
-            sys.settrace(None)
-    except Exception as e:
-        err = f'{type(e).__name__}: {e}'
-        tb = e.__traceback__
-        while tb:
-            if tb.tb_frame.f_code.co_filename == '<user_exec>':
-                ln = tb.tb_lineno
-                src = lines[ln - 1] if 1 <= ln <= len(lines) else ''
-                _push({
-                    'line': ln,
-                    'source': src,
-                    'explanation': f'异常: {err}',
-                    'func': tb.tb_frame.f_code.co_name,
-                    'event': 'exception',
-                    'depth': _frame_depth(tb.tb_frame),
-                })
-                break
-            tb = tb.tb_next
+            sys.settrace(tracer)
+            try:
+                with redirect_stdout(stdout_buf):
+                    exec(compiled, ns, ns)
+            finally:
+                sys.settrace(None)
+        except Exception as e:
+            err = f'{type(e).__name__}: {e}'
+            tb = e.__traceback__
+            while tb:
+                if tb.tb_frame.f_code.co_filename == '<user_exec>':
+                    ln = tb.tb_lineno
+                    src = lines[ln - 1] if 1 <= ln <= len(lines) else ''
+                    _push({
+                        'line': ln,
+                        'source': src,
+                        'explanation': f'异常: {err}',
+                        'func': tb.tb_frame.f_code.co_name,
+                        'event': 'exception',
+                        'depth': _frame_depth(tb.tb_frame),
+                    })
+                    break
+                tb = tb.tb_next
 
-    if not steps and not err:
-        _push({
-            'line': 1,
-            'source': lines[0] if lines else '',
-            'explanation': '代码已运行，无逐步事件（可能仅有定义/import）',
-            'func': '<module>',
-            'event': 'line',
-            'depth': 0,
-        })
+        if not steps and not err:
+            _push({
+                'line': 1,
+                'source': lines[0] if lines else '',
+                'explanation': '代码已运行，无逐步事件（可能仅有定义/import）',
+                'func': '<module>',
+                'event': 'line',
+                'depth': 0,
+            })
 
-    return {'steps': steps, 'stdout': stdout_buf.getvalue(), 'error': err}
+    final_steps = _merge_static_runtime(static_steps, steps)
+    return {'steps': final_steps, 'stdout': stdout_buf.getvalue(), 'error': err}

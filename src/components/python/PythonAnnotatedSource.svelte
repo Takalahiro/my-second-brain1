@@ -50,6 +50,7 @@
       class:active={row.state === 'active'}
       class:executed={row.state === 'executed'}
       class:pending={row.state === 'pending'}
+      class:static={row.state === 'static'}
       class:error={row.state === 'error'}
       style="--depth: {row.isActiveLine ? (current?.depth ?? 0) : 0}"
       bind:this={rowRefs[row.line]}
@@ -120,6 +121,11 @@
 
   .py-trace-row.pending {
     opacity: 0.42;
+  }
+
+  .py-trace-row.static {
+    background: rgb(126 200 255 / 0.06);
+    border-left-color: rgb(126 200 255 / 0.35);
   }
 
   .py-trace-row.active {

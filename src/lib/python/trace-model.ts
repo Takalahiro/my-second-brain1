@@ -4,7 +4,7 @@ import { MODULE_META, MODULE_ORDER, type TraceModuleKind } from './tracer';
 
 export type { TraceModuleKind };
 
-export type LineTraceState = 'idle' | 'pending' | 'executed' | 'active' | 'error';
+export type LineTraceState = 'idle' | 'pending' | 'executed' | 'active' | 'error' | 'static';
 
 export type LineTraceRow = {
   line: number;
@@ -30,17 +30,19 @@ export function buildLineTraceModel(
   const maxExecutedStep = activeStep >= 0 ? activeStep : -1;
 
   const executedLines = new Set<number>();
+  const runtimeLines = new Set<number>();
   const lineToSteps = new Map<number, number[]>();
   let errorLine = 0;
 
   steps.forEach((s, i) => {
-    if (i <= maxExecutedStep || i === activeStep) {
-      executedLines.add(s.line);
-    }
-    if (s.event === 'exception') errorLine = s.line;
     const arr = lineToSteps.get(s.line) ?? [];
     arr.push(i);
     lineToSteps.set(s.line, arr);
+    if (!s.static) runtimeLines.add(s.line);
+    if (!s.static && (i <= maxExecutedStep || i === activeStep)) {
+      executedLines.add(s.line);
+    }
+    if (s.event === 'exception') errorLine = s.line;
   });
 
   return lines.map((text, i) => {
@@ -51,6 +53,7 @@ export function buildLineTraceModel(
     if (errorLine === line && active?.event === 'exception') state = 'error';
     else if (isActiveLine) state = 'active';
     else if (executedLines.has(line)) state = 'executed';
+    else if (stepIndices.length > 0 && !runtimeLines.has(line)) state = 'static';
     else if (activeLine > 0 && line > activeLine) state = 'pending';
 
     const event = isActiveLine ? active?.event : stepIndices.length ? steps[stepIndices[stepIndices.length - 1]!]?.event : undefined;

@@ -95,7 +95,7 @@ json.dumps(run_traced(${payload}))
       if (parsed.error) stdout += (stdout ? '\n' : '') + parsed.error;
       if (parsed.steps.length > 0) {
         activeStep = 0;
-        codeView = codeView === 'edit' ? 'trace' : codeView;
+        if (codeView === 'edit') codeView = 'trace';
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
