@@ -210,23 +210,23 @@
     {/if}
     <button
       type="button"
-      class="mac-menu-item mac-menu-icon-btn mac-menu-touch mac-menu-icon-compact"
+      class="mac-menu-item mac-menu-icon-btn mac-menu-touch mac-menu-icon-compact skin-menu-btn skin-menu-btn--mute"
       aria-label={globalMuted ? m.menu.unmute : m.menu.mute}
       title={globalMuted ? m.menu.unmute : m.menu.mute}
       onclick={() => onToggleMute?.()}
     >
-      {globalMuted ? '🔇' : '🔊'}
+      <span class="skin-menu-btn__glyph" aria-hidden="true">{globalMuted ? '🔇' : '🔊'}</span>
     </button>
     <button
       type="button"
-      class="mac-menu-item mac-menu-icon-btn mac-menu-touch mac-menu-gear"
+      class="mac-menu-item mac-menu-icon-btn mac-menu-touch mac-menu-gear skin-menu-btn skin-menu-btn--gear"
       class:is-active={controlCenterOpen}
       aria-label={controlCenterOpen ? m.menu.closeControlCenter : m.menu.openControlCenter}
       title={m.menu.controlCenter}
       aria-pressed={controlCenterOpen}
       onclick={() => onToggleControlCenter?.()}
     >
-      ⚙
+      <span class="skin-menu-btn__glyph" aria-hidden="true">⚙</span>
     </button>
     <time class="mac-menu-clock" datetime={now.toISOString()}>{menuTime}</time>
   </div>

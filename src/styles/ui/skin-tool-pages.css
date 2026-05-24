@@ -1,0 +1,180 @@
+/* 沉浸式皮肤 · 工具页 / 子页面独立风格 */
+
+html[data-ui-immersive] .site-main {
+  max-width: none;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+html[data-ui-immersive] .site-nav-shell {
+  border-radius: 0;
+}
+
+/* ═══ pixel ═══ */
+html[data-ui='pixel'] .site-nav-shell,
+html[data-ui='pixel'] .glass-container,
+html[data-ui='pixel'] .pixel-card {
+  border-radius: 0 !important;
+  border: 3px solid #0f380f !important;
+  background: #9bbc0f !important;
+  color: #0f380f !important;
+}
+html[data-ui='pixel'] .site-nav-link.is-active {
+  background: #306230 !important;
+  color: #9bbc0f !important;
+}
+
+/* ═══ blueprint ═══ */
+html[data-ui='blueprint'] .site-nav-shell,
+html[data-ui='blueprint'] .glass-container,
+html[data-ui='blueprint'] .pixel-card {
+  border: 1px solid rgb(255 255 255 / 0.7) !important;
+  background: rgb(14 58 95 / 0.94) !important;
+  color: #f0f6ff !important;
+  border-radius: 2px !important;
+}
+html[data-ui='blueprint'] .site-nav-link.is-active {
+  background: rgb(230 57 70 / 0.2) !important;
+  border: 1px solid #e63946 !important;
+}
+
+/* ═══ scholar ═══ */
+html[data-ui='scholar'] .site-nav-shell,
+html[data-ui='scholar'] .glass-container,
+html[data-ui='scholar'] .pixel-card {
+  background: rgb(244 236 216 / 0.96) !important;
+  border: 1px solid rgb(139 90 43 / 0.3) !important;
+  color: rgb(60 40 20) !important;
+  font-family: 'EB Garamond', Georgia, serif;
+}
+
+/* ═══ terminal ═══ */
+html[data-ui='terminal'] .site-nav-shell,
+html[data-ui='terminal'] .glass-container,
+html[data-ui='terminal'] .pixel-card {
+  background: rgb(0 0 0 / 0.94) !important;
+  border: 1px solid rgb(0 255 65 / 0.4) !important;
+  color: #00ff41 !important;
+  font-family: 'JetBrains Mono', monospace;
+  border-radius: 0 !important;
+}
+html[data-ui='terminal'] .site-nav-link::before {
+  content: '> ';
+  opacity: 0.5;
+}
+
+/* ═══ crt ═══ */
+html[data-ui='crt'] .site-nav-shell,
+html[data-ui='crt'] .glass-container,
+html[data-ui='crt'] .pixel-card {
+  background: rgb(26 18 0 / 0.94) !important;
+  border: 2px solid rgb(255 176 0 / 0.45) !important;
+  color: #ffb000 !important;
+  font-family: 'VT323', monospace;
+  border-radius: 8px !important;
+}
+
+/* ═══ observatory ═══ */
+html[data-ui='observatory'] .site-nav-shell,
+html[data-ui='observatory'] .glass-container,
+html[data-ui='observatory'] .pixel-card {
+  background: rgb(10 14 39 / 0.94) !important;
+  border: 1px solid rgb(232 196 71 / 0.3) !important;
+  color: #e8c547 !important;
+}
+
+/* ═══ herbarium ═══ */
+html[data-ui='herbarium'] .site-nav-shell,
+html[data-ui='herbarium'] .glass-container,
+html[data-ui='herbarium'] .pixel-card {
+  background: rgb(244 236 216 / 0.95) !important;
+  border: 1px solid rgb(45 90 61 / 0.3) !important;
+  color: rgb(45 90 61) !important;
+  font-family: Georgia, serif;
+}
+
+/* ═══ ink ═══ */
+html[data-ui='ink'] .site-nav-shell,
+html[data-ui='ink'] .glass-container,
+html[data-ui='ink'] .pixel-card {
+  background: rgb(247 243 234 / 0.96) !important;
+  border: 1px solid rgb(26 26 26 / 0.12) !important;
+  color: rgb(26 26 26) !important;
+  font-family: 'Noto Serif SC', serif;
+}
+
+/* ═══ rpg ═══ */
+html[data-ui='rpg'] .site-nav-shell,
+html[data-ui='rpg'] .glass-container,
+html[data-ui='rpg'] .pixel-card {
+  background: linear-gradient(180deg, rgb(45 27 78 / 0.95), rgb(26 15 46 / 0.98)) !important;
+  border: 2px solid rgb(212 175 55 / 0.45) !important;
+  color: #e8dcc8 !important;
+  font-family: Cinzel, serif;
+}
+html[data-ui='rpg'] .site-nav-link.is-active {
+  background: rgb(212 175 55 / 0.15) !important;
+  box-shadow: inset 0 0 8px rgb(212 175 55 / 0.1);
+}
+
+/* ═══ spacecraft ═══ */
+html[data-ui='spacecraft'] .site-nav-shell,
+html[data-ui='spacecraft'] .glass-container,
+html[data-ui='spacecraft'] .pixel-card {
+  background: rgb(5 8 16 / 0.94) !important;
+  border: 1px solid rgb(74 144 217 / 0.35) !important;
+  color: #4a90d9 !important;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* 工具页内卡片 / 实验室容器 */
+html[data-ui='blueprint'] :is(.ui-card, .card, .dl-modes, .cl-modes) {
+  border: 1px solid rgb(255 255 255 / 0.5) !important;
+  background: rgb(12 50 82 / 0.9) !important;
+}
+
+html[data-ui='terminal'] :is(.ui-card, .card, .dl-modes, .cl-modes) {
+  border: 1px solid rgb(0 255 65 / 0.3) !important;
+  background: rgb(0 0 0 / 0.85) !important;
+}
+
+html[data-ui='crt'] :is(.ui-card, .card) {
+  border: 2px solid rgb(255 176 0 / 0.35) !important;
+  background: rgb(20 14 0 / 0.9) !important;
+}
+
+html[data-ui='rpg'] :is(.ui-card, .card) {
+  border: 1px solid rgb(212 175 55 / 0.4) !important;
+  background: rgb(26 15 46 / 0.9) !important;
+}
+
+html[data-ui='spacecraft'] :is(.ui-card, .card) {
+  border: 1px solid rgb(74 144 217 / 0.3) !important;
+  background: rgb(5 8 16 / 0.9) !important;
+}
+
+html[data-ui='scholar'] :is(.ui-card, .card) {
+  background: rgb(244 236 216 / 0.92) !important;
+  box-shadow: 1px 2px 0 rgb(139 90 43 / 0.1) !important;
+}
+
+html[data-ui='ink'] :is(.ui-card, .card) {
+  background: rgb(247 243 234 / 0.94) !important;
+  border: 1px solid rgb(26 26 26 / 0.1) !important;
+}
+
+/* 图谱页 HUD 样式扩展至各皮肤 — 见 graph-hud.css；此处补充非 hud 皮肤 */
+html[data-ui='blueprint'] .graph-shell {
+  border: 1px solid rgb(255 255 255 / 0.5);
+  background: rgb(14 58 95 / 0.92);
+}
+
+html[data-ui='terminal'] .graph-shell {
+  border: 1px solid rgb(0 255 65 / 0.35);
+  background: rgb(0 0 0 / 0.9);
+}
+
+html[data-ui='spacecraft'] .graph-shell {
+  border: 1px solid rgb(74 144 217 / 0.35);
+  background: rgb(5 8 16 / 0.92);
+}

@@ -14,6 +14,10 @@
 @import './skin-effects.css';
 @import './skin-chrome-layout.css';
 @import './skin-chrome-mission.css';
+@import './skin-canvas-wallpaper.css';
+@import './skin-menu-buttons.css';
+@import './skin-widgets-mission.css';
+@import './skin-tool-pages.css';
 @import './light-contrast.css';
 @import './icons.css';
 @import './overflow-safety.css';

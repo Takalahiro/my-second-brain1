@@ -1,0 +1,208 @@
+/* 沉浸式皮肤 · 桌面小组件独立外壳（每套风格完全不同） */
+
+/* 共享选择器 */
+html[data-ui-immersive] :is(
+  .floating-widget,
+  [class$='-widget'],
+  .pixel-clock,
+  .music-cd
+) {
+  position: fixed !important;
+  isolation: isolate;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══ pixel · Game Boy 卡带 ═══ */
+html[data-ui='pixel'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 0 !important;
+  border: 4px solid #0f380f !important;
+  background: #9bbc0f !important;
+  color: #0f380f !important;
+  box-shadow: inset -4px -4px 0 #8bac0f, inset 4px 4px 0 #306230 !important;
+  font-family: 'Press Start 2P', monospace;
+}
+html[data-ui='pixel'] .fw-header {
+  background: #306230 !important;
+  color: #9bbc0f !important;
+  border-bottom: 4px solid #0f380f !important;
+  font-size: 0.55rem !important;
+}
+
+/* ═══ blueprint · 图框 ═══ */
+html[data-ui='blueprint'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 2px !important;
+  border: 1px solid rgb(255 255 255 / 0.75) !important;
+  background: rgb(14 58 95 / 0.94) !important;
+  color: #f0f6ff !important;
+  box-shadow: 0 0 0 4px rgb(14 58 95 / 0.5), inset 0 0 0 1px rgb(255 255 255 / 0.2) !important;
+}
+html[data-ui='blueprint'] .fw-header {
+  border-bottom: 1px solid rgb(255 255 255 / 0.4) !important;
+  background: rgb(8 40 64 / 0.9) !important;
+}
+html[data-ui='blueprint'] .fw-header::after {
+  content: ' SCALE 1:1';
+  font-size: 0.55rem;
+  color: #e63946;
+  margin-left: auto;
+}
+
+/* ═══ scholar · 手稿 ═══ */
+html[data-ui='scholar'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 2px 2px 8px 2px !important;
+  border: 1px solid rgb(139 90 43 / 0.35) !important;
+  background: rgb(244 236 216 / 0.96) !important;
+  color: rgb(60 40 20) !important;
+  box-shadow: 2px 3px 0 rgb(139 90 43 / 0.15) !important;
+  font-family: 'EB Garamond', Georgia, serif;
+}
+html[data-ui='scholar'] .fw-header {
+  background: rgb(235 227 207 / 0.9) !important;
+  border-bottom: 1px solid rgb(139 90 43 / 0.2) !important;
+  font-style: italic;
+}
+
+/* ═══ terminal · 终端窗 ═══ */
+html[data-ui='terminal'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 0 !important;
+  border: 1px solid #00ff41 !important;
+  background: rgb(0 0 0 / 0.92) !important;
+  color: #00ff41 !important;
+  box-shadow: 0 0 12px rgb(0 255 65 / 0.12) !important;
+  font-family: 'JetBrains Mono', monospace;
+}
+html[data-ui='terminal'] .fw-header {
+  background: rgb(0 20 0 / 0.95) !important;
+  border-bottom: 1px solid rgb(0 255 65 / 0.35) !important;
+}
+html[data-ui='terminal'] .fw-header::before {
+  content: '+--[ ';
+  color: rgb(0 255 65 / 0.5);
+  font-size: 0.65rem;
+}
+
+/* ═══ crt · 显像管 ═══ */
+html[data-ui='crt'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 12px !important;
+  border: 3px solid rgb(255 176 0 / 0.5) !important;
+  background: rgb(26 18 0 / 0.94) !important;
+  color: #ffb000 !important;
+  box-shadow: inset 0 0 30px rgb(255 176 0 / 0.08), 0 0 8px rgb(255 176 0 / 0.15) !important;
+  font-family: 'VT323', monospace;
+}
+html[data-ui='crt'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgb(0 0 0 / 0.08) 2px, rgb(0 0 0 / 0.08) 4px);
+  border-radius: inherit;
+}
+
+/* ═══ observatory · 星图板 ═══ */
+html[data-ui='observatory'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 6px !important;
+  border: 1px solid rgb(232 196 71 / 0.35) !important;
+  background: rgb(10 14 39 / 0.92) !important;
+  color: #e8c547 !important;
+  box-shadow: 0 0 20px rgb(100 80 180 / 0.15) !important;
+  font-family: 'JetBrains Mono', monospace;
+}
+html[data-ui='observatory'] .fw-header {
+  background: rgb(8 10 30 / 0.95) !important;
+  border-bottom: 1px solid rgb(232 196 71 / 0.25) !important;
+}
+
+/* ═══ herbarium · 标本框 ═══ */
+html[data-ui='herbarium'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 4px !important;
+  border: 2px solid rgb(45 90 61 / 0.35) !important;
+  background: rgb(244 236 216 / 0.95) !important;
+  color: rgb(45 90 61) !important;
+  box-shadow: inset 0 0 0 8px rgb(232 239 228 / 0.8) !important;
+  font-family: Georgia, serif;
+}
+html[data-ui='herbarium'] .fw-header {
+  background: rgb(232 239 228 / 0.9) !important;
+  font-style: italic;
+}
+
+/* ═══ ink · 册页 ═══ */
+html[data-ui='ink'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 2px !important;
+  border: 1px solid rgb(26 26 26 / 0.15) !important;
+  background: rgb(247 243 234 / 0.96) !important;
+  color: rgb(26 26 26) !important;
+  box-shadow: 3px 3px 0 rgb(26 26 26 / 0.06) !important;
+  font-family: 'Noto Serif SC', serif;
+}
+html[data-ui='ink'] .fw-header {
+  border-bottom: 1px solid rgb(26 26 26 / 0.12) !important;
+  padding-right: 2rem;
+}
+html[data-ui='ink'] .fw-header::after {
+  content: '章';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgb(192 57 43 / 0.7);
+  font-size: 0.75rem;
+}
+
+/* ═══ rpg · 技能面板 ═══ */
+html[data-ui='rpg'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 8px !important;
+  border: 2px solid rgb(212 175 55 / 0.55) !important;
+  background: linear-gradient(180deg, rgb(45 27 78 / 0.95), rgb(26 15 46 / 0.98)) !important;
+  color: #e8dcc8 !important;
+  box-shadow: 0 0 14px rgb(212 175 55 / 0.12), inset 0 1px 0 rgb(212 175 55 / 0.15) !important;
+  font-family: Cinzel, serif;
+}
+html[data-ui='rpg'] .fw-header {
+  background: rgb(26 15 46 / 0.9) !important;
+  border-bottom: 1px solid rgb(212 175 55 / 0.35) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem !important;
+}
+
+/* ═══ spacecraft · 舱室面板 ═══ */
+html[data-ui='spacecraft'] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) {
+  border-radius: 4px !important;
+  border: 1px solid rgb(74 144 217 / 0.4) !important;
+  background: rgb(5 8 16 / 0.94) !important;
+  color: #4a90d9 !important;
+  box-shadow: inset 0 0 12px rgb(74 144 217 / 0.08) !important;
+  font-family: 'JetBrains Mono', monospace;
+}
+html[data-ui='spacecraft'] .fw-header {
+  background: rgb(8 12 24 / 0.95) !important;
+  border-bottom: 1px solid rgb(74 144 217 / 0.25) !important;
+}
+html[data-ui='spacecraft'] .fw-header::before {
+  content: '▸ ';
+  color: #ff8c3c;
+}
+
+/* hud 小组件仍由 hud-widgets.css 负责，此处不重复 */
+
+/* 拖拽态 */
+html[data-ui-immersive] :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd).is-active-drag {
+  opacity: 0.92;
+  z-index: 200 !important;
+}
+
+html[data-ui='pixel'] :is(.floating-widget, [class$='-widget']).is-active-drag {
+  box-shadow: inset -4px -4px 0 #0f380f, 0 0 0 3px #9bbc0f !important;
+}
+
+html[data-ui='blueprint'] :is(.floating-widget, [class$='-widget']).is-active-drag {
+  outline: 2px solid #e63946 !important;
+}
+
+html[data-ui='rpg'] :is(.floating-widget, [class$='-widget']).is-active-drag {
+  box-shadow: 0 0 24px rgb(212 175 55 / 0.45) !important;
+}

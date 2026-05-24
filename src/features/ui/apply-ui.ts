@@ -14,6 +14,7 @@ function applySkinChromeVars(id: UiSkinId): void {
   const profile = getSkinChrome(id);
   const root = document.documentElement;
   root.toggleAttribute('data-ui-immersive', isImmersiveSkin(id));
+  root.toggleAttribute('data-skin-wallpaper', profile.immersive && profile.canvasWallpaper);
   root.style.setProperty('--skin-strip-h', `${profile.statusStripHeight}px`);
   root.style.setProperty('--skin-menu-h', `${profile.menuBarHeight}px`);
   root.style.setProperty(

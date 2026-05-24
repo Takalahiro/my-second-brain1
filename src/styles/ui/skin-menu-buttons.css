@@ -1,0 +1,334 @@
+/* 沉浸式 · 按钮用 ::before 替换默认 glyph */
+html[data-ui-immersive] .skin-menu-btn__glyph {
+  display: none !important;
+}
+
+html[data-ui-immersive] .mac-menu-gear .skin-menu-btn__glyph,
+html[data-ui-immersive] .mac-menu-icon-compact .skin-menu-btn__glyph {
+  display: none !important;
+}
+html[data-ui-immersive] .mac-menu-bar {
+  border-radius: 0 !important;
+}
+
+html[data-ui-immersive] .mac-menu-touch {
+  border-radius: 0;
+  position: relative;
+  font-family: inherit;
+}
+
+/* ═══ pixel · 8-bit 方块键 ═══ */
+html[data-ui='pixel'] .mac-menu-gear {
+  background: #306230 !important;
+  color: #9bbc0f !important;
+  border: 3px solid #0f380f !important;
+  border-radius: 0 !important;
+  box-shadow: inset -3px -3px 0 #0f380f, inset 3px 3px 0 #8bac0f !important;
+  font-size: 0 !important;
+}
+html[data-ui='pixel'] .mac-menu-gear::before {
+  content: '▣';
+  font-size: 1rem;
+}
+html[data-ui='pixel'] .mac-menu-icon-compact {
+  background: #306230 !important;
+  border: 2px solid #0f380f !important;
+  border-radius: 0 !important;
+  font-size: 0 !important;
+}
+html[data-ui='pixel'] .mac-menu-icon-compact::before {
+  content: '♪';
+  font-size: 0.85rem;
+  color: #9bbc0f;
+}
+html[data-ui='pixel'] .mac-menu-clear {
+  border: 2px solid #0f380f !important;
+  border-radius: 0 !important;
+  background: #8bac0f !important;
+}
+html[data-ui='pixel'] .mac-menu-logo {
+  border-radius: 0 !important;
+  border: 2px solid #0f380f !important;
+}
+html[data-ui='pixel'] .mac-menu-clock {
+  border-radius: 0 !important;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem !important;
+  background: #0f380f !important;
+  color: #9bbc0f !important;
+}
+
+/* ═══ hud · NASA 括号键 ═══ */
+html[data-ui='hud'] .mac-menu-gear {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 0 !important;
+  outline: 1px solid rgb(15 31 61 / 0.35);
+  outline-offset: 3px;
+}
+html[data-ui='hud'] .mac-menu-gear::before {
+  content: '[⚙]';
+  font-family: 'Barlow Condensed', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: var(--hud-red, #c8102e);
+}
+html[data-ui='hud'] .mac-menu-icon-compact {
+  font-size: 0 !important;
+}
+html[data-ui='hud'] .mac-menu-icon-compact::before {
+  content: 'AUD';
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+}
+html[data-ui='hud'] .mac-menu-clock {
+  border-radius: 0 !important;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+/* ═══ blueprint · 制图十字 ═══ */
+html[data-ui='blueprint'] .mac-menu-gear {
+  background: rgb(14 58 95 / 0.9) !important;
+  border: 1px solid rgb(255 255 255 / 0.75) !important;
+  border-radius: 2px !important;
+  font-size: 0 !important;
+}
+html[data-ui='blueprint'] .mac-menu-gear::before {
+  content: '⊕';
+  font-size: 1.1rem;
+  color: #e63946;
+}
+html[data-ui='blueprint'] .mac-menu-icon-compact::before {
+  content: '♫';
+  color: #f4ecd8;
+}
+html[data-ui='blueprint'] .mac-menu-clock {
+  border: 1px dashed rgb(255 255 255 / 0.5) !important;
+  border-radius: 2px !important;
+  font-family: 'Architects Daughter', monospace;
+  font-size: 0.72rem !important;
+}
+html[data-ui='blueprint'] .mac-menu-logo {
+  border: 1px solid rgb(255 255 255 / 0.6) !important;
+  border-radius: 2px !important;
+}
+
+/* ═══ scholar · 蜡封圆钮 ═══ */
+html[data-ui='scholar'] .mac-menu-gear {
+  background: rgb(139 90 43 / 0.15) !important;
+  border: 2px solid rgb(139 90 43 / 0.45) !important;
+  border-radius: 50% !important;
+  font-size: 0 !important;
+  width: 36px;
+  height: 36px;
+}
+html[data-ui='scholar'] .mac-menu-gear::before {
+  content: '✒';
+  font-size: 1rem;
+}
+html[data-ui='scholar'] .mac-menu-icon-compact {
+  border-radius: 50% !important;
+  border: 1px solid rgb(139 90 43 / 0.35) !important;
+}
+html[data-ui='scholar'] .mac-menu-clock {
+  border-radius: 999px !important;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  background: rgb(244 236 216 / 0.6) !important;
+}
+
+/* ═══ terminal · 方块命令 ═══ */
+html[data-ui='terminal'] .mac-menu-gear {
+  background: #000 !important;
+  border: 1px solid #00ff41 !important;
+  border-radius: 0 !important;
+  font-size: 0 !important;
+  box-shadow: 0 0 8px rgb(0 255 65 / 0.35);
+}
+html[data-ui='terminal'] .mac-menu-gear::before {
+  content: ':cfg';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: #00ff41;
+}
+html[data-ui='terminal'] .mac-menu-icon-compact::before {
+  content: 'vol';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  color: #00ff41;
+}
+html[data-ui='terminal'] .mac-menu-clock {
+  background: #000 !important;
+  color: #00ff41 !important;
+  border: 1px solid rgb(0 255 65 / 0.4) !important;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem !important;
+}
+html[data-ui='terminal'] .mac-menu-gear.is-active {
+  background: rgb(0 255 65 / 0.15) !important;
+  box-shadow: 0 0 12px rgb(0 255 65 / 0.5);
+}
+
+/* ═══ crt · 琥珀电视钮 ═══ */
+html[data-ui='crt'] .mac-menu-gear {
+  background: radial-gradient(circle, #ffb000 0%, #996800 100%) !important;
+  border: 3px solid #1a1200 !important;
+  border-radius: 50% !important;
+  font-size: 0 !important;
+  width: 34px;
+  height: 34px;
+  box-shadow: inset 0 -2px 4px rgb(0 0 0 / 0.4);
+}
+html[data-ui='crt'] .mac-menu-gear::before {
+  content: 'CH';
+  font-family: 'VT323', monospace;
+  font-size: 0.85rem;
+  color: #1a1200;
+}
+html[data-ui='crt'] .mac-menu-icon-compact {
+  border-radius: 50% !important;
+  background: rgb(255 176 0 / 0.2) !important;
+}
+html[data-ui='crt'] .mac-menu-clock {
+  font-family: 'VT323', monospace;
+  font-size: 1rem !important;
+  color: #ffb000 !important;
+  background: rgb(0 0 0 / 0.5) !important;
+  border: 1px solid rgb(255 176 0 / 0.4) !important;
+}
+
+/* ═══ observatory · 星图六边形 ═══ */
+html[data-ui='observatory'] .mac-menu-gear {
+  background: rgb(10 14 39 / 0.85) !important;
+  border: 1px solid #e8c547 !important;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  font-size: 0 !important;
+  width: 38px;
+  height: 38px;
+  border-radius: 0 !important;
+}
+html[data-ui='observatory'] .mac-menu-gear::before {
+  content: '✦';
+  font-size: 1rem;
+  color: #e8c547;
+}
+html[data-ui='observatory'] .mac-menu-clock {
+  font-family: 'JetBrains Mono', monospace;
+  color: #e8c547 !important;
+  background: rgb(10 14 39 / 0.7) !important;
+  border: 1px solid rgb(232 196 71 / 0.35) !important;
+}
+
+/* ═══ herbarium · 标本夹 ═══ */
+html[data-ui='herbarium'] .mac-menu-gear {
+  background: rgb(244 236 216 / 0.9) !important;
+  border: 2px solid rgb(45 90 61 / 0.4) !important;
+  border-radius: 4px 4px 12px 12px !important;
+  font-size: 0 !important;
+}
+html[data-ui='herbarium'] .mac-menu-gear::before {
+  content: '🌿';
+  font-size: 0.95rem;
+}
+html[data-ui='herbarium'] .mac-menu-clock {
+  font-family: Georgia, serif;
+  font-style: italic;
+  color: rgb(45 90 61) !important;
+  background: rgb(232 239 228 / 0.8) !important;
+}
+
+/* ═══ ink · 印章钮 ═══ */
+html[data-ui='ink'] .mac-menu-gear {
+  background: rgb(247 243 234 / 0.95) !important;
+  border: 2px solid rgb(192 57 43 / 0.7) !important;
+  border-radius: 4px !important;
+  font-size: 0 !important;
+}
+html[data-ui='ink'] .mac-menu-gear::before {
+  content: '設';
+  font-family: serif;
+  font-size: 1rem;
+  color: rgb(192 57 43);
+}
+html[data-ui='ink'] .mac-menu-clock {
+  writing-mode: horizontal-tb;
+  font-family: 'Noto Serif SC', serif;
+  background: transparent !important;
+  border-bottom: 2px solid rgb(26 26 26 / 0.2) !important;
+  border-radius: 0 !important;
+}
+
+/* ═══ rpg · 金边技能框 ═══ */
+html[data-ui='rpg'] .mac-menu-gear {
+  background: linear-gradient(180deg, #2d1b4e, #1a0f2e) !important;
+  border: 2px solid #d4af37 !important;
+  border-radius: 6px !important;
+  font-size: 0 !important;
+  box-shadow: 0 0 10px rgb(212 175 55 / 0.25), inset 0 0 8px rgb(212 175 55 / 0.1);
+}
+html[data-ui='rpg'] .mac-menu-gear::before {
+  content: '⚔';
+  font-size: 1rem;
+}
+html[data-ui='rpg'] .mac-menu-gear.is-active {
+  box-shadow: 0 0 16px rgb(212 175 55 / 0.55) !important;
+  border-color: #ffd700 !important;
+}
+html[data-ui='rpg'] .mac-menu-clock {
+  font-family: Cinzel, serif;
+  color: #d4af37 !important;
+  background: rgb(26 15 46 / 0.8) !important;
+  border: 1px solid rgb(212 175 55 / 0.4) !important;
+}
+
+/* ═══ spacecraft · 舱室仪表 ═══ */
+html[data-ui='spacecraft'] .mac-menu-gear {
+  background: rgb(5 8 16 / 0.95) !important;
+  border: 1px solid rgb(74 144 217 / 0.55) !important;
+  border-radius: 4px !important;
+  font-size: 0 !important;
+  box-shadow: inset 0 0 6px rgb(74 144 217 / 0.15);
+}
+html[data-ui='spacecraft'] .mac-menu-gear::before {
+  content: 'SYS';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: #4a90d9;
+}
+html[data-ui='spacecraft'] .mac-menu-icon-compact::before {
+  content: 'COM';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.55rem;
+  color: #ff8c3c;
+}
+html[data-ui='spacecraft'] .mac-menu-clock {
+  font-family: 'JetBrains Mono', monospace;
+  color: #4a90d9 !important;
+  background: rgb(5 8 16 / 0.85) !important;
+  border: 1px solid rgb(74 144 217 / 0.35) !important;
+  font-size: 0.68rem !important;
+}
+
+/* 沉浸式 util 切换器形态微调 */
+html[data-ui='terminal'] .mac-menu-util :global(button),
+html[data-ui='terminal'] .mac-menu-util :global(.theme-switch) {
+  border: 1px solid rgb(0 255 65 / 0.25) !important;
+  border-radius: 0 !important;
+}
+
+html[data-ui='crt'] .mac-menu-util :global(button) {
+  color: #ffb000 !important;
+}
+
+html[data-ui='blueprint'] .mac-menu-util :global(button) {
+  border-radius: 2px !important;
+}
+
+html[data-ui='rpg'] .mac-menu-util :global(button) {
+  border: 1px solid rgb(212 175 55 / 0.35) !important;
+}

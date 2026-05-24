@@ -13,7 +13,7 @@
     readCachedWeatherCode,
   } from '../../lib/weather-rain';
   import { patchFromMode, type WallpaperMode } from '../../features/wallpaper/state/mode';
-  import HudWallpaper from '../wallpaper/HudWallpaper.svelte';
+  import SkinCanvasWallpaper from '../wallpaper/SkinCanvasWallpaper.svelte';
   import SkinScrollIndicator from '../desktop/SkinScrollIndicator.svelte';
   import { useSkinChrome } from '../../features/ui/skin-chrome.svelte';
   import { initUiSkin } from '../../features/ui/apply-ui';
@@ -493,7 +493,7 @@
     {/if}
 
     {#if skinChrome.canvasWallpaper}
-      <HudWallpaper />
+      <SkinCanvasWallpaper />
     {/if}
     {#if skinChrome.immersive && skinChrome.profile.scrollIndicator}
       <SkinScrollIndicator skin={skinChrome.id} />

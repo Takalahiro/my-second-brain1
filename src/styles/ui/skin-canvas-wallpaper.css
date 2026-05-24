@@ -1,0 +1,47 @@
+/* 沉浸式皮肤 · Canvas 壁纸容器 */
+
+.skin-canvas-wallpaper {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+html[data-ui-immersive] .skin-canvas-wallpaper {
+  display: block;
+}
+
+.skin-canvas-wallpaper__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* HUD 嵌套在统一容器内 */
+.skin-canvas-wallpaper[data-skin='hud'] .hud-wallpaper {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+/* 有 Canvas 壁纸时隐藏 CSS body 氛围层，避免叠色 */
+html[data-skin-wallpaper='1'] body {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+
+html[data-skin-wallpaper='1'][data-ui='blueprint']::before,
+html[data-skin-wallpaper='1'][data-ui='scholar']::before,
+html[data-skin-wallpaper='1'][data-ui='pixel']::before {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skin-canvas-wallpaper__canvas {
+    filter: saturate(0.85);
+  }
+}

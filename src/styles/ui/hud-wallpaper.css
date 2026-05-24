@@ -58,6 +58,13 @@ html[data-ui='hud'] .hud-wallpaper {
   display: block;
 }
 
+/* 由 skin-canvas-wallpaper.css 统一控制外层显示 */
+html[data-ui-immersive] .skin-canvas-wallpaper .hud-wallpaper {
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
 .hud-wp {
   position: absolute;
   inset: 0;
