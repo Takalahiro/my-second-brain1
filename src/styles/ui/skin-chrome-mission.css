@@ -175,10 +175,14 @@ html[data-ui='observatory'] .mac-search-wrap::before {
 }
 html[data-ui='observatory'] .mac-search-input { padding-left: 3.2rem !important; }
 
-/* 沉浸式 · 角标装饰 */
-html[data-ui-immersive] :is(.floating-widget, .mac-settings) {
+/* 沉浸式 · 角标装饰（勿改控制中心 fixed，否则会漂到桌面左侧） */
+html[data-ui-immersive] .floating-widget {
   isolation: isolate;
   position: relative;
+}
+
+html[data-ui-immersive] .mac-settings {
+  isolation: isolate;
 }
 
 

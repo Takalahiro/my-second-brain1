@@ -86,6 +86,9 @@ html[data-ui='blueprint'] .ui-skin-card {
   border-radius: 2px;
   box-shadow: var(--shadow-normal);
   backdrop-filter: none;
+}
+
+html[data-ui='blueprint'] :is(.floating-widget, .site-nav-shell, .pixel-card, .glass-container, .ui-skin-card) {
   position: relative;
 }
 

@@ -8,7 +8,7 @@ html {
 }
 
 /* ── 控制中心：始终固定右侧，不随内容滚动 ── */
-:global(.mac-os-body) .mac-settings {
+.mac-os-body .mac-settings {
   position: fixed !important;
   top: var(--cc-anchor-top) !important;
   right: max(env(safe-area-inset-right, 0px), 12px) !important;
@@ -20,15 +20,15 @@ html {
   touch-action: auto;
 }
 
-:global(.mac-os-body) .mac-settings.is-open {
+.mac-os-body .mac-settings.is-open {
   transform: translateX(0) scale(1) !important;
 }
 
-:global(.mac-os-body) .mac-settings.is-expanded {
+.mac-os-body .mac-settings.is-expanded {
   width: min(480px, calc(100vw - 24px)) !important;
 }
 
-:global(.mac-os-body) .mac-settings .mac-body {
+.mac-os-body .mac-settings .mac-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-x: hidden !important;
@@ -111,14 +111,14 @@ html[data-ui-immersive] .mac-desktop-stage {
     --skin-strip-h: 20px;
   }
 
-  :global(.mac-os-body) .mac-settings {
+  .mac-os-body .mac-settings {
     top: var(--cc-anchor-top) !important;
     bottom: calc(max(env(safe-area-inset-bottom, 0px), 10px) + 72px) !important;
   }
 }
 
 @media (pointer: coarse) and (max-width: 768px) {
-  :global(.mac-os-body) .mac-settings {
+  .mac-os-body .mac-settings {
     top: auto !important;
     left: max(env(safe-area-inset-left, 0px), 8px) !important;
     right: max(env(safe-area-inset-right, 0px), 8px) !important;

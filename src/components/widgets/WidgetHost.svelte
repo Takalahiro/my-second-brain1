@@ -500,7 +500,7 @@
     {/if}
 
     <div class="mac-desktop-stage">
-      {#if enabled.background && !skinChrome.immersive}
+      {#if enabled.background && !skinChrome.canvasWallpaper}
         <LazyWidget
           show={true}
           loader={widgetLoaders.background}
