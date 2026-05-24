@@ -1,0 +1,206 @@
+/* 各沉浸式皮肤 · 状态条 / CLI 搜索 / 高度计配色 */
+
+html[data-ui='blueprint'] .skin-status-strip {
+  background: rgb(14 58 95 / 0.98);
+  border-bottom: 1px solid rgb(255 255 255 / 0.35);
+}
+html[data-ui='blueprint'] .skin-mission-status { color: #f4ecd8; }
+html[data-ui='blueprint'] .mac-search-wrap::before {
+  content: 'DIM>';
+  position: absolute;
+  left: 10px;
+  z-index: 1;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  color: #f4ecd8;
+  pointer-events: none;
+}
+html[data-ui='blueprint'] .mac-search-input { padding-left: 3rem !important; }
+
+html[data-ui='scholar'] .skin-status-strip {
+  background: rgb(244 236 216 / 0.98);
+  border-bottom: 1px solid rgb(28 24 20 / 0.12);
+}
+html[data-ui='scholar'] .skin-mission-status { color: #1c1814; font-family: 'EB Garamond', serif; }
+html[data-ui='scholar'] .mac-search-wrap::before {
+  content: 'Note:';
+  position: absolute;
+  left: 10px;
+  z-index: 1;
+  font-family: 'Caveat', cursive;
+  font-size: 0.85rem;
+  color: #8b2500;
+  pointer-events: none;
+}
+html[data-ui='scholar'] .mac-search-input { padding-left: 3.2rem !important; }
+
+html[data-ui='terminal'] .skin-status-strip {
+  background: #0a0a0a;
+  border-bottom: 1px solid rgb(0 255 65 / 0.35);
+}
+html[data-ui='terminal'] .skin-mission-status { color: #00ff41; text-shadow: 0 0 6px rgb(0 255 65 / 0.35); }
+
+html[data-ui='crt'] .skin-status-strip {
+  background: #1a1200;
+  border-bottom: 1px solid rgb(255 176 0 / 0.35);
+}
+html[data-ui='crt'] .skin-mission-status { color: #ffb000; text-shadow: 0 0 4px rgb(255 176 0 / 0.45); }
+
+html[data-ui='observatory'] .skin-status-strip {
+  background: rgb(10 14 39 / 0.98);
+  border-bottom: 1px solid rgb(232 196 71 / 0.25);
+}
+html[data-ui='observatory'] .skin-mission-status { color: #e8c547; font-family: 'Cormorant', serif; }
+
+html[data-ui='herbarium'] .skin-status-strip {
+  background: rgb(242 235 224 / 0.98);
+  border-bottom: 1px solid rgb(45 90 61 / 0.22);
+}
+html[data-ui='herbarium'] .skin-mission-status { color: #2d5a3d; }
+
+html[data-ui='ink'] .skin-status-strip {
+  background: rgb(247 243 234 / 0.98);
+  border-bottom: 1px solid rgb(26 26 26 / 0.12);
+}
+html[data-ui='ink'] .skin-mission-status { color: #1a1a1a; font-family: 'Noto Serif SC', serif; }
+
+html[data-ui='rpg'] .skin-status-strip {
+  background: rgb(26 15 46 / 0.98);
+  border-bottom: 1px solid rgb(212 175 55 / 0.35);
+}
+html[data-ui='rpg'] .skin-mission-status { color: #d4af37; font-family: 'Cinzel', serif; }
+
+html[data-ui='spacecraft'] .skin-status-strip {
+  background: rgb(5 8 16 / 0.98);
+  border-bottom: 1px solid rgb(74 144 217 / 0.28);
+}
+html[data-ui='spacecraft'] .skin-mission-status { color: #c8d8f0; font-family: 'Orbitron', sans-serif; }
+
+html[data-ui='pixel'] .skin-status-strip {
+  background: #e0e8d8;
+  border-bottom: 3px solid #1a1c2c;
+}
+html[data-ui='pixel'] .skin-mission-status { color: #1a1c2c; font-family: 'Pixelify Sans', monospace; }
+
+/* 高度计标签 · 按皮肤 */
+html[data-ui='blueprint'] .hud-scroll-indicator__labels span:first-child::after { content: ' FT'; }
+html[data-ui='scholar'] .hud-scroll-indicator__val::before { content: 'p.'; }
+html[data-ui='terminal'] .hud-scroll-indicator__labels span:first-child { font-size: 0.55rem; }
+html[data-ui='crt'] .hud-scroll-indicator__val { color: #ffb000; }
+html[data-ui='observatory'] .hud-scroll-indicator__val { color: #e8c547; }
+html[data-ui='rpg'] .hud-scroll-indicator__val { color: #6495ed; }
+html[data-ui='spacecraft'] .hud-scroll-indicator__val { color: #4a90d9; }
+
+html[data-ui-immersive] .mac-desktop,
+html[data-ui-immersive] .mac-os-body {
+  background: transparent;
+}
+
+html[data-ui='hud'] .mac-search-wrap::before {
+  content: 'MSB://CMD>';
+  position: absolute;
+  left: 10px;
+  z-index: 1;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  color: #0f1f3d;
+  pointer-events: none;
+}
+html[data-ui='hud'] .mac-search-input { padding-left: 5.5rem !important; }
+
+html[data-ui='pixel'] .mac-search-wrap::before {
+  content: '>';
+  position: absolute;
+  left: 10px;
+  z-index: 1;
+  font-family: 'Pixelify Sans', monospace;
+  pointer-events: none;
+}
+html[data-ui='pixel'] .mac-search-input { padding-left: 1.6rem !important; }
+
+html[data-ui='rpg'] .mac-search-wrap::before {
+  content: '/quest ';
+  position: absolute;
+  left: 8px;
+  z-index: 1;
+  font-family: 'Cinzel', serif;
+  font-size: 0.62rem;
+  color: #d4af37;
+  pointer-events: none;
+}
+html[data-ui='rpg'] .mac-search-input { padding-left: 3.6rem !important; }
+
+html[data-ui='spacecraft'] .mac-search-wrap::before {
+  content: 'CMD>';
+  position: absolute;
+  left: 10px;
+  z-index: 1;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.62rem;
+  color: #4a90d9;
+  pointer-events: none;
+}
+html[data-ui='spacecraft'] .mac-search-input { padding-left: 2.8rem !important; }
+
+html[data-ui='herbarium'] .mac-search-wrap::before {
+  content: 'Spec:';
+  position: absolute;
+  left: 10px;
+  z-index: 1;
+  font-family: 'Cormorant', serif;
+  font-style: italic;
+  pointer-events: none;
+}
+html[data-ui='herbarium'] .mac-search-input { padding-left: 2.8rem !important; }
+
+html[data-ui='ink'] .mac-search-wrap::before {
+  content: '卷>';
+  position: absolute;
+  left: 10px;
+  z-index: 1;
+  font-family: 'Noto Serif SC', serif;
+  pointer-events: none;
+}
+html[data-ui='ink'] .mac-search-input { padding-left: 2.2rem !important; }
+
+html[data-ui='observatory'] .mac-search-wrap::before {
+  content: 'STAR>';
+  position: absolute;
+  left: 10px;
+  z-index: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: #e8c547;
+  pointer-events: none;
+}
+html[data-ui='observatory'] .mac-search-input { padding-left: 3.2rem !important; }
+
+/* 沉浸式 · 角标装饰 */
+html[data-ui-immersive] :is(.floating-widget, .mac-settings) {
+  isolation: isolate;
+  position: relative;
+}
+
+
+html[data-ui-immersive] .mac-search-wrap {
+  position: relative;
+}
+
+html[data-ui='pixel'] .mac-menu-bar,
+html[data-ui='blueprint'] .mac-menu-bar,
+html[data-ui='terminal'] .mac-menu-bar,
+html[data-ui='crt'] .mac-menu-bar {
+  border-radius: 0 !important;
+}
+
+html[data-ui='scholar'] .mac-menu-bar,
+html[data-ui='herbarium'] .mac-menu-bar,
+html[data-ui='ink'] .mac-menu-bar {
+  border-radius: 4px !important;
+}
+
+html[data-ui='observatory'] .mac-menu-bar,
+html[data-ui='rpg'] .mac-menu-bar,
+html[data-ui='spacecraft'] .mac-menu-bar {
+  border-radius: 6px !important;
+}

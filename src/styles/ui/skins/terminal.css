@@ -1,0 +1,148 @@
+/* terminal — tmux / CLI 黑客：纯黑 · 磷光绿 · ASCII 边框 · 闪烁光标 */
+
+html[data-ui='terminal'] {
+  --radius-card: 0;
+  --radius-button: 0;
+  --radius-small: 0;
+
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #0f0f0f;
+  --text-primary: #00ff41;
+  --text-secondary: rgb(0 255 65 / 0.65);
+  --border-color: rgb(0 255 65 / 0.45);
+
+  --ui-accent: #00ff41;
+  --ui-accent-soft: rgb(0 255 65 / 0.12);
+  --ui-accent-text: #00ff41;
+
+  --font-body-current: 'JetBrains Mono', 'Fira Code', 'IBM Plex Mono', monospace;
+  --font-heading-current: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --glass-bg: rgb(10 10 10 / 0.96);
+  --glass-bg-hover: rgb(16 16 16 / 0.98);
+  --glass-bg-strong: #050505;
+  --glass-border: rgb(0 255 65 / 0.35);
+
+  --shadow-soft: none;
+  --shadow-normal: 0 0 0 1px rgb(0 255 65 / 0.35);
+  --shadow-hover: 0 0 8px rgb(0 255 65 / 0.2), 0 0 0 1px rgb(0 255 65 / 0.55);
+  --shadow-active: inset 0 0 12px rgb(0 255 65 / 0.08);
+
+  --chrome-bg-top: #0a0a0a;
+  --chrome-bg-bottom: #0f0f0f;
+  --chrome-border: rgb(0 255 65 / 0.35);
+  --chrome-shadow: none;
+  --chrome-hover: rgb(0 255 65 / 0.08);
+  --chrome-subtle: rgb(0 255 65 / 0.04);
+  --chrome-text: #00ff41;
+  --chrome-text-muted: rgb(0 255 65 / 0.55);
+  --chrome-dropdown-bg: #0a0a0a;
+
+  --widget-bg-rgb: 10 10 10;
+  --widget-fg: #00ff41;
+  --widget-fg-muted: rgb(0 255 65 / 0.55);
+  --widget-border: rgb(0 255 65 / 0.4);
+  --widget-header-bg: #0f0f0f;
+  --widget-shadow: 0 0 0 1px rgb(0 255 65 / 0.35);
+
+  --neo-surface: #0a0a0a;
+  --neo-track: rgb(0 255 65 / 0.15);
+  --neo-thumb: #00ff41;
+  --neo-raised: 0 0 0 1px rgb(0 255 65 / 0.4);
+  --neo-inset: inset 0 0 0 1px rgb(0 255 65 / 0.25);
+
+  --code-bg: #050505;
+  --code-fg: #00ff41;
+
+  letter-spacing: 0.02em;
+}
+
+html[data-ui='terminal'].dark,
+html.dark[data-ui='terminal'] {
+  --text-primary: #bd93f9;
+  --text-secondary: rgb(189 147 249 / 0.65);
+  --ui-accent: #bd93f9;
+  --ui-accent-text: #ff79c6;
+  --border-color: rgb(189 147 249 / 0.4);
+  --chrome-text: #bd93f9;
+  --widget-fg: #bd93f9;
+}
+
+html[data-ui='terminal'] body {
+  background:
+    repeating-linear-gradient(0deg, rgb(0 255 65 / 0.02) 0, rgb(0 255 65 / 0.02) 1px, transparent 1px, transparent 3px),
+    var(--bg-primary);
+  text-shadow: 0 0 6px rgb(0 255 65 / 0.35);
+}
+
+html[data-ui='terminal'] .mac-settings,
+html[data-ui='terminal'] .floating-widget,
+html[data-ui='terminal'] .site-nav-shell,
+html[data-ui='terminal'] .pixel-card,
+html[data-ui='terminal'] .glass-container,
+html[data-ui='terminal'] .ui-skin-card {
+  border: 1px solid rgb(0 255 65 / 0.4);
+  border-radius: 0;
+  box-shadow: var(--shadow-normal);
+  backdrop-filter: none;
+  background: rgb(10 10 10 / 0.96);
+}
+
+html[data-ui='terminal'] .mac-settings::before,
+html[data-ui='terminal'] .floating-widget .fw-header::before {
+  content: '+--[ ';
+  color: rgb(0 255 65 / 0.5);
+  font-size: 0.65rem;
+  margin-right: 4px;
+}
+
+html[data-ui='terminal'] .mac-menu-app-name::before {
+  content: 'user@msb:~$ ';
+  color: rgb(0 255 65 / 0.55);
+  font-weight: 400;
+}
+
+html[data-ui='terminal'] .mac-search-wrap {
+  position: relative;
+}
+
+html[data-ui='terminal'] .mac-search-wrap::before,
+html[data-ui='terminal'] .mac-search-input::placeholder {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+html[data-ui='terminal'] .mac-search-wrap::before {
+  content: ':open ';
+  position: absolute;
+  left: 10px;
+  color: rgb(0 255 65 / 0.55);
+  font-size: 0.72rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+html[data-ui='terminal'] .mac-search-input {
+  padding-left: 3.2rem !important;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+html[data-ui='terminal'] .mac-menu-clock::after {
+  content: ' _';
+  animation: terminal-blink 1s step-end infinite;
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+html[data-ui='terminal'] .mac-toggle input:checked + span {
+  background: rgb(0 255 65 / 0.35);
+  box-shadow: 0 0 8px rgb(0 255 65 / 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui='terminal'] .mac-menu-clock::after {
+    animation: none;
+  }
+}

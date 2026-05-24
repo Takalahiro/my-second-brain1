@@ -14,8 +14,9 @@
   } from '../../lib/weather-rain';
   import { patchFromMode, type WallpaperMode } from '../../features/wallpaper/state/mode';
   import HudWallpaper from '../wallpaper/HudWallpaper.svelte';
-  import HudScrollIndicator from '../desktop/HudScrollIndicator.svelte';
-  import { useHudMode } from '../../features/ui/hud-mode.svelte';
+  import SkinScrollIndicator from '../desktop/SkinScrollIndicator.svelte';
+  import { useSkinChrome } from '../../features/ui/skin-chrome.svelte';
+  import { initUiSkin } from '../../features/ui/apply-ui';
 
   interface Props {
     backgroundDefault?: boolean;
@@ -23,7 +24,7 @@
   }
   let { backgroundDefault = false, desktopMode = false }: Props = $props();
 
-  const hudMode = useHudMode();
+  const skinChrome = useSkinChrome();
 
   const STORAGE_KEY = 'second-brain:widgets';
 
@@ -111,6 +112,7 @@
   });
 
   onMount(() => {
+    initUiSkin();
     globalMuted = readGlobalMuted();
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -490,13 +492,15 @@
       />
     {/if}
 
-    {#if hudMode.current}
+    {#if skinChrome.canvasWallpaper}
       <HudWallpaper />
-      <HudScrollIndicator />
+    {/if}
+    {#if skinChrome.immersive && skinChrome.profile.scrollIndicator}
+      <SkinScrollIndicator skin={skinChrome.id} />
     {/if}
 
     <div class="mac-desktop-stage">
-      {#if enabled.background && !hudMode.current}
+      {#if enabled.background && !skinChrome.immersive}
         <LazyWidget
           show={true}
           loader={widgetLoaders.background}

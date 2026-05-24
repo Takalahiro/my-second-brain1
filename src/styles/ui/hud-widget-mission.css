@@ -413,22 +413,8 @@ html[data-ui='hud'] .pixel-clock.is-active-drag .clock-bar {
   cursor: grabbing !important;
 }
 
-/* 控制面板固定 + 可滚动 */
-html[data-ui='hud'] .mac-settings {
-  position: fixed !important;
-  right: max(env(safe-area-inset-right, 0px), 12px) !important;
-  left: auto !important;
-  top: max(env(safe-area-inset-top, 0px), 58px) !important;
-  bottom: max(env(safe-area-inset-bottom, 0px), 16px) !important;
-  transform: translateX(calc(100% + 20px)) scale(0.96);
-  touch-action: auto;
-}
-
-html[data-ui='hud'] .mac-settings.is-open {
-  transform: translateX(0) scale(1) !important;
-}
-
-html[data-ui='hud'] .mac-settings .mac-body {
+/* 控制面板滚动（沉浸式通用；位置见 skin-chrome-layout.css） */
+html[data-ui-immersive] .mac-settings .mac-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-x: hidden !important;
@@ -440,7 +426,7 @@ html[data-ui='hud'] .mac-settings .mac-body {
   z-index: 1;
 }
 
-html[data-ui='hud'] .mac-settings::before,
-html[data-ui='hud'] .mac-settings::after {
+html[data-ui-immersive] .mac-settings::before,
+html[data-ui-immersive] .mac-settings::after {
   pointer-events: none !important;
 }

@@ -1,20 +1,56 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import PixelIcon from '../../../components/PixelIcon.svelte';
-  import { applyUiSkin, getStoredUiSkin, UI_SKINS, type UiSkinId } from '../index';
+  import { applyUiSkin, getStoredUiSkin } from '../apply-ui';
+  import { UI_SKINS } from '../registry';
+  import type { UiSkinId, UiSkinMeta } from '../types';
   import { isUiDebugEnabled, toggleUiDebug } from '../debug-ui';
   import { getMessages, initLocale } from '../../../lib/i18n/locale.svelte';
 
-  let activeId = $state<UiSkinId>('mac');
+  let activeId = $state<UiSkinId>(getStoredUiSkin());
   let debugOn = $state(false);
 
   const m = $derived(getMessages());
+
+  const PREVIEW_ICONS: Partial<Record<UiSkinId, 'puzzle' | 'palette' | 'gear' | 'orbit' | 'python'>> = {
+    mac: 'puzzle',
+    glass: 'palette',
+    pixel: 'gear',
+    hud: 'orbit',
+    terminal: 'python',
+  };
+
+  const FALLBACK_NAMES: Record<UiSkinId, string> = {
+    mac: 'Mac',
+    glass: 'Glass',
+    pixel: 'Pixel',
+    hud: 'HUD',
+    blueprint: 'Blueprint',
+    scholar: 'Scholar',
+    terminal: 'Terminal',
+    crt: 'CRT',
+    observatory: 'Observatory',
+    herbarium: 'Herbarium',
+    ink: 'Ink',
+    rpg: 'RPG',
+    spacecraft: 'Spacecraft',
+  };
 
   onMount(() => {
     initLocale();
     activeId = getStoredUiSkin();
     debugOn = isUiDebugEnabled();
   });
+
+  function skinName(skin: UiSkinMeta): string {
+    const key = skin.nameKey as keyof typeof m.drawer;
+    return (m.drawer[key] as string | undefined) ?? FALLBACK_NAMES[skin.id] ?? skin.id;
+  }
+
+  function skinDesc(skin: UiSkinMeta): string {
+    const key = skin.descKey as keyof typeof m.drawer;
+    return (m.drawer[key] as string | undefined) ?? skin.id;
+  }
 
   function pick(id: UiSkinId) {
     activeId = id;
@@ -23,6 +59,16 @@
 
   function onDebugToggle() {
     debugOn = toggleUiDebug();
+  }
+
+  function previewStyle(skin: UiSkinMeta): string {
+    if (skin.id === 'hud') {
+      return `background: ${skin.preview}; background-size: 28px 28px, 12px 12px, 12px 12px, auto;`;
+    }
+    if (skin.id === 'blueprint') {
+      return `background: ${skin.preview}; background-size: 24px 24px, 24px 24px;`;
+    }
+    return `background: ${skin.preview}`;
   }
 </script>
 
@@ -40,42 +86,17 @@
       >
         <span
           class="ui-skin-preview ui-skin-preview--{skin.id}"
-          style={skin.id === 'hud'
-            ? `background: ${skin.preview}; background-size: 28px 28px, 12px 12px, 12px 12px, auto;`
-            : `background: ${skin.preview}`}
+          style={previewStyle(skin)}
           aria-hidden="true"
         >
-          {#if skin.id === 'mac'}
-            <span class="ui-demo-chrome ui-demo-chrome--mac">
-              <span class="ui-demo-dots"><span></span><span></span><span></span></span>
-              <span class="ui-demo-bar"></span>
-            </span>
-            <span class="ui-demo-icon"><PixelIcon name="puzzle" size={20} /></span>
-          {:else if skin.id === 'glass'}
-            <span class="ui-demo-chrome ui-demo-chrome--glass">
-              <span class="ui-demo-glass-pane"></span>
-            </span>
-            <span class="ui-demo-icon"><PixelIcon name="palette" size={20} /></span>
-          {:else if skin.id === 'hud'}
-            <span class="ui-demo-chrome ui-demo-chrome--hud">
-              <span class="ui-demo-hud-label">NAV</span>
-              <span class="ui-demo-hud-panel">
-                <span class="ui-demo-hud-ring" aria-hidden="true"></span>
-                <span class="ui-demo-hud-patch" aria-hidden="true"></span>
-              </span>
-            </span>
-            <span class="ui-demo-icon"><PixelIcon name="orbit" size={20} /></span>
-          {:else}
-            <span class="ui-demo-chrome ui-demo-chrome--pixel">
-              <span class="ui-demo-pixel-block"></span>
-              <span class="ui-demo-pixel-block"></span>
-            </span>
-            <span class="ui-demo-icon"><PixelIcon name="gear" size={20} /></span>
-          {/if}
+          <span class="ui-demo-chip ui-demo-chip--{skin.id}"></span>
+          <span class="ui-demo-icon">
+            <PixelIcon name={PREVIEW_ICONS[skin.id] ?? 'gear'} size={18} />
+          </span>
         </span>
         <span class="ui-skin-text">
-          <span class="ui-skin-name">{m.drawer[skin.nameKey]}</span>
-          <span class="ui-skin-desc">{m.drawer[skin.descKey]}</span>
+          <span class="ui-skin-name">{skinName(skin)}</span>
+          <span class="ui-skin-desc">{skinDesc(skin)}</span>
         </span>
       </button>
     {/each}
@@ -98,6 +119,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-height: 0;
   }
   .ui-skin-hint {
     margin: 0;
@@ -108,17 +130,24 @@
   .ui-skin-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 8px;
+    min-height: 0;
+  }
+  @media (min-width: 360px) {
+    .ui-skin-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
   .ui-skin-card {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
-    padding: 10px;
+    padding: 8px;
     border: 1px solid var(--chrome-border);
     border-radius: var(--radius-small);
     background: var(--chrome-subtle);
+    color: var(--chrome-text);
     cursor: pointer;
     text-align: left;
     transition:
@@ -130,149 +159,59 @@
     border-color: var(--chrome-active);
     box-shadow: var(--shadow-soft);
   }
+  .ui-skin-card.is-active {
+    border-color: var(--ui-accent, var(--chrome-active));
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--ui-accent, #007aff) 25%, transparent);
+  }
   .ui-skin-preview {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 72px;
+    height: 56px;
     overflow: hidden;
     border-radius: calc(var(--radius-small) - 2px);
     border: 1px solid var(--chrome-border);
   }
-  .ui-skin-card--pixel .ui-skin-preview,
-  .ui-skin-card--pixel .ui-demo-icon,
-  .ui-skin-card--pixel .ui-demo-chrome--mac .ui-demo-bar,
-  .ui-skin-card--pixel .ui-demo-chrome--glass .ui-demo-glass-pane {
-    border-radius: 0;
-  }
-  .ui-skin-preview--glass {
-    backdrop-filter: blur(12px) saturate(1.4);
-    -webkit-backdrop-filter: blur(12px) saturate(1.4);
-  }
-  .ui-demo-chrome {
+  .ui-demo-chip {
     position: absolute;
-    inset: 10px 12px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .ui-demo-chrome--mac .ui-demo-dots {
-    display: flex;
-    gap: 5px;
-  }
-  .ui-demo-chrome--mac .ui-demo-dots span {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #ff5f57;
-  }
-  .ui-demo-chrome--mac .ui-demo-dots span:nth-child(2) { background: #febc2e; }
-  .ui-demo-chrome--mac .ui-demo-dots span:nth-child(3) { background: #28c840; }
-  .ui-demo-chrome--mac .ui-demo-bar {
-    width: 72px;
-    height: 8px;
+    inset: 8px 10px auto;
+    height: 10px;
     border-radius: 999px;
-    background: rgb(255 255 255 / 0.75);
-    box-shadow: 0 1px 0 rgb(255 255 255 / 0.9) inset;
+    opacity: 0.85;
   }
-  .ui-demo-chrome--glass .ui-demo-glass-pane {
-    width: 100%;
-    height: 36px;
-    border-radius: 14px;
-    background: rgb(255 255 255 / 0.35);
-    border: 1px solid rgb(255 255 255 / 0.55);
-    box-shadow: 0 8px 24px rgb(80 120 200 / 0.15);
-  }
-  .ui-demo-chrome--pixel {
-    flex-direction: row;
-    gap: 6px;
-  }
-  .ui-demo-chrome--pixel .ui-demo-pixel-block {
-    width: 22px;
-    height: 22px;
-    border: 2px solid #1a1c2c;
-    background: #e0e8d8;
-    box-shadow: 3px 3px 0 #1a1c2c;
-  }
-  .ui-demo-chrome--hud .ui-demo-hud-label {
-    font-family: 'Barlow Condensed', 'IBM Plex Sans', sans-serif;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    color: #c8102e;
-    text-transform: uppercase;
-  }
-  .ui-demo-chrome--hud .ui-demo-hud-label::before { content: '[ '; }
-  .ui-demo-chrome--hud .ui-demo-hud-label::after { content: ' ]'; }
-  .ui-demo-hud-panel {
-    position: relative;
-    width: 100%;
-    height: 28px;
-    border: 1px solid #0f1f3d;
-    background: rgb(245 242 235 / 0.92);
-    overflow: hidden;
-  }
-  .ui-demo-hud-ring {
-    position: absolute;
-    right: -8px;
-    bottom: -14px;
-    width: 36px;
-    height: 36px;
-    border: 1px solid rgb(15 31 61 / 0.35);
-    border-radius: 50%;
-    box-shadow: 0 0 0 6px transparent, 0 0 0 7px rgb(15 31 61 / 0.12);
-  }
-  .ui-demo-hud-patch {
-    position: absolute;
-    left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 14px;
-    height: 14px;
-    border: 1px solid #0f1f3d;
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 35% 40%, #c8102e 2px, transparent 2.5px),
-      radial-gradient(circle at 62% 58%, #0f1f3d 2.5px, transparent 3px);
-  }
+  :global(.ui-demo-chip--mac) { background: rgb(255 255 255 / 0.75); width: 48px; }
+  :global(.ui-demo-chip--glass) { background: rgb(255 255 255 / 0.4); width: 100%; height: 28px; border-radius: 10px; inset: 8px; }
+  :global(.ui-demo-chip--pixel) { background: #e0e8d8; width: 22px; height: 22px; border-radius: 0; border: 2px solid #1a1c2c; }
+  :global(.ui-demo-chip--hud) { background: rgb(245 242 235 / 0.9); width: 100%; height: 20px; border-radius: 0; border: 1px solid #0f1f3d; inset: 8px; }
+  :global(.ui-demo-chip--blueprint) { background: rgb(255 255 255 / 0.2); width: 100%; height: 100%; inset: 0; border-radius: 0; border: 1px dashed rgb(255 255 255 / 0.35); }
+  :global(.ui-demo-chip--scholar) { background: rgb(139 90 43 / 0.12); width: 60%; border-radius: 50%; height: 24px; }
+  :global(.ui-demo-chip--terminal) { background: rgb(0 255 65 / 0.15); width: 70%; height: 3px; box-shadow: 0 6px 0 rgb(0 255 65 / 0.1), 0 12px 0 rgb(0 255 65 / 0.08); }
+  :global(.ui-demo-chip--crt) { background: rgb(255 176 0 / 0.25); width: 80%; height: 18px; box-shadow: 0 0 12px rgb(255 176 0 / 0.3); }
+  :global(.ui-demo-chip--observatory) { background: rgb(232 197 71 / 0.35); width: 8px; height: 8px; border-radius: 50%; inset: auto; top: 12px; left: 16px; }
+  :global(.ui-demo-chip--herbarium) { background: rgb(45 90 61 / 0.2); width: 55%; height: 22px; border: 1px solid rgb(45 90 61 / 0.25); }
+  :global(.ui-demo-chip--ink) { background: rgb(192 57 43 / 0.2); width: 16px; height: 16px; border: 2px solid #c0392b; border-radius: 2px; inset: auto; top: 10px; right: 12px; transform: rotate(-8deg); }
+  :global(.ui-demo-chip--rpg) { background: linear-gradient(90deg, #6495ed 42%, rgb(212 175 55 / 0.3) 42%); width: 100%; height: 4px; inset: 0 0 auto; border-radius: 0; }
+  :global(.ui-demo-chip--spacecraft) { background: rgb(74 144 217 / 0.25); width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgb(74 144 217 / 0.35); inset: auto; top: 8px; right: 10px; }
   .ui-demo-icon {
     position: relative;
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     color: var(--text-primary);
-  }
-  .ui-skin-card--mac .ui-demo-icon {
-    border-radius: 10px;
-    background: rgb(255 255 255 / 0.82);
-    box-shadow: 0 4px 14px rgb(0 0 0 / 0.1);
-  }
-  .ui-skin-card--glass .ui-demo-icon {
-    border-radius: 12px;
+    border-radius: 8px;
     background: rgb(255 255 255 / 0.55);
-    border: 1px solid rgb(26 39 68 / 0.14);
+    border: 1px solid rgb(0 0 0 / 0.06);
   }
-  .ui-skin-card--pixel .ui-demo-icon {
+  .ui-skin-card--pixel .ui-demo-icon,
+  .ui-skin-card--hud .ui-demo-icon,
+  .ui-skin-card--blueprint .ui-demo-icon,
+  .ui-skin-card--terminal .ui-demo-icon,
+  .ui-skin-card--crt .ui-demo-icon {
     border-radius: 0;
-    border: 2px solid #1a1c2c;
-    background: #e8f0e0;
-    box-shadow: 3px 3px 0 #1a1c2c;
-  }
-  .ui-skin-card--hud .ui-demo-icon {
-    border-radius: 0;
-    border: 1px solid #0f1f3d;
-    background: rgb(245 242 235 / 0.94);
-    box-shadow: none;
-    color: #0f1f3d;
-  }
-  .ui-skin-preview--hud {
-    border: 1px solid #0f1f3d;
-    border-radius: 0;
-    background-color: #f5f2eb;
   }
   .ui-skin-text {
     display: flex;
@@ -281,14 +220,19 @@
     min-width: 0;
   }
   .ui-skin-name {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
-    color: var(--chrome-text);
+    color: inherit;
+    line-height: 1.25;
   }
   .ui-skin-desc {
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.35;
     color: var(--chrome-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   .ui-debug-row {
     display: flex;

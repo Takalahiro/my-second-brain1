@@ -1,6 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
 
+  interface Props {
+    topLabel?: string;
+    bottomLabel?: string;
+    valuePrefix?: string;
+  }
+
+  let { topLabel = 'ALT', bottomLabel = '0', valuePrefix = '' }: Props = $props();
+
   let progress = $state(0);
   let altFt = $state(0);
   let orbitDeg = $state(0);
@@ -69,8 +77,8 @@
     <div class="hud-scroll-indicator__needle" style:bottom="{progress * 100}%"></div>
   </div>
   <div class="hud-scroll-indicator__labels">
-    <span>ALT</span>
-    <span class="hud-scroll-indicator__val">{altFt} FT</span>
-    <span>0</span>
+    <span>{topLabel}</span>
+    <span class="hud-scroll-indicator__val">{valuePrefix}{altFt}{#if !valuePrefix} FT{/if}</span>
+    <span>{bottomLabel}</span>
   </div>
 </div>

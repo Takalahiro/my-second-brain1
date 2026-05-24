@@ -6,8 +6,8 @@
   import MenuBarRainGlass from './MenuBarRainGlass.svelte';
   import SiteLogo from '../SiteLogo.svelte';
   import PixelIcon from '../PixelIcon.svelte';
-  import HudMissionStatus from './HudMissionStatus.svelte';
-  import { useHudMode } from '../../features/ui/hud-mode.svelte';
+  import SkinMissionStatus from './SkinMissionStatus.svelte';
+  import { useSkinChrome } from '../../features/ui/skin-chrome.svelte';
   import { getSiteNavLinks, getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
 
   interface Props {
@@ -41,7 +41,7 @@
   let menuOpen = $state(false);
   let now = $state(new Date());
   let coarsePointer = $state(false);
-  const hudMode = useHudMode();
+  const skinChrome = useSkinChrome();
 
   const menuTime = $derived(
     now.toLocaleString(localeState.current === 'en' ? 'en-US' : 'zh-CN', {
@@ -102,13 +102,13 @@
   ></button>
 {/if}
 
-{#if hudMode.current}
-  <div class="hud-status-strip" aria-hidden="false">
-    <HudMissionStatus />
+{#if skinChrome.immersive}
+  <div class="skin-status-strip hud-status-strip" aria-hidden="false">
+    <SkinMissionStatus skin={skinChrome.id} />
   </div>
 {/if}
 
-<header class="mac-menu-bar" class:has-rain-glass={rainDrops} class:has-hud-strip={hudMode.current} aria-label={m.menu.systemMenu}>
+<header class="mac-menu-bar" class:has-rain-glass={rainDrops} class:has-hud-strip={skinChrome.immersive} class:has-skin-strip={skinChrome.immersive} aria-label={m.menu.systemMenu}>
   <MenuBarRainGlass active={rainDrops} />
   <div class="mac-menu-left">
     <div class="mac-menu-apple">

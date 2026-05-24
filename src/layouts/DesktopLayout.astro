@@ -2,6 +2,7 @@
 import '../styles/globals.css';
 import DesktopIntroSplash from '../components/desktop/DesktopIntroSplash.astro';
 import HudEclipseIntro from '../components/desktop/HudEclipseIntro.astro';
+import UiSkinInit from '../features/ui/components/UiSkinInit.svelte';
 
 interface Props {
   title?: string;
@@ -43,9 +44,7 @@ const {
         document.documentElement.dataset.locale = 'en';
       }
       const ui = localStorage.getItem('second-brain:ui-skin');
-      if (ui && ['mac', 'glass', 'pixel', 'hud'].includes(ui)) {
-        document.documentElement.setAttribute('data-ui', ui);
-      }
+      if (ui) document.documentElement.setAttribute('data-ui', ui);
       if (localStorage.getItem('second-brain:ui-debug') === '1') {
         document.documentElement.classList.add('ui-debug', 'debug');
       }
@@ -64,6 +63,7 @@ const {
   <body class="mac-os-body">
     {introSplash && <HudEclipseIntro />}
     {introSplash && <DesktopIntroSplash />}
+    <UiSkinInit client:load />
     <slot />
   </body>
 </html>

@@ -1,0 +1,126 @@
+/* 沉浸式皮肤 · 固定控制中心锚点 / 双层顶栏 / 桌面 stage 顶距 */
+
+html {
+  --skin-strip-h: 0px;
+  --skin-menu-h: 44px;
+  --cc-anchor-top: max(env(safe-area-inset-top, 0px), 58px);
+  --desktop-stage-top: calc(max(env(safe-area-inset-top, 0px), 12px) + 44px);
+}
+
+/* ── 控制中心：始终固定右侧，不随内容滚动 ── */
+:global(.mac-os-body) .mac-settings {
+  position: fixed !important;
+  top: var(--cc-anchor-top) !important;
+  right: max(env(safe-area-inset-right, 0px), 12px) !important;
+  left: auto !important;
+  bottom: max(env(safe-area-inset-bottom, 0px), 16px) !important;
+  width: min(400px, calc(100vw - 24px)) !important;
+  z-index: 115 !important;
+  transform: translateX(calc(100% + 20px)) scale(0.96);
+  touch-action: auto;
+}
+
+:global(.mac-os-body) .mac-settings.is-open {
+  transform: translateX(0) scale(1) !important;
+}
+
+:global(.mac-os-body) .mac-settings.is-expanded {
+  width: min(480px, calc(100vw - 24px)) !important;
+}
+
+:global(.mac-os-body) .mac-settings .mac-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  z-index: 3;
+}
+
+html[data-ui-immersive] .mac-settings::before,
+html[data-ui-immersive] .mac-settings::after {
+  pointer-events: none !important;
+}
+
+/* UI 切换面板：确保可见可滚动 */
+html[data-ui-immersive] .mac-settings .ui-skin-picker,
+html[data-ui-immersive] .mac-settings .ui-skin-grid {
+  position: relative;
+  z-index: 4;
+}
+
+html[data-ui-immersive] .mac-settings .ui-skin-card {
+  color: var(--chrome-text);
+  background: var(--chrome-subtle);
+}
+
+html[data-ui-immersive] .mac-settings .ui-skin-name,
+html[data-ui-immersive] .mac-settings .ui-skin-desc,
+html[data-ui-immersive] .mac-settings .ui-skin-hint {
+  color: var(--chrome-text);
+}
+
+html[data-ui-immersive] .mac-settings .ui-skin-desc {
+  color: var(--chrome-text-muted);
+}
+
+/* ── 顶栏状态条（通用） ── */
+html[data-ui-immersive] .skin-status-strip,
+html[data-ui-immersive] .hud-status-strip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 121;
+  height: var(--skin-strip-h, 22px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  pointer-events: none;
+}
+
+html[data-ui-immersive] .mac-menu-bar {
+  top: var(--skin-strip-h, 22px) !important;
+  left: max(env(safe-area-inset-left, 0px), 12px) !important;
+  right: max(env(safe-area-inset-right, 0px), 12px) !important;
+  height: var(--skin-menu-h, 44px) !important;
+  min-height: var(--skin-menu-h, 44px) !important;
+  z-index: 120 !important;
+}
+
+html[data-ui-immersive] .mac-menu-nav,
+html[data-ui-immersive] .mac-menu-util,
+html[data-ui-immersive] .mac-menu-clock {
+  display: flex !important;
+}
+
+html[data-ui-immersive] .mac-desktop-stage {
+  inset: var(--desktop-stage-top) 0 calc(max(env(safe-area-inset-bottom, 0px), 10px) + 78px) 0 !important;
+}
+
+@media (max-width: 768px) {
+  html[data-ui-immersive] .skin-status-strip,
+  html[data-ui-immersive] .hud-status-strip {
+    height: 20px;
+  }
+
+  html[data-ui-immersive] {
+    --skin-strip-h: 20px;
+  }
+
+  :global(.mac-os-body) .mac-settings {
+    top: var(--cc-anchor-top) !important;
+    bottom: calc(max(env(safe-area-inset-bottom, 0px), 10px) + 72px) !important;
+  }
+}
+
+@media (pointer: coarse) and (max-width: 768px) {
+  :global(.mac-os-body) .mac-settings {
+    top: auto !important;
+    left: max(env(safe-area-inset-left, 0px), 8px) !important;
+    right: max(env(safe-area-inset-right, 0px), 8px) !important;
+  }
+}

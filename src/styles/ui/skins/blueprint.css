@@ -1,0 +1,136 @@
+/* blueprint — 1960s 工程制图：蓝图蓝 · 白线网格 · 红批注 · 米黄标注 */
+
+html[data-ui='blueprint'] {
+  --radius-card: 2px;
+  --radius-button: 2px;
+  --radius-small: 2px;
+
+  --bg-primary: #0e3a5f;
+  --bg-secondary: #0c3252;
+  --text-primary: #f0f6ff;
+  --text-secondary: rgb(240 246 255 / 0.72);
+  --border-color: rgb(255 255 255 / 0.85);
+
+  --ui-accent: #e63946;
+  --ui-accent-soft: rgb(230 57 70 / 0.2);
+  --ui-accent-text: #ff8a94;
+
+  --font-body-current: 'Architects Daughter', 'IBM Plex Mono', cursive;
+  --font-heading-current: 'Architects Daughter', 'IBM Plex Mono', cursive;
+
+  --glass-bg: rgb(14 58 95 / 0.92);
+  --glass-bg-hover: rgb(18 68 110 / 0.95);
+  --glass-bg-strong: rgb(10 48 78 / 0.96);
+  --glass-border: rgb(255 255 255 / 0.75);
+
+  --shadow-soft: none;
+  --shadow-normal: 0 0 0 1px rgb(255 255 255 / 0.55);
+  --shadow-hover: 0 0 0 1px #fff, 0 0 0 4px rgb(255 255 255 / 0.15);
+  --shadow-active: inset 0 0 0 1px rgb(255 255 255 / 0.4);
+
+  --chrome-bg-top: rgb(14 58 95 / 0.98);
+  --chrome-bg-bottom: #0c3252;
+  --chrome-border: rgb(255 255 255 / 0.7);
+  --chrome-shadow: none;
+  --chrome-hover: rgb(255 255 255 / 0.08);
+  --chrome-active: rgb(255 255 255 / 0.12);
+  --chrome-subtle: rgb(255 255 255 / 0.06);
+  --chrome-text: #f0f6ff;
+  --chrome-text-muted: rgb(240 246 255 / 0.65);
+  --chrome-dropdown-bg: #0c3252;
+
+  --widget-bg-rgb: 14 58 95;
+  --widget-fg: #f0f6ff;
+  --widget-fg-muted: rgb(240 246 255 / 0.65);
+  --widget-border: rgb(255 255 255 / 0.75);
+  --widget-header-bg: #0c3252;
+  --widget-shadow: none;
+
+  --neo-surface: #0e3a5f;
+  --neo-track: rgb(255 255 255 / 0.2);
+  --neo-thumb: #f4ecd8;
+  --neo-raised: 0 0 0 1px rgb(255 255 255 / 0.55);
+  --neo-inset: inset 0 0 0 1px rgb(255 255 255 / 0.35);
+
+  --code-bg: #082840;
+  --code-fg: #f4ecd8;
+}
+
+html[data-ui='blueprint'] body {
+  background-color: var(--bg-primary);
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.14) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+  background-size: 48px 48px, 48px 48px, 12px 12px, 12px 12px;
+}
+
+html[data-ui='blueprint']::before {
+  content: '';
+  position: fixed;
+  inset: 12px;
+  pointer-events: none;
+  z-index: 0;
+  border: 2px solid rgb(255 255 255 / 0.55);
+  box-shadow: inset 0 0 0 6px rgb(14 58 95 / 0.5);
+}
+
+html[data-ui='blueprint'] .mac-settings,
+html[data-ui='blueprint'] .floating-widget,
+html[data-ui='blueprint'] .site-nav-shell,
+html[data-ui='blueprint'] .pixel-card,
+html[data-ui='blueprint'] .glass-container,
+html[data-ui='blueprint'] .ui-skin-card {
+  border: 1px solid rgb(255 255 255 / 0.75);
+  border-radius: 2px;
+  box-shadow: var(--shadow-normal);
+  backdrop-filter: none;
+  position: relative;
+}
+
+html[data-ui='blueprint'] .floating-widget::before,
+html[data-ui='blueprint'] .mac-settings::before,
+html[data-ui='blueprint'] .pixel-card::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  pointer-events: none;
+  border: 1px dashed rgb(255 255 255 / 0.35);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+html[data-ui='blueprint'] .floating-widget:hover::before,
+html[data-ui='blueprint'] .mac-settings:hover::before,
+html[data-ui='blueprint'] .pixel-card:hover::before {
+  opacity: 1;
+}
+
+html[data-ui='blueprint'] .mac-menu-app-name::after {
+  content: ' · A1';
+  color: #f4ecd8;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72em;
+}
+
+html[data-ui='blueprint'] mark,
+html[data-ui='blueprint'] .ui-accent-text {
+  color: #ff8a94;
+  background: rgb(230 57 70 / 0.15);
+}
+
+html[data-ui='blueprint'] .mac-search-input,
+html[data-ui='blueprint'] input,
+html[data-ui='blueprint'] textarea {
+  font-family: 'IBM Plex Mono', monospace;
+  background: rgb(8 40 64 / 0.8);
+  border-color: rgb(255 255 255 / 0.5);
+  color: #f4ecd8;
+}
+
+html[data-ui='blueprint'] .site-nav-link:hover,
+html[data-ui='blueprint'] .mac-menu-nav-link:hover {
+  outline: 1px dashed #e63946;
+  outline-offset: 2px;
+}

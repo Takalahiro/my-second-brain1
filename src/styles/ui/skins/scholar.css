@@ -1,0 +1,134 @@
+/* scholar — 学院手稿：羊皮纸 · 墨黑 · 朱红批注 · 旧金 · 咖啡渍 */
+
+html[data-ui='scholar'] {
+  --radius-card: 4px;
+  --radius-button: 4px;
+  --radius-small: 3px;
+
+  --bg-primary: #f4ecd8;
+  --bg-secondary: #ebe2cc;
+  --text-primary: #1c1814;
+  --text-secondary: #4a4238;
+  --border-color: rgb(28 24 20 / 0.22);
+
+  --ui-accent: #8b2500;
+  --ui-accent-soft: rgb(139 37 0 / 0.1);
+  --ui-accent-text: #8b2500;
+
+  --font-body-current: 'EB Garamond', 'Noto Serif SC', Georgia, serif;
+  --font-heading-current: 'EB Garamond', 'Noto Serif SC', Georgia, serif;
+
+  --glass-bg: rgb(244 236 216 / 0.92);
+  --glass-bg-hover: rgb(250 244 232 / 0.96);
+  --glass-bg-strong: rgb(235 226 204 / 0.95);
+  --glass-border: rgb(28 24 20 / 0.18);
+
+  --shadow-soft: 2px 3px 12px rgb(28 24 20 / 0.08);
+  --shadow-normal: 3px 4px 18px rgb(28 24 20 / 0.1), 0 0 0 1px rgb(28 24 20 / 0.06);
+  --shadow-hover: 4px 6px 24px rgb(28 24 20 / 0.14);
+
+  --chrome-bg-top: rgb(244 236 216 / 0.97);
+  --chrome-bg-bottom: #ebe2cc;
+  --chrome-border: rgb(28 24 20 / 0.15);
+  --chrome-shadow: 2px 4px 16px rgb(28 24 20 / 0.08);
+  --chrome-hover: rgb(28 24 20 / 0.05);
+  --chrome-subtle: rgb(28 24 20 / 0.04);
+  --chrome-text: #1c1814;
+  --chrome-text-muted: #6b5e4f;
+
+  --widget-bg-rgb: 244 236 216;
+  --widget-fg: #1c1814;
+  --widget-fg-muted: #6b5e4f;
+  --widget-border: rgb(28 24 20 / 0.2);
+  --widget-header-bg: #ebe2cc;
+  --widget-shadow: 3px 4px 16px rgb(28 24 20 / 0.1);
+
+  --neo-surface: #f4ecd8;
+  --neo-track: #c4b8a0;
+  --neo-thumb: #f4ecd8;
+  --neo-raised: 2px 3px 8px rgb(28 24 20 / 0.12);
+  --neo-inset: inset 0 1px 3px rgb(28 24 20 / 0.12);
+
+  --code-bg: #ebe2cc;
+  --code-fg: #1c1814;
+}
+
+html.dark[data-ui='scholar'] {
+  --bg-primary: #2a241c;
+  --bg-secondary: #342c22;
+  --text-primary: #f4ecd8;
+  --text-secondary: #c4b8a0;
+  --glass-bg: rgb(42 36 28 / 0.94);
+  --chrome-bg-top: rgb(42 36 28 / 0.97);
+  --widget-bg-rgb: 42 36 28;
+}
+
+html[data-ui='scholar'] body {
+  background:
+    radial-gradient(circle at 78% 88%, rgb(101 67 33 / 0.12) 0%, transparent 28%),
+    radial-gradient(circle at 22% 12%, rgb(101 67 33 / 0.06) 0%, transparent 22%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 27px,
+      rgb(28 24 20 / 0.04) 27px,
+      rgb(28 24 20 / 0.04) 28px
+    ),
+    var(--bg-primary);
+  box-shadow: inset 48px 0 0 -44px rgb(28 24 20 / 0.06);
+}
+
+html[data-ui='scholar']::after {
+  content: '';
+  position: fixed;
+  top: 12%;
+  right: 8%;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+  border: 2px solid rgb(101 67 33 / 0.08);
+  box-shadow: inset 0 0 20px rgb(101 67 33 / 0.06);
+  opacity: 0.5;
+}
+
+html[data-ui='scholar'] .mac-settings,
+html[data-ui='scholar'] .floating-widget,
+html[data-ui='scholar'] .site-nav-shell,
+html[data-ui='scholar'] .pixel-card,
+html[data-ui='scholar'] .glass-container {
+  background: rgb(244 236 216 / 0.94);
+  border: 1px solid rgb(28 24 20 / 0.14);
+  box-shadow: var(--shadow-normal);
+  backdrop-filter: none;
+}
+
+html[data-ui='scholar'] .mac-menu-app-name {
+  font-style: italic;
+}
+
+html[data-ui='scholar'] .mac-menu-app-name::before {
+  content: '— ';
+  color: #b8860b;
+}
+
+html[data-ui='scholar'] h1,
+html[data-ui='scholar'] h2,
+html[data-ui='scholar'] .notes-toolbar-text {
+  font-family: 'EB Garamond', 'Noto Serif SC', serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+html[data-ui='scholar'] em,
+html[data-ui='scholar'] .mac-pane-hint {
+  font-family: 'Caveat', cursive;
+  font-size: 1.05em;
+  color: var(--ui-accent-text);
+}
+
+html[data-ui='scholar'] .ui-skin-card.is-active {
+  border-color: #b8860b;
+  box-shadow: 0 0 0 2px rgb(184 134 11 / 0.25);
+}

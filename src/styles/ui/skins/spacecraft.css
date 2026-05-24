@@ -1,0 +1,122 @@
+/* spacecraft — ISS 太空舱：深空黑 · 仪表蓝 · 警示橙 · 乘员视角 */
+
+html[data-ui='spacecraft'] {
+  --radius-card: 4px;
+  --radius-button: 4px;
+  --radius-small: 3px;
+
+  --bg-primary: #050810;
+  --bg-secondary: #0c1428;
+  --text-primary: #c8d8f0;
+  --text-secondary: rgb(200 216 240 / 0.62);
+  --border-color: rgb(74 144 217 / 0.35);
+
+  --ui-accent: #4a90d9;
+  --ui-accent-soft: rgb(74 144 217 / 0.15);
+  --ui-accent-text: #ff8c42;
+
+  --font-body-current: 'Orbitron', 'IBM Plex Sans', system-ui, sans-serif;
+  --font-heading-current: 'Orbitron', 'IBM Plex Sans', sans-serif;
+
+  --glass-bg: rgb(5 8 16 / 0.94);
+  --glass-bg-hover: rgb(12 20 40 / 0.96);
+  --glass-border: rgb(74 144 217 / 0.3);
+
+  --shadow-soft: 0 4px 24px rgb(0 0 0 / 0.5);
+  --shadow-normal: 0 0 0 1px rgb(74 144 217 / 0.25), inset 0 0 20px rgb(74 144 217 / 0.04);
+  --shadow-hover: 0 0 20px rgb(74 144 217 / 0.15);
+
+  --chrome-bg-top: rgb(5 8 16 / 0.98);
+  --chrome-bg-bottom: #0c1428;
+  --chrome-border: rgb(74 144 217 / 0.28);
+  --chrome-text: #c8d8f0;
+  --chrome-text-muted: rgb(200 216 240 / 0.55);
+  --chrome-subtle: rgb(74 144 217 / 0.06);
+
+  --widget-bg-rgb: 5 8 16;
+  --widget-fg: #c8d8f0;
+  --widget-fg-muted: rgb(200 216 240 / 0.55);
+  --widget-border: rgb(74 144 217 / 0.32);
+  --widget-header-bg: #0c1428;
+  --widget-shadow: var(--shadow-normal);
+
+  --neo-surface: #0c1428;
+  --neo-track: rgb(74 144 217 / 0.2);
+  --neo-thumb: #4a90d9;
+
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-ui='spacecraft'] body {
+  background:
+    radial-gradient(ellipse 100% 80% at 50% 120%, rgb(74 144 217 / 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 15%, rgb(255 255 255 / 0.04) 0%, transparent 25%),
+    var(--bg-primary);
+}
+
+html[data-ui='spacecraft']::before {
+  content: '';
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 120px;
+  height: 120px;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+  border: 3px solid rgb(74 144 217 / 0.15);
+  box-shadow:
+    inset 0 0 40px rgb(74 144 217 / 0.08),
+    0 0 60px rgb(74 144 217 / 0.05);
+  opacity: 0.6;
+}
+
+html[data-ui='spacecraft'] .mac-settings,
+html[data-ui='spacecraft'] .floating-widget,
+html[data-ui='spacecraft'] .site-nav-shell,
+html[data-ui='spacecraft'] .pixel-card,
+html[data-ui='spacecraft'] .glass-container {
+  border: 1px solid rgb(74 144 217 / 0.3);
+  border-radius: 4px;
+  box-shadow: var(--shadow-normal);
+  backdrop-filter: none;
+  background: rgb(5 8 16 / 0.92);
+}
+
+html[data-ui='spacecraft'] .floating-widget .fw-header::before,
+html[data-ui='spacecraft'] .mac-menu-bar::after {
+  content: none;
+}
+
+html[data-ui='spacecraft'] .mac-menu-app-name::before {
+  content: 'ISS · ';
+  color: #ff8c42;
+  font-weight: 600;
+}
+
+html[data-ui='spacecraft'] .mac-menu-clock::before {
+  content: 'T+ ';
+  color: rgb(74 144 217 / 0.7);
+  font-size: 0.85em;
+}
+
+html[data-ui='spacecraft'] .floating-widget {
+  border-left: 3px solid rgb(255 140 66 / 0.5);
+}
+
+html[data-ui='spacecraft'] .ui-skin-card.is-active {
+  border-color: #4a90d9;
+  box-shadow: 0 0 12px rgb(74 144 217 / 0.2);
+}
+
+html[data-ui='spacecraft'] .mac-toggle input:checked + span {
+  background: rgb(74 144 217 / 0.45);
+  box-shadow: 0 0 8px rgb(74 144 217 / 0.3);
+}
+
+html[data-ui='spacecraft'] button:focus-visible,
+html[data-ui='spacecraft'] a:focus-visible {
+  outline: 2px solid #ff8c42;
+  outline-offset: 2px;
+}

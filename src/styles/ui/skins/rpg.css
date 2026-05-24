@@ -1,0 +1,111 @@
+/* rpg — 游戏 HUD / RPG 学习面板：深紫 · 金边 · 经验条 · 徽章 */
+
+html[data-ui='rpg'] {
+  --radius-card: 8px;
+  --radius-button: 6px;
+  --radius-small: 4px;
+
+  --bg-primary: #1a0f2e;
+  --bg-secondary: #241538;
+  --text-primary: #f0e6ff;
+  --text-secondary: rgb(240 230 255 / 0.65);
+  --border-color: rgb(212 175 55 / 0.45);
+
+  --ui-accent: #d4af37;
+  --ui-accent-soft: rgb(212 175 55 / 0.15);
+  --ui-accent-text: #ffd700;
+
+  --font-body-current: 'Cinzel', 'Noto Serif SC', serif;
+  --font-heading-current: 'Cinzel', serif;
+
+  --glass-bg: rgb(26 15 46 / 0.92);
+  --glass-bg-hover: rgb(36 21 56 / 0.94);
+  --glass-border: rgb(212 175 55 / 0.35);
+
+  --shadow-soft: 0 4px 20px rgb(0 0 0 / 0.4);
+  --shadow-normal: 0 0 0 1px rgb(212 175 55 / 0.35), 0 8px 28px rgb(0 0 0 / 0.45), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --shadow-hover: 0 0 24px rgb(212 175 55 / 0.2);
+
+  --chrome-bg-top: rgb(26 15 46 / 0.97);
+  --chrome-bg-bottom: #241538;
+  --chrome-border: rgb(212 175 55 / 0.35);
+  --chrome-text: #f0e6ff;
+  --chrome-text-muted: rgb(240 230 255 / 0.55);
+  --chrome-subtle: rgb(212 175 55 / 0.08);
+
+  --widget-bg-rgb: 26 15 46;
+  --widget-fg: #f0e6ff;
+  --widget-fg-muted: rgb(240 230 255 / 0.55);
+  --widget-border: rgb(212 175 55 / 0.4);
+  --widget-header-bg: #241538;
+  --widget-shadow: var(--shadow-normal);
+
+  --neo-surface: #241538;
+  --neo-track: rgb(100 149 237 / 0.25);
+  --neo-thumb: #6495ed;
+
+  --code-bg: #120a22;
+  --code-fg: #6495ed;
+}
+
+html[data-ui='rpg'] body {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgb(100 50 180 / 0.2) 0%, transparent 55%),
+    linear-gradient(180deg, #1a0f2e 0%, #120820 100%);
+}
+
+html[data-ui='rpg']::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 200;
+  pointer-events: none;
+  background: linear-gradient(90deg, #6495ed 0%, #6495ed var(--rpg-xp, 42%), rgb(212 175 55 / 0.2) var(--rpg-xp, 42%), rgb(212 175 55 / 0.2) 100%);
+  box-shadow: 0 0 12px rgb(100 149 237 / 0.4);
+}
+
+html[data-ui='rpg'] {
+  --rpg-xp: 42%;
+}
+
+html[data-ui='rpg'] .mac-settings,
+html[data-ui='rpg'] .floating-widget,
+html[data-ui='rpg'] .site-nav-shell,
+html[data-ui='rpg'] .pixel-card,
+html[data-ui='rpg'] .glass-container {
+  border: 1px solid rgb(212 175 55 / 0.4);
+  box-shadow: var(--shadow-normal);
+  backdrop-filter: blur(6px);
+  background: rgb(26 15 46 / 0.9);
+}
+
+html[data-ui='rpg'] .floating-widget .fw-header,
+html[data-ui='rpg'] .mac-pane-head {
+  border-bottom: 1px solid rgb(212 175 55 / 0.25);
+  background: linear-gradient(180deg, rgb(212 175 55 / 0.08) 0%, transparent 100%);
+}
+
+html[data-ui='rpg'] .mac-menu-app-name {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+html[data-ui='rpg'] .mac-menu-app-name::before {
+  content: '◆ ';
+  color: #d4af37;
+}
+
+html[data-ui='rpg'] .ui-skin-card.is-active {
+  border-color: #d4af37;
+  box-shadow: 0 0 16px rgb(212 175 55 / 0.25);
+}
+
+html[data-ui='rpg'] .mac-toggle input:checked + span {
+  background: linear-gradient(90deg, #6495ed, #4169e1);
+  border: 1px solid rgb(212 175 55 / 0.4);
+}

@@ -1,0 +1,126 @@
+/* crt — 1983 复古计算机：琥珀磷光 · 扫描线 · RGB 色散 · 曲面畸变 */
+
+html[data-ui='crt'] {
+  --radius-card: 0;
+  --radius-button: 0;
+  --radius-small: 0;
+
+  --bg-primary: #120c00;
+  --bg-secondary: #1a1200;
+  --text-primary: #ffb000;
+  --text-secondary: rgb(255 176 0 / 0.72);
+  --border-color: rgb(255 176 0 / 0.45);
+
+  --ui-accent: #ffb000;
+  --ui-accent-soft: rgb(255 176 0 / 0.15);
+  --ui-accent-text: #ffc840;
+
+  --font-body-current: 'VT323', 'IBM Plex Mono', monospace;
+  --font-heading-current: 'VT323', monospace;
+
+  --glass-bg: rgb(18 12 0 / 0.94);
+  --glass-bg-hover: rgb(26 18 0 / 0.96);
+  --glass-border: rgb(255 176 0 / 0.35);
+
+  --shadow-soft: 0 0 12px rgb(255 176 0 / 0.15);
+  --shadow-normal: 0 0 0 1px rgb(255 176 0 / 0.35), 0 0 16px rgb(255 176 0 / 0.08);
+  --shadow-hover: 0 0 24px rgb(255 176 0 / 0.2);
+
+  --chrome-bg-top: rgb(18 12 0 / 0.97);
+  --chrome-bg-bottom: #1a1200;
+  --chrome-border: rgb(255 176 0 / 0.35);
+  --chrome-text: #ffb000;
+  --chrome-text-muted: rgb(255 176 0 / 0.6);
+  --chrome-subtle: rgb(255 176 0 / 0.06);
+
+  --widget-bg-rgb: 18 12 0;
+  --widget-fg: #ffb000;
+  --widget-fg-muted: rgb(255 176 0 / 0.65);
+  --widget-border: rgb(255 176 0 / 0.4);
+  --widget-header-bg: #1a1200;
+  --widget-shadow: 0 0 16px rgb(255 176 0 / 0.12);
+
+  --neo-surface: #1a1200;
+  --neo-track: rgb(255 176 0 / 0.2);
+  --neo-thumb: #ffb000;
+
+  font-size: 1.05rem;
+}
+
+html.dark[data-ui='crt'] {
+  --text-primary: #33ff33;
+  --text-secondary: rgb(51 255 51 / 0.72);
+  --ui-accent: #33ff33;
+  --ui-accent-text: #66ff66;
+  --border-color: rgb(51 255 51 / 0.4);
+  --chrome-text: #33ff33;
+  --widget-fg: #33ff33;
+}
+
+html[data-ui='crt'] body {
+  background: radial-gradient(ellipse 120% 80% at 50% 50%, #1a1200 0%, #080500 100%);
+  text-shadow: 0 0 4px rgb(255 176 0 / 0.5), 1px 0 rgb(255 0 0 / 0.15), -1px 0 rgb(0 255 255 / 0.1);
+}
+
+html[data-ui='crt']::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99998;
+  background: repeating-linear-gradient(
+    0deg,
+    rgb(0 0 0 / 0.12) 0,
+    rgb(0 0 0 / 0.12) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.35;
+}
+
+html[data-ui='crt']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99997;
+  background: radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 0.45) 100%);
+}
+
+html[data-ui='crt'] .mac-settings,
+html[data-ui='crt'] .floating-widget,
+html[data-ui='crt'] .site-nav-shell,
+html[data-ui='crt'] .pixel-card,
+html[data-ui='crt'] .glass-container {
+  border: 2px solid rgb(255 176 0 / 0.45);
+  border-radius: 0;
+  box-shadow: var(--shadow-normal), inset 0 0 30px rgb(255 176 0 / 0.04);
+  backdrop-filter: none;
+  background: rgb(18 12 0 / 0.92);
+}
+
+html[data-ui='crt'] .mac-menu-app-name {
+  font-family: 'Press Start 2P', 'VT323', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+html[data-ui='crt'] .floating-widget,
+html[data-ui='crt'] .mac-settings {
+  animation: crt-flicker 4s infinite;
+}
+
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.96; }
+  94% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui='crt'] .floating-widget,
+  html[data-ui='crt'] .mac-settings {
+    animation: none;
+  }
+}

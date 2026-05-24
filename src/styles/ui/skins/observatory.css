@@ -1,0 +1,93 @@
+/* observatory — 天文台：午夜蓝 · 星黄 · 银河紫 · 赤经赤纬网格 */
+
+html[data-ui='observatory'] {
+  --radius-card: 6px;
+  --radius-button: 4px;
+  --radius-small: 4px;
+
+  --bg-primary: #0a0e27;
+  --bg-secondary: #101636;
+  --text-primary: #e8e4dc;
+  --text-secondary: rgb(232 228 220 / 0.65);
+  --border-color: rgb(232 196 71 / 0.35);
+
+  --ui-accent: #e8c547;
+  --ui-accent-soft: rgb(232 197 71 / 0.12);
+  --ui-accent-text: #e8c547;
+
+  --font-body-current: 'Cormorant', 'Noto Serif SC', Georgia, serif;
+  --font-heading-current: 'Cormorant', 'Noto Serif SC', serif;
+
+  --glass-bg: rgb(10 14 39 / 0.92);
+  --glass-bg-hover: rgb(16 22 54 / 0.94);
+  --glass-border: rgb(232 196 71 / 0.25);
+
+  --shadow-soft: 0 4px 24px rgb(0 0 0 / 0.35);
+  --shadow-normal: 0 0 0 1px rgb(232 196 71 / 0.2), 0 8px 32px rgb(0 0 0 / 0.4);
+  --shadow-hover: 0 0 20px rgb(196 160 255 / 0.15);
+
+  --chrome-bg-top: rgb(10 14 39 / 0.97);
+  --chrome-bg-bottom: #101636;
+  --chrome-border: rgb(232 196 71 / 0.25);
+  --chrome-text: #e8e4dc;
+  --chrome-text-muted: rgb(232 228 220 / 0.55);
+  --chrome-subtle: rgb(232 196 71 / 0.06);
+
+  --widget-bg-rgb: 10 14 39;
+  --widget-fg: #e8e4dc;
+  --widget-fg-muted: rgb(232 228 220 / 0.55);
+  --widget-border: rgb(232 196 71 / 0.3);
+  --widget-header-bg: #101636;
+  --widget-shadow: 0 8px 32px rgb(0 0 0 / 0.45);
+
+  --neo-surface: #101636;
+  --neo-track: rgb(196 160 255 / 0.2);
+  --neo-thumb: #e8c547;
+
+  --code-bg: #080c20;
+  --code-fg: #e8c547;
+}
+
+html[data-ui='observatory'] body {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, rgb(232 197 71 / 0.8) 0, transparent 2px),
+    radial-gradient(1px 1px at 30% 65%, rgb(255 255 255 / 0.6) 0, transparent 2px),
+    radial-gradient(1.2px 1.2px at 70% 30%, rgb(196 160 255 / 0.7) 0, transparent 2px),
+    radial-gradient(1px 1px at 85% 75%, rgb(232 197 71 / 0.5) 0, transparent 2px),
+    radial-gradient(1px 1px at 55% 45%, rgb(255 255 255 / 0.4) 0, transparent 2px),
+    linear-gradient(rgb(232 196 71 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(232 196 71 / 0.06) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+}
+
+html[data-ui='observatory'] .mac-settings,
+html[data-ui='observatory'] .floating-widget,
+html[data-ui='observatory'] .site-nav-shell,
+html[data-ui='observatory'] .pixel-card,
+html[data-ui='observatory'] .glass-container {
+  border: 1px solid rgb(232 196 71 / 0.28);
+  box-shadow: var(--shadow-normal);
+  backdrop-filter: blur(8px);
+  background: rgb(10 14 39 / 0.88);
+}
+
+html[data-ui='observatory'] .mac-menu-app-name::after {
+  content: ' · RA 12ʰ 34ᵐ';
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62em;
+  color: rgb(196 160 255 / 0.85);
+  letter-spacing: 0.04em;
+}
+
+html[data-ui='observatory'] h1,
+html[data-ui='observatory'] h2 {
+  font-family: 'Cormorant', serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+html[data-ui='observatory'] .graph-widget,
+html[data-ui='observatory'] .floating-widget[class*='graph'] {
+  box-shadow: var(--shadow-normal), 0 0 40px rgb(196 160 255 / 0.08);
+}

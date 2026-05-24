@@ -1,0 +1,37 @@
+/* 皮肤交互特效（JS 挂载 + 全局样式） */
+
+.blueprint-dim-tip {
+  position: fixed;
+  z-index: 100000;
+  padding: 3px 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #f4ecd8;
+  background: rgb(14 58 95 / 0.95);
+  border: 1px solid rgb(255 255 255 / 0.65);
+  border-radius: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.12s, transform 0.12s;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.35);
+}
+
+.blueprint-dim-tip.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.blueprint-dim-tip::before {
+  content: 'DIM ';
+  color: #e63946;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blueprint-dim-tip {
+    transition: none;
+  }
+}

@@ -119,7 +119,20 @@ Astro Content Layer 读取 vault 内 Markdown，经 Unified remark/rehype 链输
 | 回主界面 intro | `HudEclipseIntro.astro`（日全食加载动画） |
 | CLI 搜索样式 | `hud-mission-chrome.css` → 搜索框 `MSB://CMD>` 前缀 |
 
-HUD 模式下 `WidgetHost` 使用 `HudWallpaper` 替代普通 `BackgroundLayer`；小组件功能不被 HUD 样式隐藏，仅叠加 mission chrome 视觉。
+| 皮肤 ID | 名称 | 特征 |
+|---------|------|------|
+| `mac` / `glass` / `pixel` / `hud` | 原有四套 | 见 v1.3.0 之前 |
+| `blueprint` | 工程蓝图 | 蓝图蓝网格 · A1 图框 · hover 尺寸标注（JS） |
+| `scholar` | 学院手稿 | 羊皮纸 · Garamond · 咖啡环 · 装订线 |
+| `terminal` | 终端 CLI | 磷光绿 / Dracula · `:open` 搜索前缀 · 闪烁光标 |
+| `crt` | CRT 复古 | 琥珀磷光 · 扫描线 · 色散 · 轻微闪烁 |
+| `observatory` | 天文台 | 午夜星图 · 赤经标注 · 银河紫点缀 |
+| `herbarium` | 博物图鉴 | 标本网格 · 墨绿 · 拉丁学名气质 |
+| `ink` | 水墨古籍 | 宣纸 · 印章标题 · 竖排辅助线 |
+| `rpg` | RPG 面板 | 顶栏经验条 · 金边技能框 · Cinzel |
+| `spacecraft` | 太空舱 | ISS 乘员视角 · 舷窗 · 仪表蓝 / 警示橙 |
+
+样式文件位于 `src/styles/ui/skins/*.css`；蓝图尺寸标注由 `src/features/ui/skin-effects.ts` 在切换皮肤时挂载。
 
 ---
 

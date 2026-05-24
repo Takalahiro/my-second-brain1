@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=DotGothic16&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=DotGothic16&family=Barlow+Condensed:wght@400;500;600;700&family=Architects+Daughter&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600&family=JetBrains+Mono:wght@400;500;600&family=Fira+Code:wght@400;500&family=VT323&family=Press+Start+2P&family=Cormorant:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600;700&family=Orbitron:wght@400;600&display=swap');
 @import './global.css';
 @import './pixel.css';
 @import './site-nav.css';

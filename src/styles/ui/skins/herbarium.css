@@ -1,0 +1,90 @@
+/* herbarium — 植物学博物图鉴：羊皮 · 墨绿 · 朱砂 · 蝶翅蓝 */
+
+html[data-ui='herbarium'] {
+  --radius-card: 3px;
+  --radius-button: 3px;
+  --radius-small: 2px;
+
+  --bg-primary: #f2ebe0;
+  --bg-secondary: #e8efe4;
+  --text-primary: #1a2e1a;
+  --text-secondary: #3d5240;
+  --border-color: rgb(26 46 26 / 0.22);
+
+  --ui-accent: #2d5a3d;
+  --ui-accent-soft: rgb(45 90 61 / 0.12);
+  --ui-accent-text: #c0392b;
+
+  --font-body-current: 'EB Garamond', 'Noto Serif SC', Georgia, serif;
+  --font-heading-current: 'Cormorant', 'Noto Serif SC', serif;
+
+  --glass-bg: rgb(242 235 224 / 0.94);
+  --glass-bg-hover: rgb(248 244 236 / 0.97);
+  --glass-border: rgb(45 90 61 / 0.22);
+
+  --shadow-soft: 2px 3px 14px rgb(26 46 26 / 0.08);
+  --shadow-normal: 0 0 0 1px rgb(45 90 61 / 0.15), 2px 4px 16px rgb(26 46 26 / 0.08);
+
+  --chrome-bg-top: rgb(242 235 224 / 0.97);
+  --chrome-bg-bottom: #e8efe4;
+  --chrome-border: rgb(45 90 61 / 0.2);
+  --chrome-text: #1a2e1a;
+  --chrome-text-muted: #5a6e5c;
+  --chrome-subtle: rgb(45 90 61 / 0.06);
+
+  --widget-bg-rgb: 242 235 224;
+  --widget-fg: #1a2e1a;
+  --widget-fg-muted: #5a6e5c;
+  --widget-border: rgb(45 90 61 / 0.22);
+  --widget-header-bg: #e8efe4;
+  --widget-shadow: var(--shadow-normal);
+
+  --neo-surface: #f2ebe0;
+  --neo-track: rgb(45 90 61 / 0.2);
+  --neo-thumb: #f2ebe0;
+}
+
+html[data-ui='herbarium'] body {
+  background:
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgb(91 163 199 / 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 5% 95%, rgb(45 90 61 / 0.06) 0%, transparent 40%),
+    linear-gradient(180deg, #f2ebe0 0%, #e8efe4 100%);
+}
+
+html[data-ui='herbarium'] .mac-settings,
+html[data-ui='herbarium'] .floating-widget,
+html[data-ui='herbarium'] .site-nav-shell,
+html[data-ui='herbarium'] .pixel-card,
+html[data-ui='herbarium'] .glass-container {
+  border: 1px solid rgb(45 90 61 / 0.25);
+  box-shadow: var(--shadow-normal);
+  backdrop-filter: none;
+  background: rgb(242 235 224 / 0.94);
+}
+
+html[data-ui='herbarium'] .mac-menu-app-name::after {
+  content: ' · Specimen';
+  font-family: 'Cormorant', serif;
+  font-style: italic;
+  font-size: 0.75em;
+  color: #2d5a3d;
+}
+
+html[data-ui='herbarium'] h1::after,
+html[data-ui='herbarium'] .notes-toolbar-text::after {
+  content: ' *';
+  color: #c0392b;
+  font-weight: 400;
+}
+
+html[data-ui='herbarium'] .ui-skin-card.is-active {
+  border-color: #2d5a3d;
+  background: rgb(45 90 61 / 0.06);
+}
+
+html[data-ui='herbarium'] .floating-widget {
+  background-image:
+    linear-gradient(rgb(45 90 61 / 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(45 90 61 / 0.03) 1px, transparent 1px);
+  background-size: 16px 16px;
+}

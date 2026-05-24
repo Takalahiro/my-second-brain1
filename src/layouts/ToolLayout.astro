@@ -1,6 +1,7 @@
 ---
 import '../styles/globals.css';
 import SiteNavBar from '../components/SiteNavBar.svelte';
+import UiSkinInit from '../features/ui/components/UiSkinInit.svelte';
 
 interface Props {
   title?: string;
@@ -62,9 +63,7 @@ const {
         document.documentElement.dataset.locale = 'en';
       }
       const ui = localStorage.getItem('second-brain:ui-skin');
-      if (ui && ['mac', 'glass', 'pixel', 'hud'].includes(ui)) {
-        document.documentElement.setAttribute('data-ui', ui);
-      }
+      if (ui) document.documentElement.setAttribute('data-ui', ui);
       if (localStorage.getItem('second-brain:ui-debug') === '1') {
         document.documentElement.classList.add('ui-debug', 'debug');
       }
@@ -96,6 +95,7 @@ const {
   </head>
   <body class="min-h-screen transition-colors tool-body">
     <SiteNavBar client:load variant="tool" currentPath={Astro.url.pathname} />
+    <UiSkinInit client:load />
     <main class:list={['tool-main', fullWidth && 'tool-main--full']}>
       <slot />
     </main>

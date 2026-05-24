@@ -6,6 +6,7 @@ import SiteNavBar from '../components/SiteNavBar.svelte';
 import Mermaid from '../components/Mermaid.svelte';
 import MobileViewModeToggle from '../components/MobileViewModeToggle.svelte';
 import NotesToolHost from '../components/widgets/NotesToolHost.svelte';
+import UiSkinInit from '../features/ui/components/UiSkinInit.svelte';
 
 interface Props {
   title?: string;
@@ -59,9 +60,7 @@ const {
       }
 
       const ui = localStorage.getItem('second-brain:ui-skin');
-      if (ui && ['mac', 'glass', 'pixel', 'hud'].includes(ui)) {
-        document.documentElement.setAttribute('data-ui', ui);
-      }
+      if (ui) document.documentElement.setAttribute('data-ui', ui);
       if (localStorage.getItem('second-brain:ui-debug') === '1') {
         document.documentElement.classList.add('ui-debug', 'debug');
       }
@@ -75,6 +74,7 @@ const {
 
     <Mermaid client:idle />
     <MobileViewModeToggle client:load />
+    <UiSkinInit client:load />
     <NotesToolHost client:only="svelte" />
   </body>
 </html>

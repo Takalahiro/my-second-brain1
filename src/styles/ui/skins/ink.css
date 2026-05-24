@@ -1,0 +1,118 @@
+/* ink — 东方水墨古籍：宣纸 · 墨黑 · 印章朱红 · 青花蓝 */
+
+html[data-ui='ink'] {
+  --radius-card: 2px;
+  --radius-button: 2px;
+  --radius-small: 2px;
+
+  --bg-primary: #f7f3ea;
+  --bg-secondary: #efe9dc;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a4a4a;
+  --border-color: rgb(26 26 26 / 0.18);
+
+  --ui-accent: #c0392b;
+  --ui-accent-soft: rgb(192 57 43 / 0.1);
+  --ui-accent-text: #c0392b;
+
+  --font-body-current: 'Noto Serif SC', 'LXGW WenKai', 'Source Han Serif SC', serif;
+  --font-heading-current: 'Noto Serif SC', 'LXGW WenKai', serif;
+
+  --glass-bg: rgb(247 243 234 / 0.94);
+  --glass-bg-hover: rgb(252 250 246 / 0.97);
+  --glass-border: rgb(26 26 26 / 0.14);
+
+  --shadow-soft: 2px 3px 12px rgb(26 26 26 / 0.06);
+  --shadow-normal: 0 0 0 1px rgb(26 26 26 / 0.08), 3px 4px 16px rgb(26 26 26 / 0.06);
+
+  --chrome-bg-top: rgb(247 243 234 / 0.98);
+  --chrome-bg-bottom: #efe9dc;
+  --chrome-border: rgb(26 26 26 / 0.12);
+  --chrome-text: #1a1a1a;
+  --chrome-text-muted: #666;
+  --chrome-subtle: rgb(26 26 26 / 0.04);
+
+  --widget-bg-rgb: 247 243 234;
+  --widget-fg: #1a1a1a;
+  --widget-fg-muted: #666;
+  --widget-border: rgb(26 26 26 / 0.16);
+  --widget-header-bg: #efe9dc;
+  --widget-shadow: var(--shadow-normal);
+
+  --neo-surface: #f7f3ea;
+  --neo-track: rgb(26 26 26 / 0.15);
+  --neo-thumb: #f7f3ea;
+}
+
+html.dark[data-ui='ink'] {
+  --bg-primary: #1a1814;
+  --bg-secondary: #242018;
+  --text-primary: #f0ebe0;
+  --text-secondary: #b0a898;
+  --glass-bg: rgb(26 24 20 / 0.94);
+  --widget-bg-rgb: 26 24 20;
+}
+
+html[data-ui='ink'] body {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgb(26 26 26 / 0.03) 0%, transparent 60%),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      rgb(26 26 26 / 0.04) 39px,
+      rgb(26 26 26 / 0.04) 40px
+    ),
+    var(--bg-primary);
+}
+
+html[data-ui='ink'] .mac-settings,
+html[data-ui='ink'] .floating-widget,
+html[data-ui='ink'] .site-nav-shell,
+html[data-ui='ink'] .pixel-card,
+html[data-ui='ink'] .glass-container {
+  border: 1px solid rgb(26 26 26 / 0.14);
+  box-shadow: var(--shadow-normal);
+  backdrop-filter: none;
+}
+
+html[data-ui='ink'] h1,
+html[data-ui='ink'] h2,
+html[data-ui='ink'] .notes-toolbar-text {
+  position: relative;
+  display: inline-block;
+  padding-right: 2.5rem;
+}
+
+html[data-ui='ink'] h1::after,
+html[data-ui='ink'] .notes-toolbar-text::after {
+  content: '印';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(-8deg);
+  width: 1.8rem;
+  height: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #c0392b;
+  border: 2px solid #c0392b;
+  border-radius: 3px;
+  opacity: 0.85;
+  box-shadow: inset 0 0 0 1px rgb(192 57 43 / 0.3);
+}
+
+html[data-ui='ink'] .site-nav-link:hover,
+html[data-ui='ink'] a:hover {
+  text-decoration-color: #4a6fa5;
+}
+
+html[data-ui='ink'] blockquote {
+  border-left: 3px solid #4a6fa5;
+  padding-left: 1rem;
+  font-style: normal;
+  color: var(--text-secondary);
+}
