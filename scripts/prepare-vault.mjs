@@ -2,13 +2,20 @@
 /**
  * build 前预处理 — local dev / CI / Cloudflare Pages 第一步都会跑这个。
  *
- * 干的事：确认 vault submodule 不是空的 → 浅 clone 就 unshallow 一下（让 git log 能用）→
- * sync assets → 生成 notes-mtime.json → media-manifest / stats / wikilinks。
+ * 干的事：确认 vault submodule 不是空的 → CI 上自动拉远端最新笔记（避免 pointer 滞后）→
+ * 浅 clone 就 unshallow 一下 → sync assets → 生成 manifest。
  */
 import { execSync, spawnSync } from 'node:child_process';
 import { existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import {
+  alignVaultToRemote,
+  getPinnedVaultSha,
+  getVaultHead,
+  isCiBuild,
+  shortSha,
+} from './vault-remote.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VAULT = path.join(ROOT, 'obsidian-vault');
@@ -37,6 +44,28 @@ if (vaultEmpty) {
     console.error('  本地：手动运行 `git submodule update --init --recursive`');
     console.error('  Cloudflare Pages：在 Settings → Build & deploy 里启用 "Include git submodules"');
     process.exit(1);
+  }
+}
+
+// Step 1b — CI/Cloudflare build 直接用 vault 远端最新笔记，不依赖父仓库 pointer 是否及时 bump
+if (isCiBuild()) {
+  const before = getPinnedVaultSha(ROOT);
+  const { head, remote, updated } = alignVaultToRemote(ROOT, VAULT);
+  if (updated) {
+    console.log(
+      `▌ CI: vault 远端比父仓库 pointer 新 (${shortSha(before)} → ${shortSha(remote)})，build 用最新`,
+    );
+  } else {
+    console.log(`▌ CI: vault 已对齐 (${shortSha(head)})`);
+  }
+} else {
+  const pinned = getPinnedVaultSha(ROOT);
+  const head = existsSync(path.join(VAULT, '.git')) ? getVaultHead(VAULT) : null;
+  if (pinned && head && pinned !== head) {
+    console.warn(
+      `  ⚠ vault 本地 checkout (${shortSha(head)}) 与父仓库 pointer (${shortSha(pinned)}) 不一致`,
+    );
+    console.warn('  本地 dev 不会自动改 pointer；要同步请跑 pnpm vault:sync');
   }
 }
 

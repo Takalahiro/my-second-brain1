@@ -13,6 +13,7 @@ import { execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import process from 'node:process';
+import { getPinnedVaultSha, getRemoteVaultHead, getVaultHead, shortSha } from './vault-remote.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VAULT = path.join(ROOT, 'obsidian-vault');
@@ -88,13 +89,29 @@ if (localHead && remoteHead && localHead !== remoteHead) {
   console.log('  已是最新');
 }
 
-// Step 3 — vault 有变动就重生 manifest
-if (vaultChanged) {
+// Step 2b — 父仓库 pointer 落后 vault 远端（常见于 GitHub 已 push vault 但 pointer 未 bump）
+const pinnedSha = getPinnedVaultSha(ROOT);
+const remoteVault = getRemoteVaultHead(VAULT);
+const vaultHead = getVaultHead(VAULT);
+const pointerStale = Boolean(pinnedSha && remoteVault && pinnedSha !== remoteVault);
+
+if (pointerStale) {
+  console.log(
+    `\n▌ Step 2b: 父仓库 pointer (${shortSha(pinnedSha)}) 落后 vault 远端 (${shortSha(remoteVault)})`,
+  );
+  if (vaultHead !== remoteVault) {
+    run(`git checkout --detach ${remoteVault}`, VAULT);
+    vaultChanged = true;
+  }
+}
+
+// Step 3 — vault 有变动或 pointer 需对齐 → 重生 manifest
+if (vaultChanged || pointerStale) {
   console.log('\n▌ Step 3: 重新生成 notes-mtime / vault-sync-meta');
   run(`node "${path.join(SCRIPTS, 'build-mtime-manifest.mjs')}"`, ROOT);
   run(`node "${path.join(SCRIPTS, 'build-vault-sync-meta.mjs')}"`, ROOT);
 } else {
-  console.log('\n▌ Step 3: vault 无变动，跳过 manifest 重建');
+  console.log('\n▌ Step 3: vault 与 pointer 均已对齐，跳过 manifest 重建');
 }
 
 // Step 4 — 父仓库把 submodule pointer + meta 跟上

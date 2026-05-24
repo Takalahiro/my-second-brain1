@@ -16,8 +16,9 @@ my-second-brain1 (父仓库 - Astro 站点)
 │                      │                  │  obsidian-vault      │
 └──────────────────────┘                  └──────────┬───────────┘
                                                      │
-                                                     │ ① 自动 (cron 10 分钟)
+                                                     │ ① 自动 (cron 5 分钟)
                                                      │ ② 即时 (repository_dispatch)
+                                                     │ ③ CI build 拉远端最新（pointer 滞后也生效）
                                                      ▼
 ┌──────────────────────────────────────────────────────────────────┐
 │  GitHub: parent repo (my-second-brain1)                          │
@@ -51,8 +52,9 @@ powershell -ExecutionPolicy Bypass -File scripts/install-windows-scheduler.ps1
 - **行为**：
   1. 如果本地 vault 有未提交改动 → commit + push 到 GitHub vault
   2. fetch GitHub vault，能 fast-forward 就 reset 本地到远端（diverge 时跳过避免数据丢失）
-  3. 重新生成 `src/lib/notes-mtime.json`
-  4. **仅** commit + push 这两个白名单文件到父仓库：`obsidian-vault`（submodule pointer）和 `src/lib/notes-mtime.json` —— 不会误推你正在写的其他代码
+  3. **若父仓库 pointer 落后 vault 远端，也会 checkout 最新并 bump pointer**
+  4. 重新生成 `src/lib/notes-mtime.json`
+  5. **仅** commit + push 白名单到父仓库：`obsidian-vault`、`notes-mtime.json`、`vault-sync-meta.json`
 - **日志**：`logs/auto-sync.log`（自动保留最近 200 行）
 - **并发保护**：lockfile（`logs/auto-sync.lock`）防止上一次未完又开新一次
 
@@ -72,15 +74,19 @@ powershell -ExecutionPolicy Bypass -File scripts/install-windows-scheduler.ps1 -
 pnpm vault:auto --verbose
 ```
 
-### 第二层：GitHub Actions（每 10 分钟，云端兜底）
+### 第二层：GitHub Actions（每 5 分钟，云端兜底）
 
-`.github/workflows/sync-vault-submodule.yml` 每 10 分钟在 GitHub 上跑一次，无需你的机器开机。如果云端检测到 vault 上游有新 commit：
+`.github/workflows/sync-vault-submodule.yml` 每 5 分钟在 GitHub 上跑一次。对比**父仓库记录的 pointer** 与 **vault 远端 HEAD**，若落后则：
 
-1. 重建 `src/lib/notes-mtime.json` manifest
-2. bump 父仓库的 submodule pointer
-3. git push → 触发 Cloudflare Pages 自动重部署
+1. checkout vault 到远端最新
+2. 重建 `notes-mtime.json` / `vault-sync-meta.json`
+3. bump 父仓库 submodule pointer 并 push → 触发 Cloudflare 重部署
 
-这样即使你的电脑关机一周，回家打开网站仍然是最新的。
+### 第三层：Cloudflare build 拉远端（最终兜底）
+
+`scripts/prepare-vault.mjs` 在 CI/Cloudflare 环境（`CI` / `CF_PAGES`）下，**每次 build 都会 `fetch` vault 远端并用最新笔记构建**，即使父仓库 pointer 还没来得及 bump，网站也不会卡在旧内容。
+
+本地 `pnpm dev` 不会自动改 pointer，仍用父仓库 pin 的版本；要手动对齐跑 `pnpm vault:sync`。
 
 > **两层不会打架**：白名单 add（只 `obsidian-vault` + `notes-mtime.json`）+ 本地脚本 push 前先 `git pull --rebase` + lockfile，三重保险。
 
@@ -139,7 +145,7 @@ GitHub Action `.github/workflows/sync-vault-submodule.yml` 提供两种触发：
 | 现象 | 原因 | 解决 |
 |------|------|------|
 | `pnpm vault:sync` 提示 `rejected (non-fast-forward)` | 远程 vault 有别人/另一台机器的新 commit | 先 `pnpm vault:pull` 再 `pnpm vault:sync` |
-| 部署后笔记还是旧的 | submodule pointer 没更新 | 检查父仓库 `git log -1` 看最新 commit 是否含 `obsidian-vault` 变更 |
+| 部署后笔记还是旧的 | pointer 滞后 + build 未跑 | CI 已兜底拉远端；仍异常则查 Cloudflare 最近一次 build 日志 |
 | GitHub Action 跑了但没 commit | vault 上游没新 commit | 看 Action summary 里 `changed=false` 即正常 |
 | Cloudflare 没重新部署 | 父仓库没 push 新 commit | 手动跑一次 workflow_dispatch 触发 |
 

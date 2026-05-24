@@ -1,12 +1,10 @@
 name: Sync obsidian-vault submodule
 
 on:
-  # 每 10 分钟自动检查一次 obsidian-vault 上游
+  # 每 5 分钟检查 vault 上游（pointer 落后时 bump 并触发 Pages 重建）
   schedule:
-    - cron: '*/10 * * * *'
-  # 允许手动触发
+    - cron: '*/5 * * * *'
   workflow_dispatch:
-  # 允许从 obsidian-vault 仓库通过 repository_dispatch 远程触发
   repository_dispatch:
     types: [vault-updated]
 
@@ -32,22 +30,26 @@ jobs:
         id: update
         run: |
           set -e
+          PINNED=$(git ls-tree HEAD obsidian-vault | awk '{print $3}')
+          echo "pinned_sha=${PINNED}" >> "$GITHUB_OUTPUT"
+
           cd obsidian-vault
-          OLD_SHA=$(git rev-parse HEAD)
           git fetch origin
-          # 兼容 main / master 两种默认分支名
           DEFAULT_BRANCH=$(git remote show origin | sed -n '/HEAD branch/s/.*: //p')
           DEFAULT_BRANCH=${DEFAULT_BRANCH:-main}
-          git checkout "origin/${DEFAULT_BRANCH}"
-          NEW_SHA=$(git rev-parse HEAD)
+          REMOTE_SHA=$(git rev-parse "origin/${DEFAULT_BRANCH}")
+          git checkout --detach "$REMOTE_SHA"
           cd ..
-          echo "old_sha=${OLD_SHA}" >> "$GITHUB_OUTPUT"
-          echo "new_sha=${NEW_SHA}" >> "$GITHUB_OUTPUT"
+
+          echo "new_sha=${REMOTE_SHA}" >> "$GITHUB_OUTPUT"
           echo "branch=${DEFAULT_BRANCH}" >> "$GITHUB_OUTPUT"
-          if [ "${OLD_SHA}" = "${NEW_SHA}" ]; then
+
+          if [ "${PINNED}" = "${REMOTE_SHA}" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "vault pointer already up to date (${PINNED})"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "vault pointer stale: ${PINNED} -> ${REMOTE_SHA}"
           fi
 
       - name: Setup Node
@@ -68,13 +70,15 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add obsidian-vault src/lib/notes-mtime.json src/lib/vault-sync-meta.json
+          git diff --cached --quiet && echo "nothing to commit" && exit 0
           git commit -m "chore(vault): auto-sync submodule ${{ steps.update.outputs.new_sha }}"
+          git pull --rebase origin main || git pull --rebase origin master
           git push
 
       - name: Summary
         run: |
           echo "## Vault sync summary" >> $GITHUB_STEP_SUMMARY
-          echo "- old SHA: \`${{ steps.update.outputs.old_sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- new SHA: \`${{ steps.update.outputs.new_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- pinned SHA: \`${{ steps.update.outputs.pinned_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- remote SHA: \`${{ steps.update.outputs.new_sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- branch: \`${{ steps.update.outputs.branch }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- updated: \`${{ steps.update.outputs.changed }}\`" >> $GITHUB_STEP_SUMMARY

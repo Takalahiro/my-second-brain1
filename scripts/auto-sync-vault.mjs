@@ -2,8 +2,8 @@
 /**
  * 每小时自动 sync obsidian-vault — cron / Task Scheduler 挂着跑就行。
  *
- * 流程：vault dirty → commit+push → fetch + fast-forward → 重生 notes-mtime.json →
- * 父仓库只 commit 白名单两个 path（obsidian-vault + notes-mtime.json）→ push。
+ * 流程：vault dirty → commit+push → fetch + fast-forward → 若 pointer 落后远端也 bump →
+ * 重生 notes-mtime.json → 父仓库只 commit 白名单 path → push。
  * 日志滚在 logs/auto-sync.log，最近 200 行。
  *
  * 设计取向：默认静默（--verbose 才啰嗦）、add 只碰白名单、lockfile 防重叠跑、无改动就 no-op。
@@ -12,9 +12,15 @@
  *   node scripts/auto-sync-vault.mjs --verbose
  */
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync, unlinkSync, openSync, closeSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import {
+  getPinnedVaultSha,
+  getRemoteVaultHead,
+  getVaultHead,
+  shortSha,
+} from './vault-remote.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const VAULT = path.join(ROOT, 'obsidian-vault');
@@ -117,7 +123,6 @@ try {
   const remoteHead = git(['rev-parse', `origin/${branch}`], VAULT);
 
   if (localHead !== remoteHead) {
-    // local 是 remote 的 ancestor 才能 ff
     const isAncestor = spawnSync('git', ['merge-base', '--is-ancestor', localHead, remoteHead], {
       cwd: VAULT,
     }).status === 0;
@@ -130,8 +135,20 @@ try {
     }
   }
 
-  // 3. vault 有变动就重生 mtime + sync-meta
-  if (summary.upPushed || summary.downPulled) {
+  // 2b. 别的机器 push 了 vault，但父仓库 pointer 还没 bump — 主动对齐
+  const pinnedBefore = getPinnedVaultSha(ROOT);
+  const remoteVault = getRemoteVaultHead(VAULT);
+  const vaultHead = getVaultHead(VAULT);
+  const pointerStale = Boolean(pinnedBefore && remoteVault && pinnedBefore !== remoteVault);
+
+  if (pointerStale && vaultHead !== remoteVault) {
+    gitRun(['checkout', '--detach', remoteVault], VAULT);
+    summary.downPulled = true;
+    log('info', `vault aligned to remote ${shortSha(remoteVault)} (parent still at ${shortSha(pinnedBefore)})`);
+  }
+
+  // 3. vault 有变动，或 pointer 落后远端 → 重生 mtime + sync-meta
+  if (summary.upPushed || summary.downPulled || pointerStale) {
     for (const script of ['build-mtime-manifest.mjs', 'build-vault-sync-meta.mjs']) {
       const r = spawnSync('node', [path.join(ROOT, 'scripts', script)], {
         cwd: ROOT,
@@ -168,8 +185,8 @@ try {
     // staged 里还有 diff 才 commit
     const cached = git(['diff', '--cached', '--name-only'], ROOT, true);
     if (cached) {
-      const newVaultHash = shortHash(git(['rev-parse', 'HEAD'], VAULT));
-      gitRun(['commit', '-m', `chore(vault): auto-sync to ${newVaultHash}`], ROOT);
+      const newVaultHash = shortSha(getVaultHead(VAULT));
+      gitRun(['commit', '-m', `chore(vault): auto-sync submodule ${newVaultHash}`], ROOT);
 
       // 父 repo remote 上可能还有别的 commit（比如你手推的代码），rebase 一下
       try {
