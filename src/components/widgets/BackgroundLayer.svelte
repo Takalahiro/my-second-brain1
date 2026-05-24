@@ -306,13 +306,7 @@
       {#await import('./BackgroundPlyLayer.svelte')}
         <!-- loading banner handled below -->
       {:then { default: PlyLayer }}
-        <PlyLayer
-          plyUrl={isMobile ? (scene.compressedPly ?? scene.ply) : scene.ply}
-          poster={scene.poster}
-          {brightness}
-          {speed}
-          onStatus={onPlyStatus}
-        />
+        <PlyLayer plyUrl={scene.ply} poster={scene.poster} {brightness} {speed} onStatus={onPlyStatus} />
       {:catch err}
         <div class="bg-ply-banner is-error">{plyLoadErrorMessage(err)}</div>
       {/await}

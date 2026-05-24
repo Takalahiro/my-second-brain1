@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { createGS3Wallpaper, type GS3WallpaperStatus } from '../../features/wallpaper/render/gs3/gs3-wallpaper';
-  import { isMobileWallpaperDevice } from '../../features/wallpaper/device/is-mobile';
+  import { isMobileUa } from '../../features/wallpaper/device/is-mobile';
 
   type PlyLoadStatus = 'loading' | 'ready' | 'failed';
 
@@ -19,18 +19,17 @@
   let ready = $state(false);
   let failed = $state(false);
   let failMessage = $state('');
-  let mobile = $state(
-    typeof window !== 'undefined' ? isMobileWallpaperDevice() : false,
+  /** 手机/平板：只显示 poster，不跑 WebGL */
+  let posterOnly = $state(
+    typeof navigator !== 'undefined' ? isMobileUa() : false,
   );
-  let lowPower = $state(
-    typeof navigator !== 'undefined' ? (navigator.hardwareConcurrency ?? 8) <= 4 : false,
-  );
-  const useWebgl = $derived(!mobile || !lowPower);
 
   let engine: { dispose: () => void | Promise<void> } | null = null;
   let loadGen = 0;
   let abortCtrl: AbortController | null = null;
   let disposeChain: Promise<void> = Promise.resolve();
+
+  const layerVisible = $derived(ready || failed || posterOnly || !!poster);
 
   function report(status: PlyLoadStatus, message?: string) {
     ready = status === 'ready';
@@ -40,19 +39,16 @@
   }
 
   onMount(() => {
-    mobile = isMobileWallpaperDevice();
-    lowPower = (navigator.hardwareConcurrency ?? 8) <= 4;
-    const mql = window.matchMedia('(max-width: 768px)');
-    const onChange = () => {
-      mobile = isMobileWallpaperDevice();
-    };
-    mql.addEventListener('change', onChange);
+    posterOnly = isMobileUa();
+    if (posterOnly) {
+      report('ready');
+      return;
+    }
     return () => {
       loadGen++;
       abortCtrl?.abort();
       void engine?.dispose();
       engine = null;
-      mql.removeEventListener('change', onChange);
     };
   });
 
@@ -60,10 +56,7 @@
     const el = host;
     const url = plyUrl;
     const spd = speed;
-    if (!el || !url || !useWebgl) {
-      if (!useWebgl && poster) report('ready');
-      return;
-    }
+    if (!el || posterOnly || !url) return;
 
     loadGen++;
     const gen = loadGen;
@@ -73,10 +66,11 @@
     abortCtrl = new AbortController();
     ready = false;
     failed = false;
+    onStatus?.('loading');
 
     void (async () => {
       await disposeChain;
-      if (!active || gen !== loadGen || !el || !url) return;
+      if (!active || gen !== loadGen || !el || posterOnly || !url) return;
 
       engine = createGS3Wallpaper(el, {
         url,
@@ -102,14 +96,19 @@
 
 <div
   class="ply-layer gs-wallpaper"
-  class:is-ready={ready}
+  class:is-visible={layerVisible}
+  class:is-webgl-ready={ready && !posterOnly}
   class:is-failed={failed}
-  class:has-poster={!!poster}
   bind:this={host}
   aria-hidden="true"
 >
   {#if poster}
-    <img class="ply-poster" class:is-visible={!ready && !failed} src={poster} alt="" />
+    <img
+      class="ply-poster"
+      class:is-visible={!ready || posterOnly || failed}
+      src={poster}
+      alt=""
+    />
   {/if}
   {#if failed && failMessage}
     <div class="ply-error">{failMessage}</div>
@@ -127,17 +126,12 @@
     overflow: hidden;
     background: #121212;
   }
-  .ply-layer.is-ready,
-  .ply-layer.is-failed,
-  .ply-layer.has-poster:not(.is-ready):not(.is-failed) {
+  .ply-layer.is-visible {
     opacity: 1;
   }
-  /* 加载完成前隐藏 canvas，避免渐进解析时的画面漂移 */
-  .ply-layer:not(.is-ready) :global(canvas) {
+  /* WebGL 加载完成前隐藏 canvas，避免解析中的画面漂移 */
+  .ply-layer:not(.is-webgl-ready) :global(canvas) {
     visibility: hidden;
-  }
-  .ply-layer.is-failed {
-    opacity: 1;
   }
   .ply-layer :global(canvas) {
     display: block;
@@ -159,9 +153,11 @@
   .ply-poster.is-visible {
     opacity: 1;
   }
-  .ply-layer.is-ready .ply-poster {
+  .ply-layer.is-webgl-ready .ply-poster {
     opacity: 0;
-    pointer-events: none;
+  }
+  .ply-layer.is-webgl-ready .ply-poster.is-visible {
+    opacity: 1;
   }
   .ply-error {
     position: absolute;
