@@ -546,7 +546,7 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
 | 壁纸 rAF 暂停 | `document.hidden` |
 | Lazy import | 工具页、点云层、Pyodide |
 
-目标：避免移动端 Safari OOM 与 WebGL context 争用。
+AIM：避免移动端 Safari OOM 与 WebGL context 争用。
 
 ### 13.3 Python IDE 流程
 
@@ -568,7 +568,7 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
   → Pyodide formula-solver.py → SymPy
 ```
 
-FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不入 git）。
+FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 
 ---
 
@@ -583,7 +583,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不入 git）。
 | `messages/en.ts` | 英文文案 |
 | `catalog.ts` | 抽屉 / 菜单 catalog |
 
-皮肤名称、控制中心、小组件、工具页均走 i18n key。详见 [I18N_NOTES.md](./I18N_NOTES.md)。
+皮肤名称、控制中心、小组件、工具页均走 i18n key。详清见 [I18N_NOTES.md](./I18N_NOTES.md)。
 
 ---
 
@@ -605,7 +605,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不入 git）。
 | `katex` | KaTeX |
 | `svelte` | Svelte runtime |
 
-`modulePreload: false` 避免首屏预加载过重 chunk。
+`modulePreload: false` 可以避免首屏预加载过重 chunk。
 
 ---
 
@@ -687,7 +687,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不入 git）。
 | `scripts/verify-katex.mjs` | KaTeX 渲染验证 |
 | `scripts/diagnose-notes.mjs` | 笔记路由诊断 |
 
-推荐发布前流程：
+推荐发布前的流程：
 
 ```bash
 pnpm build
@@ -707,8 +707,6 @@ pnpm check:self http://localhost:4321
 | FormulaNet | 首次下载 ~77 MiB，依赖 CDN |
 | Pages 体积 | 大 PLY 必须部署期上传 |
 | LaTeX→SymPy | 启发式转换，复杂式子需人工核对 |
-
-可选后续：
 
 - KSplat 离线预处理减载
 - Service Worker 缓存 PLY
