@@ -2,6 +2,7 @@ import { DEFAULT_UI_SKIN, isUiSkinId, UI_STORAGE_KEY } from './registry';
 import type { UiSkinId } from './types';
 import { UI_SKIN_CHANGE_EVENT } from './hud-mode.svelte';
 import { initSkinEffects, teardownSkinEffects } from './skin-effects';
+import { invalidateWidgetSafeZoneCache } from '../../lib/floating-widget-layout';
 import { getSkinChrome, isImmersiveSkin } from './skin-chrome';
 
 export function getStoredUiSkin(): UiSkinId {
@@ -29,6 +30,13 @@ function applySkinChromeVars(id: UiSkinId): void {
       ? `calc(${profile.statusStripHeight}px + ${profile.menuBarHeight}px + max(env(safe-area-inset-top, 0px), 4px))`
       : `calc(max(env(safe-area-inset-top, 0px), 12px) + 44px)`,
   );
+  root.style.setProperty(
+    '--widget-safe-top',
+    profile.immersive
+      ? `calc(${profile.statusStripHeight}px + ${profile.menuBarHeight}px + max(env(safe-area-inset-top, 0px), 8px) + 8px)`
+      : `calc(max(env(safe-area-inset-top, 0px), 8px) + 52px + 8px)`,
+  );
+  invalidateWidgetSafeZoneCache();
 }
 
 export function applyUiSkin(id: UiSkinId): void {

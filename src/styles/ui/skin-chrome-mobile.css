@@ -1,0 +1,64 @@
+/* 移动端 · 桌面壳滚动 + 小组件触控 + 安全区 */
+
+@media (max-width: 768px) {
+  html {
+    --widget-safe-top: calc(
+      max(env(safe-area-inset-top, 0px), 6px) + var(--skin-strip-h, 0px) + var(--skin-menu-h, 48px) + 8px
+    );
+  }
+
+  html[data-ui-immersive] {
+    --widget-safe-top: calc(
+      max(env(safe-area-inset-top, 0px), 6px) + var(--skin-strip-h, 20px) + var(--skin-menu-h, 48px) + 8px
+    );
+  }
+
+  /* 允许整页纵向滚动（控制中心 / 长内容） */
+  body.mac-os-body.mac-os-body--scroll {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    height: auto !important;
+    min-height: 100dvh;
+    overscroll-behavior-y: contain;
+  }
+
+  body.mac-os-body.mac-os-body--scroll .mac-desktop {
+    position: relative !important;
+    inset: auto !important;
+    min-height: 100dvh;
+    height: auto;
+    overflow: visible !important;
+  }
+
+  body.mac-os-body.mac-os-body--scroll .mac-desktop-stage {
+    position: relative !important;
+    inset: auto !important;
+    min-height: calc(100dvh - var(--widget-safe-top, 72px) - 80px);
+    padding-top: 0;
+  }
+
+  /* 控制中心内部列表必须可滚 */
+  .mac-os-body .mac-settings .mac-body {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain;
+    touch-action: pan-y !important;
+  }
+
+  /* 小组件：非拖拽时允许页面滚动穿透 */
+  :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd):not(.is-active-drag) {
+    touch-action: pan-y pinch-zoom !important;
+  }
+
+  :is(.floating-widget, [class$='-widget'], .pixel-clock, .music-cd) .fw-body,
+  :is(.floating-widget, [class$='-widget']) :global(.scroll-area) {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html[data-ui-immersive] .skin-status-strip,
+  html[data-ui-immersive] .hud-status-strip {
+    pointer-events: none;
+  }
+}

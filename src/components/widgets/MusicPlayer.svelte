@@ -9,6 +9,7 @@
   import { makeWidgetTouchBindings } from '../../lib/widget-touch-bindings';
   import { signalWaveBars } from '../../lib/hud-widget-ui';
   import { getWidgetTier, tierClass } from '../../lib/widget-size-tier';
+  import { clampPosition, getWidgetSafeTop } from '../../lib/floating-widget-layout';
 
   interface Props {
     onClose?: () => void;
@@ -131,13 +132,15 @@
   function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
   function clampPos() {
     if (typeof window === 'undefined') return;
-    posX = clamp(posX, 4, Math.max(4, window.innerWidth - width - 4));
-    posY = clamp(posY, 4, Math.max(4, window.innerHeight - 80));
+    const p = clampPosition(posX, posY, width, height);
+    posX = p.x;
+    posY = p.y;
   }
   function clampOrb() {
     if (typeof window === 'undefined') return;
+    const minY = getWidgetSafeTop();
     orbX = clamp(orbX, 4, Math.max(4, window.innerWidth - 56));
-    orbY = clamp(orbY, 4, Math.max(4, window.innerHeight - 56));
+    orbY = clamp(orbY, minY, Math.max(minY, window.innerHeight - 56));
   }
   function persistLayout() {
     try { localStorage.setItem(LAYOUT_KEY, JSON.stringify({ x: posX, y: posY, width, height, r: rotation })); } catch {}

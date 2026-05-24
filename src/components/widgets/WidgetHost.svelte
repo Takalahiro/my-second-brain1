@@ -16,6 +16,7 @@
   import SkinCanvasWallpaper from '../wallpaper/SkinCanvasWallpaper.svelte';
   import SkinScrollIndicator from '../desktop/SkinScrollIndicator.svelte';
   import { useSkinChrome } from '../../features/ui/skin-chrome.svelte';
+  import { clampDropPoint } from '../../lib/floating-widget-layout';
   import { initUiSkin } from '../../features/ui/apply-ui';
 
   interface Props {
@@ -111,6 +112,12 @@
     desktopAtmosphere.rainDrops = desktopMode && bg.rainDrops;
   });
 
+  $effect(() => {
+    if (!desktopMode || typeof document === 'undefined') return;
+    document.body.classList.toggle('mac-os-body--scroll', isMobile);
+    return () => document.body.classList.remove('mac-os-body--scroll');
+  });
+
   onMount(() => {
     initUiSkin();
     globalMuted = readGlobalMuted();
@@ -192,7 +199,8 @@
         try {
           const cur = JSON.parse(localStorage.getItem('second-brain:music-layout') || '{}');
           const w = typeof cur.width === 'number' ? cur.width : 360;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), width: w });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, width: w });
         } catch { return ''; }
       },
     },
@@ -203,7 +211,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:notes-widget-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 560;
           const h = typeof cur.h === 'number' ? cur.h : 440;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h });
         } catch { return ''; }
       },
     },
@@ -215,7 +224,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:todo-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 360;
           const h = typeof cur.h === 'number' ? cur.h : 420;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h });
         } catch { return ''; }
       },
     },
@@ -226,7 +236,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:cal-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 380;
           const h = typeof cur.h === 'number' ? cur.h : 460;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h });
         } catch { return ''; }
       },
     },
@@ -237,7 +248,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:pomo-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 340;
           const h = typeof cur.h === 'number' ? cur.h : 380;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h });
         } catch { return ''; }
       },
     },
@@ -248,7 +260,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:weather-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 340;
           const h = typeof cur.h === 'number' ? cur.h : 380;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h });
         } catch { return ''; }
       },
     },
@@ -259,7 +272,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:stats-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 560;
           const h = typeof cur.h === 'number' ? cur.h : 520;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h });
         } catch { return ''; }
       },
     },
@@ -270,7 +284,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:world-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 640;
           const h = typeof cur.h === 'number' ? cur.h : 440;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h });
         } catch { return ''; }
       },
     },
@@ -281,7 +296,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:graph-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 680;
           const h = typeof cur.h === 'number' ? cur.h : 540;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h });
         } catch { return ''; }
       },
     },
@@ -292,7 +308,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:territory-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 720;
           const h = typeof cur.h === 'number' ? cur.h : 520;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h });
         } catch { return ''; }
       },
     },
@@ -303,7 +320,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:calc-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 420;
           const h = typeof cur.h === 'number' ? cur.h : 520;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h, r: cur.r ?? 0 });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h, r: cur.r ?? 0 });
         } catch { return ''; }
       },
     },
@@ -314,7 +332,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:python-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 520;
           const h = typeof cur.h === 'number' ? cur.h : 560;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h, r: cur.r ?? 0 });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h, r: cur.r ?? 0 });
         } catch { return ''; }
       },
     },
@@ -325,7 +344,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:whiteboard-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 640;
           const h = typeof cur.h === 'number' ? cur.h : 520;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h, r: cur.r ?? 0 });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h, r: cur.r ?? 0 });
         } catch { return ''; }
       },
     },
@@ -336,7 +356,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:whitenoise-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 380;
           const h = typeof cur.h === 'number' ? cur.h : 480;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h, r: cur.r ?? 0 });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h, r: cur.r ?? 0 });
         } catch { return ''; }
       },
     },
@@ -347,7 +368,8 @@
           const cur = JSON.parse(localStorage.getItem('second-brain:network-layout') || '{}');
           const w = typeof cur.w === 'number' ? cur.w : 400;
           const h = typeof cur.h === 'number' ? cur.h : 460;
-          return JSON.stringify({ x: Math.max(8, x - 24), y: Math.max(8, y - 16), w, h, r: cur.r ?? 0 });
+          const d = clampDropPoint(x, y);
+          return JSON.stringify({ x: d.x, y: d.y, w, h, r: cur.r ?? 0 });
         } catch { return ''; }
       },
     },

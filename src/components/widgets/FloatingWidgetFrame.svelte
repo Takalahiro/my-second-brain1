@@ -105,7 +105,7 @@
   });
 
   function clampPos() {
-    const p = clampPosition(posX, posY, width);
+    const p = clampPosition(posX, posY, width, minimized ? 48 : height);
     posX = p.x;
     posY = p.y;
   }

@@ -5,6 +5,7 @@
   import WhiteboardWidget from './WhiteboardWidget.svelte';
   import NotesToolDrawer from './NotesToolDrawer.svelte';
   import { isNotesContextPath } from '../../lib/notes-context';
+  import { clampDropPoint } from '../../lib/floating-widget-layout';
 
   const STORAGE_KEY = 'second-brain:notes-tools';
 
@@ -73,9 +74,10 @@
         const cur = JSON.parse(localStorage.getItem(m.key) || '{}');
         const w = typeof cur.w === 'number' ? cur.w : m.defaultW;
         const h = typeof cur.h === 'number' ? cur.h : m.defaultH;
+        const d = clampDropPoint(drop.x, drop.y);
         localStorage.setItem(
           m.key,
-          JSON.stringify({ x: Math.max(8, drop.x - 24), y: Math.max(8, drop.y - 16), w, h, r: cur.r ?? 0 })
+          JSON.stringify({ x: d.x, y: d.y, w, h, r: cur.r ?? 0 })
         );
       } catch {}
     }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { clampPosition, spawnPosition } from '../../lib/floating-widget-layout';
   import { onMount } from 'svelte';
   import WindowChrome from './WindowChrome.svelte';
   import ResizeHandles from './ResizeHandles.svelte';
@@ -112,22 +113,18 @@
     if (pinned) return;
     if (typeof window === 'undefined') return;
     if (posX < 0 || posY < 0) {
-      const W = window.innerWidth;
-      const H = window.innerHeight;
-      posX = Math.max(16, W - width - 24);
-      posY = Math.max(16, H - 220);
+      const sp = spawnPosition(width, height);
+      posX = sp.x;
+      posY = sp.y;
     }
     clampPos();
   });
 
   function clamp(v: number, min: number, max: number) { return Math.max(min, Math.min(max, v)); }
   function clampPos() {
-    if (pinned || typeof window === 'undefined' || !rootEl) return;
-    const W = window.innerWidth;
-    const H = window.innerHeight;
-    const h = rootEl.offsetHeight || 220;
-    posX = clamp(posX, 4, Math.max(4, W - width - 4));
-    posY = clamp(posY, 4, Math.max(4, H - h - 4));
+    const p = clampPosition(posX, posY, width, height);
+    posX = p.x;
+    posY = p.y;
   }
   function persist() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ hour24, showSeconds, style, sizeScale, bgAlpha })); } catch {}

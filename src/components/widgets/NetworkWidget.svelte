@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { clampPosition, spawnPosition, getWidgetSafeTop } from '../../lib/floating-widget-layout';
   import { onMount } from 'svelte';
   import WindowChrome from './WindowChrome.svelte';
   import ResizeHandles from './ResizeHandles.svelte';
@@ -68,9 +69,7 @@
   });
   const DISC_SIZE_DESKTOP = 84;
   const DISC_SIZE_MOBILE = 72;
-  const MENU_BAR_SAFE_TOP = 52;
-
-  function discSize() {
+    function discSize() {
     if (typeof window === 'undefined') return DISC_SIZE_DESKTOP;
     return window.matchMedia('(max-width: 768px)').matches ? DISC_SIZE_MOBILE : DISC_SIZE_DESKTOP;
   }
@@ -128,8 +127,9 @@
     } catch {}
 
     if (posX < 0 || posY < 0) {
-      posX = Math.max(24, Math.min(window.innerWidth - width - 24, 120));
-      posY = Math.max(24, Math.min(window.innerHeight - height - 24, 160));
+      const sp = spawnPosition(width, height);
+      posX = sp.x;
+      posY = sp.y;
     }
     if (discX < 0 || discY < 0) {
       discX = window.innerWidth - 88 - 24;
@@ -203,17 +203,15 @@
     return Math.max(min, Math.min(max, v));
   }
   function clampPos() {
-    if (typeof window === 'undefined') return;
-    const W = window.innerWidth;
-    const H = window.innerHeight;
-    posX = clamp(posX, 4, Math.max(4, W - width - 4));
-    posY = clamp(posY, MENU_BAR_SAFE_TOP, Math.max(MENU_BAR_SAFE_TOP, H - 80));
+    const p = clampPosition(posX, posY, width, minimized ? 48 : height);
+    posX = p.x;
+    posY = p.y;
   }
   function clampDisc() {
     if (typeof window === 'undefined') return;
     const size = discSize();
     discX = clamp(discX, 8, Math.max(8, window.innerWidth - size - 8));
-    discY = clamp(discY, MENU_BAR_SAFE_TOP, Math.max(MENU_BAR_SAFE_TOP, window.innerHeight - size - 8));
+    discY = clamp(discY, getWidgetSafeTop(), Math.max(getWidgetSafeTop(), window.innerHeight - size - 8));
   }
   function persistLayout() {
     try { localStorage.setItem(LAYOUT_KEY, JSON.stringify({ x: posX, y: posY, w: width, h: height, r: rotation })); } catch {}
