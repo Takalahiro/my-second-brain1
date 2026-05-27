@@ -53,8 +53,10 @@
 |------|------|------|
 | **1.5.0** | 2026-05-26 | **设计系统统一**：`theme-tokens.css` 语义变量、`design-system.css` 子页 spacing/阴影/组件类、`ThemeBoot.astro` 全站预水合；笔记/工具/图谱/MATLAB/Python/神经网络/白板子页对齐 mac 皮肤；图谱画布与 GraphWidget 主题化；`design-system/` structural widget 双轨；文档 [subpage-design-sync.md](./subpage-design-sync.md) · [theme-color-audit.md](./theme-color-audit.md) |
 | **1.4.0** | 2026-05-20 | **13 套 UI 皮肤**与 **Skin Chrome** 体系统一（状态条、CLI 搜索、滚动高度计）；控制中心右侧固定锚点；沉浸式皮肤恢复视频/海报壁纸；重写 README 与中英文文档 |
-| **1.3.0** | 2026-05-20 | NASA-punk **HUD 皮肤**（Canvas 壁纸、任务状态条、日全食 intro）；**NotesToolHost**（笔记页 Python / MATLAB / 白板）；修复笔记工具开关双触发 |
-| 1.2.0 | 2026-05-15 | 3DGS 环境壁纸、媒体 manifest、vault 同步与 git mtime |
+| **1.3.0** | 2026-05-20 | NASA-punk **HUD 皮肤**（Canvas 壁纸、任务状态条、日全食 intro）；**NotesToolHost**修复（笔记页 Python / MATLAB / 白板）；修复笔记工具开关双触发 |
+| 1.2.0 | 2026-05-15 | 3DGS 环境壁纸、媒体 manifest、vault 同步与 git mtime 修复|
+| 1.1.0 | 2026-05-14 | 环境壁纸test、vault 同步与 git mtime |
+| 1.0.0 | 2026-05-13 | 笔记同步 、python教学、matlab计算器 |
 
 ---
 
