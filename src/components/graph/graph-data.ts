@@ -25,22 +25,25 @@ export type WikiData = {
   hot?: { id: string; deg: number }[];
 };
 
-export const PALETTE = [
-  '#ff9ed4',
-  '#b48cff',
-  '#7dd0ff',
-  '#7fe6c4',
-  '#ffd86b',
-  '#ff9d6b',
-  '#a4b8ff',
-  '#ffa3a3',
-  '#9fffbb',
-  '#ff8de8',
+import { readCssVarList } from '../../lib/theme/css-vars';
+
+const FOLDER_FALLBACK = [
+  '#ff9ed4', '#b48cff', '#7dd0ff', '#7fe6c4',
+  '#ffd86b', '#ff9d6b', '#a4b8ff', '#ffa3a3',
+  '#9fffbb', '#ff8de8',
 ];
 
+function folderPalette(): string[] {
+  return readCssVarList('--graph-folder-', 10, FOLDER_FALLBACK);
+}
+
+/** @deprecated 使用 folderPalette()；静态导出仅供类型/测试 */
+export const PALETTE = FOLDER_FALLBACK;
+
 export function folderColor(folder: string, folders: string[]) {
+  const palette = folderPalette();
   const i = folders.indexOf(folder);
-  return PALETTE[(i < 0 ? 0 : i) % PALETTE.length];
+  return palette[(i < 0 ? 0 : i) % palette.length];
 }
 
 export async function loadWiki(options?: { fresh?: boolean }): Promise<WikiData> {

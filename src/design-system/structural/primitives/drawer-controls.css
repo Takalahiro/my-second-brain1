@@ -1,0 +1,609 @@
+/* 控制中心 · 九皮肤 Switch / Slider / Segment / Tabs */
+
+@import './switch-skins.css';
+
+.ctl-switch {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.ctl-switch:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Switch 样式见 switch-skins.css */
+
+/* —— Slider —— */
+.ctl-slider {
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.ctl-slider__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+  font-size: 0.72rem;
+}
+
+.ctl-slider__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+.ctl-slider__dim {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+  position: relative;
+}
+
+.ctl-slider__track {
+  flex: 1;
+  height: 8px;
+  border-top: 1px solid rgb(255 255 255 / 0.55);
+  border-bottom: 1px solid rgb(255 255 255 / 0.55);
+  position: relative;
+}
+
+.ctl-slider--blueprint .ctl-slider__fill {
+  position: absolute;
+  left: 0;
+  top: 3px;
+  height: 2px;
+  background: #f4ecd8;
+  transition: width 0.15s;
+}
+
+.ctl-slider--blueprint .ctl-slider__cursor {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 14px;
+  background: #e63946;
+  transform: translateX(-50%);
+  transition: left 0.15s;
+}
+
+.ctl-slider--blueprint .ctl-slider__tick {
+  font-size: 0.65rem;
+  color: rgb(255 255 255 / 0.55);
+}
+
+.ctl-slider--scholar .ctl-slider__ribbon-track {
+  height: 14px;
+  border-bottom: 1px solid rgb(139 90 43 / 0.25);
+  position: relative;
+}
+
+.ctl-slider--scholar .ctl-slider__ribbon {
+  position: absolute;
+  top: 0;
+  width: 3px;
+  height: 12px;
+  background: #8b0000;
+  transform: translateX(-50%);
+  transition: left 0.15s;
+}
+
+.ctl-slider--terminal .ctl-slider__bar,
+.ctl-slider--crt .ctl-slider__bar {
+  margin: 0;
+  font-size: 0.72rem;
+}
+
+.ctl-slider--terminal .ctl-slider__bar { color: #33ff66; font-family: 'JetBrains Mono', monospace; }
+.ctl-slider--crt .ctl-slider__bar { color: #ffb000; font-family: 'VT323', monospace; font-size: 0.95rem; }
+
+.ctl-slider--observatory .ctl-slider__ra {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: rgb(232 196 71 / 0.85);
+  margin-bottom: 2px;
+}
+
+.ctl-slider--herbarium .ctl-slider__ruler {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  color: rgb(45 90 61 / 0.65);
+  position: relative;
+  height: 14px;
+}
+
+.ctl-slider--herbarium .ctl-slider__needle {
+  position: absolute;
+  transform: translateX(-50%);
+  transition: left 0.15s;
+}
+
+.ctl-slider--ink .ctl-slider__scroll {
+  display: flex;
+  align-items: center;
+  height: 10px;
+  gap: 2px;
+}
+
+.ctl-slider--ink .ctl-slider__roll {
+  width: 6px;
+  height: 10px;
+  background: rgb(139 90 43 / 0.45);
+}
+
+.ctl-slider--ink .ctl-slider__paper {
+  height: 4px;
+  background: rgb(26 26 26 / 0.25);
+  transition: width 0.15s;
+  max-width: calc(100% - 16px);
+}
+
+.ctl-slider--rpg .ctl-slider__exp {
+  height: 10px;
+  border: 1px solid rgb(212 175 55 / 0.45);
+  background: rgb(0 0 0 / 0.35);
+  overflow: hidden;
+}
+
+.ctl-slider--rpg .ctl-slider__exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4169e1, #6495ed);
+  box-shadow: 0 0 8px rgb(100 149 237 / 0.45);
+  transition: width 0.15s;
+}
+
+.ctl-slider--spacecraft .ctl-slider__throttle {
+  display: flex;
+  gap: 2px;
+  height: 16px;
+  align-items: flex-end;
+}
+
+.ctl-slider--spacecraft .ctl-slider__seg {
+  flex: 1;
+  height: 40%;
+  background: rgb(136 192 255 / 0.15);
+  border: 1px solid rgb(136 192 255 / 0.25);
+  transition: height 0.15s, background 0.15s;
+}
+
+.ctl-slider--spacecraft .ctl-slider__seg.is-on {
+  height: 100%;
+  background: linear-gradient(180deg, #ffaa00, #4169e1);
+}
+
+/* —— Segment —— */
+.ctl-segment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ctl-segment__item {
+  position: relative;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  padding: 6px 10px;
+}
+
+.ctl-segment__item:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ctl-segment--blueprint .ctl-segment__item {
+  border: 1px solid rgb(255 255 255 / 0.45);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: #f0f6ff;
+}
+
+.ctl-segment--blueprint .ctl-segment__item.is-active {
+  outline: 2px solid #e63946;
+}
+
+.ctl-segment--blueprint .ctl-segment__fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 10px 10px 0;
+  border-color: transparent #f4ecd8 transparent transparent;
+}
+
+.ctl-segment--scholar .ctl-segment__item {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  border-bottom: 2px solid transparent;
+  font-size: 0.78rem;
+}
+
+.ctl-segment--scholar .ctl-segment__item.is-active {
+  border-bottom-color: #8b0000;
+}
+
+.ctl-segment--terminal .ctl-segment__item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: rgb(51 255 102 / 0.65);
+}
+
+.ctl-segment--terminal .ctl-segment__item.is-active {
+  color: #33ff66;
+  text-shadow: 0 0 6px #33ff66;
+}
+
+.ctl-segment--crt .ctl-segment__item {
+  font-family: 'VT323', monospace;
+  font-size: 0.9rem;
+  color: rgb(255 176 0 / 0.55);
+}
+
+.ctl-segment--crt .ctl-segment__item.is-active {
+  color: #ffb000;
+  background: rgb(255 176 0 / 0.12);
+  animation: crt-flicker-once 0.1s 1;
+}
+
+@keyframes crt-flicker-once {
+  50% { filter: brightness(1.8); }
+}
+
+.ctl-segment--observatory .ctl-segment__item {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: rgb(232 196 71 / 0.55);
+  border: 1px solid transparent;
+}
+
+.ctl-segment--observatory .ctl-segment__item.is-active {
+  border-color: rgb(232 196 71 / 0.45);
+  color: #e8c547;
+}
+
+.ctl-segment--herbarium .ctl-segment__item {
+  font-family: Georgia, serif;
+  font-size: 0.72rem;
+  border: 2px dashed rgb(45 90 61 / 0.25);
+  padding: 6px 8px;
+}
+
+.ctl-segment--herbarium .ctl-segment__item.is-active {
+  border-style: solid;
+}
+
+.ctl-segment--ink .ctl-segment__item {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.78rem;
+  border-bottom: 1px solid transparent;
+}
+
+.ctl-segment--ink .ctl-segment__item.is-active {
+  border-bottom-color: #c0392b;
+  color: #c0392b;
+}
+
+.ctl-segment--rpg .ctl-segment__item {
+  font-family: Cinzel, serif;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  border: 1px solid rgb(212 175 55 / 0.25);
+  color: rgb(232 220 200 / 0.65);
+}
+
+.ctl-segment--rpg .ctl-segment__item.is-active {
+  border-color: #d4af37;
+  color: #ffd700;
+  box-shadow: 0 0 10px rgb(255 215 0 / 0.15);
+}
+
+.ctl-segment--rpg .ctl-segment__arrow {
+  margin-right: 4px;
+  color: #fff;
+}
+
+.ctl-segment--spacecraft .ctl-segment__item {
+  font-family: 'Barlow Condensed', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  border: 1px solid rgb(74 144 217 / 0.35);
+  color: rgb(136 192 255 / 0.65);
+}
+
+.ctl-segment--spacecraft .ctl-segment__item.is-active {
+  border-color: #ffaa00;
+  color: #ffaa00;
+}
+
+/* —— Drawer Tabs —— */
+.ctl-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 8px;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+  flex-shrink: 0;
+}
+
+.structural-drawer-root .ctl-tabs {
+  background: color-mix(in srgb, var(--struct-drawer-bg) 92%, #000);
+}
+
+.ctl-tabs__item {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  padding: 6px 4px;
+  font-size: 0.62rem;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ctl-tabs--blueprint .ctl-tabs__item {
+  font-family: 'IBM Plex Mono', monospace;
+  color: rgb(240 246 255 / 0.65);
+  border: 1px solid transparent;
+}
+
+.ctl-tabs--blueprint .ctl-tabs__item.is-active {
+  border-color: rgb(255 255 255 / 0.45);
+  color: #f0f6ff;
+}
+
+.ctl-tabs--blueprint .ctl-tabs__fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border-width: 0 8px 8px 0;
+  border-style: solid;
+  border-color: transparent #f4ecd8 transparent transparent;
+}
+
+.ctl-tabs--scholar .ctl-tabs__item {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  color: rgb(60 40 20 / 0.55);
+}
+
+.ctl-tabs--scholar .ctl-tabs__item.is-active {
+  color: rgb(60 40 20);
+  border-bottom: 2px solid #8b0000;
+}
+
+.ctl-tabs--terminal .ctl-tabs__item {
+  font-family: 'JetBrains Mono', monospace;
+  color: rgb(51 255 102 / 0.45);
+}
+
+.ctl-tabs--terminal .ctl-tabs__item.is-active {
+  color: #33ff66;
+}
+
+.ctl-tabs--terminal .ctl-tabs__tmux {
+  opacity: 0.65;
+  margin-right: 2px;
+}
+
+.ctl-tabs--crt .ctl-tabs__item {
+  font-family: 'VT323', monospace;
+  font-size: 0.78rem;
+  color: rgb(255 176 0 / 0.45);
+}
+
+.ctl-tabs--crt .ctl-tabs__item.is-active {
+  color: #ffb000;
+  animation: crt-tab-jitter 0.15s ease;
+}
+
+@keyframes crt-tab-jitter {
+  25% { transform: translateX(-1px); }
+  75% { transform: translateX(1px); }
+}
+
+.ctl-tabs--observatory .ctl-tabs__item {
+  font-family: 'JetBrains Mono', monospace;
+  color: rgb(232 196 71 / 0.45);
+}
+
+.ctl-tabs--observatory .ctl-tabs__item.is-active {
+  color: #e8c547;
+  text-shadow: 0 0 6px rgb(232 196 71 / 0.35);
+}
+
+.ctl-tabs--herbarium .ctl-tabs__item {
+  font-family: Georgia, serif;
+  color: rgb(45 90 61 / 0.55);
+}
+
+.ctl-tabs--herbarium .ctl-tabs__item.is-active {
+  color: rgb(45 90 61);
+  border-bottom: 2px solid rgb(45 90 61 / 0.45);
+}
+
+.ctl-tabs--ink .ctl-tabs__item {
+  font-family: 'Noto Serif SC', serif;
+  color: rgb(26 26 26 / 0.45);
+}
+
+.ctl-tabs--ink .ctl-tabs__item.is-active {
+  color: #c0392b;
+}
+
+.ctl-tabs--rpg .ctl-tabs__item {
+  font-family: Cinzel, serif;
+  letter-spacing: 0.05em;
+  color: rgb(232 220 200 / 0.45);
+}
+
+.ctl-tabs--rpg .ctl-tabs__item.is-active {
+  color: #ffd700;
+}
+
+.ctl-tabs--rpg .ctl-tabs__arrow {
+  margin-right: 2px;
+  color: #fff;
+}
+
+.ctl-tabs--spacecraft .ctl-tabs__item {
+  font-family: 'Barlow Condensed', monospace;
+  letter-spacing: 0.06em;
+  color: rgb(136 192 255 / 0.45);
+  border: 1px solid transparent;
+}
+
+.ctl-tabs--spacecraft .ctl-tabs__item.is-active {
+  color: #ffaa00;
+  border-color: rgb(255 170 0 / 0.45);
+}
+
+/* —— Action buttons (desktop) —— */
+.ctl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ctl-action {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  padding: 8px 12px;
+}
+
+.ctl-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ctl-actions--blueprint .ctl-action {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  border: 1px solid #e63946;
+  color: #ff8a94;
+  background: rgb(230 57 70 / 0.1);
+}
+
+.ctl-actions--scholar .ctl-action {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  border: 1px solid rgb(139 90 43 / 0.35);
+  background: rgb(235 227 207 / 0.8);
+}
+
+.ctl-actions--terminal .ctl-action {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  border: 1px solid #33ff66;
+  color: #33ff66;
+  background: transparent;
+}
+
+.ctl-actions--crt .ctl-action {
+  font-family: 'VT323', monospace;
+  border: 1px solid rgb(255 176 0 / 0.45);
+  color: #ffb000;
+  background: transparent;
+}
+
+.ctl-actions--observatory .ctl-action {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  border: 1px solid rgb(232 196 71 / 0.35);
+  color: #e8c547;
+  background: rgb(8 10 30 / 0.6);
+}
+
+.ctl-actions--herbarium .ctl-action {
+  font-family: Georgia, serif;
+  border: 2px solid rgb(45 90 61 / 0.35);
+  background: rgb(244 236 216 / 0.8);
+  color: rgb(45 90 61);
+}
+
+.ctl-actions--ink .ctl-action {
+  font-family: 'Noto Serif SC', serif;
+  border: 1px solid rgb(26 26 26 / 0.25);
+  background: rgb(247 243 234);
+}
+
+.ctl-actions--rpg .ctl-action {
+  font-family: Cinzel, serif;
+  font-size: 0.62rem;
+  border: 2px solid #d4af37;
+  color: #ffd700;
+  background: linear-gradient(180deg, rgb(212 175 55 / 0.15), transparent);
+}
+
+.ctl-actions--spacecraft .ctl-action {
+  font-family: 'Barlow Condensed', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  border: 1px solid #ff4444;
+  color: #ff8a8a;
+  background: rgb(255 68 68 / 0.1);
+}
+
+.ctl-actions--spacecraft .ctl-action.is-accent {
+  border-color: #ffaa00;
+  color: #ffaa00;
+}
+
+.ctl-slot-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.ctl-slot-segment {
+  margin-top: 6px;
+}
+
+.structural-drawer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 2px dashed color-mix(in srgb, var(--struct-frame-border) 35%, transparent);
+}
+
+.structural-drawer-row.is-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.structural-drawer-root .mac-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.structural-drawer-root .mac-body > :not(.ctl-tabs) {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}

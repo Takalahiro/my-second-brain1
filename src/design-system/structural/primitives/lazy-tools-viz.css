@@ -1,0 +1,55 @@
+/* Calculator / Python / Whiteboard · 9-skin */
+
+.skin-calc,
+.skin-python,
+.skin-whiteboard {
+  font-size: 0.78rem;
+  box-sizing: border-box;
+}
+
+.skin-whiteboard {
+  position: relative;
+  height: 100%;
+  min-height: 240px;
+}
+
+.skin-whiteboard__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-family: var(--struct-font-display);
+  font-size: 0.42rem;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.skin-whiteboard__frame {
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  border: 1px solid var(--struct-frame-border);
+  background: #fff;
+}
+
+.skin-calc--terminal :global(.matlab-calc),
+.skin-python--terminal :global(.python-ide) {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.skin-python :global(.py-code-editor),
+.skin-python :global(.py-code-editor *) {
+  letter-spacing: 0;
+  text-shadow: none;
+  font-variant-ligatures: none;
+}
+
+.skin-whiteboard--ink .skin-whiteboard__frame {
+  border: 1px solid #1a1a1a;
+}
+
+.skin-whiteboard--spacecraft .skin-whiteboard__frame {
+  border-color: rgb(80 120 160 / 0.55);
+}

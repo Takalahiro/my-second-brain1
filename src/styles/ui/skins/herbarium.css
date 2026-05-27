@@ -20,6 +20,7 @@ html[data-ui='herbarium'] {
 
   --glass-bg: rgb(242 235 224 / 0.94);
   --glass-bg-hover: rgb(248 244 236 / 0.97);
+  --glass-bg-strong: rgb(242 235 224 / 0.95);
   --glass-border: rgb(45 90 61 / 0.22);
 
   --shadow-soft: 2px 3px 14px rgb(26 46 26 / 0.08);
@@ -42,6 +43,41 @@ html[data-ui='herbarium'] {
   --neo-surface: #f2ebe0;
   --neo-track: rgb(45 90 61 / 0.2);
   --neo-thumb: #f2ebe0;
+  --neo-raised: 2px 3px 10px rgb(26 46 26 / 0.12);
+  --neo-raised-hover: 3px 5px 14px rgb(26 46 26 / 0.16);
+  --neo-pressed: inset 0 2px 6px rgb(26 46 26 / 0.14);
+}
+
+html.dark[data-ui='herbarium'] {
+  --bg-primary: #1e2a1e;
+  --bg-secondary: #263226;
+  --text-primary: #f2ebe0;
+  --text-secondary: #a8b8a8;
+  --border-color: rgb(242 235 224 / 0.12);
+
+  --glass-bg: rgb(30 42 30 / 0.88);
+  --glass-bg-hover: rgb(36 48 36 / 0.92);
+  --glass-bg-strong: rgb(30 42 30 / 0.94);
+  --glass-border: rgb(242 235 224 / 0.12);
+
+  --chrome-bg-top: rgb(30 42 30 / 0.94);
+  --chrome-bg-bottom: #263226;
+  --chrome-border: rgb(242 235 224 / 0.12);
+  --chrome-hover: rgb(242 235 224 / 0.08);
+  --chrome-subtle: rgb(242 235 224 / 0.06);
+  --chrome-text: #f2ebe0;
+  --chrome-text-muted: #a8b8a8;
+
+  --neo-surface: rgb(40 52 40);
+  --neo-track: rgb(168 184 168 / 0.3);
+  --neo-thumb: rgb(56 68 56);
+  --neo-raised: 2px 3px 10px rgb(0 0 0 / 0.35);
+
+  --widget-bg-rgb: 30 42 30;
+  --widget-fg: #f2ebe0;
+  --widget-fg-muted: #a8b8a8;
+  --widget-border: rgb(242 235 224 / 0.14);
+  --widget-header-bg: rgb(40 52 40 / 0.95);
 }
 
 html[data-ui='herbarium'] body {
@@ -56,10 +92,12 @@ html[data-ui='herbarium'] .floating-widget,
 html[data-ui='herbarium'] .site-nav-shell,
 html[data-ui='herbarium'] .pixel-card,
 html[data-ui='herbarium'] .glass-container {
-  border: 1px solid rgb(45 90 61 / 0.25);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-normal);
-  backdrop-filter: none;
-  background: rgb(242 235 224 / 0.94);
+  backdrop-filter: blur(10px) saturate(110%);
+  -webkit-backdrop-filter: blur(10px) saturate(110%);
+  background: var(--glass-bg-strong);
+  color: var(--text-primary);
 }
 
 html[data-ui='herbarium'] .mac-menu-app-name::after {

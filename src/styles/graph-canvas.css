@@ -1,0 +1,71 @@
+/* 图谱画布 · 柔化边缘，融入页面/小组件 */
+
+.graph-canvas-shell,
+.gw-canvas,
+.gp-canvas {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: var(--graph-canvas-shadow);
+  background: var(--surface);
+}
+
+.graph-canvas-shell::before,
+.gw-canvas::before,
+.gp-canvas::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 48px 12px var(--graph-canvas-edge-inner);
+}
+
+.graph-canvas-shell::after,
+.gw-canvas::after,
+.gp-canvas::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+  background: var(--graph-canvas-vignette);
+}
+
+.gw-svg,
+.g-svg,
+.gp-canvas :global(.g-svg) {
+  position: relative;
+  z-index: 0;
+  background: var(--graph-canvas-bg);
+}
+
+.gw-canvas {
+  flex: 1;
+  min-height: 0;
+  margin: 6px 8px 8px;
+  border: 1px solid var(--graph-canvas-border);
+}
+
+.gp-canvas {
+  border: 1px solid var(--graph-canvas-border);
+  border-radius: 18px;
+}
+
+.g-label,
+.gw-label {
+  fill: var(--graph-label);
+  stroke: var(--graph-label-stroke);
+}
+
+.g-svg--hud .g-label {
+  fill: var(--graph-hud-label);
+  stroke: var(--graph-hud-label-stroke);
+}
+
+.g-node.is-sel circle:last-of-type,
+.gw-node.is-sel circle:nth-child(2) {
+  stroke: var(--graph-node-sel);
+}

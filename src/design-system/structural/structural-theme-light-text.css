@@ -1,0 +1,1019 @@
+/* 结构换皮 · 浅色模式字色兜底（覆盖硬编码浅字 / :root 浅字） */
+
+/* —— 壳 / 控制中心根 —— */
+html:not(.dark)[data-ui='blueprint'] :is(.bp-sheet, .structural-frame, .mac-settings.structural-drawer-root),
+html:not(.dark)[data-ui='scholar'] :is(.folio-page, .structural-frame, .mac-settings.structural-drawer-root),
+html:not(.dark)[data-ui='terminal'] :is(.term-pane, .structural-frame, .mac-settings.structural-drawer-root),
+html:not(.dark)[data-ui='crt'] :is(.crt-screen, .structural-frame, .mac-settings.structural-drawer-root),
+html:not(.dark)[data-ui='observatory'] :is(.obs-dome, .structural-frame, .mac-settings.structural-drawer-root),
+html:not(.dark)[data-ui='herbarium'] :is(.herb-mount, .structural-frame, .mac-settings.structural-drawer-root),
+html:not(.dark)[data-ui='ink'] :is(.ink-scroll, .structural-frame, .mac-settings.structural-drawer-root),
+html:not(.dark)[data-ui='rpg'] :is(.rpg-window, .structural-frame, .mac-settings.structural-drawer-root),
+html:not(.dark)[data-ui='spacecraft'] :is(.sc-panel, .structural-frame, .mac-settings.structural-drawer-root) {
+  color: var(--struct-frame-fg);
+}
+
+html:not(.dark)[data-ui='blueprint'] .mac-settings.structural-drawer-root :is(
+    .mac-body,
+    .mac-pane-row,
+    .mac-setting-row,
+    .mac-search,
+    .structural-drawer-row__title,
+    .structural-menu-cart,
+    .structural-menu-cart__title,
+    .structural-ui-cart,
+    .structural-ui-cart__title,
+    .structural-drawer-widget-row__text,
+    .structural-drawer-tips,
+    input,
+    select,
+    textarea,
+    button
+  ),
+html:not(.dark)[data-ui='scholar'] .mac-settings.structural-drawer-root :is(
+    .mac-body,
+    .mac-pane-row,
+    .mac-setting-row,
+    .mac-search,
+    .structural-drawer-row__title,
+    .structural-menu-cart,
+    .structural-menu-cart__title,
+    .structural-ui-cart,
+    .structural-ui-cart__title,
+    .structural-drawer-widget-row__text,
+    .structural-drawer-tips,
+    input,
+    select,
+    textarea,
+    button
+  ),
+html:not(.dark)[data-ui='terminal'] .mac-settings.structural-drawer-root :is(
+    .mac-body,
+    .mac-pane-row,
+    .mac-setting-row,
+    .mac-search,
+    .structural-drawer-row__title,
+    .structural-menu-cart,
+    .structural-menu-cart__title,
+    .structural-ui-cart,
+    .structural-ui-cart__title,
+    .structural-drawer-widget-row__text,
+    .structural-drawer-tips,
+    input,
+    select,
+    textarea,
+    button
+  ),
+html:not(.dark)[data-ui='crt'] .mac-settings.structural-drawer-root :is(
+    .mac-body,
+    .mac-pane-row,
+    .mac-setting-row,
+    .mac-search,
+    .structural-drawer-row__title,
+    .structural-menu-cart,
+    .structural-menu-cart__title,
+    .structural-ui-cart,
+    .structural-ui-cart__title,
+    .structural-drawer-widget-row__text,
+    .structural-drawer-tips,
+    input,
+    select,
+    textarea,
+    button
+  ),
+html:not(.dark)[data-ui='observatory'] .mac-settings.structural-drawer-root :is(
+    .mac-body,
+    .mac-pane-row,
+    .mac-setting-row,
+    .mac-search,
+    .structural-drawer-row__title,
+    .structural-menu-cart,
+    .structural-menu-cart__title,
+    .structural-ui-cart,
+    .structural-ui-cart__title,
+    .structural-drawer-widget-row__text,
+    .structural-drawer-tips,
+    input,
+    select,
+    textarea,
+    button
+  ),
+html:not(.dark)[data-ui='herbarium'] .mac-settings.structural-drawer-root :is(
+    .mac-body,
+    .mac-pane-row,
+    .mac-setting-row,
+    .mac-search,
+    .structural-drawer-row__title,
+    .structural-menu-cart,
+    .structural-menu-cart__title,
+    .structural-ui-cart,
+    .structural-ui-cart__title,
+    .structural-drawer-widget-row__text,
+    .structural-drawer-tips,
+    input,
+    select,
+    textarea,
+    button
+  ),
+html:not(.dark)[data-ui='ink'] .mac-settings.structural-drawer-root :is(
+    .mac-body,
+    .mac-pane-row,
+    .mac-setting-row,
+    .mac-search,
+    .structural-drawer-row__title,
+    .structural-menu-cart,
+    .structural-menu-cart__title,
+    .structural-ui-cart,
+    .structural-ui-cart__title,
+    .structural-drawer-widget-row__text,
+    .structural-drawer-tips,
+    input,
+    select,
+    textarea,
+    button
+  ),
+html:not(.dark)[data-ui='rpg'] .mac-settings.structural-drawer-root :is(
+    .mac-body,
+    .mac-pane-row,
+    .mac-setting-row,
+    .mac-search,
+    .structural-drawer-row__title,
+    .structural-menu-cart,
+    .structural-menu-cart__title,
+    .structural-ui-cart,
+    .structural-ui-cart__title,
+    .structural-drawer-widget-row__text,
+    .structural-drawer-tips,
+    input,
+    select,
+    textarea,
+    button
+  ),
+html:not(.dark)[data-ui='spacecraft'] .mac-settings.structural-drawer-root :is(
+    .mac-body,
+    .mac-pane-row,
+    .mac-setting-row,
+    .mac-search,
+    .structural-drawer-row__title,
+    .structural-menu-cart,
+    .structural-menu-cart__title,
+    .structural-ui-cart,
+    .structural-ui-cart__title,
+    .structural-drawer-widget-row__text,
+    .structural-drawer-tips,
+    input,
+    select,
+    textarea,
+    button
+  ) {
+  color: var(--struct-frame-fg);
+}
+
+html:not(.dark)[data-ui='blueprint'] .structural-drawer-row__sub,
+html:not(.dark)[data-ui='scholar'] .structural-drawer-row__sub,
+html:not(.dark)[data-ui='terminal'] .structural-drawer-row__sub,
+html:not(.dark)[data-ui='crt'] .structural-drawer-row__sub,
+html:not(.dark)[data-ui='observatory'] .structural-drawer-row__sub,
+html:not(.dark)[data-ui='herbarium'] .structural-drawer-row__sub,
+html:not(.dark)[data-ui='ink'] .structural-drawer-row__sub,
+html:not(.dark)[data-ui='rpg'] .structural-drawer-row__sub,
+html:not(.dark)[data-ui='spacecraft'] .structural-drawer-row__sub,
+html:not(.dark)[data-ui='blueprint'] .structural-menu-cart__desc,
+html:not(.dark)[data-ui='scholar'] .structural-menu-cart__desc,
+html:not(.dark)[data-ui='terminal'] .structural-menu-cart__desc,
+html:not(.dark)[data-ui='crt'] .structural-menu-cart__desc,
+html:not(.dark)[data-ui='observatory'] .structural-menu-cart__desc,
+html:not(.dark)[data-ui='herbarium'] .structural-menu-cart__desc,
+html:not(.dark)[data-ui='ink'] .structural-menu-cart__desc,
+html:not(.dark)[data-ui='rpg'] .structural-menu-cart__desc,
+html:not(.dark)[data-ui='spacecraft'] .structural-menu-cart__desc,
+html:not(.dark)[data-ui='blueprint'] .structural-ui-cart__desc,
+html:not(.dark)[data-ui='scholar'] .structural-ui-cart__desc,
+html:not(.dark)[data-ui='terminal'] .structural-ui-cart__desc,
+html:not(.dark)[data-ui='crt'] .structural-ui-cart__desc,
+html:not(.dark)[data-ui='observatory'] .structural-ui-cart__desc,
+html:not(.dark)[data-ui='herbarium'] .structural-ui-cart__desc,
+html:not(.dark)[data-ui='ink'] .structural-ui-cart__desc,
+html:not(.dark)[data-ui='rpg'] .structural-ui-cart__desc,
+html:not(.dark)[data-ui='spacecraft'] .structural-ui-cart__desc {
+  color: var(--struct-frame-muted);
+}
+
+/* ═══ 浅色 · 全结构皮肤暗色字 + 按钮 ═══ */
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  ) {
+  --struct-frame-muted: color-mix(in srgb, var(--struct-frame-fg) 72%, transparent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    [class*='skin-'],
+    .structural-drawer-pane,
+    .structural-drawer-section,
+    .structural-drawer-row,
+    .structural-drawer-widget-row,
+    .structural-menu-cart,
+    .structural-ui-cart,
+    .structural-drawer-tips,
+    .structural-drawer-footnote,
+    .structural-frame__body,
+    .structural-frame__title,
+    .structural-frame__subtitle,
+    .structural-setting-row,
+    .structural-drawer-chrome__back,
+    .structural-drawer-chrome__title
+  ) {
+  color: var(--struct-frame-fg);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    button,
+    input,
+    select,
+    textarea,
+    label,
+    .structural-chrome-btn,
+    .structural-close,
+    .ctl-action,
+    .ctl-tabs__item,
+    .ctl-segment__item,
+    .skin-menu-bar__brand-btn,
+    .skin-menu-bar__icon,
+    .skin-menu-bar__app,
+    .skin-menu-bar__stamp,
+    .skin-menu-bar__clock,
+    .skin-menubar-ctl,
+    .skin-mb-theme,
+    .skin-mb-locale,
+    .folio-wax,
+    .herb-stamp,
+    .ink-seal
+  ) {
+  color: var(--struct-frame-fg);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .structural-drawer-row__sub,
+    .structural-menu-cart__desc,
+    .structural-ui-cart__desc,
+    .ctl-slider__label,
+    .ctl-switch__scholar-caption
+  ) {
+  color: var(--struct-frame-muted);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-tabs__item.is-active,
+    .ctl-segment__item.is-active,
+    .structural-chrome-btn.is-active,
+    .herb-stamp.is-on,
+    .ink-seal.is-on,
+    .folio-wax.is-on
+  ) {
+  color: var(--struct-accent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .structural-chrome-btn.is-active {
+  color: #0c0c14;
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .skin-menu-bar__gear.is-active {
+  color: var(--struct-frame-fg);
+}
+
+/* 深底皮肤 · 浅色模式：覆盖控件里的浅字硬编码 */
+html:not(.dark)[data-ui='blueprint'] :is(
+    .ctl-tabs--blueprint .ctl-tabs__item,
+    .ctl-segment--blueprint .ctl-segment__item,
+    .ctl-actions--blueprint .ctl-action,
+    .skin-todo--blueprint
+  ) {
+  color: var(--struct-frame-muted);
+  border-color: color-mix(in srgb, var(--struct-frame-border) 55%, transparent);
+  background: color-mix(in srgb, var(--struct-panel-bg) 92%, transparent);
+}
+
+html:not(.dark)[data-ui='blueprint'] :is(
+    .ctl-tabs--blueprint .ctl-tabs__item.is-active,
+    .ctl-segment--blueprint .ctl-segment__item.is-active
+  ) {
+  color: var(--struct-frame-fg);
+  border-color: var(--struct-frame-border);
+}
+
+html:not(.dark)[data-ui='terminal'] :is(
+    .ctl-tabs--terminal .ctl-tabs__item,
+    .ctl-segment--terminal .ctl-segment__item,
+    .term-echo,
+    .term-todo-rm
+  ) {
+  color: var(--struct-frame-muted);
+}
+
+html:not(.dark)[data-ui='terminal'] :is(
+    .ctl-tabs--terminal .ctl-tabs__item.is-active,
+    .ctl-segment--terminal .ctl-segment__item.is-active,
+    .term-ok,
+    .term-todo-add button,
+    .ctl-actions--terminal .ctl-action
+  ) {
+  color: var(--struct-accent);
+  border-color: color-mix(in srgb, var(--struct-accent) 45%, transparent);
+}
+
+html:not(.dark)[data-ui='crt'] :is(
+    .ctl-tabs--crt .ctl-tabs__item,
+    .ctl-segment--crt .ctl-segment__item,
+    .ctl-actions--crt .ctl-action
+  ) {
+  color: var(--struct-frame-muted);
+}
+
+html:not(.dark)[data-ui='crt'] :is(
+    .ctl-tabs--crt .ctl-tabs__item.is-active,
+    .ctl-segment--crt .ctl-segment__item.is-active
+  ) {
+  color: var(--struct-accent);
+}
+
+html:not(.dark)[data-ui='observatory'] :is(
+    .ctl-tabs--observatory .ctl-tabs__item,
+    .ctl-segment--observatory .ctl-segment__item,
+    .ctl-actions--observatory .ctl-action
+  ) {
+  color: var(--struct-frame-muted);
+}
+
+html:not(.dark)[data-ui='observatory'] :is(
+    .ctl-tabs--observatory .ctl-tabs__item.is-active,
+    .ctl-segment--observatory .ctl-segment__item.is-active
+  ) {
+  color: var(--struct-accent);
+}
+
+html:not(.dark)[data-ui='rpg'] :is(
+    .ctl-tabs--rpg .ctl-tabs__item,
+    .ctl-segment--rpg .ctl-segment__item,
+    .skin-todo--rpg,
+    .rpg-quest-item__arrow
+  ) {
+  color: var(--struct-frame-muted);
+}
+
+html:not(.dark)[data-ui='rpg'] :is(
+    .ctl-tabs--rpg .ctl-tabs__item.is-active,
+    .ctl-segment--rpg .ctl-segment__item.is-active,
+    .ctl-actions--rpg .ctl-action
+  ) {
+  color: var(--struct-accent);
+  border-color: color-mix(in srgb, var(--struct-accent) 45%, transparent);
+}
+
+html:not(.dark)[data-ui='spacecraft'] :is(
+    .ctl-tabs--spacecraft .ctl-tabs__item,
+    .ctl-segment--spacecraft .ctl-segment__item,
+    .ctl-actions--spacecraft .ctl-action
+  ) {
+  color: var(--struct-frame-muted);
+}
+
+html:not(.dark)[data-ui='spacecraft'] :is(
+    .ctl-tabs--spacecraft .ctl-tabs__item.is-active,
+    .ctl-segment--spacecraft .ctl-segment__item.is-active,
+    .ctl-actions--spacecraft .ctl-action.is-accent
+  ) {
+  color: var(--struct-accent);
+}
+
+/* Scholar / Herbarium / Ink · 浅色模式壳与 Todo */
+html:not(.dark)[data-ui='scholar'] :is(
+    .folio-head,
+    .folio-body,
+    .folio-margin,
+    .sch-todo-row,
+    .sch-todo-text,
+    .sch-todo-add,
+    .sch-todo-add input,
+    .sch-todo-add button
+  ) {
+  color: var(--struct-frame-fg);
+}
+
+html:not(.dark)[data-ui='herbarium'] :is(
+    .herb-head,
+    .herb-body,
+    .herb-label,
+    .herb-specimen,
+    .herb-specimen__text,
+    .herb-todo-add,
+    .herb-todo-add input,
+    .herb-todo-add button
+  ) {
+  color: var(--struct-frame-fg);
+}
+
+html:not(.dark)[data-ui='ink'] :is(
+    .ink-head,
+    .ink-body,
+    .ink-note,
+    .ink-todo-row,
+    .ink-todo-text,
+    .ink-todo-add,
+    .ink-todo-add input,
+    .ink-todo-add button,
+    .ink-todo-main
+  ) {
+  color: var(--struct-frame-fg);
+}
+
+html:not(.dark)[data-ui='ink'] :is(.ink-note__tag, .ink-circle-mark, .ink-strike-bar, .ink-todo-rm) {
+  color: var(--struct-accent);
+}
+
+html:not(.dark)[data-ui='ink'] .ink-seal--off {
+  color: var(--struct-frame-muted);
+}
+
+/* ═══ 浅色 · 按钮暗色（字 / 底 / 边） ═══ */
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  ) {
+  --struct-btn-fg: var(--struct-frame-fg);
+  --struct-btn-fg-muted: var(--struct-frame-muted);
+  --struct-btn-fg-accent: var(--struct-accent);
+  --struct-btn-bg: color-mix(in srgb, var(--struct-drawer-face) 94%, var(--struct-frame-fg) 6%);
+  --struct-btn-border: color-mix(in srgb, var(--struct-frame-border) 65%, var(--struct-frame-fg) 35%);
+  --struct-btn-bg-active: color-mix(in srgb, var(--struct-accent) 28%, var(--struct-panel-bg));
+  --struct-btn-fg-on-accent: #0c0c14;
+  --struct-progress-fg: var(--struct-frame-fg);
+  --struct-progress-muted: var(--struct-frame-muted);
+  --struct-progress-track: color-mix(in srgb, var(--struct-frame-fg) 14%, transparent);
+  --struct-progress-track-border: color-mix(in srgb, var(--struct-frame-fg) 38%, transparent);
+  --struct-progress-fill: var(--struct-accent);
+  --struct-progress-cursor: var(--struct-accent);
+  --struct-range-accent: var(--struct-accent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .structural-chrome-btn,
+    .structural-close,
+    .structural-drawer-chrome__back,
+    .structural-drawer-chrome__close,
+    .folio-drawer-chrome__close,
+    .ctl-actions .ctl-action,
+    .herb-stamp,
+    .herb-stamp--reject,
+    .herb-specimen__rm,
+    .ink-seal,
+    .sch-todo-add button,
+    .herb-todo-add button,
+    .ink-todo-add button,
+    .ink-todo-rm,
+    .term-todo-add button,
+    .term-todo-rm,
+    .skin-todo button,
+    .skin-menu-bar__brand-btn,
+    .skin-menu-bar__icon,
+    .skin-menu-bar__gear,
+    .skin-menu-bar__app,
+    .skin-menubar-ctl button,
+    .ctl-switch,
+    .bp-todo-check,
+    .skin-pomo__start,
+    .skin-stats__tag
+  ) {
+  color: var(--struct-btn-fg);
+  background: var(--struct-btn-bg);
+  border-color: var(--struct-btn-border);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .sch-todo-mark,
+    .term-todo-toggle,
+    .crt-todo-toggle,
+    .obs-star,
+    .ink-todo-main,
+    .bp-todo-check
+  ) {
+  color: var(--struct-btn-fg);
+  background: transparent;
+  border-color: color-mix(in srgb, var(--struct-btn-border) 60%, transparent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-tabs__item,
+    .ctl-segment__item,
+    .folio-wax,
+    .skin-mb-theme,
+    .skin-mb-locale
+  ) {
+  color: var(--struct-btn-fg-muted);
+  background: transparent;
+  border-color: color-mix(in srgb, var(--struct-btn-border) 55%, transparent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-tabs__item.is-active,
+    .ctl-segment__item.is-active,
+    .folio-wax.is-on
+  ) {
+  color: var(--struct-btn-fg-accent);
+  background: transparent;
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .herb-stamp.is-on,
+    .ink-seal.is-on
+  ) {
+  color: var(--struct-btn-fg-accent);
+  background: var(--struct-btn-bg-active);
+  border-color: var(--struct-btn-fg-accent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .structural-chrome-btn.is-active,
+    .ctl-action.is-accent
+  ) {
+  color: var(--struct-btn-fg-on-accent);
+  background: var(--struct-btn-bg-active);
+  border-color: var(--struct-btn-fg-accent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .ink-seal--off {
+  color: var(--struct-btn-fg-muted);
+  background: transparent;
+  border-color: color-mix(in srgb, var(--struct-btn-border) 50%, transparent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .herb-stamp--reject {
+  color: color-mix(in srgb, var(--struct-btn-fg) 70%, #8b2020 30%);
+  border-color: color-mix(in srgb, var(--struct-btn-fg-accent) 35%, #b03030 65%);
+}
+
+/* ═══ 浅色 · 进度条 / 滑块暗色 ═══ */
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-slider__head,
+    .ctl-slider__tick,
+    .ctl-slider--herbarium .ctl-slider__ruler,
+    .ctl-slider--observatory .ctl-slider__ra,
+    .bp-dim-progress,
+    .sch-ribbon-progress,
+    .sch-page-num,
+    .obs-arc-progress__ra,
+    .herb-ruler-progress,
+    .herb-ruler__no,
+    .rpg-exp-bar,
+    .term-bar,
+    .crt-bar,
+    .sc-fuel-gauge,
+    .sc-telemetry,
+    .skin-stats__bar-label,
+    .skin-stats__bar-val
+  ) {
+  color: var(--struct-progress-fg);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-slider__track,
+    .bp-dim-progress__line,
+    .bp-dim-progress__tick--l,
+    .bp-dim-progress__tick--r,
+    .ctl-slider--scholar .ctl-slider__ribbon-track,
+    .ctl-slider--rpg .ctl-slider__exp,
+    .rpg-exp-bar__track,
+    .sc-fuel-gauge__seg,
+    .ctl-slider--spacecraft .ctl-slider__seg,
+    .skin-stats__bar-track
+  ) {
+  border-color: var(--struct-progress-track-border);
+  background: var(--struct-progress-track);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-slider--blueprint .ctl-slider__fill,
+    .bp-dim-progress__fill,
+    .ctl-slider--scholar .ctl-slider__ribbon,
+    .sch-ribbon,
+    .ctl-slider--ink .ctl-slider__paper,
+    .ink-scroll-progress__paper,
+    .ctl-slider--rpg .ctl-slider__exp-fill,
+    .rpg-exp-bar__fill,
+    .herb-ruler__fill,
+    .skin-stats__bar-track span
+  ) {
+  background: var(--struct-progress-fill);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-slider--blueprint .ctl-slider__cursor,
+    .bp-dim-progress__cursor,
+    .ctl-slider--herbarium .ctl-slider__needle,
+    .herb-ruler__needle,
+    .ctl-slider--ink .ctl-slider__roll,
+    .ink-scroll-progress__roll
+  ) {
+  background: var(--struct-progress-cursor);
+  border-color: var(--struct-progress-cursor);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-slider--terminal .ctl-slider__bar,
+    .ctl-slider--crt .ctl-slider__bar
+  ) {
+  color: var(--struct-progress-fg);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-slider--spacecraft .ctl-slider__seg.is-on,
+    .sc-fuel-gauge__seg.is-on
+  ) {
+  background: linear-gradient(
+    180deg,
+    var(--struct-progress-fill),
+    color-mix(in srgb, var(--struct-progress-fill) 55%, #4169e1)
+  );
+  border-color: var(--struct-progress-fill);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .obs-arc-progress__svg path:first-child {
+  stroke: var(--struct-progress-track-border);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .obs-arc-progress__svg path:last-child {
+  stroke: var(--struct-progress-fill);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    input[type='range'],
+    .structural-setting-row__range
+  ) {
+  accent-color: var(--struct-range-accent);
+  color: var(--struct-progress-fg);
+}
+
+/* 浅色 · Switch 字色 */
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .ctl-switch {
+  color: var(--struct-btn-fg);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  :is(
+    .ctl-switch--blueprint .ctl-switch__bp,
+    .ctl-switch--blueprint .ctl-switch__dim,
+    .ctl-switch--scholar .ctl-switch__scholar-caption,
+    .ctl-switch--terminal .ctl-switch__term-line,
+    .ctl-switch--crt .ctl-switch__crt-ch,
+    .ctl-switch--crt .ctl-switch__crt-pwr,
+    .ctl-switch--observatory .ctl-switch__obs-label,
+    .ctl-switch--herbarium .ctl-switch__herb-date,
+    .ctl-switch--ink .ctl-switch__ink-vol,
+    .ctl-switch--rpg .ctl-switch__rpg-label,
+    .ctl-switch--spacecraft .ctl-switch__sc-title,
+    .ctl-switch--spacecraft .ctl-switch__sc-state
+  ) {
+  color: var(--struct-btn-fg-muted);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .ctl-switch.is-on :is(
+    .ctl-switch__scholar-caption,
+    .ctl-switch__obs-label,
+    .ctl-switch__rpg-label,
+    .ctl-switch__sc-state,
+    .ctl-switch__bool,
+    .ctl-switch__dim
+  ) {
+  color: var(--struct-btn-fg-accent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .ctl-switch--blueprint :is(.ctl-switch__wire, .ctl-switch__contact, .ctl-switch__arm) {
+  border-color: var(--struct-btn-fg);
+  background: color-mix(in srgb, var(--struct-btn-fg) 72%, transparent);
+}
+
+html:not(.dark):is(
+    [data-ui='blueprint'],
+    [data-ui='scholar'],
+    [data-ui='terminal'],
+    [data-ui='crt'],
+    [data-ui='observatory'],
+    [data-ui='herbarium'],
+    [data-ui='ink'],
+    [data-ui='rpg'],
+    [data-ui='spacecraft']
+  )
+  .ctl-switch--blueprint.is-on :is(.ctl-switch__wire--r, .ctl-switch__contact, .ctl-switch__arm) {
+  background: var(--struct-btn-fg-accent);
+  border-color: var(--struct-btn-fg-accent);
+}

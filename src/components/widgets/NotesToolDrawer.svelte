@@ -40,21 +40,43 @@
   let fabStartLeft = 0;
   let fabStartTop = 0;
 
+  function navClearance() {
+    const header = document.querySelector('.site-header');
+    if (header) return Math.ceil(header.getBoundingClientRect().bottom) + 10;
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--widget-safe-top').trim();
+    if (raw) {
+      const probe = document.createElement('div');
+      probe.style.position = 'fixed';
+      probe.style.top = raw;
+      probe.style.visibility = 'hidden';
+      document.body.appendChild(probe);
+      const y = probe.getBoundingClientRect().top;
+      probe.remove();
+      if (Number.isFinite(y) && y > 0) return y + 8;
+    }
+    return window.matchMedia('(max-width: 640px)').matches ? 140 : 96;
+  }
+
   function defaultFabPos() {
     const w = fabEl?.offsetWidth ?? 40;
     const h = fabEl?.offsetHeight ?? 40;
     const narrow = window.matchMedia('(max-width: 640px)').matches;
-    const top = narrow ? 140 : 88;
+    const top = Math.max(navClearance(), narrow ? 120 : 88);
     const right = narrow ? 12 : 64;
     return clampFabPosition(window.innerWidth - w - right, top, w, h);
   }
 
   function initFabPos() {
     const stored = untrack(() => loadFabPosition(FAB_POS_KEY));
+    const w = fabEl?.offsetWidth ?? 40;
+    const h = fabEl?.offsetHeight ?? 40;
+    const minTop = navClearance();
     if (stored) {
-      const c = clampFabPosition(stored.left, stored.top, fabEl?.offsetWidth ?? 40, fabEl?.offsetHeight ?? 40);
+      const safeTop = Math.max(stored.top, minTop);
+      const c = clampFabPosition(stored.left, safeTop, w, h);
       fabLeft = c.left;
       fabTop = c.top;
+      if (safeTop !== stored.top) saveFabPosition(FAB_POS_KEY, fabLeft, fabTop);
     } else {
       const c = defaultFabPos();
       fabLeft = c.left;
@@ -312,9 +334,9 @@
 <style>
   .notes-tool-btn {
     position: fixed;
-    top: max(env(safe-area-inset-top, 0px), 88px);
+    top: calc(var(--widget-safe-top, 72px) + 10px);
     right: max(env(safe-area-inset-right, 0px), 64px);
-    z-index: 60;
+    z-index: 125;
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -322,6 +344,7 @@
     background: var(--glass-bg-strong);
     color: var(--text-primary);
     backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     cursor: grab;
     font-size: 1.05rem;
     box-shadow: var(--shadow-normal);
@@ -344,7 +367,7 @@
   .notes-tool-mask {
     position: fixed;
     inset: 0;
-    z-index: 55;
+    z-index: 124;
     border: 0;
     background: rgb(0 0 0 / 0.12);
     cursor: default;
@@ -355,7 +378,7 @@
     bottom: 0;
     right: 0;
     width: min(300px, 88vw);
-    z-index: 58;
+    z-index: 126;
     padding: 16px 14px;
     background: var(--chrome-dropdown-bg);
     color: var(--chrome-text);
@@ -491,7 +514,7 @@
   @media (max-width: 640px) {
     .notes-tool-btn:not(.is-ready) {
       right: max(env(safe-area-inset-right, 0px), 12px);
-      top: calc(max(env(safe-area-inset-top, 0px), 88px) + 52px);
+      top: calc(var(--widget-safe-top, 72px) + 56px);
     }
   }
 </style>

@@ -1,7 +1,6 @@
 ---
 import '../styles/globals.css';
-import ThemeToggle from '../components/ThemeToggle.svelte';
-import FontSwitcher from '../components/FontSwitcher.svelte';
+import ThemeBoot from '../components/ThemeBoot.astro';
 import SiteNavBar from '../components/SiteNavBar.svelte';
 import Mermaid from '../components/Mermaid.svelte';
 import MobileViewModeToggle from '../components/MobileViewModeToggle.svelte';
@@ -11,11 +10,13 @@ import UiSkinInit from '../features/ui/components/UiSkinInit.svelte';
 interface Props {
   title?: string;
   description?: string;
+  wide?: boolean;
 }
 
 const {
   title = 'My Second Brain',
   description = '我的第二大脑',
+  wide = false,
 } = Astro.props;
 ---
 
@@ -34,58 +35,39 @@ const {
       integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV"
       crossorigin="anonymous"
     />
-
-    <script is:inline>
-      const theme = localStorage.getItem('theme');
-      if (theme === 'light') {
-        document.documentElement.classList.remove('dark');
-      } else if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-      }
-
-      const font = localStorage.getItem('second-brain:font-family');
-      if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {
-        document.documentElement.setAttribute('data-font', font);
-      }
-
-      const notesMode = localStorage.getItem('second-brain:notes-display-mode');
-      if (notesMode === 'widgets' || notesMode === 'recursive') {
-        document.documentElement.setAttribute('data-notes-mode', notesMode);
-      }
-
-      const loc = localStorage.getItem('second-brain:locale');
-      if (loc === 'en') {
-        document.documentElement.lang = 'en';
-        document.documentElement.dataset.locale = 'en';
-      }
-
-      const ui = localStorage.getItem('second-brain:ui-skin');
-      if (ui) document.documentElement.setAttribute('data-ui', ui);
-      if (localStorage.getItem('second-brain:ui-debug') === '1') {
-        document.documentElement.classList.add('ui-debug', 'debug');
-      }
-    </script>
+    <ThemeBoot />
   </head>
   <body class="min-h-screen transition-colors site-body">
-    <SiteNavBar client:load variant="site" currentPath={Astro.url.pathname} />
-    <main class="site-main max-w-5xl mx-auto px-4 py-8">
+    <SiteNavBar client:idle variant="site" currentPath={Astro.url.pathname} />
+    <main class:list={['site-main subpage-shell', wide ? 'site-main--wide' : 'site-main--default']}>
       <slot />
     </main>
 
     <Mermaid client:idle />
-    <MobileViewModeToggle client:load />
-    <UiSkinInit client:load />
-    <NotesToolHost client:only="svelte" />
+    <MobileViewModeToggle client:idle />
+    <UiSkinInit client:idle />
+    <NotesToolHost client:idle />
   </body>
 </html>
 
 <style>
   .site-body {
-    background: var(--bg-primary);
-    color: var(--text-primary);
+    background: var(--bg, var(--bg-primary));
+    color: var(--text, var(--text-primary));
+    font-family: var(--font-body);
   }
   .site-main {
     animation: site-main-in 0.35s var(--motion-ease) both;
+  }
+  .site-main--default {
+    max-width: 64rem;
+    margin-inline: auto;
+    padding: var(--space-5) var(--space-4);
+  }
+  .site-main--wide {
+    max-width: none;
+    margin-inline: auto;
+    padding: var(--space-4);
   }
   @keyframes site-main-in {
     from {

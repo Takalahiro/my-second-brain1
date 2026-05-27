@@ -8,15 +8,27 @@
   const skinChrome = useSkinChrome();
   let canvas: HTMLCanvasElement | null = $state(null);
   let activeSkin = $state(skinChrome.id);
+  let themeTick = $state(0);
 
   onMount(() => {
     document.documentElement.dataset.skinWallpaper = '1';
     const sync = () => {
       activeSkin = document.documentElement.dataset.ui ?? 'mac';
     };
+    const syncTheme = () => {
+      themeTick += 1;
+    };
     window.addEventListener(UI_SKIN_CHANGE_EVENT, sync);
-    const obs = new MutationObserver(sync);
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-ui'] });
+    const obs = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.attributeName === 'data-ui') sync();
+        if (m.attributeName === 'class' || m.attributeName === 'data-theme') syncTheme();
+      }
+    });
+    obs.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-ui', 'class', 'data-theme'],
+    });
     return () => {
       delete document.documentElement.dataset.skinWallpaper;
       window.removeEventListener(UI_SKIN_CHANGE_EVENT, sync);
@@ -27,6 +39,7 @@
   $effect(() => {
     const skin = activeSkin;
     const el = canvas;
+    void themeTick;
     if (skin === 'hud' || !el) return;
 
     const engine = startSkinWallpaperEngine(skin, el);

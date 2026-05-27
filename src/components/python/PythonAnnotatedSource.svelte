@@ -188,10 +188,10 @@
     background: none;
   }
 
-  .py-trace-code :global(.py-hl-keyword) { color: #c792ea; font-weight: 600; }
+  .py-trace-code :global(.py-hl-keyword) { color: #c792ea; }
   .py-trace-code :global(.py-hl-builtin) { color: #82aaff; }
   .py-trace-code :global(.py-hl-string) { color: #a5e844; }
-  .py-trace-code :global(.py-hl-comment) { color: rgb(255 255 255 / 0.38); font-style: italic; }
+  .py-trace-code :global(.py-hl-comment) { color: rgb(255 255 255 / 0.38); }
   .py-trace-code :global(.py-hl-number) { color: #f78c6c; }
   .py-trace-code :global(.py-hl-decorator) { color: #ffd580; }
 

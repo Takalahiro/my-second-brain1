@@ -205,69 +205,85 @@
 
 <style>
   .graph-page {
-    color: var(--text-primary);
+    color: var(--text, var(--text-primary));
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: var(--space-3);
   }
   .gp-head {
-    display: flex; justify-content: space-between; align-items: flex-end;
-    flex-wrap: wrap; gap: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: var(--space-3);
   }
-  .gp-head h1 { margin: 0; font-size: 1.4rem; font-weight: 800; }
-  .gp-sub { margin: 4px 0 0; color: var(--text-secondary); font-size: 0.84rem; }
+  .gp-head h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+  }
+  .gp-sub { margin: var(--space-1) 0 0; color: var(--text-muted, var(--text-secondary)); font-size: var(--text-sm); }
   .gp-link {
     text-decoration: none;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    background: var(--surface, var(--bg-secondary));
+    border: 1px solid var(--border, var(--border-color));
     border-radius: 999px;
-    padding: 5px 14px;
-    font-size: 0.82rem;
-    color: var(--text-primary);
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+    color: var(--text, var(--text-primary));
+    box-shadow: var(--shadow-sm);
   }
 
   .gp-tabs {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    padding: 6px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    background: var(--surface, var(--bg-secondary));
+    border: 1px solid var(--border, var(--border-color));
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-sm);
   }
   .gp-tab {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 10px;
-    color: var(--text-primary);
-    font-size: 0.84rem;
+    border-radius: var(--radius-button);
+    color: var(--text, var(--text-primary));
+    font-size: var(--text-sm);
     cursor: pointer;
-    transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    transition: background var(--motion-fast), transform var(--motion-fast), border-color var(--motion-fast);
   }
-  .gp-tab:hover { background: var(--chrome-hover); transform: translateY(-1px); }
+  .gp-tab:hover { background: var(--overlay-medium, var(--chrome-hover)); transform: translateY(-1px); }
   .gp-tab.is-active {
-    background: linear-gradient(135deg, rgba(255, 141, 232, 0.22), rgba(180, 140, 255, 0.22));
-    border-color: rgba(180, 140, 255, 0.5);
-    box-shadow: 0 4px 12px rgb(180 140 255 / 0.18);
+    background: var(--widget-tab-active-bg);
+    border-color: var(--widget-tab-active-border);
+    box-shadow: var(--shadow-sm);
   }
   .gp-tab-icon { font-size: 0.95rem; }
 
   .gp-stats {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 10px;
+    gap: var(--space-3);
   }
   .gp-stats .kpi {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 10px 14px;
-    display: flex; flex-direction: column;
+    background: var(--surface, var(--bg-secondary));
+    border: 1px solid var(--border, var(--border-color));
+    border-radius: var(--radius-card);
+    padding: var(--space-3);
+    display: flex;
+    flex-direction: column;
     text-align: center;
+    box-shadow: var(--shadow-sm);
   }
   .gp-stats .kpi strong {
     font-size: 1.5rem; font-weight: 800;
-    background: linear-gradient(135deg, #ff8de8, #b48cff);
+    background: var(--widget-kpi-gradient);
     -webkit-background-clip: text; background-clip: text;
     color: transparent;
     line-height: 1;
@@ -299,7 +315,7 @@
     background: var(--c);
   }
   .gp-folders .dot.all {
-    background: conic-gradient(#ff9ed4, #b48cff, #7dd0ff, #7fe6c4, #ffd86b, #ff9ed4);
+    background: var(--widget-folder-ring);
   }
 
   .gp-canvas-row {
@@ -310,10 +326,6 @@
   }
 
   .gp-canvas {
-    background: var(--graph-canvas-bg);
-    border: 1px solid var(--graph-canvas-border);
-    border-radius: 18px;
-    overflow: hidden;
     aspect-ratio: 16 / 10;
     min-height: 480px;
     max-height: 84vh;
@@ -364,8 +376,8 @@
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .det-nb:hover { color: var(--text-primary); text-decoration: underline; }
-  .dir { color: #b48cff; font-weight: 700; min-width: 14px; text-align: center; }
-  .dir.in { color: #ff9ed4; }
+  .dir { color: var(--accent-out); font-weight: 700; min-width: 14px; text-align: center; }
+  .dir.in { color: var(--accent-in); }
   .nb-folder {
     font-size: 0.64rem;
     max-width: 40%;
@@ -381,8 +393,8 @@
     text-decoration: none;
   }
   .det-btn.primary {
-    background: linear-gradient(180deg, #ffd0e6, #b48cff);
-    color: #1c0f30; border-color: rgb(255 255 255 / 0.4);
+    background: linear-gradient(180deg, var(--graph-link-grad-a), var(--accent-out));
+    color: var(--on-accent); border-color: var(--widget-control-border);
   }
 
   @media (max-width: 768px) {

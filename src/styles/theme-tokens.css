@@ -1,0 +1,258 @@
+/**
+ * 主题语义 Token · 单一事实来源
+ * 组件只引用此处变量，禁止硬编码 # / rgb() / rgba()（token 定义文件除外）
+ */
+
+:root {
+  /* ── 语义别名（推荐组件使用） ── */
+  --bg: var(--bg-primary);
+  --surface: var(--bg-secondary);
+  --surface-elevated: var(--glass-bg-strong);
+  --text: var(--text-primary);
+  --text-muted: var(--text-secondary);
+  --accent: var(--accent-lavender);
+  --accent-strong: #8860cc;
+  --accent-link: #7a58c8;
+  --accent-in: #c45a9a;
+  --accent-out: #8860cc;
+  --border: var(--border-color);
+  --border-subtle: rgb(43 43 48 / 0.12);
+  --overlay-subtle: rgb(43 43 48 / 0.06);
+  --overlay-medium: rgb(43 43 48 / 0.1);
+  --overlay-strong: rgb(43 43 48 / 0.16);
+  --on-accent: #1c0f30;
+
+  --color-success: #3a9a78;
+  --color-error: #c03050;
+  --color-success-soft: rgb(58 154 120 / 0.18);
+  --color-error-soft: rgb(192 48 80 / 0.12);
+
+  /* ── 图谱 · 画布壳层 ── */
+  --graph-canvas-bg: linear-gradient(180deg, var(--graph-space-mid), var(--graph-space-deep));
+  --graph-canvas-border: var(--border-color);
+  --graph-canvas-shadow: 0 8px 28px rgb(43 43 48 / 0.08), inset 0 1px 0 rgb(255 255 255 / 0.65);
+  --graph-canvas-vignette: radial-gradient(
+    ellipse at center,
+    transparent 58%,
+    rgb(244 245 247 / 0.35) 100%
+  );
+  --graph-canvas-edge-inner: rgb(244 245 247 / 0.55);
+  --graph-panel-bg: var(--glass-bg-strong);
+  --graph-panel-text: var(--text-primary);
+  --graph-panel-muted: var(--text-secondary);
+
+  /* ── 图谱 · 星空渐变（默认 / 非 HUD） ── */
+  --graph-space-deep: #e8ebf2;
+  --graph-space-mid: #eef1f8;
+  --graph-space-inner: #dce3ef;
+  --graph-glow: rgb(255 255 255 / 0.55);
+  --graph-grid: rgb(43 43 48 / 0.06);
+  --graph-link: rgb(120 90 200 / 0.42);
+  --graph-link-dim: rgb(43 43 48 / 0.08);
+  --graph-link-hi: #8860cc;
+  --graph-link-hi-soft: rgb(136 96 204 / 0.55);
+  --graph-link-grad-a: rgb(196 90 154 / 0.45);
+  --graph-link-grad-b: rgb(120 90 200 / 0.45);
+  --graph-label: var(--text-primary);
+  --graph-label-muted: var(--text-secondary);
+  --graph-label-stroke: rgb(244 245 247 / 0.92);
+  --graph-node-sel: var(--text-primary);
+  --graph-node-orphan-stroke: rgb(43 43 48 / 0.35);
+  --graph-core: var(--text-primary);
+  --graph-alert: #c03050;
+  --graph-telemetry: var(--text-secondary);
+  --graph-center-fill: rgb(43 43 48 / 0.08);
+  --graph-center-stroke: rgb(43 43 48 / 0.12);
+  --graph-baseline: rgb(43 43 48 / 0.16);
+  --graph-ring-stroke: var(--graph-grid);
+
+  /* ── 图谱 · HUD 星图 ── */
+  --graph-hud-space-deep: #eef1f8;
+  --graph-hud-space-mid: #e4e9f2;
+  --graph-hud-space-inner: #dce2ee;
+  --graph-hud-grid: rgb(43 43 48 / 0.06);
+  --graph-hud-link: rgb(90 110 140 / 0.38);
+  --graph-hud-link-dim: rgb(43 43 48 / 0.06);
+  --graph-hud-link-hi: #c03050;
+  --graph-hud-link-hi-soft: rgb(192 48 80 / 0.55);
+  --graph-hud-label: var(--text-primary);
+  --graph-hud-label-muted: var(--text-secondary);
+  --graph-hud-label-stroke: rgb(244 245 247 / 0.92);
+  --graph-hud-core: var(--text-primary);
+  --graph-hud-glow: rgb(43 43 48 / 0.12);
+  --graph-hud-center-fill: rgb(43 43 48 / 0.06);
+  --graph-hud-center-stroke: rgb(43 43 48 / 0.14);
+  --graph-hud-baseline: rgb(43 43 48 / 0.2);
+  --graph-hud-ring-stroke: rgb(43 43 48 / 0.08);
+
+  /* ── 图谱 · 文件夹调色板（10 色） ── */
+  --graph-folder-0: #c45a9a;
+  --graph-folder-1: #8860cc;
+  --graph-folder-2: #4a90c8;
+  --graph-folder-3: #3a9a78;
+  --graph-folder-4: #c8a030;
+  --graph-folder-5: #c87048;
+  --graph-folder-6: #6878d0;
+  --graph-folder-7: #c85858;
+  --graph-folder-8: #48b878;
+  --graph-folder-9: #b848a8;
+
+  --graph-hud-folder-0: var(--text-primary);
+  --graph-hud-folder-1: #6a8098;
+  --graph-hud-folder-2: #c03050;
+  --graph-hud-folder-3: #98a8c0;
+  --graph-hud-folder-4: #a89880;
+  --graph-hud-folder-5: #7898c0;
+  --graph-hud-folder-6: #d898a8;
+  --graph-hud-folder-7: #a8c0e0;
+  --graph-hud-folder-8: #d8c0a8;
+  --graph-hud-folder-9: #88a8d0;
+
+  /* ── 浮动小组件壳层（GraphWidget 等） ── */
+  --widget-shell-bg: rgb(244 245 247 / 0.92);
+  --widget-shell-border: var(--border-color);
+  --widget-shell-shadow: 0 12px 32px rgb(43 43 48 / 0.12);
+  --widget-shell-shadow-drag: 0 16px 40px rgb(43 43 48 / 0.18);
+  --widget-header-bg: rgb(236 238 242 / 0.65);
+  --widget-header-border: var(--border-subtle);
+  --widget-muted: var(--text-muted);
+  --widget-control-bg: var(--overlay-subtle);
+  --widget-control-border: var(--border-subtle);
+  --widget-control-hover: var(--overlay-medium);
+  --widget-accent-fill: var(--accent-strong);
+  --widget-slider-thumb: var(--surface-elevated);
+  --widget-detail-bg: var(--surface-elevated);
+  --widget-tab-active-bg: color-mix(in srgb, var(--accent-in) 18%, transparent);
+  --widget-tab-active-border: color-mix(in srgb, var(--accent-out) 45%, transparent);
+  --widget-kpi-gradient: linear-gradient(135deg, var(--accent-in), var(--accent-out));
+  --widget-folder-ring: conic-gradient(
+    var(--graph-folder-0),
+    var(--graph-folder-1),
+    var(--graph-folder-2),
+    var(--graph-folder-3),
+    var(--graph-folder-4),
+    var(--graph-folder-0)
+  );
+}
+
+:root.dark,
+[data-theme='dark'],
+.dark {
+  --accent-strong: #b48cff;
+  --accent-link: #b48cff;
+  --accent-in: #ff9ed4;
+  --accent-out: #b48cff;
+  --border-subtle: rgb(255 255 255 / 0.08);
+  --overlay-subtle: rgb(255 255 255 / 0.06);
+  --overlay-medium: rgb(255 255 255 / 0.1);
+  --overlay-strong: rgb(255 255 255 / 0.16);
+  --on-accent: #1c0f30;
+
+  --color-success: #7fe6c4;
+  --color-error: #ff9d9d;
+  --color-success-soft: rgb(127 230 196 / 0.12);
+  --color-error-soft: rgb(255 157 157 / 0.1);
+
+  --graph-canvas-bg: linear-gradient(180deg, var(--graph-space-mid), var(--graph-space-deep));
+  --graph-canvas-border: rgb(255 255 255 / 0.08);
+  --graph-canvas-shadow: 0 16px 40px rgb(0 0 0 / 0.42), inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  --graph-canvas-vignette: radial-gradient(
+    ellipse at center,
+    transparent 52%,
+    rgb(6 3 15 / 0.72) 100%
+  );
+  --graph-canvas-edge-inner: rgb(6 3 15 / 0.65);
+
+  --graph-space-deep: #06030f;
+  --graph-space-mid: #110926;
+  --graph-space-inner: #3a234a;
+  --graph-glow: rgb(255 255 255 / 0.55);
+  --graph-grid: rgb(255 255 255 / 0.04);
+  --graph-link: rgb(180 140 255 / 0.38);
+  --graph-link-dim: rgb(255 255 255 / 0.05);
+  --graph-link-hi: #ffd0e6;
+  --graph-link-hi-soft: rgb(200 16 46 / 0.55);
+  --graph-link-grad-a: rgb(255 208 230 / 0.5);
+  --graph-link-grad-b: rgb(180 140 255 / 0.5);
+  --graph-label: #f3ecff;
+  --graph-label-muted: #b6a8d3;
+  --graph-label-stroke: rgb(20 12 32 / 0.85);
+  --graph-node-sel: #fff;
+  --graph-node-orphan-stroke: rgb(255 255 255 / 0.45);
+  --graph-center-fill: rgb(0 0 0 / 0.55);
+  --graph-center-stroke: rgb(255 255 255 / 0.12);
+  --graph-baseline: rgb(255 255 255 / 0.16);
+  --graph-ring-stroke: rgb(255 255 255 / 0.06);
+  --graph-core: #f3ecff;
+  --graph-alert: #ff4d6a;
+  --graph-telemetry: #9aafc9;
+
+  --graph-hud-center-fill: rgb(5 10 20 / 0.72);
+  --graph-hud-center-stroke: rgb(245 242 235 / 0.18);
+  --graph-hud-baseline: rgb(245 242 235 / 0.22);
+  --graph-hud-ring-stroke: rgb(245 242 235 / 0.08);
+
+  --graph-hud-space-deep: #050a14;
+  --graph-hud-space-mid: #0b1426;
+  --graph-hud-space-inner: #101d36;
+  --graph-hud-grid: rgb(245 242 235 / 0.05);
+  --graph-hud-link: rgb(154 175 201 / 0.38);
+  --graph-hud-link-dim: rgb(245 242 235 / 0.05);
+  --graph-hud-link-hi: #ff4d6a;
+  --graph-hud-link-hi-soft: rgb(200 16 46 / 0.55);
+  --graph-hud-label: #f5f2eb;
+  --graph-hud-label-muted: #9aafc9;
+  --graph-hud-label-stroke: rgb(5 10 20 / 0.92);
+  --graph-hud-core: #f5f2eb;
+  --graph-hud-glow: rgb(245 242 235 / 0.35);
+
+  --graph-hud-center-fill: rgb(5 10 20 / 0.72);
+  --graph-hud-center-stroke: rgb(245 242 235 / 0.18);
+  --graph-hud-baseline: rgb(245 242 235 / 0.22);
+  --graph-hud-ring-stroke: rgb(245 242 235 / 0.08);
+
+  --graph-folder-0: #ff9ed4;
+  --graph-folder-1: #b48cff;
+  --graph-folder-2: #7dd0ff;
+  --graph-folder-3: #7fe6c4;
+  --graph-folder-4: #ffd86b;
+  --graph-folder-5: #ff9d6b;
+  --graph-folder-6: #a4b8ff;
+  --graph-folder-7: #ffa3a3;
+  --graph-folder-8: #9fffbb;
+  --graph-folder-9: #ff8de8;
+
+  --graph-hud-folder-0: #f5f2eb;
+  --graph-hud-folder-1: #9aafc9;
+  --graph-hud-folder-2: #ff4d6a;
+  --graph-hud-folder-3: #c8d4e8;
+  --graph-hud-folder-4: #e8dcc8;
+  --graph-hud-folder-5: #a8c4e8;
+  --graph-hud-folder-6: #ffb3c1;
+  --graph-hud-folder-7: #d4e4f8;
+  --graph-hud-folder-8: #ffe8d4;
+  --graph-hud-folder-9: #b8cfe8;
+
+  --graph-canvas-bg: linear-gradient(180deg, var(--graph-space-mid), var(--graph-space-deep));
+  --graph-canvas-border: rgb(255 255 255 / 0.08);
+  --graph-panel-bg: rgb(12 8 22 / 0.88);
+  --graph-panel-text: #f3ecff;
+  --graph-panel-muted: #b6a8d3;
+
+  --widget-shell-bg: rgb(20 16 32 / 0.78);
+  --widget-shell-border: rgb(255 255 255 / 0.16);
+  --widget-shell-shadow: 0 20px 44px rgb(0 0 0 / 0.42);
+  --widget-shell-shadow-drag: 0 24px 48px rgb(0 0 0 / 0.55);
+  --widget-header-bg: rgb(0 0 0 / 0.18);
+  --widget-header-border: rgb(255 255 255 / 0.08);
+  --widget-muted: var(--graph-panel-muted);
+  --widget-control-bg: rgb(255 255 255 / 0.08);
+  --widget-control-border: rgb(255 255 255 / 0.14);
+  --widget-control-hover: rgb(255 255 255 / 0.16);
+  --widget-accent-fill: var(--accent-out);
+  --widget-slider-thumb: #f0e8ff;
+  --widget-detail-bg: rgb(12 8 22 / 0.78);
+  --widget-tab-active-bg: linear-gradient(135deg, rgb(255 141 232 / 0.22), rgb(180 140 255 / 0.22));
+  --widget-tab-active-border: rgb(180 140 255 / 0.5);
+  --widget-kpi-gradient: linear-gradient(135deg, var(--accent-in), var(--accent-out));
+}

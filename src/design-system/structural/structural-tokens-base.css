@@ -1,0 +1,654 @@
+/* 结构换皮 — 共享 frame / 控制中心（各皮肤通过 data-ui 覆盖 --struct-*） */
+
+@import './shells/floating-shell-interaction.css';
+@import './shells/floating-shell-drag.css';
+
+:root {
+  --struct-frame-bg: #1a1030;
+  --struct-frame-fg: #e8e8f0;
+  --struct-frame-muted: #9090a8;
+  --struct-frame-border: #000;
+  --struct-frame-header-bg: #c0c0c0;
+  --struct-frame-header-fg: #000;
+  --struct-accent: #fc9838;
+  --struct-panel-bg: #12101c;
+  --struct-drawer-bg: #12101c;
+  --struct-drawer-face: #383838;
+  --struct-font-display: 'Press Start 2P', monospace;
+  --struct-font-body: 'VT323', monospace;
+  --struct-radius: 0px;
+  --struct-shadow: 4px 4px 0 rgb(0 0 0 / 0.45);
+}
+
+/* —— 浮动小组件壳 —— */
+.structural-floating-root {
+  position: fixed;
+  z-index: 90;
+  touch-action: none;
+  box-sizing: border-box;
+}
+
+.structural-frame {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  border: 2px solid var(--struct-frame-border);
+  box-shadow: var(--struct-shadow);
+  background: var(--struct-frame-bg);
+  color: var(--struct-frame-fg);
+  border-radius: var(--struct-radius);
+  overflow: hidden;
+}
+
+.structural-frame__header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--struct-frame-header-bg);
+  color: var(--struct-frame-header-fg);
+  border-bottom: 2px solid var(--struct-frame-border);
+  cursor: grab;
+  user-select: none;
+}
+
+.structural-frame__badge {
+  font-family: var(--struct-font-display);
+  font-size: 0.38rem;
+  padding: 2px 6px;
+  border: 1px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-accent) 35%, transparent);
+  color: var(--struct-accent);
+}
+
+.structural-frame__title {
+  margin: 0;
+  font-family: var(--struct-font-display);
+  font-size: 0.42rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.structural-frame__subtitle {
+  display: block;
+  font-family: var(--struct-font-h2);
+  font-weight: var(--struct-font-h2-weight, 600);
+  font-size: 0.78rem;
+  opacity: 0.75;
+}
+
+.structural-frame__actions {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.structural-chrome-btn,
+.structural-close {
+  min-width: 22px;
+  height: 20px;
+  padding: 0 4px;
+  border: 2px solid var(--struct-frame-border);
+  background: var(--struct-drawer-face);
+  color: inherit;
+  font-family: var(--struct-font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.structural-chrome-btn.is-active {
+  background: var(--struct-accent);
+  color: #000;
+}
+
+.structural-frame__settings {
+  margin: 0 4px;
+  padding: 8px;
+  background: color-mix(in srgb, var(--struct-panel-bg) 92%, #000);
+  border-bottom: 2px solid var(--struct-frame-border);
+  max-height: min(42vh, 280px);
+  overflow: auto;
+}
+
+.structural-setting-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 4px 8px;
+  margin: 0 0 8px;
+  font-family: var(--struct-font-body);
+  font-size: 0.82rem;
+}
+
+.structural-setting-row__label {
+  grid-column: 1 / -1;
+}
+
+.structural-setting-row__range {
+  width: 100%;
+  accent-color: var(--struct-accent);
+}
+
+.structural-setting-row__val {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.structural-settings-extra {
+  padding-top: 8px;
+  border-top: 2px dashed color-mix(in srgb, var(--struct-frame-fg) 25%, transparent);
+}
+
+.structural-frame__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px;
+  background: var(--struct-panel-bg);
+  font-family: var(--struct-font-body);
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.structural-floating-root :global(.rh) {
+  border-color: var(--struct-accent);
+}
+
+/* —— 控制中心 —— */
+html[data-ui='blueprint'] .mac-settings.structural-drawer-root,
+html[data-ui='scholar'] .mac-settings.structural-drawer-root,
+html[data-ui='terminal'] .mac-settings.structural-drawer-root,
+html[data-ui='crt'] .mac-settings.structural-drawer-root,
+html[data-ui='observatory'] .mac-settings.structural-drawer-root,
+html[data-ui='herbarium'] .mac-settings.structural-drawer-root,
+html[data-ui='ink'] .mac-settings.structural-drawer-root,
+html[data-ui='rpg'] .mac-settings.structural-drawer-root,
+html[data-ui='spacecraft'] .mac-settings.structural-drawer-root {
+  display: flex !important;
+  flex-direction: column;
+  background: var(--struct-drawer-bg) !important;
+  color: var(--struct-frame-fg) !important;
+  border: 2px solid var(--struct-frame-border) !important;
+  border-radius: var(--struct-radius) !important;
+  box-shadow: var(--struct-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='blueprint'] .structural-drawer-root .mac-body,
+html[data-ui='scholar'] .structural-drawer-root .mac-body,
+html[data-ui='terminal'] .structural-drawer-root .mac-body,
+html[data-ui='crt'] .structural-drawer-root .mac-body,
+html[data-ui='observatory'] .structural-drawer-root .mac-body,
+html[data-ui='herbarium'] .structural-drawer-root .mac-body,
+html[data-ui='ink'] .structural-drawer-root .mac-body,
+html[data-ui='rpg'] .structural-drawer-root .mac-body,
+html[data-ui='spacecraft'] .structural-drawer-root .mac-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  background: var(--struct-panel-bg);
+  color: var(--struct-frame-fg);
+  padding: 8px 10px 12px;
+  overflow: auto;
+}
+
+html[data-ui='blueprint'] .structural-drawer-root .mac-pane-home,
+html[data-ui='scholar'] .structural-drawer-root .mac-pane-home,
+html[data-ui='terminal'] .structural-drawer-root .mac-pane-home,
+html[data-ui='crt'] .structural-drawer-root .mac-pane-home,
+html[data-ui='observatory'] .structural-drawer-root .mac-pane-home,
+html[data-ui='herbarium'] .structural-drawer-root .mac-pane-home,
+html[data-ui='ink'] .structural-drawer-root .mac-pane-home,
+html[data-ui='rpg'] .structural-drawer-root .mac-pane-home,
+html[data-ui='spacecraft'] .structural-drawer-root .mac-pane-home {
+  gap: 8px;
+}
+
+html[data-ui='blueprint'] .structural-drawer-root .mac-search-stage,
+html[data-ui='scholar'] .structural-drawer-root .mac-search-stage,
+html[data-ui='terminal'] .structural-drawer-root .mac-search-stage,
+html[data-ui='crt'] .structural-drawer-root .mac-search-stage,
+html[data-ui='observatory'] .structural-drawer-root .mac-search-stage,
+html[data-ui='herbarium'] .structural-drawer-root .mac-search-stage,
+html[data-ui='ink'] .structural-drawer-root .mac-search-stage,
+html[data-ui='rpg'] .structural-drawer-root .mac-search-stage,
+html[data-ui='spacecraft'] .structural-drawer-root .mac-search-stage {
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+html[data-ui='blueprint'] .structural-drawer-root .mac-search,
+html[data-ui='scholar'] .structural-drawer-root .mac-search,
+html[data-ui='terminal'] .structural-drawer-root .mac-search,
+html[data-ui='crt'] .structural-drawer-root .mac-search,
+html[data-ui='observatory'] .structural-drawer-root .mac-search,
+html[data-ui='herbarium'] .structural-drawer-root .mac-search,
+html[data-ui='ink'] .structural-drawer-root .mac-search,
+html[data-ui='rpg'] .structural-drawer-root .mac-search,
+html[data-ui='spacecraft'] .structural-drawer-root .mac-search {
+  border-radius: var(--struct-radius) !important;
+  border: 2px solid var(--struct-frame-border) !important;
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, #000) !important;
+  color: var(--struct-frame-fg) !important;
+  font-family: var(--struct-font-body) !important;
+}
+
+html[data-ui='blueprint'] .structural-drawer-root .structural-drawer-pane,
+html[data-ui='scholar'] .structural-drawer-root .structural-drawer-pane,
+html[data-ui='terminal'] .structural-drawer-root .structural-drawer-pane,
+html[data-ui='crt'] .structural-drawer-root .structural-drawer-pane,
+html[data-ui='observatory'] .structural-drawer-root .structural-drawer-pane,
+html[data-ui='herbarium'] .structural-drawer-root .structural-drawer-pane,
+html[data-ui='ink'] .structural-drawer-root .structural-drawer-pane,
+html[data-ui='rpg'] .structural-drawer-root .structural-drawer-pane,
+html[data-ui='spacecraft'] .structural-drawer-root .structural-drawer-pane {
+  padding: 0;
+}
+
+.structural-drawer-chrome {
+  flex: 0 0 auto;
+  height: auto !important;
+  background: var(--struct-drawer-face);
+  border-bottom: 2px solid var(--struct-frame-border);
+}
+
+.structural-drawer-chrome__bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+}
+
+.structural-drawer-chrome__icon {
+  width: 10px;
+  height: 10px;
+  background: var(--struct-accent);
+  border: 1px solid var(--struct-frame-border);
+}
+
+.structural-drawer-chrome__title {
+  margin: 0;
+  font-family: var(--struct-font-display);
+  font-size: 0.42rem;
+}
+
+.structural-drawer-chrome__back {
+  border: none;
+  background: transparent;
+  font-family: var(--struct-font-display);
+  font-size: 0.34rem;
+  cursor: pointer;
+  color: inherit;
+  margin-bottom: 2px;
+}
+
+.structural-drawer-section__label {
+  margin: 0 0 6px;
+  font-family: var(--struct-font-display);
+  font-size: 0.38rem;
+  color: var(--struct-accent);
+}
+
+.structural-drawer-section__hint,
+.structural-drawer-footnote {
+  font-family: var(--struct-font-body);
+  font-size: 0.82rem;
+  color: var(--struct-frame-muted);
+}
+
+.structural-menu-shelf {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.structural-menu-cart {
+  border: 2px solid var(--struct-frame-border);
+  background: var(--struct-drawer-face);
+  box-shadow: var(--struct-shadow);
+  padding: 8px;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.structural-menu-cart__title {
+  font-family: var(--struct-font-display);
+  font-size: 0.42rem;
+}
+
+.structural-menu-cart__desc {
+  margin: 4px 0 6px;
+  font-size: 0.85rem;
+  color: var(--struct-frame-muted);
+}
+
+.structural-menu-cart__pins {
+  height: 6px;
+  background: repeating-linear-gradient(90deg, var(--struct-accent) 0 5px, var(--struct-frame-border) 5px 7px);
+}
+
+.structural-drawer-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.structural-drawer-status__clock,
+.structural-drawer-status__slot {
+  border: 2px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, #000);
+}
+
+.structural-drawer-status__time {
+  font-family: var(--struct-font-display);
+  font-size: 0.52rem;
+  color: var(--struct-accent);
+}
+
+.structural-menu-row {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border: 2px solid var(--struct-frame-border);
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.structural-menu-row.is-on {
+  outline: 2px solid var(--struct-accent);
+}
+
+.structural-drawer-pane {
+  padding: 12px;
+}
+
+.structural-drawer-section {
+  margin-bottom: 16px;
+}
+
+.structural-drawer-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.structural-drawer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 2px dashed color-mix(in srgb, var(--struct-frame-border) 35%, transparent);
+}
+
+.structural-drawer-row.is-disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.structural-drawer-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.structural-drawer-row__title {
+  font-family: var(--struct-font-display);
+  font-size: 0.42rem;
+}
+
+.structural-drawer-row__sub {
+  font-family: var(--struct-font-body);
+  font-size: 0.9rem;
+  color: var(--struct-frame-muted);
+}
+
+.structural-fc-pad-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+  margin: 8px 0;
+}
+
+.structural-wp-shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 14px 10px;
+  padding-bottom: 4px;
+}
+
+.structural-ui-shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.structural-ui-cart {
+  border: 2px solid var(--struct-frame-border);
+  background: var(--struct-drawer-face);
+  box-shadow: var(--struct-shadow);
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  overflow: hidden;
+  color: inherit;
+}
+
+.structural-ui-cart[data-active='true'] {
+  outline: 2px solid var(--struct-accent);
+}
+
+.structural-ui-cart__label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-bottom: 2px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, #000);
+}
+
+.structural-ui-cart__title {
+  font-family: var(--struct-font-display);
+  font-size: 0.34rem;
+}
+
+.structural-ui-cart__screen {
+  height: 48px;
+}
+
+.structural-ui-cart__desc {
+  margin: 0;
+  padding: 6px;
+  font-family: var(--struct-font-body);
+  font-size: 0.75rem;
+  color: var(--struct-frame-muted);
+  line-height: 1.2;
+}
+
+.structural-ui-cart__pins {
+  height: 6px;
+  background: repeating-linear-gradient(90deg, var(--struct-accent) 0 5px, var(--struct-frame-border) 5px 7px);
+}
+
+.structural-drawer-widget-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.structural-drawer-widget-row__icon {
+  display: grid;
+  place-items: center;
+}
+
+.structural-drawer-widget-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.structural-drawer-tips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--struct-font-body);
+  font-size: 0.85rem;
+  color: var(--struct-frame-muted);
+}
+
+.structural-drawer-tips li + li {
+  margin-top: 6px;
+}
+
+/* 蓝图控制中心标题栏 */
+.bp-drawer-chrome {
+  flex: 0 0 auto;
+  border-bottom: 1px solid rgb(255 255 255 / 0.45);
+  background: rgb(8 40 64 / 0.95);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.bp-drawer-chrome__grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+}
+
+.bp-drawer-chrome__sheet {
+  font-size: 0.58rem;
+  color: #f4ecd8;
+  border: 1px solid rgb(255 255 255 / 0.45);
+  padding: 2px 5px;
+}
+
+.bp-drawer-chrome__title {
+  margin: 0;
+  font-family: 'Architects Daughter', cursive;
+  font-size: 0.95rem;
+  color: #f0f6ff;
+}
+
+.bp-drawer-chrome__back {
+  display: block;
+  border: none;
+  background: transparent;
+  color: rgb(240 246 255 / 0.7);
+  font-size: 0.62rem;
+  cursor: pointer;
+  margin-bottom: 2px;
+  padding: 0;
+}
+
+.bp-drawer-chrome__dim {
+  font-size: 0.58rem;
+  color: #e63946;
+}
+
+/* RPG 控制中心标题栏 */
+.rpg-drawer-chrome {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 2px solid rgb(212 175 55 / 0.45);
+  background: linear-gradient(180deg, rgb(45 27 78 / 0.95), rgb(26 15 46 / 0.98));
+  font-family: Cinzel, serif;
+}
+
+.rpg-drawer-chrome__orn {
+  color: #d4af37;
+  font-size: 0.65rem;
+}
+
+.rpg-drawer-chrome__title {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ffd700;
+}
+
+.rpg-drawer-chrome__back {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: #e8dcc8;
+  font-family: inherit;
+  font-size: 0.62rem;
+  cursor: pointer;
+  margin-bottom: 4px;
+  padding: 0;
+}
+
+.rpg-drawer-chrome__close {
+  border: none;
+  background: transparent;
+  color: #e8dcc8;
+  font-family: inherit;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+@import './primitives/todo-interactions.css';
+@import './primitives/drawer-controls.css';
+@import './primitives/stats-viz.css';
+@import './primitives/weather-viz.css';
+@import './primitives/music-viz.css';
+@import './primitives/calendar-viz.css';
+@import './primitives/pomodoro-viz.css';
+@import './primitives/notes-viz.css';
+@import './primitives/network-viz.css';
+@import './primitives/world-viz.css';
+@import './primitives/whitenoise-viz.css';
+@import './primitives/clock-viz.css';
+@import './primitives/graph-viz.css';
+@import './primitives/lazy-tools-viz.css';
+@import './primitives/territory-viz.css';
+@import './primitives/menu-bar.css';
+@import './primitives/menu-bar-controls.css';
+@import './primitives/scene-pick.css';
+@import './shells/generic-shell.css';
+@import './primitives/scholar-wax.css';
+@import './shells/blueprint/blueprint-shell.css';
+@import './shells/scholar/scholar-shell.css';
+@import './shells/terminal/terminal-shell.css';
+@import './shells/crt/crt-shell.css';
+@import './shells/observatory/observatory-shell.css';
+@import './shells/herbarium/herbarium-shell.css';
+@import './shells/ink/ink-shell.css';
+@import './shells/rpg/rpg-shell.css';
+@import './shells/spacecraft/spacecraft-shell.css';
+@import './skins/blueprint.css';
+@import './skins/scholar.css';
+@import './skins/terminal.css';
+@import './skins/crt.css';
+@import './skins/observatory.css';
+@import './skins/herbarium.css';
+@import './skins/ink.css';
+@import './skins/rpg.css';
+@import './skins/spacecraft.css';
+@import './structural-fonts.css';
+@import './structural-theme.css';
+@import './structural-theme-dark-text.css';
+@import './structural-theme-light-text.css';

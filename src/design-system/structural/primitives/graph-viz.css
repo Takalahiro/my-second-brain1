@@ -1,0 +1,163 @@
+/* Graph · 9-skin */
+
+.skin-graph {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  font-size: 0.78rem;
+}
+
+.skin-graph__stats {
+  font-family: var(--struct-font-display);
+  font-size: 0.38rem;
+  opacity: 0.65;
+  margin-bottom: 6px;
+}
+
+.skin-graph__canvas {
+  position: relative;
+  flex: 1;
+  min-height: 200px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--struct-accent) 25%, var(--struct-frame-border));
+}
+
+.skin-graph__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  touch-action: none;
+  background: color-mix(in srgb, var(--struct-panel-bg) 92%, #000);
+}
+
+.skin-graph__link {
+  stroke: color-mix(in srgb, var(--struct-accent) 55%, transparent);
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+
+.skin-graph__link.is-dim {
+  stroke: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.skin-graph__node {
+  cursor: pointer;
+}
+
+.skin-graph__node.is-link {
+  cursor: alias;
+}
+
+.skin-graph__node.is-dim {
+  opacity: 0.18;
+}
+
+.skin-graph__node.is-orphan {
+  opacity: 0.78;
+}
+
+.skin-graph__node-dot {
+  stroke: transparent;
+  stroke-width: 0.6;
+}
+
+.skin-graph__node.is-sel .skin-graph__node-dot {
+  stroke: var(--struct-accent);
+  stroke-width: 1.4;
+}
+
+.skin-graph__label {
+  font-size: 9px;
+  fill: currentColor;
+  pointer-events: none;
+}
+
+.skin-graph__empty {
+  text-align: center;
+  padding: 40px 16px;
+  opacity: 0.65;
+}
+
+.skin-graph__detail {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
+  padding: 8px;
+  border: 1px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 94%, #000);
+}
+
+.skin-graph__detail-title {
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+.skin-graph__detail-sub {
+  font-size: 0.68rem;
+  opacity: 0.65;
+  margin-top: 2px;
+}
+
+.skin-graph__detail-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.skin-graph__btn {
+  border: 1px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-accent) 18%, transparent);
+  color: inherit;
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.skin-graph-settings__row {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 0.72rem;
+}
+
+.skin-graph-settings__select {
+  border: 1px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, #000);
+  color: inherit;
+  font: inherit;
+  padding: 4px 6px;
+}
+
+.skin-graph-settings__toolbar {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.skin-graph--terminal .skin-graph__svg {
+  background: #000a05;
+}
+
+.skin-graph--terminal .skin-graph__link {
+  stroke: #33ff66;
+}
+
+.skin-graph--crt .skin-graph__svg {
+  background: #0a0a12;
+}
+
+.skin-graph--crt .skin-graph__link {
+  stroke: #ffb000;
+}
+
+.skin-graph--ink .skin-graph__canvas {
+  border: none;
+  border-left: 2px solid #1a1a1a;
+}

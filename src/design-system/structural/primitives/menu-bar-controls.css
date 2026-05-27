@@ -1,0 +1,83 @@
+/* 结构换皮 · 顶栏 util 控件 */
+
+@import './menu-bar-theme-locale.css';
+
+.skin-menubar-ctl {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 8px;
+  border: 2px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, var(--struct-frame-bg));
+  color: var(--struct-frame-fg);
+  font-family: var(--struct-font-body);
+  font-size: 0.78rem;
+  border-radius: var(--struct-radius, 0);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background 0.12s ease,
+    transform 0.1s ease,
+    color 0.28s ease,
+    border-color 0.28s ease;
+}
+
+.skin-menubar-ctl:active {
+  transform: scale(0.94);
+  background: color-mix(in srgb, var(--struct-accent) 22%, transparent);
+}
+
+.skin-menubar-ctl--font {
+  cursor: default;
+  padding: 0 6px;
+}
+
+.skin-menubar-ctl__select {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.72rem;
+  outline: none;
+  cursor: pointer;
+  max-width: 4.5rem;
+}
+
+html.dark[data-ui='blueprint'] .skin-menubar-ctl--blueprint {
+  border: 1px solid rgb(255 255 255 / 0.45);
+}
+
+html.dark[data-ui='terminal'] .skin-menubar-ctl--terminal {
+  text-shadow: 0 0 4px rgb(189 147 249 / 0.3);
+}
+
+html:not(.dark)[data-ui='terminal'] .skin-menubar-ctl--terminal {
+  text-shadow: none;
+}
+
+html.dark[data-ui='crt'] .skin-menubar-ctl--crt {
+  color: var(--struct-accent);
+}
+
+html:not(.dark)[data-ui='ink'] .skin-menubar-ctl--ink {
+  border-width: 1px;
+}
+
+html.dark[data-ui='ink'] .skin-menubar-ctl--ink {
+  border-width: 1px;
+}
+
+html.dark[data-ui='rpg'] .skin-menubar-ctl--rpg {
+  color: var(--struct-accent);
+}
+
+html.dark[data-ui='spacecraft'] .skin-menubar-ctl--spacecraft {
+  color: #6ec4ff;
+}
+
+html:not(.dark)[data-ui='spacecraft'] .skin-menubar-ctl--spacecraft {
+  color: #2868a8;
+}

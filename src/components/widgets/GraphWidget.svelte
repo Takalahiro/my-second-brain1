@@ -5,7 +5,7 @@
   import ResizeHandles from './ResizeHandles.svelte';
   import RotateHandle from './RotateHandle.svelte';
   import { layoutRotation, rotationStyle } from '../../lib/widget-rotation';
-  import { noteHref, loadWiki, watchWikiRefresh } from '../graph/graph-data';
+  import { noteHref, loadWiki, watchWikiRefresh, folderColor } from '../graph/graph-data';
   import { getWidgetTier, tierClass, TIER_LABEL } from '../../lib/widget-size-tier';
   import {
     createForceController,
@@ -94,15 +94,7 @@
   let simFrame = $state(0);
   let canvasEl: HTMLDivElement | null = null;
 
-  // folder 配色盘
-  const folderPalette = [
-    '#ff9ed4', '#b48cff', '#7dd0ff', '#7fe6c4',
-    '#ffd86b', '#ff9d6b', '#a4b8ff', '#ffa3a3',
-    '#9fffbb', '#ff8de8',
-  ];
-  function colorForFolder(f: string, idx: number) {
-    return folderPalette[idx % folderPalette.length];
-  }
+  // folder 配色见 theme-tokens.css `--graph-folder-N`
 
   onMount(() => {
     void loadGraph();
@@ -167,7 +159,6 @@
       const data = await loadWiki({ fresh: !reseed });
       const prevPos = reseed ? null : new Map(nodes.map((n) => [n.id, { x: n.x, y: n.y, fixed: n.fixed }]));
       const folders = Array.from(new Set(data.nodes.map((n) => n.folder)));
-      const folderIdx = new Map(folders.map((f, i) => [f, i] as const));
       const useNodes = onlyConnected
         ? data.nodes.filter((n) => n.inDegree + n.outDegree > 0)
         : data.nodes;
@@ -181,7 +172,7 @@
           vx: 0,
           vy: 0,
           fixed: prev?.fixed,
-          color: colorForFolder(n.folder, folderIdx.get(n.folder) ?? 0),
+          color: folderColor(n.folder, folders),
         };
       });
       nodeMap = new Map(nodes.map((n) => [n.id, n]));
@@ -472,8 +463,8 @@
         >
           <defs>
             <radialGradient id="gw-node-glow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#fff" stop-opacity="0.55" />
-              <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+              <stop offset="0%" stop-color="var(--graph-glow)" stop-opacity="0.55" />
+              <stop offset="100%" stop-color="var(--graph-glow)" stop-opacity="0" />
             </radialGradient>
             <filter id="gw-glow">
               <feGaussianBlur stdDeviation="2" result="blur" />
@@ -483,8 +474,8 @@
               </feMerge>
             </filter>
             <linearGradient id="gw-link-grad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="rgb(255 208 230 / 0.55)" />
-              <stop offset="100%" stop-color="rgb(180 140 255 / 0.55)" />
+              <stop offset="0%" stop-color="var(--graph-link-grad-a)" />
+              <stop offset="100%" stop-color="var(--graph-link-grad-b)" />
             </linearGradient>
           </defs>
 
@@ -498,7 +489,7 @@
                   {@const dim = (folderFilter && !(a.folder === folderFilter || b.folder === folderFilter)) || (highlightSet && !(highlightSet.has(a.id) && highlightSet.has(b.id)))}
                   <line
                     x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-                    stroke={dim ? 'rgba(255,255,255,0.05)' : 'url(#gw-link-grad)'}
+                    stroke={dim ? 'var(--graph-link-dim)' : 'url(#gw-link-grad)'}
                     stroke-width="0.9"
                     stroke-linecap="round"
                   />
@@ -524,13 +515,13 @@
                     <circle cx={n.x} cy={n.y} r={r * 2.2} fill="url(#gw-node-glow)" />
                   {/if}
                   <circle cx={n.x} cy={n.y} r={r} fill={n.color} filter={n.id === selectedId ? 'url(#gw-glow)' : null}
-                          stroke={orphan ? 'rgb(255 255 255 / 0.45)' : 'none'}
+                          stroke={orphan ? 'var(--graph-node-orphan-stroke)' : 'none'}
                           stroke-width="0.6"
                           stroke-dasharray={orphan ? '1.5,1.5' : ''}>
                     <title>{n.title}（{n.folder}） · 入{n.inDegree}/出{n.outDegree}{orphan ? ' · 孤岛' : ''}</title>
                   </circle>
                   {#if n.id === selectedId || (hoveredId && n.id === hoveredId)}
-                    <text x={n.x} y={n.y - r - 4} text-anchor="middle" class="gw-label" fill="#fff">{n.title}</text>
+                    <text x={n.x} y={n.y - r - 4} text-anchor="middle" class="gw-label">{n.title}</text>
                   {/if}
                 </g>
               {/each}
@@ -571,16 +562,15 @@
 
 <style>
   .graph-widget {
-    --w-bg-alpha: 0.78;
     position: fixed;
     z-index: 38;
     display: flex;
     flex-direction: column;
     border-radius: 18px;
-    background: rgb(20 16 32 / var(--w-bg-alpha));
-    color: #f3ecff;
-    border: 1px solid rgb(255 255 255 / 0.16);
-    box-shadow: 0 20px 44px rgb(0 0 0 / 0.42);
+    background: var(--widget-shell-bg);
+    color: var(--text);
+    border: 1px solid var(--widget-shell-border);
+    box-shadow: var(--widget-shell-shadow);
     backdrop-filter: blur(16px) saturate(120%);
     -webkit-backdrop-filter: blur(16px) saturate(120%);
     overflow: hidden;
@@ -590,87 +580,72 @@
     left: 24px !important; top: 24px !important; right: 24px !important; bottom: 24px !important;
     width: auto !important; height: auto !important;
   }
-  .graph-widget.is-active-drag { user-select: none; box-shadow: 0 24px 48px rgb(0 0 0 / 0.55); }
+  .graph-widget.is-active-drag { user-select: none; box-shadow: var(--widget-shell-shadow-drag); }
 
   .gw-header {
     display: flex; align-items: center; gap: 10px;
     padding: 8px 12px;
-    border-bottom: 1px solid rgb(255 255 255 / 0.08);
-    background: rgb(0 0 0 / 0.18);
+    border-bottom: 1px solid var(--widget-header-border);
+    background: var(--widget-header-bg);
     cursor: grab;
   }
   .graph-widget.is-active-drag .gw-header { cursor: grabbing; }
   .graph-widget.is-maximized .gw-header { cursor: default; }
-  .gw-title { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; letter-spacing: 1px; font-weight: 600; color: rgb(255 255 255 / 0.78); }
-  .gw-stats { margin-left: auto; font-size: 0.7rem; color: #b6a8d3; }
-  .gw-tier { font-size: 0.62rem; padding: 1px 7px; border-radius: 999px; background: rgb(255 255 255 / 0.08); color: #b6a8d3; }
+  .gw-title { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; letter-spacing: 1px; font-weight: 600; color: var(--text); opacity: 0.85; }
+  .gw-stats { margin-left: auto; font-size: 0.7rem; color: var(--widget-muted); }
+  .gw-tier { font-size: 0.62rem; padding: 1px 7px; border-radius: 999px; background: var(--widget-control-bg); color: var(--widget-muted); }
   .gw-cog {
     width: 26px; height: 26px; border-radius: 8px;
-    background: rgb(255 255 255 / 0.08);
-    border: 1px solid rgb(255 255 255 / 0.14);
-    color: #f3ecff; cursor: pointer; font-size: 0.85rem;
+    background: var(--widget-control-bg);
+    border: 1px solid var(--widget-control-border);
+    color: var(--text); cursor: pointer; font-size: 0.85rem;
     display: inline-flex; align-items: center; justify-content: center;
     text-decoration: none;
   }
-  .gw-cog:hover { background: rgb(255 255 255 / 0.16); }
+  .gw-cog:hover { background: var(--widget-control-hover); }
 
   .gw-cfg {
     padding: 8px 14px 10px;
-    border-bottom: 1px dashed rgb(255 255 255 / 0.12);
+    border-bottom: 1px dashed var(--widget-control-border);
     display: flex; flex-direction: column; gap: 6px;
   }
   .gw-cfg-row {
     display: grid;
     grid-template-columns: 64px 1fr 56px;
     gap: 8px; align-items: center;
-    font-size: 0.74rem; color: #ddd0f1;
+    font-size: 0.74rem; color: var(--text);
   }
   .gw-cfg-row input[type='range'] {
     appearance: none; -webkit-appearance: none;
     height: 4px; border-radius: 999px;
-    background: rgb(255 255 255 / 0.16); outline: none;
+    background: var(--widget-control-hover); outline: none;
   }
   .gw-cfg-row input[type='range']::-webkit-slider-thumb,
   .gw-cfg-row input[type='range']::-moz-range-thumb {
     appearance: none; -webkit-appearance: none;
     width: 12px; height: 12px; border-radius: 50%;
-    background: #f0e8ff; border: 1px solid rgb(255 255 255 / 0.6); cursor: pointer;
+    background: var(--widget-slider-thumb); border: 1px solid var(--widget-control-border); cursor: pointer;
   }
   .gw-cfg-val { text-align: right; font-variant-numeric: tabular-nums; }
-  .gw-cfg-lbl { color: #b6a8d3; }
+  .gw-cfg-lbl { color: var(--widget-muted); }
   .gw-switch {
     grid-column: 2 / span 2;
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 0.74rem; color: #ddd0f1;
+    font-size: 0.74rem; color: var(--text);
   }
-  .gw-switch input { accent-color: #b48cff; }
+  .gw-switch input { accent-color: var(--widget-accent-fill); }
   .gw-select {
     grid-column: 2 / span 2;
-    background: rgb(255 255 255 / 0.06);
-    border: 1px solid rgb(255 255 255 / 0.14);
-    color: #f3ecff;
+    background: var(--widget-control-bg);
+    border: 1px solid var(--widget-control-border);
+    color: var(--text);
     border-radius: 8px;
     padding: 3px 8px;
     font-size: 0.74rem;
   }
-  :global(.dark) .gw-select option { background: #1a1126; color: #f0e6ff; }
 
-  .gw-canvas {
-    position: relative;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .gw-svg {
-    width: 100%; height: 100%; display: block;
-    background:
-      radial-gradient(ellipse at 50% 50%, rgb(40 28 70 / 0.6) 0%, rgb(12 8 24 / 0.4) 70%, transparent 100%),
-      linear-gradient(180deg, rgb(28 18 50 / 0.4), rgb(10 6 22 / 0.5));
-    cursor: grab;
-    touch-action: none;
-  }
   .gw-empty {
-    color: #b6a8d3;
+    color: var(--widget-muted);
     text-align: center;
     padding: 60px 20px;
     font-size: 0.85rem;
@@ -682,14 +657,12 @@
   .gw-node circle:nth-child(2) {
     transition: stroke-width 0.2s ease, fill 0.2s ease;
   }
-  .gw-node.is-sel circle:nth-child(2) {
-    stroke: #fff;
-    stroke-width: 1.4;
-  }
+  .gw-svg { cursor: grab; touch-action: none; }
   .gw-label {
+    fill: var(--graph-label);
     font-size: 9px;
     paint-order: stroke;
-    stroke: rgb(20 12 32 / 0.85);
+    stroke: var(--graph-label-stroke);
     stroke-width: 2.5;
     font-weight: 600;
     pointer-events: none;
@@ -698,26 +671,27 @@
   .gw-detail {
     position: absolute;
     bottom: 12px; left: 12px;
-    background: rgb(12 8 22 / 0.78);
-    border: 1px solid rgb(255 255 255 / 0.16);
+    z-index: 3;
+    background: var(--widget-detail-bg);
+    border: 1px solid var(--widget-control-border);
     border-radius: 12px;
     padding: 8px 12px 10px;
     max-width: 70%;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
-  .gw-det-title { font-size: 0.86rem; font-weight: 700; color: #fff; }
-  .gw-det-sub { font-size: 0.72rem; color: #b6a8d3; margin-top: 2px; }
+  .gw-det-title { font-size: 0.86rem; font-weight: 700; color: var(--text); }
+  .gw-det-sub { font-size: 0.72rem; color: var(--widget-muted); margin-top: 2px; }
   .gw-det-actions { display: flex; gap: 6px; margin-top: 6px; }
   .gw-btn {
-    background: rgb(255 255 255 / 0.08);
-    border: 1px solid rgb(255 255 255 / 0.14);
-    color: #f3ecff; cursor: pointer;
+    background: var(--widget-control-bg);
+    border: 1px solid var(--widget-control-border);
+    color: var(--text); cursor: pointer;
     padding: 3px 10px; border-radius: 8px;
     font-size: 0.74rem;
     text-decoration: none;
   }
-  .gw-btn:hover { background: rgb(255 255 255 / 0.16); }
+  .gw-btn:hover { background: var(--widget-control-hover); }
 
   @media (max-width: 768px) {
     .graph-widget:not(.is-maximized) {

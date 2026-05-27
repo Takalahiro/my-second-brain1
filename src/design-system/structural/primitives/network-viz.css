@@ -1,0 +1,82 @@
+/* Network · 9-skin */
+
+.skin-network {
+  font-size: 0.78rem;
+}
+
+.skin-network__banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0 8px;
+  font-family: var(--struct-font-display);
+  font-size: 0.38rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.skin-network__tanks {
+  display: flex;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.skin-network__tank {
+  width: 20px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  font-size: 0.55rem;
+  border: 2px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, #000);
+  opacity: 0.45;
+}
+
+.skin-network__tank.is-full {
+  opacity: 1;
+  background: color-mix(in srgb, var(--struct-accent) 45%, transparent);
+  color: var(--struct-frame-fg);
+}
+
+.skin-network__hero {
+  font-family: var(--struct-font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 8px;
+  border: 2px solid var(--struct-frame-border);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.skin-network__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.72rem;
+}
+
+.skin-network__label {
+  opacity: 0.65;
+}
+
+.skin-network__value {
+  font-variant-numeric: tabular-nums;
+}
+
+.skin-network__badge {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border: 1px dashed var(--struct-accent);
+  font-size: 0.68rem;
+  text-align: center;
+}
+
+.skin-network--terminal .skin-network__hero {
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 6px rgb(51 255 102 / 0.35);
+}
+
+.skin-network--spacecraft .skin-network__tank {
+  border-radius: 2px;
+  font-family: 'Share Tech Mono', monospace;
+}

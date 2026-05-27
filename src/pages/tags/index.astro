@@ -13,49 +13,21 @@ const tags = [...tagMap.entries()].sort((a, b) => b[1] - a[1]);
 ---
 
 <BaseLayout title="标签">
-  <h1 class="text-3xl font-bold mb-6">🏷️ 标签</h1>
-  {tags.length === 0 ? (
-    <p class="text-gray-500">暂无标签。在笔记 frontmatter 的 <code>tags</code> 字段添加标签。</p>
-  ) : (
-    <ul class="flex flex-wrap gap-2">
-      {tags.map(([tag, count]) => (
-        <li>
-          <a href={`/tags/${tag}`} class="pixel-badge tag-chip inline-flex items-center gap-1.5 px-3 py-1.5">
-            <span>#{tag}</span>
-            <span class="text-xs tag-chip-count">{count}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
-  )}
+  <section class="subpage-section">
+    <h1 class="subpage-title">🏷️ 标签</h1>
+    {tags.length === 0 ? (
+      <p class="subpage-muted">暂无标签。在笔记 frontmatter 的 <code>tags</code> 字段添加标签。</p>
+    ) : (
+      <ul class="flex flex-wrap gap-2">
+        {tags.map(([tag, count]) => (
+          <li>
+            <a href={`/tags/${tag}`} class="pixel-badge ui-tag">
+              <span>#{tag}</span>
+              <span class="ui-tag-count">{count}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
 </BaseLayout>
-
-<style>
-  .tag-chip {
-    text-decoration: none;
-    color: var(--text-primary);
-    background: var(--accent-lavender);
-    border-color: var(--border-color);
-    transition: transform var(--motion-fast) var(--motion-ease),
-      box-shadow var(--motion-fast) var(--motion-ease),
-      background-color var(--motion-fast) var(--motion-ease),
-      border-color var(--motion-fast) var(--motion-ease);
-  }
-  .tag-chip:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-pixel);
-    background: var(--accent-peach);
-  }
-  .tag-chip-count {
-    color: var(--text-secondary);
-  }
-  :global(.dark) .tag-chip {
-    background: #4a355f;
-    border-color: #6a4f87;
-    color: #f0e8ff;
-  }
-  :global(.dark) .tag-chip:hover {
-    background: #5b4275;
-    border-color: #7a5e99;
-  }
-</style>

@@ -30,25 +30,30 @@
   .excal-wrap {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 72px);
+    height: calc(100dvh - var(--site-nav-offset, 88px));
     width: 100%;
   }
   .excal-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border-color);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border, var(--border-color));
+    background: var(--surface, var(--bg-secondary));
+    color: var(--text, var(--text-primary));
   }
-  .excal-head h1 { margin: 0; font-size: 1.1rem; }
-  .excal-sub { margin: 2px 0 0; font-size: 0.78rem; color: var(--text-secondary); }
-  .excal-loading { font-size: 0.8rem; color: var(--text-secondary); }
+  .excal-head h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+  }
+  .excal-sub { margin: var(--space-1) 0 0; font-size: var(--text-sm); color: var(--text-muted, var(--text-secondary)); }
+  .excal-loading { font-size: var(--text-sm); color: var(--text-muted, var(--text-secondary)); }
   .excal-frame {
     flex: 1;
     width: 100%;
     border: 0;
-    background: #fff;
+    background: var(--surface-elevated, var(--bg-secondary));
   }
 </style>

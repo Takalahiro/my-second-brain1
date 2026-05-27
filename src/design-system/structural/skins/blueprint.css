@@ -1,0 +1,28 @@
+/* 工程蓝图 · 1960s drafting（默认暗色） */
+html.dark[data-ui='blueprint'] {
+  --struct-frame-bg: #0e3a5f;
+  --struct-frame-fg: #e8f4ff;
+  --struct-frame-muted: #8cb4d8;
+  --struct-frame-border: #ffffff;
+  --struct-frame-header-bg: #0a2d4a;
+  --struct-frame-header-fg: #ffffff;
+  --struct-accent: #ffffff;
+  --struct-panel-bg: #0c3254;
+  --struct-drawer-bg: #0a2844;
+  --struct-drawer-face: #124a72;
+  --struct-shadow: 0 0 0 1px rgb(255 255 255 / 0.35);
+}
+
+html.dark[data-ui='blueprint'] body {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+html[data-ui='blueprint'] .structural-frame--blueprint {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+  background-size: 16px 16px;
+}

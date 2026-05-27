@@ -19,6 +19,8 @@
 @import './skin-widgets-mission.css';
 @import './skin-tool-pages.css';
 @import './skin-chrome-mobile.css';
+@import '../../design-system/pixel/pixel-tokens.css';
+@import '../../design-system/structural/structural-tokens-base.css';
 @import './light-contrast.css';
 @import './icons.css';
 @import './overflow-safety.css';

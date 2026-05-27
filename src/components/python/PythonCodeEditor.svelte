@@ -58,7 +58,7 @@
     class="py-highlight"
     bind:this={highlightEl}
     aria-hidden="true"
-  ><code>{@html highlighted}</code></pre>
+  ><code class="py-highlight__code">{@html highlighted}{#if code.endsWith('\n')}<br />{/if}</code></pre>
   <textarea
     class="py-code-input"
     bind:this={textareaEl}
@@ -76,26 +76,44 @@
 
 <style>
   .py-code-editor {
+    --py-editor-font: 'IBM Plex Mono', 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+    --py-editor-size: 0.85rem;
+    --py-editor-line-height: 21px;
+    --py-editor-pad-x: 14px;
+    --py-editor-pad-y: 12px;
+
     position: relative;
+    display: grid;
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    isolation: isolate;
+    letter-spacing: 0;
+    text-shadow: none;
+    font-variant-ligatures: none;
+    font-feature-settings: 'liga' 0, 'calt' 0;
   }
 
   .py-highlight,
   .py-code-input {
-    position: absolute;
-    inset: 0;
+    grid-area: 1 / 1;
     margin: 0;
-    padding: 12px 14px;
+    padding: var(--py-editor-pad-y) var(--py-editor-pad-x);
     border: 0;
-    font-family: 'IBM Plex Mono', 'Consolas', monospace;
-    font-size: 0.85rem;
-    line-height: 21px;
+    width: 100%;
+    min-height: 100%;
+    font-family: var(--py-editor-font);
+    font-size: var(--py-editor-size);
+    font-weight: 400;
+    font-style: normal;
+    font-synthesis: none;
+    line-height: var(--py-editor-line-height);
+    letter-spacing: 0;
+    text-shadow: none;
+    text-rendering: geometricPrecision;
     tab-size: 4;
     -moz-tab-size: 4;
-    white-space: pre-wrap;
-    word-break: break-word;
+    white-space: pre;
     overflow: auto;
     box-sizing: border-box;
   }
@@ -104,16 +122,30 @@
     pointer-events: none;
     color: var(--code-fg);
     background: var(--code-bg);
+    overflow: auto;
+    scrollbar-width: none;
+    word-spacing: normal;
   }
 
+  .py-highlight::-webkit-scrollbar {
+    display: none;
+  }
+
+  .py-highlight__code,
   .py-highlight :global(code) {
+    display: block;
+    margin: 0;
+    padding: 0;
     font: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+    white-space: inherit;
     background: none;
+    text-shadow: none;
   }
 
   .py-highlight :global(.py-hl-keyword) {
     color: #c792ea;
-    font-weight: 600;
   }
 
   .py-highlight :global(.py-hl-builtin) {
@@ -126,7 +158,6 @@
 
   .py-highlight :global(.py-hl-comment) {
     color: rgb(255 255 255 / 0.38);
-    font-style: italic;
   }
 
   .py-highlight :global(.py-hl-number) {
@@ -151,6 +182,8 @@
     caret-color: var(--code-fg);
     background: transparent;
     outline: none;
+    overflow: auto;
+    -webkit-text-fill-color: transparent;
   }
 
   .py-code-input::selection {

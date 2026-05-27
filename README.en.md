@@ -5,7 +5,7 @@
 A personal knowledge-base static site that publishes an Obsidian vault as a browsable, searchable web app—with a **desktop OS shell** (wallpaper, widgets, Control Center) and **in-browser interactive tools** (Python, math labs, neural networks, graph explorer, and more).
 
 **Live demo:** [my-second-brain1.pages.dev](https://my-second-brain1.pages.dev)  
-**Current version:** 1.4.0 · **License:** [MIT](./LICENSE)
+**Current version:** 1.5.0 · **License:** [MIT](./LICENSE)
 
 ---
 
@@ -47,6 +47,7 @@ What sets it apart from a typical static blog or 3D demo:
 - **PKM + personal OS shell** share one domain and persistent state
 - **3D Gaussian Splatting** as a full-screen ambient wallpaper, not a standalone viewer
 - **13 UI skins**, 11 of them immersive with NASA-punk-style mission chrome (status strip, CLI search, scroll altimeter)
+- **Unified design system**: semantic CSS variables align sub-pages with the mac desktop skin (color, type, spacing, radius, shadow)
 - Multiple GPU / Worker compute stacks coexist via **tab-level and visibility-level resource arbitration**
 
 ---
@@ -398,6 +399,8 @@ Tracked files must be **≤ 25 MiB** each (Cloudflare Pages). See `scripts/check
 | Document | Contents |
 |----------|----------|
 | [docs/TECHNICAL_REPORT.md](./docs/TECHNICAL_REPORT.md) | Full architecture, module design, source index |
+| [docs/subpage-design-sync.md](./docs/subpage-design-sync.md) | Sub-page design sync acceptance checklist |
+| [docs/theme-color-audit.md](./docs/theme-color-audit.md) | Hardcoded color audit and migration status |
 | [docs/VAULT_SYNC.md](./docs/VAULT_SYNC.md) | Obsidian vault submodule sync |
 | [docs/WIKILINKS_REPORT.md](./docs/WIKILINKS_REPORT.md) | Wikilink graph build report |
 | [docs/I18N_NOTES.md](./docs/I18N_NOTES.md) | Internationalization notes |

@@ -110,10 +110,10 @@
   .neural-lab {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    min-height: calc(100vh - 88px);
-    padding: 12px 16px 20px;
-    color: var(--text-primary);
+    gap: var(--space-4);
+    min-height: calc(100dvh - var(--site-nav-offset, 88px));
+    padding: var(--space-3) var(--space-4) var(--space-5);
+    color: var(--text, var(--text-primary));
   }
 
   .nl-head {
@@ -121,34 +121,36 @@
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: flex-end;
-    gap: 12px;
+    gap: var(--space-3);
   }
 
   .nl-head h1 {
     margin: 0;
-    font-size: 1.35rem;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
   }
 
   .nl-sub {
-    margin: 6px 0 0;
-    font-size: 0.84rem;
-    color: var(--text-secondary);
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted, var(--text-secondary));
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
   }
 
   .nl-demo-tag {
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
-    padding: 2px 7px;
+    padding: 2px var(--space-2);
     border-radius: 999px;
-    background: rgb(180 140 255 / 0.18);
-    color: #c4a8ff;
-    border: 1px solid rgb(180 140 255 / 0.28);
+    background: color-mix(in srgb, var(--accent-out, var(--ui-accent)) 18%, transparent);
+    color: var(--accent-out, var(--ui-accent));
+    border: 1px solid color-mix(in srgb, var(--accent-out, var(--ui-accent)) 28%, transparent);
   }
 
   .nl-demo-desc {
@@ -157,33 +159,34 @@
 
   .nl-tabs {
     display: flex;
-    gap: 6px;
-    padding: 4px;
-    border-radius: 12px;
-    border: 1px solid rgb(180 140 255 / 0.2);
-    background: rgb(180 140 255 / 0.06);
+    gap: var(--space-2);
+    padding: var(--space-1);
+    border-radius: var(--radius-button);
+    border: 1px solid var(--border, var(--border-color));
+    background: var(--overlay-subtle, var(--chrome-subtle));
   }
 
   .nl-tab {
-    padding: 8px 14px;
+    padding: var(--space-2) var(--space-3);
     border: 0;
-    border-radius: 9px;
+    border-radius: calc(var(--radius-button) - 2px);
     background: transparent;
-    color: var(--text-secondary);
-    font-size: 0.82rem;
+    color: var(--text-muted, var(--text-secondary));
+    font-size: var(--text-sm);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background var(--motion-fast), color var(--motion-fast);
   }
 
   .nl-tab:hover {
-    color: var(--text-primary);
-    background: rgb(180 140 255 / 0.1);
+    color: var(--text, var(--text-primary));
+    background: var(--overlay-medium, var(--chrome-hover));
   }
 
   .nl-tab.active {
-    color: #1c0f30;
-    font-weight: 650;
-    background: linear-gradient(135deg, #b48cff, #7ec8ff);
+    color: var(--on-accent);
+    font-weight: var(--weight-semibold);
+    background: linear-gradient(135deg, var(--accent-out, var(--ui-accent)), color-mix(in srgb, var(--accent-out) 70%, var(--accent-in, var(--accent))));
+    box-shadow: var(--shadow-sm);
   }
 
   .nl-body {

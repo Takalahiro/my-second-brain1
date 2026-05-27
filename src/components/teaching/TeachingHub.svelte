@@ -46,38 +46,39 @@
   .teaching-hub {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    min-height: calc(100vh - 88px);
-    padding: 4px 0 16px;
+    gap: var(--space-3);
+    min-height: 0;
+    padding: 0;
   }
   .th-head {
-    padding: 0 4px 4px;
+    padding: 0 var(--space-1) var(--space-1);
   }
   .th-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-2);
     flex-wrap: wrap;
-    font-size: 1.05rem;
-    font-weight: 650;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    font-family: var(--font-display);
   }
   .th-crumb {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    color: var(--text-secondary);
+    gap: var(--space-2);
+    color: var(--text-muted, var(--text-secondary));
   }
   .th-crumb.active {
-    color: var(--text-primary);
+    color: var(--text, var(--text-primary));
   }
   .th-sep {
-    color: var(--text-secondary);
+    color: var(--text-muted, var(--text-secondary));
     opacity: 0.5;
   }
   .th-sub {
-    margin: 6px 0 0;
-    font-size: 0.82rem;
-    color: var(--text-secondary);
+    margin: var(--space-2) 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-muted, var(--text-secondary));
   }
   .th-main {
     flex: 1;

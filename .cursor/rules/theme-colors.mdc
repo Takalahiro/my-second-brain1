@@ -1,0 +1,49 @@
+---
+description: 主题颜色规范 — 禁止硬编码，必须使用 CSS 变量
+globs: src/**/*.{svelte,css,ts,tsx}
+alwaysApply: true
+---
+
+# 主题颜色规范
+
+## 禁止
+
+在组件、页面、工具样式中**禁止**硬编码颜色：
+
+- 十六进制：`#fff`、`#b48cff`
+- 函数：`rgb()`、`rgba()`、`hsl()`
+
+**例外**（仅允许在 token 定义文件内写死）：
+
+- `src/styles/theme-tokens.css`
+- `src/styles/globals.css`（`:root` / `.dark` 基础层）
+- `src/styles/ui/skins/*.css`（皮肤覆盖）
+- `src/styles/structural/**`（结构皮肤 token）
+- `src/styles/pixel-tokens.css`
+
+## 必须使用
+
+| 用途 | 变量 |
+|------|------|
+| 页面背景 / 文字 | `--bg`, `--surface`, `--text`, `--text-muted` |
+| 强调 / 链接 | `--accent`, `--accent-in`, `--accent-out`, `--on-accent` |
+| 边框 / 遮罩 | `--border`, `--overlay-subtle`, `--overlay-medium` |
+| 图谱画布 | `--graph-canvas-bg`, `--graph-space-*`, `--graph-link-*`, `--graph-label*` |
+| 图谱文件夹色 | `--graph-folder-0` … `--graph-folder-9`（JS 用 `readCssVarList('--graph-folder-', 10, fallback)`） |
+| HUD 星图 | `--graph-hud-*` |
+| 浮动小组件 | `--widget-shell-*`, `--widget-control-*` |
+| 结构皮肤控件 | `--struct-*`（按钮、进度条等） |
+
+完整定义见 `src/styles/theme-tokens.css`。
+
+## SVG / Canvas
+
+- 渐变 `<stop stop-color="var(--graph-space-deep)" />` 优先于 JS 常量
+- 运行时配色（节点文件夹色、HUD 链接色）从 CSS 读取：`src/lib/theme/css-vars.ts`
+- 画布容器加 `.gp-canvas` / `.gw-canvas`，样式见 `src/styles/graph-canvas.css`（圆角 + 阴影 + 渐晕）
+
+## 新增组件检查清单
+
+1. 样式里是否还有 `#` / `rgb(` / `rgba(`？
+2. 是否复用了 `--graph-*` / `--widget-*` 而非复制色值？
+3. 明暗切换后子区域（画布、按钮、面板）是否仍跟随主题？

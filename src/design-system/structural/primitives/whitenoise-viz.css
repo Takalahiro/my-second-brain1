@@ -1,0 +1,53 @@
+/* White noise · 9-skin */
+
+.skin-wn {
+  font-size: 0.78rem;
+}
+
+.skin-wn__master {
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.skin-wn__master-label {
+  display: block;
+  font-family: var(--struct-font-display);
+  font-size: 0.38rem;
+  color: var(--struct-accent);
+  margin-bottom: 6px;
+}
+
+.skin-wn__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.skin-wn__row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 4px 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.skin-wn__track-label {
+  font-size: 0.72rem;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.skin-wn__row :global(.ctl-slider) {
+  grid-column: 1 / -1;
+}
+
+.skin-wn--herbarium .skin-wn__row {
+  border-bottom-style: dashed;
+}
+
+.skin-wn--terminal .skin-wn__track-label {
+  font-family: 'JetBrains Mono', monospace;
+}

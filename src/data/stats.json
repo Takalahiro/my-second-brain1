@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-24T19:55:35.532Z",
-  "totalNotes": 129,
-  "totalWords": 253327,
+  "generatedAt": "2026-05-27T06:10:52.305Z",
+  "totalNotes": 130,
+  "totalWords": 255091,
   "byFolder": [
     {
       "name": "计算机",
@@ -24,6 +24,11 @@
       "words": 5248
     },
     {
+      "name": "202605250907.md",
+      "count": 1,
+      "words": 0
+    },
+    {
       "name": "INFO1111",
       "count": 1,
       "words": 5047
@@ -31,7 +36,7 @@
     {
       "name": "_Inbox 入口",
       "count": 1,
-      "words": 3003
+      "words": 4767
     }
   ],
   "byMonth": [
@@ -93,19 +98,11 @@
     {
       "month": "2026-05",
       "label": "5月",
-      "count": 129
+      "count": 130
     }
   ],
   "topTags": [],
   "heatmap": [
-    {
-      "date": "2026-03-03",
-      "count": 0
-    },
-    {
-      "date": "2026-03-04",
-      "count": 0
-    },
     {
       "date": "2026-03-05",
       "count": 0
@@ -416,7 +413,7 @@
     },
     {
       "date": "2026-05-21",
-      "count": 2
+      "count": 0
     },
     {
       "date": "2026-05-22",
@@ -432,6 +429,14 @@
     },
     {
       "date": "2026-05-25",
+      "count": 1
+    },
+    {
+      "date": "2026-05-26",
+      "count": 2
+    },
+    {
+      "date": "2026-05-27",
       "count": 0
     }
   ]

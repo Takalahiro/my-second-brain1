@@ -177,29 +177,29 @@
   <defs>
     {#if hudTheme.hud}
       <linearGradient id="av-bg" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#0b1426" />
-        <stop offset="55%" stop-color="#08101e" />
-        <stop offset="100%" stop-color="#050a14" />
+        <stop offset="0%" stop-color="var(--graph-hud-space-mid)" />
+        <stop offset="55%" stop-color="var(--graph-hud-space-mid)" />
+        <stop offset="100%" stop-color="var(--graph-hud-space-deep)" />
       </linearGradient>
       <pattern id="av-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-        <path d="M 32 0 L 0 0 0 32" fill="none" stroke="rgba(245,242,235,0.05)" />
+        <path d="M 32 0 L 0 0 0 32" fill="none" stroke="var(--graph-hud-grid)" />
       </pattern>
     {:else}
       <linearGradient id="av-bg" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#0e0620" />
-        <stop offset="60%" stop-color="#1a1132" />
-        <stop offset="100%" stop-color="#06030f" />
+        <stop offset="0%" stop-color="var(--graph-space-mid)" />
+        <stop offset="60%" stop-color="var(--graph-space-inner)" />
+        <stop offset="100%" stop-color="var(--graph-space-deep)" />
       </linearGradient>
       <linearGradient id="av-arc" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="rgb(180 140 255 / 0.7)" />
-        <stop offset="100%" stop-color="rgb(255 208 230 / 0.15)" />
+        <stop offset="0%" stop-color="var(--graph-link-grad-b)" />
+        <stop offset="100%" stop-color="var(--graph-link-grad-a)" />
       </linearGradient>
       <linearGradient id="av-arc-hi" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ffd0e6" />
-        <stop offset="100%" stop-color="#b48cff" />
+        <stop offset="0%" stop-color="var(--graph-link-hi)" />
+        <stop offset="100%" stop-color="var(--accent-out)" />
       </linearGradient>
       <pattern id="av-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" stroke="rgba(255,255,255,0.04)" fill="none" />
+        <path d="M 40 0 L 0 0 0 40" stroke="var(--graph-grid)" fill="none" />
       </pattern>
     {/if}
   </defs>
@@ -210,7 +210,7 @@
   <g transform={`translate(${panX} ${panY}) scale(${zoom})`}>
 
   <!-- baseline -->
-  <line x1={PAD - 10} y1={BASE_Y} x2={VB_W - PAD + 10} y2={BASE_Y} stroke={hudTheme.hud ? 'rgba(245,242,235,0.22)' : 'rgb(255 255 255 / 0.16)'} stroke-width="1" />
+  <line x1={PAD - 10} y1={BASE_Y} x2={VB_W - PAD + 10} y2={BASE_Y} stroke={hudTheme.hud ? 'var(--graph-hud-baseline)' : 'var(--graph-baseline)'} stroke-width="1" />
 
   <!-- 弧线 -->
   <g opacity={settings.edgeOpacity}>
@@ -221,7 +221,7 @@
         {@const hi = highlightSet && highlightSet.has(l.source) && highlightSet.has(l.target)}
         {@const dim = (folderFocus && a.folder !== folderFocus && b.folder !== folderFocus) || (highlightSet && !hi)}
         <path d={arcPath(a, b)} fill="none"
-              stroke={hudTheme.hud ? hudLinkStroke(!!dim, !!hi) : (hi ? 'url(#av-arc-hi)' : (dim ? 'rgba(255,255,255,0.04)' : 'url(#av-arc)'))}
+              stroke={hudTheme.hud ? hudLinkStroke(!!dim, !!hi) : (hi ? 'url(#av-arc-hi)' : (dim ? 'var(--graph-link-dim)' : 'url(#av-arc)'))}
               stroke-width={(hi ? 1.4 : (dim ? 0.4 : 0.8)) * settings.edgeScale}
               stroke-linecap="round" />
       {/if}
@@ -283,7 +283,7 @@
           />
         {:else}
           <circle cx={p.x} cy={BASE_Y} r={r} fill={p.color}
-                  stroke={p.orphan ? 'rgb(255 255 255 / 0.45)' : 'none'}
+                  stroke={p.orphan ? 'var(--graph-node-orphan-stroke)' : 'none'}
                   stroke-width="0.6"
                   stroke-dasharray={p.orphan ? '1.4,1.4' : ''}>
             <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
@@ -309,10 +309,8 @@
   .g-node.is-link { cursor: alias; }
   .g-node.is-dim { opacity: 0.2; }
   .g-node.is-orphan { opacity: 0.85; }
-  .g-node.is-sel circle { stroke: #fff; stroke-width: 1.6; }
   .g-label {
-    fill: #fff; font-size: 13px; font-weight: 700;
-    paint-order: stroke; stroke: rgb(20 12 32 / 0.85); stroke-width: 3;
+    font-size: 13px; font-weight: 700;
     pointer-events: none;
   }
 </style>

@@ -1,0 +1,187 @@
+/* Music · 9-skin data viz */
+
+.skin-music {
+  font-size: 0.78rem;
+}
+
+.skin-music__top {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.skin-music__deck {
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 6px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--music-accent, currentColor) 35%, transparent);
+  min-width: 0;
+}
+
+.skin-music__deck.is-playing {
+  box-shadow: 0 0 8px color-mix(in srgb, var(--music-accent, currentColor) 25%, transparent);
+}
+
+.skin-music__deck-tag {
+  font-size: 0.55rem;
+  opacity: 0.65;
+}
+
+.skin-music__deck-meta {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.skin-music__deck-title,
+.skin-music__deck-artist {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skin-music__deck-artist {
+  font-size: 0.62rem;
+  opacity: 0.65;
+}
+
+.skin-music__deck-icon {
+  font-size: 1rem;
+}
+
+.skin-music__list-btn {
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.skin-music__list-btn.is-active {
+  background: color-mix(in srgb, var(--music-accent, currentColor) 18%, transparent);
+}
+
+.skin-music__track {
+  margin: 8px 0 2px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skin-music__artist {
+  margin: 0 0 8px;
+  font-size: 0.68rem;
+  opacity: 0.65;
+}
+
+.skin-music__section {
+  font-size: 0.65rem;
+  opacity: 0.7;
+  margin: 0 0 4px;
+}
+
+.skin-music__playlist ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.skin-music__pick {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  padding: 6px 4px;
+  cursor: pointer;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.skin-music__pick.is-active {
+  background: color-mix(in srgb, var(--music-accent, currentColor) 12%, transparent);
+}
+
+.skin-music__idx {
+  font-size: 0.58rem;
+  opacity: 0.55;
+  min-width: 1.4rem;
+}
+
+.skin-music__pick-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 0.68rem;
+}
+
+.skin-music__pick-meta span:last-child {
+  font-size: 0.58rem;
+  opacity: 0.6;
+}
+
+.skin-music__transport {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 12px 0 8px;
+}
+
+.skin-music__transport button {
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.skin-music__seek {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 6px;
+  align-items: center;
+  font-size: 0.58rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.skin-music__seek :global(.ctl-slider) {
+  margin: 0;
+}
+
+.skin-music__seek :global(.ctl-slider__head) {
+  display: none;
+}
+
+.skin-music--blueprint { --music-accent: #f4ecd8; font-family: 'IBM Plex Mono', monospace; }
+.skin-music--scholar { --music-accent: #8b4513; font-family: 'EB Garamond', serif; }
+.skin-music--terminal { --music-accent: #33ff66; font-family: 'JetBrains Mono', monospace; }
+.skin-music--crt { --music-accent: #ffb000; font-family: 'VT323', monospace; }
+.skin-music--observatory { --music-accent: #e8c547; font-family: 'IBM Plex Mono', monospace; }
+.skin-music--herbarium { --music-accent: rgb(45 90 61); font-family: Georgia, serif; }
+.skin-music--ink { --music-accent: #c0392b; font-family: 'Noto Serif SC', serif; }
+.skin-music--rpg { --music-accent: #ffd700; font-family: Cinzel, serif; }
+.skin-music--spacecraft { --music-accent: #ffaa00; font-family: 'IBM Plex Mono', monospace; }
+
+.skin-music--rpg .skin-music__deck {
+  border-width: 2px;
+  border-color: rgb(212 175 55 / 0.45);
+}
+
+.skin-music--spacecraft .skin-music__deck {
+  border-top: 2px repeating-linear-gradient(90deg, #ffaa00 0 6px, #1a1a1a 6px 12px);
+}

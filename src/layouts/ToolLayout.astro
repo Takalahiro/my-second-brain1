@@ -1,14 +1,13 @@
 ---
 import '../styles/globals.css';
+import ThemeBoot from '../components/ThemeBoot.astro';
 import SiteNavBar from '../components/SiteNavBar.svelte';
 import UiSkinInit from '../features/ui/components/UiSkinInit.svelte';
 
 interface Props {
   title?: string;
   description?: string;
-  // 是否全宽铺满（工具页默认 true）
   fullWidth?: boolean;
-  // 是否加载 MathJax 3（公式页用）
   mathJax?: boolean;
 }
 
@@ -46,28 +45,7 @@ const {
         <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
       </>
     )}
-    <script is:inline>
-      const theme = localStorage.getItem('theme');
-      if (theme === 'light') {
-        document.documentElement.classList.remove('dark');
-      } else if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-      }
-      const font = localStorage.getItem('second-brain:font-family');
-      if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {
-        document.documentElement.setAttribute('data-font', font);
-      }
-      const loc = localStorage.getItem('second-brain:locale');
-      if (loc === 'en') {
-        document.documentElement.lang = 'en';
-        document.documentElement.dataset.locale = 'en';
-      }
-      const ui = localStorage.getItem('second-brain:ui-skin');
-      if (ui) document.documentElement.setAttribute('data-ui', ui);
-      if (localStorage.getItem('second-brain:ui-debug') === '1') {
-        document.documentElement.classList.add('ui-debug', 'debug');
-      }
-    </script>
+    <ThemeBoot />
     <script is:inline>
       (function () {
         var prefetched = false;
@@ -93,29 +71,31 @@ const {
       })();
     </script>
   </head>
-  <body class="min-h-screen transition-colors tool-body">
-    <SiteNavBar client:load variant="tool" currentPath={Astro.url.pathname} />
-    <UiSkinInit client:load />
-    <main class:list={['tool-main', fullWidth && 'tool-main--full']}>
-      <slot />
+  <body class="min-h-screen transition-colors site-body tool-body">
+    <SiteNavBar client:idle variant="tool" currentPath={Astro.url.pathname} />
+    <UiSkinInit client:idle />
+    <main class:list={['tool-main subpage-shell', fullWidth && 'tool-main--full']}>
+      <div class:list={['tool-shell', fullWidth && 'tool-shell--flush']}>
+        <slot />
+      </div>
     </main>
   </body>
 </html>
 
 <style>
+  .site-body,
   .tool-body {
-    background: var(--bg-primary);
+    background: var(--bg, var(--bg-primary));
+    color: var(--text, var(--text-primary));
+    font-family: var(--font-body);
   }
   .tool-main {
     max-width: 72rem;
     margin: 0 auto;
-    padding: 1rem 1rem 2rem;
     animation: site-main-in 0.35s var(--motion-ease) both;
   }
   .tool-main--full {
     max-width: none;
-    padding: 0;
-    min-height: calc(100vh - 80px);
   }
   @keyframes site-main-in {
     from {

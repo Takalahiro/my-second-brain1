@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-24T19:55:35.708Z",
+  "generatedAt": "2026-05-27T06:10:52.410Z",
   "stats": {
-    "totalFiles": 129,
+    "totalFiles": 130,
     "totalLinks": 194,
     "resolved": 98,
     "broken": 96,
@@ -9,6 +9,13 @@
     "aliased": 4
   },
   "nodes": [
+    {
+      "id": "202605250907",
+      "title": "202605250907",
+      "folder": ".",
+      "outDegree": 0,
+      "inDegree": 0
+    },
     {
       "id": "DATA1001/Notes/Hypothesis Testing 假设检验/ANOVA",
       "title": "ANOVA",
@@ -1908,6 +1915,7 @@
     }
   ],
   "orphans": [
+    "202605250907",
     "DATA1001/Structure/REPORT",
     "INFO1110/foundition/Codereview",
     "INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）",

@@ -1,0 +1,27 @@
+/* 水墨 · 纸墨红印（默认亮色） */
+html:not(.dark)[data-ui='ink'] {
+  --struct-frame-bg: #f7f3ea;
+  --struct-frame-fg: #1a1a1a;
+  --struct-frame-muted: #666;
+  --struct-frame-border: #1a1a1a;
+  --struct-frame-header-bg: #efe8dc;
+  --struct-frame-header-fg: #1a1a1a;
+  --struct-accent: #c0392b;
+  --struct-panel-bg: #faf8f2;
+  --struct-drawer-bg: #f0ebe0;
+  --struct-drawer-face: #e8e0d4;
+  --struct-radius: 0;
+  --struct-shadow: 3px 3px 0 rgb(0 0 0 / 0.12);
+}
+
+html:not(.dark)[data-ui='ink'] .structural-frame__badge {
+  border-radius: 50%;
+  min-width: 1.4rem;
+  text-align: center;
+}
+
+html.dark[data-ui='ink'] .structural-frame__badge {
+  border-radius: 50%;
+  min-width: 1.4rem;
+  text-align: center;
+}

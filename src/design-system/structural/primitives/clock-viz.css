@@ -1,0 +1,87 @@
+/* Clock dock · 9-skin */
+
+.skin-clock {
+  position: fixed;
+  right: max(env(safe-area-inset-right, 0px), 12px);
+  bottom: max(env(safe-area-inset-bottom, 0px), 12px);
+  z-index: 88;
+  font-size: 0.78rem;
+}
+
+.skin-clock.is-floating {
+  top: calc(var(--widget-safe-top, 72px) + 8px);
+  bottom: auto;
+}
+
+.skin-clock__frame {
+  border: 2px solid var(--struct-frame-border);
+  background: var(--struct-frame-bg);
+  color: var(--struct-frame-fg);
+  box-shadow: var(--struct-shadow);
+  border-radius: var(--struct-radius, 0);
+  overflow: hidden;
+}
+
+.skin-clock__header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: var(--struct-frame-header-bg);
+  color: var(--struct-frame-header-fg);
+  border-bottom: 2px solid var(--struct-frame-border);
+}
+
+.skin-clock__badge {
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.skin-clock__title {
+  margin: 0;
+  font-family: var(--struct-font-display);
+  font-size: 0.42rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skin-clock__body {
+  padding: 8px 12px;
+  background: var(--struct-panel-bg);
+}
+
+.skin-clock__display {
+  font-family: var(--struct-font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--struct-accent);
+}
+
+.skin-clock--terminal .skin-clock__display {
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 8px rgb(51 255 102 / 0.4);
+}
+
+.skin-clock--crt .skin-clock__display {
+  font-family: 'VT323', monospace;
+  font-size: 1.4rem;
+  color: #ffb000;
+}
+
+.skin-clock--ink .skin-clock__display {
+  font-family: 'Noto Serif SC', serif;
+  color: var(--struct-frame-fg);
+}
+
+.skin-clock--rpg .skin-clock__display {
+  font-family: Cinzel, serif;
+  color: #ffd700;
+}
+
+.skin-clock--spacecraft .skin-clock__display {
+  font-family: 'Share Tech Mono', monospace;
+}

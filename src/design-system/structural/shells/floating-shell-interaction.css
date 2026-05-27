@@ -1,0 +1,51 @@
+/* 浮动壳交互：壳层盖住缩放手柄，设置区可点 */
+
+:is(
+    .structural-floating-root,
+    .bp-float-root,
+    .folio-float-root,
+    .term-float-root,
+    .crt-float-root,
+    .obs-float-root,
+    .herb-float-root,
+    .ink-float-root,
+    .rpg-float-root,
+    .sc-float-root,
+    .pixel-nes-window-root
+  )
+  :is(
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .pixel-nes-window
+  ) {
+  position: relative;
+  z-index: 7;
+}
+
+:is(
+    .structural-floating-root,
+    .bp-float-root,
+    .folio-float-root,
+    .term-float-root,
+    .crt-float-root,
+    .obs-float-root,
+    .herb-float-root,
+    .ink-float-root,
+    .rpg-float-root,
+    .sc-float-root,
+    .pixel-nes-window-root
+  )
+  [data-no-drag] {
+  position: relative;
+  z-index: 10;
+  touch-action: manipulation;
+  pointer-events: auto;
+}

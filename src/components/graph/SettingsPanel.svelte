@@ -117,31 +117,31 @@
     height: 100%;
     overflow: auto;
     padding: 20px 24px;
-    background: linear-gradient(180deg, #110926, #06030f);
+    background: var(--graph-canvas-bg);
     color: var(--graph-panel-text);
     display: flex; flex-direction: column;
     gap: 18px;
   }
   .sp-head {
     display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    border-bottom: 1px solid var(--widget-header-border);
     padding-bottom: 10px;
   }
   .sp-head h2 { margin: 0; font-size: 1.05rem; }
   .sp-reset {
-    background: rgb(255 255 255 / 0.08);
-    border: 1px solid rgb(255 255 255 / 0.16);
+    background: var(--widget-control-bg);
+    border: 1px solid var(--widget-control-border);
     color: var(--graph-panel-text);
     border-radius: 8px;
     padding: 5px 12px;
     cursor: pointer;
     font-size: 0.78rem;
   }
-  .sp-reset:hover { background: rgb(255 255 255 / 0.16); }
+  .sp-reset:hover { background: var(--widget-control-hover); }
 
   .sp-section {
-    background: rgb(255 255 255 / 0.04);
-    border: 1px solid rgb(255 255 255 / 0.1);
+    background: var(--overlay-subtle);
+    border: 1px solid var(--widget-control-border);
     border-radius: 12px;
     padding: 14px 16px;
     display: flex; flex-direction: column;
@@ -151,13 +151,13 @@
     margin: 0;
     font-size: 0.84rem;
     letter-spacing: 1px;
-    color: rgb(255 255 255 / 0.65);
+    color: var(--widget-muted);
     text-transform: uppercase;
   }
   .sp-hint {
     margin: -4px 0 0;
     font-size: 0.72rem;
-    color: #b6a8d3;
+    color: var(--graph-panel-muted);
   }
 
   .sp-row {
@@ -165,7 +165,7 @@
     gap: 12px;
     font-size: 0.84rem;
   }
-  .sp-lbl { color: #d6cae6; }
+  .sp-lbl { color: var(--graph-panel-text); }
   .sp-slider {
     display: grid;
     grid-template-columns: 90px 1fr 60px;
@@ -174,44 +174,44 @@
   .sp-slider input[type='range'] {
     appearance: none; -webkit-appearance: none;
     height: 4px; border-radius: 999px;
-    background: rgb(255 255 255 / 0.16); outline: none;
+    background: var(--widget-control-hover); outline: none;
     width: 100%;
   }
   .sp-slider input[type='range']::-webkit-slider-thumb {
     appearance: none; -webkit-appearance: none;
     width: 14px; height: 14px; border-radius: 50%;
-    background: #f0e8ff;
-    border: 1px solid rgb(180 140 255 / 0.7);
+    background: var(--widget-slider-thumb);
+    border: 1px solid var(--widget-control-border);
     cursor: pointer;
   }
   .sp-val {
     text-align: right;
     font-variant-numeric: tabular-nums;
-    color: #fff;
+    color: var(--text);
     font-size: 0.82rem;
   }
 
   .sp-seg {
     display: inline-flex;
-    background: rgb(255 255 255 / 0.06);
-    border: 1px solid rgb(255 255 255 / 0.12);
+    background: var(--widget-control-bg);
+    border: 1px solid var(--widget-control-border);
     border-radius: 10px;
     padding: 2px;
   }
   .sp-seg-btn {
     background: transparent;
     border: 0;
-    color: #d6cae6;
+    color: var(--graph-panel-text);
     border-radius: 8px;
     padding: 4px 12px;
     font-size: 0.78rem;
     cursor: pointer;
     transition: background 0.12s ease;
   }
-  .sp-seg-btn:hover { background: rgb(255 255 255 / 0.08); }
+  .sp-seg-btn:hover { background: var(--widget-control-hover); }
   .sp-seg-btn.is-active {
-    background: linear-gradient(135deg, rgba(255, 141, 232, 0.35), rgba(180, 140, 255, 0.35));
-    color: #fff;
+    background: var(--widget-tab-active-bg);
+    color: var(--text);
   }
 
   .sp-toggle {
@@ -222,7 +222,7 @@
   .sp-toggle input { opacity: 0; width: 0; height: 0; }
   .sp-toggle span {
     position: absolute; inset: 0;
-    background: rgb(255 255 255 / 0.18);
+    background: var(--widget-control-hover);
     border-radius: 999px;
     transition: background 0.2s ease;
     cursor: pointer;
@@ -231,19 +231,19 @@
     content: '';
     position: absolute;
     width: 16px; height: 16px; border-radius: 50%;
-    background: #fff;
+    background: var(--text);
     top: 3px; left: 3px;
     transition: transform 0.2s ease;
   }
-  .sp-toggle input:checked + span { background: rgb(180 140 255 / 0.8); }
+  .sp-toggle input:checked + span { background: var(--widget-accent-fill); }
   .sp-toggle input:checked + span::before { transform: translateX(16px); }
 
   .sp-foot {
     margin-top: auto;
     text-align: center;
-    color: #aa97cf;
+    color: var(--graph-panel-muted);
     font-size: 0.72rem;
     padding-top: 6px;
-    border-top: 1px solid rgb(255 255 255 / 0.06);
+    border-top: 1px solid var(--widget-header-border);
   }
 </style>

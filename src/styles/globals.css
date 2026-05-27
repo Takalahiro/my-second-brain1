@@ -1,7 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&display=swap');
 @import url('https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.1.0/style.css');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=DotGothic16&family=Barlow+Condensed:wght@400;500;600;700&family=Architects+Daughter&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Caveat:wght@400;600&family=JetBrains+Mono:wght@400;500;600&family=Fira+Code:wght@400;500&family=VT323&family=Press+Start+2P&family=Cormorant:ital,wght@0,400;0,600;1,400&family=Cinzel:wght@400;600;700&family=Orbitron:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=DotGothic16&family=Barlow+Condensed:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Caveat:wght@400;700&family=Share+Tech+Mono&family=Permanent+Marker&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Tangerine:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Fira+Code:wght@400;500&family=Press+Start+2P&family=VT323&family=Silkscreen&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Major+Mono+Display&family=Special+Elite&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=ZCOOL+KuaiLe&family=Noto+Serif+SC:ital,wght@0,400;0,700;1,400&family=Noto+Sans+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=MedievalSharp&family=Cormorant:ital,wght@0,400;0,600;1,400&family=UnifrakturMaguntia&family=Audiowide&display=swap');
 @import './global.css';
+@import './theme-tokens.css';
+@import './graph-canvas.css';
+@import './design-system.css';
 @import './pixel.css';
 @import './site-nav.css';
 @import './gs-wallpaper.css';
@@ -96,12 +104,7 @@
   --code-output-bg: rgb(236 238 242 / 0.92);
   --code-output-fg: var(--text-primary);
 
-  /* 图谱画布 */
-  --graph-canvas-bg: linear-gradient(180deg, #eef0f6, #e4e7ef);
-  --graph-canvas-border: var(--border-color);
-  --graph-panel-bg: var(--glass-bg-strong);
-  --graph-panel-text: var(--text-primary);
-  --graph-panel-muted: var(--text-secondary);
+  /* 图谱 — 见 theme-tokens.css */
 }
 
 [data-theme='dark'],
@@ -171,11 +174,7 @@
   --code-output-bg: rgb(8 6 14 / 0.5);
   --code-output-fg: #d6cae6;
 
-  --graph-canvas-bg: linear-gradient(180deg, #110926, #06030f);
-  --graph-canvas-border: rgb(255 255 255 / 0.08);
-  --graph-panel-bg: rgb(12 8 22 / 0.88);
-  --graph-panel-text: #f3ecff;
-  --graph-panel-muted: #b6a8d3;
+  /* 图谱 dark 细节由 theme-tokens.css + hud 皮肤覆盖 */
 }
 
 body {

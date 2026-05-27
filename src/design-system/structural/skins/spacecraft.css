@@ -1,0 +1,25 @@
+/* 太空舱 · ISS 仪表界面（默认暗色） */
+html.dark[data-ui='spacecraft'] {
+  --struct-frame-bg: #0c1428;
+  --struct-frame-fg: #c8e0ff;
+  --struct-frame-muted: #6888a8;
+  --struct-frame-border: #3a5880;
+  --struct-frame-header-bg: #101830;
+  --struct-frame-header-fg: #88c0ff;
+  --struct-accent: #ffaa00;
+  --struct-panel-bg: #080e1c;
+  --struct-drawer-bg: #050810;
+  --struct-drawer-face: #101828;
+  --struct-shadow: inset 0 0 0 1px rgb(136 192 255 / 0.15), 0 4px 0 rgb(0 0 0 / 0.4);
+}
+
+html[data-ui='spacecraft'] .structural-frame__badge {
+  background: rgb(255 170 0 / 0.2);
+  color: #ffaa00;
+  letter-spacing: 0.12em;
+}
+
+html[data-ui='spacecraft'] .structural-chrome-btn.is-active {
+  background: #ffaa00;
+  color: #000;
+}

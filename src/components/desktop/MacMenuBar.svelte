@@ -111,6 +111,12 @@
 <header class="mac-menu-bar" class:has-rain-glass={rainDrops} class:has-hud-strip={skinChrome.immersive} class:has-skin-strip={skinChrome.immersive} aria-label={m.menu.systemMenu}>
   <MenuBarRainGlass active={rainDrops} />
   <div class="mac-menu-left">
+    {#if skinChrome.id === 'pixel'}
+      <span class="pixel-nes-brand" aria-hidden="true">
+        <span>第二大脑</span>
+        <span>像素桌面</span>
+      </span>
+    {/if}
     <div class="mac-menu-apple">
       <button
         type="button"
@@ -171,7 +177,7 @@
         </ul>
       {/if}
     </div>
-    <span class="mac-menu-item mac-menu-app-name">My Second Brain</span>
+    <span class="mac-menu-item mac-menu-app-name">{skinChrome.id === 'pixel' ? '第二大脑' : 'My Second Brain'}</span>
     <nav class="mac-menu-nav" aria-label={m.nav.siteNav}>
       {#each navLinks as item (item.href)}
         <a href={item.href} class="mac-menu-nav-link" title={item.title}>{item.label}</a>
@@ -180,6 +186,13 @@
   </div>
 
   <div class="mac-menu-right">
+    {#if skinChrome.id === 'pixel'}
+      <div class="mac-menu-nav pixel-nes-tools" aria-label="工具">
+        {#each navLinks.slice(0, 4) as item (item.href)}
+          <a href={item.href} class="mac-menu-tool-btn" title={item.title}>{item.label}</a>
+        {/each}
+      </div>
+    {/if}
     <div class="mac-menu-util">
       <LocaleToggle />
       <FontSwitcher />

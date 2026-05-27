@@ -1,0 +1,19 @@
+/* 终端 · 磷光绿 CRT（默认暗色） */
+html.dark[data-ui='terminal'] {
+  --struct-frame-bg: #001a0a;
+  --struct-frame-fg: #33ff66;
+  --struct-frame-muted: #1a9940;
+  --struct-frame-border: #33ff66;
+  --struct-frame-header-bg: #000f06;
+  --struct-frame-header-fg: #33ff66;
+  --struct-accent: #33ff66;
+  --struct-panel-bg: #000a05;
+  --struct-drawer-bg: #000805;
+  --struct-drawer-face: #001408;
+  --struct-shadow: 0 0 12px rgb(51 255 102 / 0.15);
+}
+
+html.dark[data-ui='terminal'] .structural-frame__title,
+html.dark[data-ui='terminal'] .structural-frame__body {
+  text-shadow: 0 0 6px rgb(51 255 102 / 0.35);
+}

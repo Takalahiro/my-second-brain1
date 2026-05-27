@@ -18,6 +18,23 @@
   import { getDrawerCatalog, type DrawerWidget } from '../../lib/i18n/drawer-catalog';
   import { getMessages, initLocale, localeState } from '../../lib/i18n/locale.svelte';
   import UiSkinPicker from '../../features/ui/components/UiSkinPicker.svelte';
+  import { useSkinChrome } from '../../features/ui/skin-chrome.svelte';
+  import PixelDrawerChrome from '../../design-system/pixel/settings/PixelDrawerChrome.svelte';
+  import PixelDrawerHome from '../../design-system/pixel/settings/PixelDrawerHome.svelte';
+  import PixelDrawerWidgets from '../../design-system/pixel/settings/PixelDrawerWidgets.svelte';
+  import PixelDrawerWallpaper from '../../design-system/pixel/settings/PixelDrawerWallpaper.svelte';
+  import PixelDrawerDesktop from '../../design-system/pixel/settings/PixelDrawerDesktop.svelte';
+  import PixelDrawerUi from '../../design-system/pixel/settings/PixelDrawerUi.svelte';
+  import { isStructuralSkinId } from '../../design-system/structural/registry';
+  import SkinDrawerChrome from '../../design-system/structural/settings/SkinDrawerChrome.svelte';
+  import SkinDrawerHome from '../../design-system/structural/settings/SkinDrawerHome.svelte';
+  import SkinDrawerWidgets from '../../design-system/structural/settings/SkinDrawerWidgets.svelte';
+  import SkinDrawerWallpaper from '../../design-system/structural/settings/SkinDrawerWallpaper.svelte';
+  import SkinDrawerDesktop from '../../design-system/structural/settings/SkinDrawerDesktop.svelte';
+  import SkinDrawerUi from '../../design-system/structural/settings/SkinDrawerUi.svelte';
+  import SkinDrawerTabs from '../../design-system/structural/components/SkinDrawerTabs.svelte';
+  import { getStructuralDrawerTabs } from '../../design-system/structural/lib/structural-copy';
+  import type { DrawerPaneId } from '../../design-system/structural/primitives/controls/types';
 
   type WidgetKey = WidgetIconKey;
   type PaneId = 'home' | 'widgets' | 'wallpaper' | 'desktop' | 'ui';
@@ -89,6 +106,10 @@
   };
   let suppressTileClick = false;
 
+  const skin = useSkinChrome();
+  const isPixelSkin = $derived(skin.id === 'pixel');
+  const isStructuralSkin = $derived(isStructuralSkinId(skin.id));
+
   const catalog = $derived(getDrawerCatalog(localeState.current));
   const m = $derived(getMessages());
   const categories = $derived(catalog.categories);
@@ -129,6 +150,15 @@
 
   const paneTitle = $derived(
     pane === 'home' ? m.drawer.controlCenter : categories.find((c) => c.id === pane)?.name ?? m.drawer.settings
+  );
+
+  const drawerTabs = $derived(
+    isStructuralSkin && isStructuralSkinId(skin.id)
+      ? getStructuralDrawerTabs(skin.id)
+      : [
+          { id: 'home' as DrawerPaneId, label: m.drawer.home },
+          ...categories.map((c) => ({ id: c.id as DrawerPaneId, label: c.name })),
+        ],
   );
 
   function resetDrag() {
@@ -242,7 +272,7 @@
 
   function onTilePointerDown(e: PointerEvent, w: Widget) {
     if (w.pinned) return;
-    if ((e.target as HTMLElement).closest('.mac-toggle, [data-no-drag]')) return;
+    if ((e.target as HTMLElement).closest('.mac-toggle, .pixel-fc-switch, .ctl-switch, [data-no-drag]')) return;
     drag = {
       key: w.id,
       startX: e.clientX,
@@ -279,7 +309,7 @@
     if (drag.dragging && drag.key === w.id) {
       el.releasePointerCapture?.(e.pointerId);
       const target = document.elementFromPoint(e.clientX, e.clientY);
-      const onDrawer = !!target?.closest('.mac-settings, .mac-menu-bar');
+      const onDrawer = !!target?.closest('.mac-settings, .mac-menu-bar, .pixel-drawer-root, .structural-drawer-root');
       if (!onDrawer) onToggle(w.id, { x: e.clientX, y: e.clientY });
       suppressTileClick = true;
     } else if (drag.moved) {
@@ -292,7 +322,7 @@
       suppressTileClick = false;
       return;
     }
-    if ((e.target as HTMLElement).closest('.mac-toggle, [data-no-drag]')) return;
+    if ((e.target as HTMLElement).closest('.mac-toggle, .pixel-fc-switch, .ctl-switch, [data-no-drag]')) return;
     onToggle(w.id);
   }
 
@@ -343,6 +373,8 @@
 
 <aside
   class="mac-settings"
+  class:pixel-drawer-root={isPixelSkin}
+  class:structural-drawer-root={isStructuralSkin}
   class:is-open={open}
   class:is-spotlight={spotlightActive}
   class:is-minimized={panelMinimized}
@@ -351,6 +383,26 @@
   aria-hidden={!open}
   onkeydown={onDrawerKeydown}
 >
+  {#if isPixelSkin}
+    <PixelDrawerChrome
+      title={paneTitle}
+      showBack={pane !== 'home'}
+      backLabel={m.drawer.home}
+      closeLabel={m.drawer.closeBtn}
+      onBack={goBack}
+      onClose={closeDrawer}
+    />
+  {:else if isStructuralSkin}
+    <SkinDrawerChrome
+      title={paneTitle}
+      {pane}
+      showBack={pane !== 'home'}
+      backLabel={m.drawer.home}
+      closeLabel={m.drawer.closeBtn}
+      onBack={goBack}
+      onClose={closeDrawer}
+    />
+  {:else}
   <div class="mac-window-chrome">
     <div class="mac-traffic" role="toolbar" aria-label={m.drawer.windowControls}>
       <button type="button" class="dot red" aria-label={m.drawer.closeBtn} title={m.drawer.closeBtn} onclick={onTrafficRed}></button>
@@ -382,6 +434,7 @@
       <button type="button" class="mac-close" aria-label={m.drawer.closeBtn} onclick={closeDrawer}>×</button>
     </div>
   </div>
+  {/if}
 
   <div class="mac-body">
     {#if pane === 'home'}
@@ -461,6 +514,34 @@
               </ul>
             {/if}
           </div>
+        {:else if isPixelSkin}
+          <PixelDrawerHome
+            m={m.drawer}
+            {categories}
+            {slotWidget}
+            {enabled}
+            {hasSnapshot}
+            {isCleared}
+            onGoPane={goPane}
+            onSlotChange={onSlotChange}
+            onToggleSlot={() => onToggle(slotWidget)}
+            {onClearAll}
+            {onRestore}
+          />
+        {:else if isStructuralSkin}
+          <SkinDrawerHome
+            m={m.drawer}
+            {categories}
+            {slotWidget}
+            {enabled}
+            {hasSnapshot}
+            {isCleared}
+            onGoPane={goPane}
+            onSlotChange={onSlotChange}
+            onToggleSlot={() => onToggle(slotWidget)}
+            {onClearAll}
+            {onRestore}
+          />
         {:else}
           <div class="mac-home-content">
             <div class="cc-widget-grid">
@@ -518,6 +599,35 @@
         {/if}
       </div>
     {:else if pane === 'widgets'}
+      {#if isPixelSkin}
+        <PixelDrawerWidgets
+          m={m.drawer}
+          groups={filteredGroups}
+          {itemMap}
+          {enabled}
+          dragKey={drag.key}
+          dragging={drag.dragging}
+          {onTileClick}
+          {onTilePointerDown}
+          {onTilePointerMove}
+          {onTilePointerUp}
+          onToggle={(key) => onToggle(key)}
+        />
+      {:else if isStructuralSkin}
+        <SkinDrawerWidgets
+          m={m.drawer}
+          groups={filteredGroups}
+          {itemMap}
+          {enabled}
+          dragKey={drag.key}
+          dragging={drag.dragging}
+          {onTileClick}
+          {onTilePointerDown}
+          {onTilePointerMove}
+          {onTilePointerUp}
+          onToggle={(key) => onToggle(key)}
+        />
+      {:else}
       <div class="mac-pane mac-pane-detail">
         <p class="mac-pane-hint">{m.drawer.paneHint}</p>
         {#each filteredGroups as group (group.title)}
@@ -566,7 +676,13 @@
           </section>
         {/each}
       </div>
+      {/if}
     {:else if pane === 'wallpaper'}
+      {#if isPixelSkin}
+        <PixelDrawerWallpaper m={m.drawer} {bg} {scenes} {onPatchBg} {onSetWallpaperMode} />
+      {:else if isStructuralSkin}
+        <SkinDrawerWallpaper m={m.drawer} {bg} {scenes} {onPatchBg} {onSetWallpaperMode} />
+      {:else}
       <div class="mac-pane mac-pane-detail">
         <section class="mac-group">
           <h3 class="mac-group-label">{m.drawer.scenes}</h3>
@@ -746,7 +862,13 @@
           </ul>
         </section>
       </div>
+      {/if}
     {:else if pane === 'desktop'}
+      {#if isPixelSkin}
+        <PixelDrawerDesktop m={m.drawer} {hasSnapshot} {isCleared} {onClearAll} {onRestore} />
+      {:else if isStructuralSkin}
+        <SkinDrawerDesktop m={m.drawer} {hasSnapshot} {isCleared} {onClearAll} {onRestore} />
+      {:else}
       <div class="mac-pane mac-pane-detail">
         <section class="mac-group">
           <h3 class="mac-group-label">{m.drawer.layout}</h3>
@@ -790,13 +912,24 @@
           </ul>
         </section>
       </div>
+      {/if}
     {:else if pane === 'ui'}
+      {#if isPixelSkin}
+        <PixelDrawerUi m={m.drawer} />
+      {:else if isStructuralSkin}
+        <SkinDrawerUi m={m.drawer} />
+      {:else}
       <div class="mac-pane mac-pane-detail">
         <section class="mac-group">
           <h3 class="mac-group-label">{m.drawer.uiSwitch}</h3>
           <UiSkinPicker />
         </section>
       </div>
+      {/if}
+    {/if}
+
+    {#if isStructuralSkin && !spotlightActive}
+      <SkinDrawerTabs pane={pane} tabs={drawerTabs} onchange={goPane} />
     {/if}
   </div>
 </aside>

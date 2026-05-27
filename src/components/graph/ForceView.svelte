@@ -7,7 +7,6 @@
   import ZoomControls from './ZoomControls.svelte';
   import GraphHudNode from './GraphHudNode.svelte';
   import {
-    HUD_GRAPH,
     hudLinkStroke,
     hudNodeCoreColor,
     resolveGraphColor,
@@ -228,30 +227,30 @@
   <defs>
     {#if hudTheme.hud}
       <radialGradient id="fv-bg" cx="50%" cy="45%" r="70%">
-        <stop offset="0%" stop-color="#101d36" stop-opacity="0.95" />
-        <stop offset="55%" stop-color="#0b1426" stop-opacity="0.98" />
-        <stop offset="100%" stop-color="#050a14" stop-opacity="1" />
+        <stop offset="0%" stop-color="var(--graph-hud-space-inner)" stop-opacity="0.95" />
+        <stop offset="55%" stop-color="var(--graph-hud-space-mid)" stop-opacity="0.98" />
+        <stop offset="100%" stop-color="var(--graph-hud-space-deep)" stop-opacity="1" />
       </radialGradient>
       <pattern id="fv-hud-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-        <path d="M 32 0 L 0 0 0 32" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5" />
+        <path d="M 32 0 L 0 0 0 32" fill="none" stroke="var(--graph-hud-grid)" stroke-width="0.5" />
       </pattern>
       <radialGradient id="fv-glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#f5f2eb" stop-opacity="0.35" />
-        <stop offset="100%" stop-color="#f5f2eb" stop-opacity="0" />
+        <stop offset="0%" stop-color="var(--graph-hud-glow)" stop-opacity="0.35" />
+        <stop offset="100%" stop-color="var(--graph-hud-glow)" stop-opacity="0" />
       </radialGradient>
     {:else}
       <radialGradient id="fv-bg" cx="50%" cy="50%" r="55%">
-        <stop offset="0%" stop-color="#3a234a" stop-opacity="0.9" />
-        <stop offset="60%" stop-color="#1a1024" stop-opacity="0.95" />
-        <stop offset="100%" stop-color="#0a0418" stop-opacity="1" />
+        <stop offset="0%" stop-color="var(--graph-space-inner)" stop-opacity="0.9" />
+        <stop offset="60%" stop-color="var(--graph-space-mid)" stop-opacity="0.95" />
+        <stop offset="100%" stop-color="var(--graph-space-deep)" stop-opacity="1" />
       </radialGradient>
       <radialGradient id="fv-glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="0.55" />
-        <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+        <stop offset="0%" stop-color="var(--graph-glow)" stop-opacity="0.55" />
+        <stop offset="100%" stop-color="var(--graph-glow)" stop-opacity="0" />
       </radialGradient>
       <linearGradient id="fv-link" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="rgb(255 208 230 / 0.5)" />
-        <stop offset="100%" stop-color="rgb(180 140 255 / 0.5)" />
+        <stop offset="0%" stop-color="var(--graph-link-grad-a)" />
+        <stop offset="100%" stop-color="var(--graph-link-grad-b)" />
       </linearGradient>
     {/if}
   </defs>
@@ -271,7 +270,7 @@
           {@const hi = highlightSet && highlightSet.has(l.source) && highlightSet.has(l.target)}
           <line
             x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-            stroke={hudTheme.hud ? hudLinkStroke(!!dim, !!hi) : (dim ? 'rgba(255,255,255,0.05)' : 'url(#fv-link)')}
+            stroke={hudTheme.hud ? hudLinkStroke(!!dim, !!hi) : (dim ? 'var(--graph-link-dim)' : 'url(#fv-link)')}
             stroke-width={(dim ? 0.5 : (hi ? 1.2 : 1)) * settings.edgeScale}
             stroke-linecap="round"
             stroke-opacity={hudTheme.hud && hi ? 0.9 : 1}
@@ -308,13 +307,13 @@
             {#if !orphan}
               <circle cx={n.x} cy={n.y} r={r * 2.2} fill="url(#fv-glow)" />
             {/if}
-            <circle cx={n.x} cy={n.y} r={r} fill={n.color} stroke={orphan ? 'rgb(255 255 255 / 0.4)' : 'none'} stroke-width="0.5" stroke-dasharray={orphan ? '1.5,1.5' : ''}>
+            <circle cx={n.x} cy={n.y} r={r} fill={n.color} stroke={orphan ? 'var(--graph-node-orphan-stroke)' : 'none'} stroke-width="0.5" stroke-dasharray={orphan ? '1.5,1.5' : ''}>
               <title>{n.title}（{n.folder}） · 入{n.inDegree}/出{n.outDegree}{orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
             </circle>
           {/if}
           <title>{n.title}（{n.folder}） · 入{n.inDegree}/出{n.outDegree}{orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
           {#if showLabel}
-            <text x={n.x} y={n.y - r - 4} text-anchor="middle" class="g-label" fill={hudTheme.hud ? HUD_GRAPH.label : '#fff'}>{n.title}</text>
+            <text x={n.x} y={n.y - r - 4} text-anchor="middle" class="g-label">{n.title}</text>
           {/if}
         </g>
       {/each}
@@ -334,12 +333,8 @@
   .g-node.is-link { cursor: alias; }
   .g-node.is-dim { opacity: 0.2; }
   .g-node.is-orphan { opacity: 0.78; }
-  .g-node.is-sel circle:last-of-type { stroke: #fff; stroke-width: 1.6; }
   .g-label {
     font-size: 11px; font-weight: 600;
-    paint-order: stroke;
-    stroke: rgb(20 12 32 / 0.85);
-    stroke-width: 2.5;
     pointer-events: none;
   }
 </style>

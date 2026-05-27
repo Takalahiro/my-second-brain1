@@ -106,7 +106,7 @@
     <input
       bind:this={inputEl}
       type="text"
-      class="ns-input"
+      class="ns-input ui-input"
       placeholder={m.search.placeholder}
       bind:value={query}
       onfocus={onFocus}
@@ -177,21 +177,12 @@
     pointer-events: none;
   }
   .ns-input {
-    width: 100%;
     height: 38px;
     box-sizing: border-box;
     padding: 0 36px 0 32px;
-    border-radius: var(--radius-button, 10px);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    font-size: 0.85rem;
-    outline: none;
-    color: var(--text-primary);
-    transition: border-color 0.15s ease, background 0.15s ease;
   }
   .ns-input:focus {
-    border-color: var(--pixel-pink, #ff8de8);
-    background: var(--bg-primary);
+    background: var(--surface, var(--bg-secondary));
   }
   .ns-clear {
     position: absolute;
@@ -218,18 +209,18 @@
 
   .ns-panel {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + var(--space-2));
     right: 0; left: 0;
     z-index: 50;
-    background: var(--glass-bg-strong);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: var(--shadow-normal);
+    background: var(--surface-elevated, var(--glass-bg-strong));
+    border: 1px solid var(--border, var(--border-color));
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-md);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     max-height: 70vh;
     overflow: auto;
-    padding: 6px;
+    padding: var(--space-2);
   }
   .ns-empty {
     padding: 22px;
@@ -250,7 +241,7 @@
     transition: background 0.12s ease;
   }
   .ns-item.is-active {
-    background: linear-gradient(135deg, rgba(255, 141, 232, 0.18), rgba(180, 140, 255, 0.18));
+    background: color-mix(in srgb, var(--accent-in, var(--accent)) 18%, transparent);
   }
   .ns-it-icon {
     display: inline-flex;
@@ -277,14 +268,10 @@
     padding: 1px 8px;
   }
   .ns-item :global(mark) {
-    background: rgba(255, 220, 100, 0.55);
+    background: color-mix(in srgb, var(--accent-in, var(--accent)) 35%, transparent);
     color: inherit;
-    border-radius: 3px;
+    border-radius: var(--radius-tag);
     padding: 0 1px;
-  }
-  :global(.dark) .ns-item :global(mark) {
-    background: rgba(255, 200, 80, 0.32);
-    color: #fff;
   }
   .ns-foot {
     padding: 6px 8px 4px;

@@ -288,15 +288,15 @@
         <span class="mc-prompt">&gt;&gt;</span>
         <input
           type="text"
-          class="mc-input"
+          class="mc-input ui-input"
           bind:value={expr}
           onkeydown={onKey}
           placeholder="例如 sin(pi/2) 或 det([1,2;3,4])，按 Enter 计算"
           autocomplete="off"
           aria-label="表达式输入"
         />
-        <button type="button" class="mc-run" onclick={submit}>执行</button>
-        <button type="button" class="mc-clear" onclick={() => { expr = ''; lastResult = null; }} title="清空">清空</button>
+        <button type="button" class="mc-run ui-button ui-button--primary" onclick={submit}>执行</button>
+        <button type="button" class="mc-clear pixel-button ui-button ui-button--ghost" onclick={() => { expr = ''; lastResult = null; }} title="清空">清空</button>
       </div>
 
       <div class="mc-presets">
@@ -371,227 +371,258 @@
 
 <style>
   .matlab-calc {
-    color: var(--text-primary);
-    display: flex; flex-direction: column;
-    gap: 12px;
-    height: calc(100vh - 88px);
-    padding: 12px 16px;
+    color: var(--text, var(--text-primary));
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    height: calc(100dvh - var(--site-nav-offset, 88px));
+    padding: var(--space-3) var(--space-4);
   }
   .matlab-calc.compact {
     height: 100%;
     padding: 0;
-    gap: 8px;
+    gap: var(--space-2);
   }
-  .mc-head h1 { margin: 0; font-size: 1.35rem; }
-  .mc-sub { margin: 4px 0 0; color: var(--text-secondary); font-size: 0.84rem; }
+  .mc-head h1 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+  }
+  .mc-sub {
+    margin: var(--space-1) 0 0;
+    color: var(--text-muted, var(--text-secondary));
+    font-size: var(--text-sm);
+  }
   .mc-tabs {
     display: flex;
-    gap: 6px;
+    gap: var(--space-2);
     flex-wrap: wrap;
   }
   .mc-tabs button {
-    padding: 7px 12px;
+    padding: var(--space-2) var(--space-3);
     border-radius: 999px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-secondary);
+    border: 1px solid var(--border, var(--border-color));
+    background: var(--surface, var(--bg-secondary));
     color: inherit;
-    font-size: 0.78rem;
+    font-size: var(--text-xs);
     cursor: pointer;
+    transition: background var(--motion-fast), border-color var(--motion-fast);
   }
   .mc-tabs button.active {
-    background: rgb(180 140 255 / 0.25);
-    border-color: rgb(180 140 255 / 0.45);
-    font-weight: 650;
+    background: color-mix(in srgb, var(--accent-out, var(--ui-accent)) 25%, transparent);
+    border-color: color-mix(in srgb, var(--accent-out, var(--ui-accent)) 45%, transparent);
+    font-weight: var(--weight-semibold);
   }
   .mc-head {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 12px;
+    gap: var(--space-3);
     flex-wrap: wrap;
-    padding: 0 16px;
+    padding: 0 var(--space-4);
   }
 
   .mc-lab-loading,
   .mc-lab-error {
-    margin: 0 16px;
-    padding: 24px 16px;
-    border-radius: 12px;
-    border: 1px dashed rgb(180 140 255 / 0.25);
+    margin: 0 var(--space-4);
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-card);
+    border: 1px dashed color-mix(in srgb, var(--accent-out, var(--ui-accent)) 25%, transparent);
     text-align: center;
-    font-size: 0.88rem;
-    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    color: var(--text-muted, var(--text-secondary));
   }
 
   .mc-lab-error {
-    color: #ff9d9d;
-    border-color: rgb(255 120 120 / 0.35);
-    background: rgb(255 80 80 / 0.08);
+    color: var(--color-error);
+    border-color: color-mix(in srgb, var(--color-error) 35%, transparent);
+    background: var(--color-error-soft);
   }
 
   .mc-body {
-    flex: 1; min-height: 0;
+    flex: 1;
+    min-height: 0;
     display: grid;
     grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.2fr);
-    gap: 14px;
+    gap: var(--space-3);
   }
   .matlab-calc.compact .mc-body {
     grid-template-columns: 1fr;
   }
 
   .mc-command, .mc-viz {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 12px;
-    display: flex; flex-direction: column;
-    gap: 10px;
+    background: var(--surface, var(--bg-secondary));
+    border: 1px solid var(--border, var(--border-color));
+    border-radius: var(--radius-card);
+    padding: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
     min-height: 0;
     overflow: auto;
+    box-shadow: var(--shadow-sm);
   }
 
   .mc-input-row {
-    display: flex; align-items: center; gap: 8px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
   }
   .mc-prompt {
-    color: #b48cff;
-    font-family: 'IBM Plex Mono', monospace;
-    font-weight: 700;
-    font-size: 0.9rem;
+    color: var(--accent-out, var(--ui-accent));
+    font-family: var(--font-mono);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-sm);
   }
   .mc-input {
     flex: 1;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
     background: var(--code-bg);
     color: var(--code-fg);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.88rem;
   }
   .mc-run {
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-button);
     border: 0;
-    background: linear-gradient(135deg, #ffd0e6, #b48cff);
-    color: #1c0f30;
-    font-weight: 600;
+    font-size: var(--text-sm);
     cursor: pointer;
-    font-size: 0.82rem;
   }
-  .mc-run.small { padding: 5px 12px; font-size: 0.76rem; }
+  .mc-run.small { padding: var(--space-1) var(--space-3); font-size: var(--text-xs); }
   .mc-clear {
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-primary);
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 0.78rem;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
   }
 
   .mc-presets {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px;
+    gap: var(--space-2);
   }
   .mc-presets-label {
-    font-size: 0.68rem;
-    color: var(--text-secondary);
-    margin-right: 2px;
+    font-size: var(--text-xs);
+    color: var(--text-muted, var(--text-secondary));
+    margin-right: var(--space-1);
   }
   .mc-preset {
-    padding: 4px 10px;
+    padding: var(--space-1) var(--space-3);
     border-radius: 999px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-primary);
+    border: 1px solid var(--border, var(--border-color));
+    background: var(--bg, var(--bg-primary));
     color: inherit;
-    font-size: 0.68rem;
+    font-size: var(--text-xs);
     cursor: pointer;
+    transition: background var(--motion-fast), border-color var(--motion-fast);
   }
   .mc-preset:hover {
-    background: rgb(180 140 255 / 0.18);
-    border-color: rgb(180 140 255 / 0.35);
+    background: color-mix(in srgb, var(--accent-out, var(--ui-accent)) 18%, transparent);
+    border-color: color-mix(in srgb, var(--accent-out, var(--ui-accent)) 35%, transparent);
   }
 
   .mc-result {
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: rgb(180 140 255 / 0.12);
-    border: 1px solid rgb(180 140 255 / 0.25);
+    padding: var(--space-3);
+    border-radius: var(--radius-button);
+    background: color-mix(in srgb, var(--accent-out, var(--ui-accent)) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent-out, var(--ui-accent)) 25%, transparent);
   }
   .mc-result.err {
-    background: rgb(255 80 80 / 0.1);
-    border-color: rgb(255 120 120 / 0.3);
+    background: var(--color-error-soft);
+    border-color: color-mix(in srgb, var(--color-error) 30%, transparent);
   }
   .mc-result pre {
-    margin: 4px 0 0;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.82rem;
+    margin: var(--space-1) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
     white-space: pre-wrap;
     word-break: break-all;
   }
-  .mc-ans { font-size: 0.72rem; color: var(--text-secondary); }
+  .mc-ans { font-size: var(--text-xs); color: var(--text-muted, var(--text-secondary)); }
 
-  .mc-keypad { display: flex; flex-direction: column; gap: 4px; }
-  .mc-krow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .mc-keypad { display: flex; flex-direction: column; gap: var(--space-1); }
+  .mc-krow { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-1); }
   .mc-key {
-    padding: 6px 4px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
+    padding: var(--space-2) var(--space-1);
+    border-radius: var(--radius-tag);
+    border: 1px solid var(--border, var(--border-color));
+    background: var(--bg, var(--bg-primary));
+    color: var(--text, var(--text-primary));
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
     cursor: pointer;
+    transition: background var(--motion-fast);
   }
-  .mc-key:hover { background: rgb(180 140 255 / 0.2); }
+  .mc-key:hover { background: color-mix(in srgb, var(--accent-out, var(--ui-accent)) 20%, transparent); }
 
-  .mc-history { margin-top: 4px; }
-  .mc-hlbl { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 4px; }
+  .mc-history { margin-top: var(--space-1); }
+  .mc-hlbl { font-size: var(--text-xs); color: var(--text-muted, var(--text-secondary)); margin-bottom: var(--space-1); }
   .mc-history ul { list-style: none; margin: 0; padding: 0; }
   .mc-hitem {
-    width: 100%; text-align: left;
-    display: flex; justify-content: space-between; gap: 8px;
-    padding: 4px 6px; border: 0; background: transparent;
-    cursor: pointer; font-size: 0.74rem;
-    border-radius: 6px;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: var(--text-xs);
+    border-radius: var(--radius-tag);
   }
-  .mc-hitem:hover { background: var(--chrome-hover); }
+  .mc-hitem:hover { background: var(--overlay-medium, var(--chrome-hover)); }
   .mc-hitem code { color: var(--code-fg); }
-  .mc-hitem .ok { color: #7fe6c4; }
-  .mc-hitem .bad { color: #ff9d9d; }
+  .mc-hitem .ok { color: var(--color-success); }
+  .mc-hitem .bad { color: var(--color-error); }
 
   .mc-viz-head {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-    font-size: 0.82rem; font-weight: 600;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
   }
   .mc-plot-expr {
-    flex: 1; min-width: 120px;
-    padding: 5px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
+    flex: 1;
+    min-width: 120px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-tag);
+    border: 1px solid var(--border, var(--border-color));
     background: var(--code-bg);
     color: var(--code-fg);
-    font-family: monospace;
+    font-family: var(--font-mono);
   }
   .mc-range {
-    display: flex; align-items: center; gap: 4px;
-    font-size: 0.74rem; color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-xs);
+    color: var(--text-muted, var(--text-secondary));
   }
-  .mc-range input { width: 56px; padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border-color); background: var(--bg-primary); color: inherit; }
+  .mc-range input {
+    width: 56px;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-tag);
+    border: 1px solid var(--border, var(--border-color));
+    background: var(--bg, var(--bg-primary));
+    color: inherit;
+  }
 
   .mc-canvas {
-    flex: 1; min-height: 220px;
+    flex: 1;
+    min-height: 220px;
     width: 100%;
-    border-radius: 10px;
-    border: 1px solid rgb(255 255 255 / 0.08);
+    border-radius: var(--radius-button);
+    border: 1px solid var(--border-subtle, var(--border-color));
   }
   .mc-help {
-    margin: 0; padding: 0 0 0 16px;
-    font-size: 0.68rem; color: var(--text-secondary);
-    line-height: 1.5;
+    margin: 0;
+    padding: 0 0 0 var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--text-muted, var(--text-secondary));
+    line-height: var(--leading-normal);
   }
 
   @media (max-width: 900px) {

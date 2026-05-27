@@ -58,9 +58,34 @@ html.dark[data-ui='scholar'] {
   --bg-secondary: #342c22;
   --text-primary: #f4ecd8;
   --text-secondary: #c4b8a0;
-  --glass-bg: rgb(42 36 28 / 0.94);
-  --chrome-bg-top: rgb(42 36 28 / 0.97);
+  --border-color: rgb(244 236 216 / 0.14);
+
+  --glass-bg: rgb(42 36 28 / 0.88);
+  --glass-bg-hover: rgb(48 40 32 / 0.92);
+  --glass-bg-strong: rgb(42 36 28 / 0.94);
+  --glass-border: rgb(244 236 216 / 0.12);
+
+  --chrome-bg-top: rgb(42 36 28 / 0.94);
+  --chrome-bg-bottom: #342c22;
+  --chrome-border: rgb(244 236 216 / 0.12);
+  --chrome-hover: rgb(244 236 216 / 0.08);
+  --chrome-subtle: rgb(244 236 216 / 0.06);
+  --chrome-text: #f4ecd8;
+  --chrome-text-muted: #c4b8a0;
+
+  --neo-surface: rgb(52 44 34);
+  --neo-track: rgb(196 184 160 / 0.35);
+  --neo-thumb: rgb(72 62 48);
+  --neo-raised: 2px 3px 10px rgb(0 0 0 / 0.35);
+  --neo-raised-hover: 3px 5px 14px rgb(0 0 0 / 0.42);
+  --neo-pressed: inset 0 2px 6px rgb(0 0 0 / 0.35);
+
   --widget-bg-rgb: 42 36 28;
+  --widget-fg: #f4ecd8;
+  --widget-fg-muted: #c4b8a0;
+  --widget-border: rgb(244 236 216 / 0.14);
+  --widget-header-bg: rgb(52 44 34 / 0.95);
+  --chrome-dropdown-bg: rgb(42 36 28 / 0.96);
 }
 
 html[data-ui='scholar'] body {
@@ -98,10 +123,12 @@ html[data-ui='scholar'] .floating-widget,
 html[data-ui='scholar'] .site-nav-shell,
 html[data-ui='scholar'] .pixel-card,
 html[data-ui='scholar'] .glass-container {
-  background: rgb(244 236 216 / 0.94);
-  border: 1px solid rgb(28 24 20 / 0.14);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-normal);
-  backdrop-filter: none;
+  backdrop-filter: blur(10px) saturate(110%);
+  -webkit-backdrop-filter: blur(10px) saturate(110%);
+  color: var(--text-primary);
 }
 
 html[data-ui='scholar'] .mac-menu-app-name {

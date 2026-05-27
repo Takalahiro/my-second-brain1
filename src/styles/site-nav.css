@@ -5,6 +5,8 @@
   top: 0;
   z-index: 20;
   padding: max(env(safe-area-inset-top, 0px), 10px) 12px 0;
+  /* 供笔记工具 FAB 避让导航高度 */
+  --site-nav-stack: 1;
 }
 
 .site-nav-shell {
@@ -16,6 +18,12 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  background: var(--glass-bg-strong, var(--surface-elevated));
+  border: 1px solid var(--glass-border, var(--border));
+  border-radius: 16px;
+  box-shadow: var(--shadow-normal, var(--chrome-shadow));
+  backdrop-filter: blur(12px) saturate(115%);
+  -webkit-backdrop-filter: blur(12px) saturate(115%);
 }
 
 .site-nav-primary {
@@ -94,14 +102,10 @@
 }
 
 .site-nav-link.is-active {
-  color: rgb(120 90 200);
+  color: var(--accent-out, var(--ui-accent-text));
   box-shadow:
     var(--neo-raised),
-    inset 0 0 0 1px rgb(180 140 255 / 0.35);
-}
-
-:global(.dark) .site-nav-link.is-active {
-  color: rgb(200 170 255);
+    inset 0 0 0 1px color-mix(in srgb, var(--accent-out, var(--ui-accent)) 35%, transparent);
 }
 
 .site-nav-crumb {

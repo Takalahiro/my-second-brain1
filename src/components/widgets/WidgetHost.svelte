@@ -3,8 +3,13 @@
   import { DESKTOP_ATMOSPHERE_KEY, type DesktopAtmosphereState } from '../../lib/desktop-atmosphere';
   import { media } from '../../lib/media';
   import LazyWidget from './LazyWidget.svelte';
+  import { resolveWidgetLoader } from '../../design-system/resolveWidgetLoader';
+  import { isStructuralSkinId } from '../../design-system/structural/registry';
+  import StructuralBackgroundOverlay from '../../design-system/structural/widgets/StructuralBackgroundOverlay.svelte';
   import { widgetLoaders } from './widgetLoaders';
   import WidgetDrawer from './WidgetDrawer.svelte';
+  import PixelFxLayer from '../../design-system/pixel/components/PixelFxLayer.svelte';
+  import SkinMenuBar from '../../design-system/structural/components/SkinMenuBar.svelte';
   import MacMenuBar from '../desktop/MacMenuBar.svelte';
   import MobileHomeDock from '../desktop/MobileHomeDock.svelte';
   import { readGlobalMuted, writeGlobalMuted } from '../../lib/global-audio-mute';
@@ -18,6 +23,7 @@
   import { useSkinChrome } from '../../features/ui/skin-chrome.svelte';
   import { clampDropPoint } from '../../lib/floating-widget-layout';
   import { initUiSkin } from '../../features/ui/apply-ui';
+  import type { UiSkinId } from '../../features/ui/types';
 
   interface Props {
     backgroundDefault?: boolean;
@@ -26,11 +32,108 @@
   let { backgroundDefault = false, desktopMode = false }: Props = $props();
 
   const skinChrome = useSkinChrome();
+  const isPixelSkin = $derived(skinChrome.id === 'pixel');
+  const isStructuralSkin = $derived(isStructuralSkinId(skinChrome.id));
+  const wl = (key: WidgetKey) => resolveWidgetLoader(skinChrome.id, key);
 
   const STORAGE_KEY = 'second-brain:widgets';
 
   type WidgetKey = 'background' | 'clock' | 'music' | 'notes' | 'todo' | 'calendar' | 'pomodoro' | 'weather' | 'stats' | 'world' | 'graph' | 'territory' | 'calculator' | 'python' | 'whiteboard' | 'whitenoise' | 'network';
   type Enabled = Record<WidgetKey, boolean>;
+
+  const WIDGET_KEYS: WidgetKey[] = [
+    'background',
+    'clock',
+    'music',
+    'notes',
+    'todo',
+    'calendar',
+    'pomodoro',
+    'weather',
+    'stats',
+    'world',
+    'graph',
+    'territory',
+    'calculator',
+    'python',
+    'whiteboard',
+    'whitenoise',
+    'network',
+  ];
+
+  function createEmptyEnabled(background: boolean): Enabled {
+    return {
+      background,
+      clock: false,
+      music: false,
+      notes: false,
+      todo: false,
+      calendar: false,
+      pomodoro: false,
+      weather: false,
+      stats: false,
+      world: false,
+      graph: false,
+      territory: false,
+      calculator: false,
+      python: false,
+      whiteboard: false,
+      whitenoise: false,
+      network: false,
+    };
+  }
+
+  function isWidgetsCleared(state: Enabled): boolean {
+    return WIDGET_KEYS.filter((k) => k !== 'background').every((k) => !state[k]);
+  }
+
+  function parseStoredEnabled(raw: unknown, backgroundDefault: boolean): Enabled | null {
+    if (!raw || typeof raw !== 'object') return null;
+    const s = raw as { enabled?: Partial<Enabled> };
+    if (!s.enabled || typeof s.enabled !== 'object') return null;
+    const out = createEmptyEnabled(backgroundDefault);
+    for (const key of WIDGET_KEYS) {
+      if (typeof s.enabled[key] === 'boolean') out[key] = s.enabled[key]!;
+    }
+    if (backgroundDefault) out.background = true;
+    return out;
+  }
+
+  function pixelDesktopDefaults(backgroundDefault: boolean, useVideo: boolean): Enabled {
+    return {
+      ...createEmptyEnabled(backgroundDefault),
+      clock: backgroundDefault && useVideo,
+      todo: true,
+      music: true,
+      notes: true,
+      pomodoro: true,
+      weather: true,
+      stats: true,
+    };
+  }
+
+  function usesFloatingDesktopDefaults(skinId: UiSkinId, isDesktop: boolean) {
+    return isDesktop && (skinId === 'pixel' || isStructuralSkinId(skinId));
+  }
+
+  function resolveEnabledOnLoad(
+    stored: Enabled | null,
+    skinId: UiSkinId,
+    backgroundDefault: boolean,
+    useVideo: boolean,
+    isDesktop: boolean,
+  ): Enabled {
+    if (stored) {
+      if (usesFloatingDesktopDefaults(skinId, isDesktop) && isWidgetsCleared(stored)) {
+        return pixelDesktopDefaults(backgroundDefault, useVideo);
+      }
+      return stored;
+    }
+    if (usesFloatingDesktopDefaults(skinId, isDesktop)) {
+      return pixelDesktopDefaults(backgroundDefault, useVideo);
+    }
+    return createEmptyEnabled(backgroundDefault);
+  }
   type BgState = {
     sceneId: string;
     useVideo: boolean;
@@ -46,25 +149,7 @@
   };
 
   let ready = $state(false);
-  let enabled = $state<Enabled>({
-    background: backgroundDefault,
-    clock: false,
-    music: false,
-    notes: false,
-    todo: false,
-    calendar: false,
-    pomodoro: false,
-    weather: false,
-    stats: false,
-    world: false,
-    graph: false,
-    territory: false,
-    calculator: false,
-    python: false,
-    whiteboard: false,
-    whitenoise: false,
-    network: false,
-  });
+  let enabled = $state<Enabled>(createEmptyEnabled(backgroundDefault));
   // 壁纸层一键静音（音乐 + 白噪音）
   let globalMuted = $state(false);
   // 清屏前的快照；有值就显示「恢复」按钮
@@ -119,8 +204,9 @@
   });
 
   onMount(() => {
-    initUiSkin();
+    const skinId = initUiSkin();
     globalMuted = readGlobalMuted();
+    let storedEnabled: Enabled | null = null;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
@@ -139,31 +225,13 @@
             mobileIndex: typeof s.bg.mobileIndex === 'number' ? s.bg.mobileIndex : 0,
           };
         }
+        storedEnabled = parseStoredEnabled(s, backgroundDefault);
       }
     } catch {}
+    enabled = resolveEnabledOnLoad(storedEnabled, skinId, backgroundDefault, bg.useVideo, desktopMode);
     lastWeatherCode = readCachedWeatherCode();
     syncLinkedRainDrops(lastWeatherCode);
     window.addEventListener('weather:sync', onWeatherSync);
-    // 每次打开主界面：壁纸始终保留（若页面默认开启），其余小组件清空
-    enabled = {
-      background: backgroundDefault,
-      clock: false,
-      music: false,
-      notes: false,
-      todo: false,
-      calendar: false,
-      pomodoro: false,
-      weather: false,
-      stats: false,
-      world: false,
-      graph: false,
-    territory: false,
-      calculator: false,
-      python: false,
-      whiteboard: false,
-      whitenoise: false,
-      network: false,
-    };
     snapshot = null;
     // 监听移动端断点 —— 时钟在此条件下永远不 pin
     try {
@@ -491,19 +559,35 @@
 {#if desktopMode}
   <div class="mac-desktop" aria-label="桌面">
     {#if ready}
-      <MacMenuBar
-        controlCenterOpen={controlCenterOpen}
-        globalMuted={globalMuted}
-        hasSnapshot={!!snapshot}
-        {isCleared}
-        rainDrops={bg.rainDrops}
-        onToggleControlCenter={toggleControlCenter}
-        onToggleMute={toggleGlobalMute}
-        onClearAll={clearAll}
-        onRestore={restoreAll}
-        onToggleManual={toggleManualFromDesktop}
-        onOpenSpotlight={openSpotlight}
-      />
+      {#if isStructuralSkin}
+        <SkinMenuBar
+          controlCenterOpen={controlCenterOpen}
+          globalMuted={globalMuted}
+          hasSnapshot={!!snapshot}
+          {isCleared}
+          rainDrops={bg.rainDrops}
+          onToggleControlCenter={toggleControlCenter}
+          onToggleMute={toggleGlobalMute}
+          onClearAll={clearAll}
+          onRestore={restoreAll}
+          onToggleManual={toggleManualFromDesktop}
+          onOpenSpotlight={openSpotlight}
+        />
+      {:else}
+        <MacMenuBar
+          controlCenterOpen={controlCenterOpen}
+          globalMuted={globalMuted}
+          hasSnapshot={!!snapshot}
+          {isCleared}
+          rainDrops={bg.rainDrops}
+          onToggleControlCenter={toggleControlCenter}
+          onToggleMute={toggleGlobalMute}
+          onClearAll={clearAll}
+          onRestore={restoreAll}
+          onToggleManual={toggleManualFromDesktop}
+          onOpenSpotlight={openSpotlight}
+        />
+      {/if}
     {/if}
 
     {#if ready}
@@ -514,6 +598,9 @@
       />
     {/if}
 
+    {#if isPixelSkin}
+      <PixelFxLayer />
+    {/if}
     {#if skinChrome.canvasWallpaper}
       <SkinCanvasWallpaper />
     {/if}
@@ -545,42 +632,49 @@
             active: true,
           }}
         />
+        {#if isStructuralSkin}
+          <StructuralBackgroundOverlay
+            sceneId={bg.sceneId}
+            {scenes}
+            onSceneChange={(id) => patchBg({ sceneId: id })}
+          />
+        {/if}
       {/if}
 
       {#if ready && enabled.clock}
         <LazyWidget
           show={true}
-          loader={widgetLoaders.clock}
+          loader={wl('clock')}
           props={{ onClose: () => toggleEnabled('clock'), pinned: clockPinned }}
         />
       {/if}
       {#if ready && enabled.music}
         <LazyWidget
           show={true}
-          loader={widgetLoaders.music}
+          loader={wl('music')}
           props={{ onClose: () => toggleEnabled('music'), globalMuted }}
         />
       {/if}
       {#if ready && enabled.notes}
-        <LazyWidget show={true} loader={widgetLoaders.notes} props={{ onClose: () => toggleEnabled('notes') }} />
+        <LazyWidget show={true} loader={wl('notes')} props={{ onClose: () => toggleEnabled('notes') }} />
       {/if}
       {#if ready && enabled.todo}
-        <LazyWidget show={true} loader={widgetLoaders.todo} props={{ onClose: () => toggleEnabled('todo') }} />
+        <LazyWidget show={true} loader={wl('todo')} props={{ onClose: () => toggleEnabled('todo') }} />
       {/if}
       {#if ready && enabled.calendar}
-        <LazyWidget show={true} loader={widgetLoaders.calendar} props={{ onClose: () => toggleEnabled('calendar') }} />
+        <LazyWidget show={true} loader={wl('calendar')} props={{ onClose: () => toggleEnabled('calendar') }} />
       {/if}
       {#if ready && enabled.pomodoro}
-        <LazyWidget show={true} loader={widgetLoaders.pomodoro} props={{ onClose: () => toggleEnabled('pomodoro') }} />
+        <LazyWidget show={true} loader={wl('pomodoro')} props={{ onClose: () => toggleEnabled('pomodoro') }} />
       {/if}
       {#if ready && enabled.weather}
-        <LazyWidget show={true} loader={widgetLoaders.weather} props={{ onClose: () => toggleEnabled('weather') }} />
+        <LazyWidget show={true} loader={wl('weather')} props={{ onClose: () => toggleEnabled('weather') }} />
       {/if}
       {#if ready && enabled.stats}
-        <LazyWidget show={true} loader={widgetLoaders.stats} props={{ onClose: () => toggleEnabled('stats') }} />
+        <LazyWidget show={true} loader={wl('stats')} props={{ onClose: () => toggleEnabled('stats') }} />
       {/if}
       {#if ready && enabled.world}
-        <LazyWidget show={true} loader={widgetLoaders.world} props={{ onClose: () => toggleEnabled('world') }} />
+        <LazyWidget show={true} loader={wl('world')} props={{ onClose: () => toggleEnabled('world') }} />
       {/if}
       {#if ready && enabled.graph}
         <LazyWidget show={true} loader={widgetLoaders.graph} props={{ onClose: () => toggleEnabled('graph') }} />
@@ -600,12 +694,12 @@
       {#if ready && enabled.whitenoise}
         <LazyWidget
           show={true}
-          loader={widgetLoaders.whitenoise}
+          loader={wl('whitenoise')}
           props={{ onClose: () => toggleEnabled('whitenoise'), globalMuted }}
         />
       {/if}
       {#if ready && enabled.network}
-        <LazyWidget show={true} loader={widgetLoaders.network} props={{ onClose: () => toggleEnabled('network') }} />
+        <LazyWidget show={true} loader={wl('network')} props={{ onClose: () => toggleEnabled('network') }} />
       {/if}
     </div>
 
@@ -667,37 +761,37 @@
   {#if ready && enabled.clock}
     <LazyWidget
       show={true}
-      loader={widgetLoaders.clock}
+      loader={wl('clock')}
       props={{ onClose: () => toggleEnabled('clock'), pinned: clockPinned }}
     />
   {/if}
   {#if ready && enabled.music}
     <LazyWidget
       show={true}
-      loader={widgetLoaders.music}
+      loader={wl('music')}
       props={{ onClose: () => toggleEnabled('music'), globalMuted }}
     />
   {/if}
   {#if ready && enabled.notes}
-    <LazyWidget show={true} loader={widgetLoaders.notes} props={{ onClose: () => toggleEnabled('notes') }} />
+    <LazyWidget show={true} loader={wl('notes')} props={{ onClose: () => toggleEnabled('notes') }} />
   {/if}
   {#if ready && enabled.todo}
-    <LazyWidget show={true} loader={widgetLoaders.todo} props={{ onClose: () => toggleEnabled('todo') }} />
+    <LazyWidget show={true} loader={wl('todo')} props={{ onClose: () => toggleEnabled('todo') }} />
   {/if}
   {#if ready && enabled.calendar}
-    <LazyWidget show={true} loader={widgetLoaders.calendar} props={{ onClose: () => toggleEnabled('calendar') }} />
+    <LazyWidget show={true} loader={wl('calendar')} props={{ onClose: () => toggleEnabled('calendar') }} />
   {/if}
   {#if ready && enabled.pomodoro}
-    <LazyWidget show={true} loader={widgetLoaders.pomodoro} props={{ onClose: () => toggleEnabled('pomodoro') }} />
+    <LazyWidget show={true} loader={wl('pomodoro')} props={{ onClose: () => toggleEnabled('pomodoro') }} />
   {/if}
   {#if ready && enabled.weather}
-    <LazyWidget show={true} loader={widgetLoaders.weather} props={{ onClose: () => toggleEnabled('weather') }} />
+    <LazyWidget show={true} loader={wl('weather')} props={{ onClose: () => toggleEnabled('weather') }} />
   {/if}
   {#if ready && enabled.stats}
-    <LazyWidget show={true} loader={widgetLoaders.stats} props={{ onClose: () => toggleEnabled('stats') }} />
+    <LazyWidget show={true} loader={wl('stats')} props={{ onClose: () => toggleEnabled('stats') }} />
   {/if}
   {#if ready && enabled.world}
-    <LazyWidget show={true} loader={widgetLoaders.world} props={{ onClose: () => toggleEnabled('world') }} />
+    <LazyWidget show={true} loader={wl('world')} props={{ onClose: () => toggleEnabled('world') }} />
   {/if}
   {#if ready && enabled.graph}
     <LazyWidget show={true} loader={widgetLoaders.graph} props={{ onClose: () => toggleEnabled('graph') }} />
@@ -717,12 +811,12 @@
   {#if ready && enabled.whitenoise}
     <LazyWidget
       show={true}
-      loader={widgetLoaders.whitenoise}
+      loader={wl('whitenoise')}
       props={{ onClose: () => toggleEnabled('whitenoise'), globalMuted }}
     />
   {/if}
   {#if ready && enabled.network}
-    <LazyWidget show={true} loader={widgetLoaders.network} props={{ onClose: () => toggleEnabled('network') }} />
+    <LazyWidget show={true} loader={wl('network')} props={{ onClose: () => toggleEnabled('network') }} />
   {/if}
 
   {#if ready}

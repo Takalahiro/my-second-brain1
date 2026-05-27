@@ -35,36 +35,42 @@ notes.sort((a, b) => {
 ---
 
 <BaseLayout title={folder}>
-  <nav class="text-sm text-gray-500 mb-4">
-    <a href="/" class="hover:underline">首页</a>
-    <span class="mx-2">/</span>
-    <span class="inline-flex items-center gap-1"><PixelIcon name="folder" size={14} /> {folder}</span>
-  </nav>
+  <section class="subpage-section">
+    <nav class="subpage-breadcrumb">
+      <a href="/">首页</a>
+      <span>/</span>
+      <a href="/notes">笔记</a>
+      <span>/</span>
+      <span class="inline-flex items-center gap-1"><PixelIcon name="folder" size={14} /> {folder}</span>
+    </nav>
 
-  <h1 class="text-3xl font-bold mb-3 inline-flex items-center gap-2"><PixelIcon name="folder" size={24} /> {folder}</h1>
-  <p class="text-gray-500 mb-6">{notes.length} 篇笔记</p>
+    <h1 class="subpage-title inline-flex items-center gap-2">
+      <PixelIcon name="folder" size={24} /> {folder}
+    </h1>
+    <p class="subpage-muted" style="margin-bottom: var(--space-4);">{notes.length} 篇笔记</p>
 
-  <ul class="space-y-3">
-    {notes.map((note) => {
-      const slug = noteIdToSlug(note.id);
-      const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
-      return (
-        <li>
-          <a href={`/notes/${slug}`} class="block p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 transition">
-            <div class="flex items-baseline justify-between gap-4">
-              <h2 class="font-semibold">{title}</h2>
-              {note.data.date && (
-                <time class="text-xs text-gray-500 shrink-0">
-                  {note.data.date.toLocaleDateString('zh-CN')}
-                </time>
+    <ul class="subpage-stack-md" style="list-style: none; margin: 0; padding: 0;">
+      {notes.map((note) => {
+        const slug = noteIdToSlug(note.id);
+        const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
+        return (
+          <li>
+            <a href={`/notes/${slug}`} class="ui-list-card">
+              <div class="flex items-baseline justify-between gap-4">
+                <h2 class="ui-list-card-title">{title}</h2>
+                {note.data.date && (
+                  <time class="subpage-muted pixel-digits shrink-0" style="font-size: var(--text-xs);">
+                    {note.data.date.toLocaleDateString('zh-CN')}
+                  </time>
+                )}
+              </div>
+              {note.data.description && (
+                <p class="ui-list-card-desc">{note.data.description}</p>
               )}
-            </div>
-            {note.data.description && (
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">{note.data.description}</p>
-            )}
-          </a>
-        </li>
-      );
-    })}
-  </ul>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
 </BaseLayout>

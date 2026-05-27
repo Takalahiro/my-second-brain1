@@ -1,0 +1,165 @@
+/* Calendar · 9-skin */
+
+.skin-cal,
+.skin-cal-settings {
+  font-size: 0.78rem;
+}
+
+.skin-cal__nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.skin-cal__month {
+  flex: 1;
+  font-family: var(--struct-font-display);
+  font-size: 0.48rem;
+  text-align: center;
+}
+
+.skin-cal__btn {
+  border: 1px solid color-mix(in srgb, var(--struct-accent) 40%, var(--struct-frame-border));
+  background: color-mix(in srgb, var(--struct-panel-bg) 90%, #000);
+  color: inherit;
+  font-family: var(--struct-font-body);
+  font-size: 0.72rem;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.skin-cal__btn--today {
+  margin-left: auto;
+}
+
+.skin-cal__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 4px;
+  font-size: 0.62rem;
+  opacity: 0.65;
+  text-align: center;
+}
+
+.skin-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.skin-cal__cell {
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.skin-cal__cell.is-out {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.skin-cal__cell.is-today {
+  outline: 1px solid var(--struct-accent);
+}
+
+.skin-cal__cell.is-selected {
+  background: color-mix(in srgb, var(--struct-accent) 35%, transparent);
+}
+
+.skin-cal__cell.has-events::after {
+  content: '·';
+  display: block;
+  font-size: 0.55rem;
+  line-height: 0;
+  color: var(--struct-accent);
+}
+
+.skin-cal__section {
+  margin: 10px 0 4px;
+  font-family: var(--struct-font-display);
+  font-size: 0.38rem;
+  color: var(--struct-accent);
+}
+
+.skin-cal__events {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.skin-cal__event {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  padding: 4px 0;
+  border-bottom: 1px dashed color-mix(in srgb, currentColor 15%, transparent);
+  font-size: 0.72rem;
+}
+
+.skin-cal__event-time {
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.skin-cal-settings__label {
+  font-family: var(--struct-font-display);
+  font-size: 0.38rem;
+  color: var(--struct-accent);
+  margin: 0 0 6px;
+}
+
+.skin-cal-settings__input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, #000);
+  color: inherit;
+  font: inherit;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+}
+
+.skin-cal-settings__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.skin-cal-settings__hint {
+  font-size: 0.68rem;
+  opacity: 0.65;
+  margin: 0;
+}
+
+.skin-cal-settings__err {
+  color: #e63946;
+  font-size: 0.72rem;
+  margin: 6px 0 0;
+}
+
+.skin-cal--terminal,
+.skin-cal-settings--terminal {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.skin-cal--crt {
+  font-family: 'VT323', monospace;
+  font-size: 0.9rem;
+}
+
+.skin-cal--ink .skin-cal__month {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.85rem;
+}
+
+.skin-cal--rpg .skin-cal__cell.is-selected {
+  background: rgb(212 175 55 / 0.2);
+}

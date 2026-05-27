@@ -1,0 +1,195 @@
+/* Weather · 9-skin data viz */
+
+.skin-weather {
+  font-size: 0.78rem;
+}
+
+.skin-weather__banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0 8px;
+  font-size: 0.62rem;
+  opacity: 0.75;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.skin-weather__now {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.skin-weather__temp {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.skin-weather__cond p {
+  margin: 0;
+  font-size: 0.72rem;
+}
+
+.skin-weather__wind {
+  opacity: 0.65;
+  font-size: 0.62rem !important;
+}
+
+.skin-weather__badge {
+  display: inline-block;
+  font-size: 0.55rem;
+  padding: 1px 4px;
+  margin-bottom: 2px;
+  border: 1px solid currentColor;
+  opacity: 0.65;
+}
+
+.skin-weather__glyph {
+  font-size: 1.6rem;
+  margin-left: auto;
+}
+
+.skin-weather__glyph-sm {
+  font-size: 1rem;
+}
+
+.skin-weather__elements {
+  margin: 8px 0;
+}
+
+.skin-weather__elements-head,
+.skin-weather__elements-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.skin-weather__elements-head span {
+  font-size: 0.58rem;
+  text-align: center;
+  opacity: 0.65;
+}
+
+.skin-weather__gauge {
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 28px;
+  position: relative;
+}
+
+.skin-weather__gauge-seg {
+  flex: 1;
+  max-width: 8px;
+  height: 18px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+}
+
+.skin-weather__gauge-seg.is-on {
+  background: color-mix(in srgb, var(--weather-accent, currentColor) 55%, transparent);
+}
+
+.skin-weather__gauge-readout {
+  position: absolute;
+  bottom: -12px;
+  font-size: 0.5rem;
+  opacity: 0.65;
+}
+
+.skin-weather__section {
+  font-size: 0.65rem;
+  opacity: 0.75;
+  margin: 8px 0 4px;
+}
+
+.skin-weather__forecast {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.62rem;
+}
+
+.skin-weather__forecast li {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  gap: 6px;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.skin-weather__foot,
+.skin-weather__scan,
+.skin-weather__empty,
+.skin-weather__err {
+  font-size: 0.62rem;
+  opacity: 0.65;
+  margin-top: 8px;
+}
+
+.skin-weather__err {
+  color: #e63946;
+  opacity: 1;
+}
+
+.skin-weather-settings__label {
+  font-size: 0.65rem;
+  margin: 0 0 4px;
+}
+
+.skin-weather-settings__form {
+  display: flex;
+  gap: 4px;
+}
+
+.skin-weather-settings__input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 4px 6px;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  background: transparent;
+  color: inherit;
+}
+
+.skin-weather-settings__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.skin-weather-settings__btn {
+  font: inherit;
+  font-size: 0.62rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  background: transparent;
+  color: inherit;
+}
+
+.skin-weather-settings__hint {
+  font-size: 0.58rem;
+  opacity: 0.55;
+  margin: 6px 0 0;
+}
+
+.skin-weather--blueprint { --weather-accent: #f4ecd8; font-family: 'IBM Plex Mono', monospace; }
+.skin-weather--scholar { --weather-accent: #8b4513; font-family: 'EB Garamond', serif; }
+.skin-weather--terminal { --weather-accent: #33ff66; font-family: 'JetBrains Mono', monospace; }
+.skin-weather--terminal .skin-weather__temp { text-shadow: 0 0 8px #33ff66; }
+.skin-weather--crt { --weather-accent: #ffb000; font-family: 'VT323', monospace; font-size: 0.9rem; }
+.skin-weather--observatory { --weather-accent: #e8c547; font-family: 'IBM Plex Mono', monospace; }
+.skin-weather--herbarium { --weather-accent: rgb(45 90 61); font-family: Georgia, serif; }
+.skin-weather--ink { --weather-accent: #c0392b; font-family: 'Noto Serif SC', serif; }
+.skin-weather--rpg { --weather-accent: #ffd700; font-family: Cinzel, serif; }
+.skin-weather--spacecraft { --weather-accent: #ffaa00; font-family: 'IBM Plex Mono', monospace; }
+
+.skin-weather-settings--terminal .skin-weather-settings__input { font-family: 'JetBrains Mono', monospace; }
+.skin-weather-settings--crt .skin-weather-settings__input { font-family: 'VT323', monospace; }

@@ -1,0 +1,246 @@
+/* Stats · 9-skin data viz */
+
+.skin-stats {
+  --stats-heat-empty: #303040;
+  --stats-heat-hot: #33ff66;
+  --stats-heat-cold: #0a0e27;
+  --stats-accent: var(--struct-accent, #fc9838);
+  font-size: 0.78rem;
+}
+
+.skin-stats__kpis {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.skin-stats__kpi {
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--stats-accent) 35%, transparent);
+}
+
+.skin-stats__kpi-num {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.skin-stats__kpi-num small {
+  font-size: 0.65rem;
+}
+
+.skin-stats__kpi-label {
+  display: block;
+  font-size: 0.62rem;
+  opacity: 0.65;
+  margin-top: 2px;
+}
+
+.skin-stats__section,
+.skin-stats__foot,
+.skin-stats__loading,
+.skin-stats__err,
+.skin-stats__empty {
+  margin: 8px 0 0;
+  font-size: 0.68rem;
+}
+
+.skin-stats__err {
+  color: #e63946;
+}
+
+.skin-stats__chart {
+  width: 100%;
+  height: 110px;
+  margin-top: 6px;
+}
+
+.skin-stats__chart-line {
+  stroke: var(--stats-accent);
+}
+
+.skin-stats__chart-dot {
+  fill: var(--stats-accent);
+}
+
+.skin-stats__chart-x {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.55rem;
+  opacity: 0.65;
+  margin-top: 4px;
+}
+
+.skin-stats__ascii {
+  margin: 6px 0 0;
+  font-size: 0.62rem;
+  line-height: 1.35;
+  white-space: pre-wrap;
+}
+
+.skin-stats__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.skin-stats__bar-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1fr auto;
+  gap: 6px;
+  align-items: center;
+  font-size: 0.62rem;
+}
+
+.skin-stats__bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skin-stats__bar-track {
+  height: 8px;
+  background: color-mix(in srgb, var(--stats-accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--stats-accent) 25%, transparent);
+}
+
+.skin-stats__bar-track span {
+  display: block;
+  height: 100%;
+  background: var(--stats-accent);
+}
+
+.skin-stats__heat {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+  overflow-x: auto;
+}
+
+.skin-stats__heat-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.skin-stats__heat-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+}
+
+.skin-stats__heat-cell--empty {
+  background: var(--stats-heat-empty);
+  opacity: 0.35;
+}
+
+.skin-stats__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.skin-stats__tag {
+  font-size: 0.62rem;
+  padding: 2px 6px;
+  border: 1px solid color-mix(in srgb, var(--stats-accent) 35%, transparent);
+}
+
+.skin-stats__tag em {
+  font-style: normal;
+  opacity: 0.65;
+}
+
+/* blueprint */
+.skin-stats--blueprint {
+  --stats-accent: #f4ecd8;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.skin-stats--blueprint .skin-stats__kpi {
+  border-style: dashed;
+  border-color: rgb(255 255 255 / 0.45);
+}
+.skin-stats--blueprint .skin-stats__bar-val {
+  color: #e63946;
+  font-size: 0.58rem;
+}
+
+/* scholar */
+.skin-stats--scholar {
+  --stats-accent: #8b0000;
+  font-family: 'EB Garamond', serif;
+}
+.skin-stats--scholar .skin-stats__kpi {
+  background: rgb(250 246 238 / 0.6);
+  border: none;
+  border-bottom: 2px solid rgb(139 0 0 / 0.35);
+}
+
+/* terminal */
+.skin-stats--terminal {
+  --stats-accent: #33ff66;
+  --stats-heat-hot: #33ff66;
+  font-family: 'JetBrains Mono', monospace;
+}
+.skin-stats--terminal .skin-stats__kpi-num {
+  text-shadow: 0 0 6px rgb(51 255 102 / 0.35);
+}
+
+/* crt */
+.skin-stats--crt {
+  --stats-accent: #ffb000;
+  --stats-heat-hot: #ffb000;
+  font-family: 'VT323', monospace;
+  font-size: 0.9rem;
+}
+
+/* observatory */
+.skin-stats--observatory {
+  --stats-accent: #e8c547;
+  --stats-heat-hot: #e8c547;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.skin-stats--observatory .skin-stats__heat-cell {
+  border-radius: 50%;
+}
+
+/* herbarium */
+.skin-stats--herbarium {
+  --stats-accent: rgb(45 90 61);
+  font-family: Georgia, serif;
+}
+.skin-stats--herbarium .skin-stats__tag {
+  border-radius: 999px;
+  border-style: dashed;
+}
+
+/* ink */
+.skin-stats--ink {
+  --stats-accent: #c0392b;
+  font-family: 'Noto Serif SC', serif;
+}
+
+/* rpg */
+.skin-stats--rpg {
+  --stats-accent: #ffd700;
+  font-family: Cinzel, serif;
+}
+.skin-stats--rpg .skin-stats__kpi {
+  border-color: rgb(212 175 55 / 0.45);
+  background: rgb(212 175 55 / 0.08);
+}
+
+/* spacecraft */
+.skin-stats--spacecraft {
+  --stats-accent: #ffaa00;
+  --stats-heat-hot: #6fc;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.skin-stats--spacecraft .skin-stats__gauge-seg,
+.skin-stats--spacecraft .skin-stats__bar-track {
+  border-radius: 0;
+}

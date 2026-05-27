@@ -1,0 +1,197 @@
+/* 学院手稿 · 羊皮纸对开本 */
+
+.folio-float-root {
+  position: fixed;
+  z-index: 90;
+  touch-action: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.folio-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--struct-frame-bg);
+  color: var(--struct-frame-fg);
+  border: 1px solid var(--struct-frame-border);
+  box-shadow: var(--struct-shadow), inset 0 0 40px color-mix(in srgb, var(--struct-accent) 6%, transparent);
+}
+
+.folio-spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgb(92 64 51 / 0.25);
+  pointer-events: none;
+}
+
+.folio-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 3px double var(--struct-frame-border);
+  background: var(--struct-frame-header-bg);
+  color: var(--struct-frame-header-fg);
+  cursor: grab;
+  user-select: none;
+}
+
+.folio-head__chapter {
+  display: block;
+  font-style: italic;
+  font-size: 0.72rem;
+  color: var(--struct-frame-muted);
+  margin-bottom: 2px;
+}
+
+.folio-head__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+.folio-head__sub {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.folio-head__acts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.folio-wax {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--struct-frame-fg);
+  cursor: pointer;
+  padding: 2px 0;
+  touch-action: manipulation;
+}
+
+.folio-wax:hover .sch-wax-seal:not(.is-broken) {
+  transform: rotate(-6deg) scale(1.04);
+}
+
+.folio-wax.is-on {
+  color: #8b0000;
+}
+
+.folio-wax--close {
+  justify-content: center;
+  min-width: 28px;
+  padding: 2px 4px;
+}
+
+.folio-wax--close:hover .sch-wax-seal {
+  transform: rotate(-6deg) scale(1.03);
+}
+
+.folio-wax__seal {
+  margin: 2px 0;
+}
+
+.folio-margin {
+  padding: 8px 14px;
+  border-bottom: 1px dashed color-mix(in srgb, var(--struct-frame-border) 35%, transparent);
+  background: color-mix(in srgb, var(--struct-panel-bg) 92%, transparent);
+}
+
+.folio-margin__tag {
+  font-style: italic;
+  font-size: 0.68rem;
+  color: var(--struct-frame-muted);
+}
+
+.folio-margin__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 8px;
+  font-size: 0.72rem;
+  margin-top: 4px;
+}
+
+.folio-margin__row input[type='range'] {
+  grid-column: 1 / -1;
+}
+
+.folio-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 16px;
+}
+
+.folio-foot {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px;
+  font-size: 0.65rem;
+  opacity: 0.4;
+  border-top: 1px solid rgb(92 64 51 / 0.2);
+}
+
+/* 控制中心 */
+.folio-drawer-chrome {
+  flex: 0 0 auto;
+  border-bottom: 3px double var(--struct-frame-border);
+  background: var(--struct-frame-header-bg);
+  color: var(--struct-frame-header-fg);
+  font-family: inherit;
+}
+
+.folio-drawer-chrome__bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+}
+
+.folio-drawer-chrome__ribbon {
+  width: 8px;
+  height: 28px;
+  background: linear-gradient(180deg, #8b0000, #5c4033);
+  border-radius: 0 0 2px 2px;
+}
+
+.folio-drawer-chrome__stamp {
+  display: block;
+  font-style: italic;
+  font-size: 0.65rem;
+  opacity: 0.65;
+}
+
+.folio-drawer-chrome__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.folio-drawer-chrome__back {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-style: italic;
+  font-size: 0.68rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 2px;
+}

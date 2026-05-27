@@ -1,0 +1,558 @@
+/* ═══ 九皮肤 · 字体配方（标题 / 正文 / 数据 / 等宽 / 强调 / 装饰） ═══ */
+
+html[data-ui='blueprint'],
+html[data-ui='scholar'],
+html[data-ui='terminal'],
+html[data-ui='crt'],
+html[data-ui='observatory'],
+html[data-ui='herbarium'],
+html[data-ui='ink'],
+html[data-ui='rpg'],
+html[data-ui='spacecraft'] {
+  --struct-type-h1: clamp(1.75rem, 4vw, 2.5rem);
+  --struct-type-h2: clamp(1.35rem, 3vw, 1.75rem);
+  --struct-type-h3: clamp(1.05rem, 2.2vw, 1.25rem);
+  --struct-type-body: clamp(0.875rem, 1.6vw, 1rem);
+  --struct-type-caption: clamp(0.72rem, 1.2vw, 0.8125rem);
+  --struct-type-display: clamp(2.75rem, 8vw, 4.5rem);
+  --struct-type-tag: 0.72rem;
+}
+
+/* 1 · 蓝图 */
+html[data-ui='blueprint'] {
+  --struct-font-h1: 'Architects Daughter', cursive;
+  --struct-font-h2: 'Caveat', cursive;
+  --struct-font-h3: 'Caveat', cursive;
+  --struct-font-body: 'Caveat', cursive;
+  --struct-font-data: 'Share Tech Mono', monospace;
+  --struct-font-mono: 'Share Tech Mono', monospace;
+  --struct-font-emphasis: 'Caveat', cursive;
+  --struct-font-decor: 'Permanent Marker', cursive;
+  --struct-font-display: var(--struct-font-h1);
+  --struct-font-h1-weight: 400;
+  --struct-font-h2-weight: 700;
+  --struct-font-h3-weight: 700;
+  --struct-font-tracking: 0.02em;
+  --struct-font-leading: 1.5;
+}
+
+/* 2 · 手稿 */
+html[data-ui='scholar'] {
+  --struct-font-h1: 'Cormorant Garamond', 'Noto Serif SC', serif;
+  --struct-font-h2: 'Cormorant Garamond', 'Noto Serif SC', serif;
+  --struct-font-h3: 'Cormorant Garamond', 'Noto Serif SC', serif;
+  --struct-font-body: 'EB Garamond', 'LXGW WenKai', 'Noto Serif SC', serif;
+  --struct-font-data: 'EB Garamond', 'Noto Serif SC', serif;
+  --struct-font-mono: 'Courier Prime', 'Courier New', monospace;
+  --struct-font-emphasis: 'EB Garamond', 'Noto Serif SC', serif;
+  --struct-font-decor: 'Tangerine', cursive;
+  --struct-font-display: var(--struct-font-h1);
+  --struct-font-h1-weight: 600;
+  --struct-font-h2-weight: 600;
+  --struct-font-h3-weight: 600;
+  --struct-font-tracking: 0.01em;
+  --struct-font-leading: 1.7;
+}
+
+/* 3 · 终端 */
+html[data-ui='terminal'] {
+  --struct-font-h1: 'JetBrains Mono', 'Fira Code', monospace;
+  --struct-font-h2: 'JetBrains Mono', 'Fira Code', monospace;
+  --struct-font-h3: 'JetBrains Mono', 'Fira Code', monospace;
+  --struct-font-body: 'JetBrains Mono', 'Fira Code', monospace;
+  --struct-font-data: 'JetBrains Mono', monospace;
+  --struct-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --struct-font-emphasis: 'JetBrains Mono', monospace;
+  --struct-font-decor: 'Fira Code', monospace;
+  --struct-font-display: var(--struct-font-h1);
+  --struct-font-h1-weight: 700;
+  --struct-font-h2-weight: 700;
+  --struct-font-h3-weight: 700;
+  --struct-font-tracking: 0;
+  --struct-font-leading: 1.4;
+}
+
+/* 4 · CRT */
+html[data-ui='crt'] {
+  --struct-font-h1: 'Press Start 2P', monospace;
+  --struct-font-h2: 'VT323', monospace;
+  --struct-font-h3: 'VT323', monospace;
+  --struct-font-body: 'VT323', monospace;
+  --struct-font-data: 'VT323', monospace;
+  --struct-font-mono: 'VT323', monospace;
+  --struct-font-emphasis: 'VT323', monospace;
+  --struct-font-decor: 'Silkscreen', monospace;
+  --struct-font-display: var(--struct-font-h1);
+  --struct-font-h1-weight: 400;
+  --struct-font-h2-weight: 400;
+  --struct-font-h3-weight: 400;
+  --struct-font-tracking: 0.05em;
+  --struct-font-leading: 1.3;
+}
+
+/* 5 · 天文台 */
+html[data-ui='observatory'] {
+  --struct-font-h1: 'Orbitron', sans-serif;
+  --struct-font-h2: 'Orbitron', sans-serif;
+  --struct-font-h3: 'Orbitron', sans-serif;
+  --struct-font-body: 'Inter', 'IBM Plex Sans', sans-serif;
+  --struct-font-data: 'Space Mono', monospace;
+  --struct-font-mono: 'Space Mono', monospace;
+  --struct-font-emphasis: 'Inter', sans-serif;
+  --struct-font-decor: 'Major Mono Display', monospace;
+  --struct-font-display: var(--struct-font-h1);
+  --struct-font-h1-weight: 700;
+  --struct-font-h2-weight: 400;
+  --struct-font-h3-weight: 400;
+  --struct-font-tracking: 0.15em;
+  --struct-font-leading: 1.5;
+}
+
+/* 6 · 标本 */
+html[data-ui='herbarium'] {
+  --struct-font-h1: 'Special Elite', 'Courier New', serif;
+  --struct-font-h2: 'IM Fell English', Georgia, serif;
+  --struct-font-h3: 'IM Fell English', Georgia, serif;
+  --struct-font-body: 'Crimson Text', 'LXGW WenKai', Georgia, serif;
+  --struct-font-data: 'Special Elite', monospace;
+  --struct-font-mono: 'Courier Prime', 'Courier New', monospace;
+  --struct-font-emphasis: 'Crimson Text', Georgia, serif;
+  --struct-font-decor: 'Tangerine', cursive;
+  --struct-font-display: var(--struct-font-h1);
+  --struct-font-h1-weight: 400;
+  --struct-font-h2-weight: 400;
+  --struct-font-h3-weight: 400;
+  --struct-font-tracking: 0.03em;
+  --struct-font-leading: 1.6;
+}
+
+/* 7 · 古籍 */
+html[data-ui='ink'] {
+  --struct-font-h1: 'Ma Shan Zheng', 'Noto Serif SC', serif;
+  --struct-font-h2: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+  --struct-font-h3: 'ZCOOL XiaoWei', 'Noto Serif SC', serif;
+  --struct-font-body: 'Noto Serif SC', 'LXGW WenKai', serif;
+  --struct-font-data: 'Noto Serif SC', serif;
+  --struct-font-mono: 'Noto Sans Mono', 'Courier New', monospace;
+  --struct-font-emphasis: 'Noto Serif SC', serif;
+  --struct-font-decor: 'ZCOOL KuaiLe', cursive;
+  --struct-font-display: var(--struct-font-h1);
+  --struct-font-h1-weight: 400;
+  --struct-font-h2-weight: 400;
+  --struct-font-h3-weight: 400;
+  --struct-font-tracking: 0.2em;
+  --struct-font-leading: 1.8;
+}
+
+/* 8 · RPG */
+html[data-ui='rpg'] {
+  --struct-font-h1: 'Cinzel', 'EB Garamond', serif;
+  --struct-font-h2: 'MedievalSharp', 'Cinzel', serif;
+  --struct-font-h3: 'MedievalSharp', 'Cinzel', serif;
+  --struct-font-body: 'Cormorant', 'LXGW WenKai', serif;
+  --struct-font-data: 'Cinzel', serif;
+  --struct-font-mono: 'Fira Code', monospace;
+  --struct-font-emphasis: 'Cormorant', serif;
+  --struct-font-decor: 'UnifrakturMaguntia', 'Cinzel', serif;
+  --struct-font-display: var(--struct-font-h1);
+  --struct-font-h1-weight: 700;
+  --struct-font-h2-weight: 400;
+  --struct-font-h3-weight: 400;
+  --struct-font-tracking: 0.1em;
+  --struct-font-leading: 1.5;
+}
+
+/* 9 · 太空舱 */
+html[data-ui='spacecraft'] {
+  --struct-font-h1: 'Major Mono Display', monospace;
+  --struct-font-h2: 'Orbitron', sans-serif;
+  --struct-font-h3: 'Orbitron', sans-serif;
+  --struct-font-body: 'Share Tech Mono', 'IBM Plex Mono', monospace;
+  --struct-font-data: 'Share Tech Mono', monospace;
+  --struct-font-mono: 'Share Tech Mono', monospace;
+  --struct-font-emphasis: 'Share Tech Mono', monospace;
+  --struct-font-decor: 'Audiowide', sans-serif;
+  --struct-font-display: var(--struct-font-h1);
+  --struct-font-h1-weight: 400;
+  --struct-font-h2-weight: 700;
+  --struct-font-h3-weight: 700;
+  --struct-font-tracking: 0.1em;
+  --struct-font-leading: 1.4;
+}
+
+/* —— 全局排版基线 —— */
+html[data-ui='blueprint'],
+html[data-ui='scholar'],
+html[data-ui='terminal'],
+html[data-ui='crt'],
+html[data-ui='observatory'],
+html[data-ui='herbarium'],
+html[data-ui='ink'],
+html[data-ui='rpg'],
+html[data-ui='spacecraft'] {
+  font-family: var(--struct-font-body);
+  letter-spacing: var(--struct-font-tracking);
+  line-height: var(--struct-font-leading);
+}
+
+html[data-ui='blueprint'] :is(
+    .structural-frame,
+    .skin-menu-bar,
+    .mac-settings.structural-drawer-root,
+    .skin-todo,
+    .skin-pomo,
+    .skin-music,
+    .skin-weather,
+    .skin-stats,
+    .skin-network,
+    .skin-notes
+  ),
+html[data-ui='scholar'] :is(
+    .structural-frame,
+    .skin-menu-bar,
+    .mac-settings.structural-drawer-root,
+    .skin-todo,
+    .skin-pomo,
+    .skin-music,
+    .skin-weather,
+    .skin-stats,
+    .skin-network,
+    .skin-notes
+  ),
+html[data-ui='terminal'] :is(
+    .structural-frame,
+    .skin-menu-bar,
+    .mac-settings.structural-drawer-root,
+    .skin-todo,
+    .skin-pomo,
+    .skin-music,
+    .skin-weather,
+    .skin-stats,
+    .skin-network,
+    .skin-notes
+  ),
+html[data-ui='crt'] :is(
+    .structural-frame,
+    .skin-menu-bar,
+    .mac-settings.structural-drawer-root,
+    .skin-todo,
+    .skin-pomo,
+    .skin-music,
+    .skin-weather,
+    .skin-stats,
+    .skin-network,
+    .skin-notes
+  ),
+html[data-ui='observatory'] :is(
+    .structural-frame,
+    .skin-menu-bar,
+    .mac-settings.structural-drawer-root,
+    .skin-todo,
+    .skin-pomo,
+    .skin-music,
+    .skin-weather,
+    .skin-stats,
+    .skin-network,
+    .skin-notes
+  ),
+html[data-ui='herbarium'] :is(
+    .structural-frame,
+    .skin-menu-bar,
+    .mac-settings.structural-drawer-root,
+    .skin-todo,
+    .skin-pomo,
+    .skin-music,
+    .skin-weather,
+    .skin-stats,
+    .skin-network,
+    .skin-notes
+  ),
+html[data-ui='ink'] :is(
+    .structural-frame,
+    .skin-menu-bar,
+    .mac-settings.structural-drawer-root,
+    .skin-todo,
+    .skin-pomo,
+    .skin-music,
+    .skin-weather,
+    .skin-stats,
+    .skin-network,
+    .skin-notes
+  ),
+html[data-ui='rpg'] :is(
+    .structural-frame,
+    .skin-menu-bar,
+    .mac-settings.structural-drawer-root,
+    .skin-todo,
+    .skin-pomo,
+    .skin-music,
+    .skin-weather,
+    .skin-stats,
+    .skin-network,
+    .skin-notes
+  ),
+html[data-ui='spacecraft'] :is(
+    .structural-frame,
+    .skin-menu-bar,
+    .mac-settings.structural-drawer-root,
+    .skin-todo,
+    .skin-pomo,
+    .skin-music,
+    .skin-weather,
+    .skin-stats,
+    .skin-network,
+    .skin-notes
+  ) {
+  font-family: var(--struct-font-body);
+  letter-spacing: var(--struct-font-tracking);
+  line-height: var(--struct-font-leading);
+}
+
+html[data-ui='blueprint'] :is(.structural-frame__title, .structural-drawer-chrome__title, .skin-menu-bar__brand),
+html[data-ui='scholar'] :is(.structural-frame__title, .structural-drawer-chrome__title, .skin-menu-bar__brand),
+html[data-ui='terminal'] :is(.structural-frame__title, .structural-drawer-chrome__title, .skin-menu-bar__brand),
+html[data-ui='crt'] :is(.structural-frame__title, .structural-drawer-chrome__title, .skin-menu-bar__brand),
+html[data-ui='observatory'] :is(.structural-frame__title, .structural-drawer-chrome__title, .skin-menu-bar__brand),
+html[data-ui='herbarium'] :is(.structural-frame__title, .structural-drawer-chrome__title, .skin-menu-bar__brand),
+html[data-ui='ink'] :is(.structural-frame__title, .structural-drawer-chrome__title, .skin-menu-bar__brand),
+html[data-ui='rpg'] :is(.structural-frame__title, .structural-drawer-chrome__title, .skin-menu-bar__brand),
+html[data-ui='spacecraft'] :is(.structural-frame__title, .structural-drawer-chrome__title, .skin-menu-bar__brand) {
+  font-family: var(--struct-font-h1);
+  font-weight: var(--struct-font-h1-weight);
+}
+
+html[data-ui='blueprint'] :is(.structural-frame__subtitle, .structural-drawer-section__label),
+html[data-ui='scholar'] :is(.structural-frame__subtitle, .structural-drawer-section__label),
+html[data-ui='terminal'] :is(.structural-frame__subtitle, .structural-drawer-section__label),
+html[data-ui='crt'] :is(.structural-frame__subtitle, .structural-drawer-section__label),
+html[data-ui='observatory'] :is(.structural-frame__subtitle, .structural-drawer-section__label),
+html[data-ui='herbarium'] :is(.structural-frame__subtitle, .structural-drawer-section__label),
+html[data-ui='ink'] :is(.structural-frame__subtitle, .structural-drawer-section__label),
+html[data-ui='rpg'] :is(.structural-frame__subtitle, .structural-drawer-section__label),
+html[data-ui='spacecraft'] :is(.structural-frame__subtitle, .structural-drawer-section__label) {
+  font-family: var(--struct-font-h2);
+  font-weight: var(--struct-font-h2-weight);
+}
+
+html[data-ui='blueprint'] .structural-frame__badge,
+html[data-ui='scholar'] .structural-frame__badge,
+html[data-ui='terminal'] .structural-frame__badge,
+html[data-ui='crt'] .structural-frame__badge,
+html[data-ui='observatory'] .structural-frame__badge,
+html[data-ui='herbarium'] .structural-frame__badge,
+html[data-ui='ink'] .structural-frame__badge,
+html[data-ui='rpg'] .structural-frame__badge,
+html[data-ui='spacecraft'] .structural-frame__badge {
+  font-family: var(--struct-font-decor);
+}
+
+html[data-ui='blueprint'] :is(.structural-setting-row__val, .structural-drawer-status__pct, .skin-clock__display, .skin-pomo__display),
+html[data-ui='scholar'] :is(.structural-setting-row__val, .structural-drawer-status__pct, .skin-clock__display, .skin-pomo__display),
+html[data-ui='terminal'] :is(.structural-setting-row__val, .structural-drawer-status__pct, .skin-clock__display, .skin-pomo__display),
+html[data-ui='crt'] :is(.structural-setting-row__val, .structural-drawer-status__pct, .skin-clock__display, .skin-pomo__display),
+html[data-ui='observatory'] :is(.structural-setting-row__val, .structural-drawer-status__pct, .skin-clock__display, .skin-pomo__display),
+html[data-ui='herbarium'] :is(.structural-setting-row__val, .structural-drawer-status__pct, .skin-clock__display, .skin-pomo__display),
+html[data-ui='ink'] :is(.structural-setting-row__val, .structural-drawer-status__pct, .skin-clock__display, .skin-pomo__display),
+html[data-ui='rpg'] :is(.structural-setting-row__val, .structural-drawer-status__pct, .skin-clock__display, .skin-pomo__display),
+html[data-ui='spacecraft'] :is(.structural-setting-row__val, .structural-drawer-status__pct, .skin-clock__display, .skin-pomo__display) {
+  font-family: var(--struct-font-data);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-ui='blueprint'] :is(code, pre, .structural-drawer-footnote kbd),
+html[data-ui='scholar'] :is(code, pre, .structural-drawer-footnote kbd),
+html[data-ui='terminal'] :is(code, pre, .structural-drawer-footnote kbd),
+html[data-ui='crt'] :is(code, pre, .structural-drawer-footnote kbd),
+html[data-ui='observatory'] :is(code, pre, .structural-drawer-footnote kbd),
+html[data-ui='herbarium'] :is(code, pre, .structural-drawer-footnote kbd),
+html[data-ui='ink'] :is(code, pre, .structural-drawer-footnote kbd),
+html[data-ui='rpg'] :is(code, pre, .structural-drawer-footnote kbd),
+html[data-ui='spacecraft'] :is(code, pre, .structural-drawer-footnote kbd) {
+  font-family: var(--struct-font-mono);
+}
+
+html[data-ui='blueprint'] :is(em, i, .structural-drawer-row__sub em),
+html[data-ui='scholar'] :is(em, i, .structural-drawer-row__sub em),
+html[data-ui='terminal'] :is(em, i, .structural-drawer-row__sub em),
+html[data-ui='crt'] :is(em, i, .structural-drawer-row__sub em),
+html[data-ui='observatory'] :is(em, i, .structural-drawer-row__sub em),
+html[data-ui='herbarium'] :is(em, i, .structural-drawer-row__sub em),
+html[data-ui='ink'] :is(em, i, .structural-drawer-row__sub em),
+html[data-ui='rpg'] :is(em, i, .structural-drawer-row__sub em),
+html[data-ui='spacecraft'] :is(em, i, .structural-drawer-row__sub em) {
+  font-family: var(--struct-font-emphasis);
+  font-style: italic;
+}
+
+/* 语义字号工具类 */
+.struct-type-h1 {
+  font-family: var(--struct-font-h1);
+  font-size: var(--struct-type-h1);
+  font-weight: var(--struct-font-h1-weight, 700);
+  letter-spacing: var(--struct-font-tracking);
+  line-height: var(--struct-font-leading);
+}
+
+.struct-type-h2 {
+  font-family: var(--struct-font-h2);
+  font-size: var(--struct-type-h2);
+  font-weight: var(--struct-font-h2-weight, 600);
+  letter-spacing: var(--struct-font-tracking);
+  line-height: var(--struct-font-leading);
+}
+
+.struct-type-h3 {
+  font-family: var(--struct-font-h3);
+  font-size: var(--struct-type-h3);
+  font-weight: var(--struct-font-h3-weight, 600);
+  letter-spacing: var(--struct-font-tracking);
+  line-height: var(--struct-font-leading);
+}
+
+.struct-type-body {
+  font-family: var(--struct-font-body);
+  font-size: var(--struct-type-body);
+  font-weight: 400;
+  letter-spacing: var(--struct-font-tracking);
+  line-height: var(--struct-font-leading);
+}
+
+.struct-type-caption {
+  font-family: var(--struct-font-body);
+  font-size: var(--struct-type-caption);
+  font-weight: 400;
+}
+
+.struct-type-data {
+  font-family: var(--struct-font-data);
+  font-size: var(--struct-type-display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.struct-type-tag {
+  font-family: var(--struct-font-h3);
+  font-size: var(--struct-type-tag);
+  font-weight: 500;
+  letter-spacing: calc(var(--struct-font-tracking) * 0.75);
+}
+
+.struct-font-decor {
+  font-family: var(--struct-font-decor);
+}
+
+/* —— 控制中心 · 控件字体 —— */
+html[data-ui='blueprint'] :is(.ctl-tabs--blueprint .ctl-tabs__item, .ctl-segment--blueprint .ctl-segment__item, .ctl-actions--blueprint .ctl-action, .ctl-slider--blueprint, .ctl-switch--blueprint) {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='scholar'] :is(.ctl-tabs--scholar .ctl-tabs__item, .ctl-segment--scholar .ctl-segment__item, .ctl-actions--scholar .ctl-action, .ctl-slider--scholar, .ctl-switch--scholar) {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='terminal'] :is(.ctl-tabs--terminal .ctl-tabs__item, .ctl-segment--terminal .ctl-segment__item, .ctl-actions--terminal .ctl-action, .ctl-slider--terminal, .ctl-switch--terminal, .ctl-slider--terminal .ctl-slider__bar) {
+  font-family: var(--struct-font-mono);
+}
+
+html[data-ui='crt'] :is(.ctl-tabs--crt .ctl-tabs__item, .ctl-segment--crt .ctl-segment__item, .ctl-actions--crt .ctl-action, .ctl-slider--crt, .ctl-switch--crt, .ctl-slider--crt .ctl-slider__bar) {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='observatory'] :is(.ctl-tabs--observatory .ctl-tabs__item, .ctl-segment--observatory .ctl-segment__item, .ctl-actions--observatory .ctl-action, .ctl-slider--observatory, .ctl-switch--observatory, .ctl-slider--observatory .ctl-slider__ra) {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='observatory'] :is(.ctl-tabs--observatory .ctl-tabs__item, .ctl-segment--observatory .ctl-segment__item) {
+  font-family: var(--struct-font-h2);
+}
+
+html[data-ui='herbarium'] :is(.ctl-tabs--herbarium .ctl-tabs__item, .ctl-segment--herbarium .ctl-segment__item, .ctl-actions--herbarium .ctl-action, .ctl-slider--herbarium, .ctl-switch--herbarium) {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='ink'] :is(.ctl-tabs--ink .ctl-tabs__item, .ctl-segment--ink .ctl-segment__item, .ctl-actions--ink .ctl-action, .ctl-slider--ink, .ctl-switch--ink) {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='rpg'] :is(.ctl-tabs--rpg .ctl-tabs__item, .ctl-segment--rpg .ctl-segment__item, .ctl-actions--rpg .ctl-action, .ctl-slider--rpg, .ctl-switch--rpg) {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='spacecraft'] :is(.ctl-tabs--spacecraft .ctl-tabs__item, .ctl-segment--spacecraft .ctl-segment__item, .ctl-actions--spacecraft .ctl-action, .ctl-slider--spacecraft, .ctl-switch--spacecraft) {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='blueprint'] .ctl-slider--blueprint :is(.ctl-slider__head, .ctl-slider__tick),
+html[data-ui='scholar'] .ctl-slider--scholar :is(.ctl-slider__head, .ctl-slider__tick),
+html[data-ui='herbarium'] .ctl-slider--herbarium :is(.ctl-slider__head, .ctl-slider__ruler),
+html[data-ui='observatory'] .ctl-slider--observatory .ctl-slider__ra,
+html[data-ui='rpg'] .ctl-slider--rpg .ctl-slider__head,
+html[data-ui='spacecraft'] .ctl-slider--spacecraft .ctl-slider__head {
+  font-family: var(--struct-font-data);
+}
+
+/* —— Widget viz 皮肤字体 —— */
+html[data-ui='blueprint'] .skin-weather--blueprint,
+html[data-ui='blueprint'] .skin-music--blueprint {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='scholar'] .skin-weather--scholar,
+html[data-ui='scholar'] .skin-music--scholar {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='terminal'] .skin-weather--terminal,
+html[data-ui='terminal'] .skin-music--terminal {
+  font-family: var(--struct-font-mono);
+}
+
+html[data-ui='crt'] .skin-weather--crt,
+html[data-ui='crt'] .skin-music--crt {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='observatory'] .skin-weather--observatory,
+html[data-ui='observatory'] .skin-music--observatory {
+  font-family: var(--struct-font-data);
+}
+
+html[data-ui='herbarium'] .skin-weather--herbarium,
+html[data-ui='herbarium'] .skin-music--herbarium {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='ink'] .skin-weather--ink,
+html[data-ui='ink'] .skin-music--ink {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='rpg'] .skin-weather--rpg,
+html[data-ui='rpg'] .skin-music--rpg {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='spacecraft'] .skin-weather--spacecraft,
+html[data-ui='spacecraft'] .skin-music--spacecraft {
+  font-family: var(--struct-font-mono);
+}
+
+/* —— Todo 进度 / 标签 —— */
+html[data-ui='blueprint'] .bp-dim-progress,
+html[data-ui='scholar'] .sch-page-num,
+html[data-ui='observatory'] .obs-arc-progress__ra,
+html[data-ui='herbarium'] .herb-ruler-progress,
+html[data-ui='rpg'] .rpg-exp-bar,
+html[data-ui='spacecraft'] .sc-fuel-gauge {
+  font-family: var(--struct-font-data);
+}
+
+html[data-ui='scholar'] .sch-ribbon-progress,
+html[data-ui='ink'] .ink-scroll-progress {
+  font-family: var(--struct-font-body);
+}
+
+html[data-ui='ink'] .ink-note__tag {
+  font-family: var(--struct-font-decor);
+}

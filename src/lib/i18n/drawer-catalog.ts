@@ -44,7 +44,7 @@ const zhCatalog: Catalog = {
     { id: 'calendar', name: '日历', desc: 'iCal URL 同步事件', keywords: ['日程'] },
     { id: 'pomodoro', name: '番茄钟', desc: '专注 / 小憩 / 长休', keywords: ['专注'] },
     { id: 'weather', name: '天气', desc: 'Open-Meteo · 5 天预报', keywords: ['气温'] },
-    { id: 'world', name: '世界时钟', desc: '地图切城市/天气', keywords: ['时区'] },
+    { id: 'world', name: '世界时钟', desc: '切换城市查看各地时间', keywords: ['时区'] },
     { id: 'stats', name: '学习统计', desc: '笔记 / 字数统计', keywords: ['数据'] },
     { id: 'network', name: '网络流量', desc: '会话下载 · 实时速率', keywords: ['带宽', '流量', '网络'] },
     { id: 'graph', name: '关系图谱', desc: '力导向双链网络', keywords: ['双链', '图谱'] },
@@ -54,7 +54,7 @@ const zhCatalog: Catalog = {
     { id: 'whiteboard', name: '白板', desc: 'Excalidraw 手绘', keywords: ['画板'] },
     { id: 'whitenoise', name: '白噪音', desc: '多轨混音 · 可调混响', keywords: ['雨声', '环境音'] },
   ],
-  searchHints: ['天气', '待办', '音乐', '图谱', '墙纸', 'UI', '外观', 'HUD'],
+  searchHints: ['天气', '待办', '音乐', '图谱', '墙纸', 'UI', '外观', '设置'],
 };
 
 const enCatalog: Catalog = {

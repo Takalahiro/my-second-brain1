@@ -1,0 +1,246 @@
+/* Generic 浮动壳 — 各皮肤容器装饰（规范 ① 窗口外壳） */
+
+.structural-frame {
+  position: relative;
+}
+
+/* —— 学者 · 对开本 + 书脊 —— */
+.structural-frame--scholar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(92 64 51 / 0.35) 8%,
+    rgb(92 64 51 / 0.35) 92%,
+    transparent
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.structural-frame--scholar::after {
+  content: '❦';
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.structural-frame--scholar .structural-frame__header {
+  border-bottom-style: double;
+  border-bottom-width: 3px;
+}
+
+/* —— 终端 · ASCII 框角 —— */
+.structural-frame--terminal {
+  box-shadow:
+    inset 0 0 0 1px rgb(51 255 102 / 0.25),
+    var(--struct-shadow);
+}
+
+.structural-frame--terminal .structural-frame__header::before {
+  content: '╔';
+  margin-right: 4px;
+  opacity: 0.55;
+  font-family: var(--struct-font-body);
+}
+
+.structural-frame--terminal .structural-frame__header::after {
+  content: '╗';
+  position: absolute;
+  right: 8px;
+  opacity: 0.55;
+  font-family: var(--struct-font-body);
+}
+
+.structural-frame--terminal .structural-frame__meta {
+  font-family: var(--struct-font-body);
+  font-size: 0.62rem;
+  opacity: 0.75;
+}
+
+/* —— CRT · 扫描线 + 暗角 —— */
+.structural-frame--crt {
+  box-shadow:
+    inset 0 0 40px rgb(0 0 0 / 0.45),
+    0 0 18px rgb(255 176 0 / 0.12);
+}
+
+.structural-frame--crt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgb(0 0 0 / 0.08) 0,
+    rgb(0 0 0 / 0.08) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  z-index: 2;
+}
+
+.structural-frame--crt .structural-frame__header {
+  letter-spacing: 0.08em;
+  animation: crt-marquee-idle 4s linear infinite;
+}
+
+@keyframes crt-marquee-idle {
+  0%,
+  100% {
+    text-shadow: 0 0 6px rgb(255 176 0 / 0.35);
+  }
+  50% {
+    text-shadow: 0 0 10px rgb(255 176 0 / 0.55);
+  }
+}
+
+/* —— 天文台 · 星轨虚线 —— */
+.structural-frame--observatory .structural-frame__header {
+  border-bottom: 1px dashed rgb(232 196 71 / 0.35);
+}
+
+.structural-frame--observatory::before {
+  content: '✦ · · · ✦';
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  font-size: 0.55rem;
+  color: rgb(232 196 71 / 0.45);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* —— 博物 · 台纸角贴 —— */
+.structural-frame--herbarium {
+  background-image:
+    linear-gradient(135deg, rgb(45 90 61 / 0.08) 8px, transparent 8px),
+    linear-gradient(225deg, rgb(45 90 61 / 0.08) 8px, transparent 8px),
+    linear-gradient(315deg, rgb(45 90 61 / 0.08) 8px, transparent 8px),
+    linear-gradient(45deg, rgb(45 90 61 / 0.08) 8px, transparent 8px);
+  background-size: 24px 24px;
+  background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+  background-repeat: no-repeat;
+}
+
+.structural-frame--herbarium .structural-frame__header {
+  border-bottom: 2px dashed rgb(45 90 61 / 0.35);
+}
+
+/* —— 水墨 · 卷轴轴头 —— */
+.structural-frame--ink .structural-frame__header {
+  border-bottom: 2px solid rgb(26 26 26 / 0.65);
+  writing-mode: horizontal-tb;
+}
+
+.structural-frame--ink::before,
+.structural-frame--ink::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(to right, rgb(60 40 20 / 0.35), rgb(40 30 20 / 0.15));
+  pointer-events: none;
+  z-index: 1;
+}
+
+.structural-frame--ink::before {
+  left: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+.structural-frame--ink::after {
+  right: 0;
+  border-radius: 0 3px 3px 0;
+}
+
+/* —— 太空舱 · 铆钉 + 警示条 —— */
+.structural-frame--spacecraft {
+  border-top: 3px repeating-linear-gradient(
+    90deg,
+    #ffaa00 0 8px,
+    #1a1a1a 8px 16px
+  );
+}
+
+.structural-frame--spacecraft .structural-frame__badge {
+  border-radius: 50%;
+  min-width: 22px;
+  text-align: center;
+}
+
+.structural-frame--spacecraft .structural-frame__header {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.06), transparent);
+}
+
+/* —— 共享 meta 行 —— */
+.structural-frame__meta {
+  display: block;
+  grid-column: 1 / -1;
+  font-family: var(--struct-font-body);
+  font-size: 0.62rem;
+  opacity: 0.72;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.structural-frame__header {
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+}
+
+.structural-frame__titles {
+  grid-column: 2;
+}
+
+.structural-frame__actions {
+  grid-column: 3;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.structural-frame__badge {
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+/* —— Generic 抽屉 chrome 签名栏 —— */
+.structural-drawer-chrome__stamp {
+  display: block;
+  font-family: var(--struct-font-body);
+  font-size: 0.58rem;
+  letter-spacing: 0.05em;
+  opacity: 0.72;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html[data-ui='terminal'] .structural-drawer-chrome__stamp {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+html[data-ui='crt'] .structural-drawer-chrome__stamp {
+  animation: crt-marquee-idle 3s linear infinite;
+}
+
+html[data-ui='ink'] .structural-drawer-chrome__stamp {
+  font-family: 'Noto Serif SC', serif;
+}
+
+html[data-ui='scholar'] .structural-drawer-chrome__stamp {
+  font-style: italic;
+}

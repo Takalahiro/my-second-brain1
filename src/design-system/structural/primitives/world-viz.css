@@ -1,0 +1,99 @@
+/* World clock · 9-skin */
+
+.skin-world {
+  font-size: 0.78rem;
+}
+
+.skin-world__label {
+  font-family: var(--struct-font-display);
+  font-size: 0.38rem;
+  color: var(--struct-accent);
+  margin: 0 0 8px;
+}
+
+.skin-world__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.skin-world__slot {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border: 2px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, #000);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.skin-world__slot.is-ready {
+  outline: 2px solid var(--struct-accent);
+}
+
+.skin-world__name {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.skin-world__flag {
+  font-size: 0.62rem;
+  opacity: 0.55;
+}
+
+.skin-world__time {
+  font-family: var(--struct-font-display);
+  font-size: 0.48rem;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.skin-world__state {
+  font-size: 0.62rem;
+  opacity: 0.65;
+}
+
+.skin-world__meta {
+  font-size: 0.58rem;
+  opacity: 0.55;
+}
+
+.skin-world__detail {
+  margin-top: 12px;
+  padding: 8px;
+  border: 1px solid color-mix(in srgb, var(--struct-accent) 35%, transparent);
+}
+
+.skin-world__detail-label {
+  margin: 0;
+  font-size: 0.62rem;
+  opacity: 0.65;
+}
+
+.skin-world__detail-time {
+  margin: 4px 0;
+  font-family: var(--struct-font-display);
+  font-size: 0.85rem;
+  color: var(--struct-accent);
+}
+
+.skin-world__detail-date {
+  margin: 0;
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+.skin-world--observatory .skin-world__slot {
+  border-radius: 8px;
+}
+
+.skin-world--spacecraft .skin-world__time {
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.skin-world--terminal .skin-world__detail-time {
+  text-shadow: 0 0 6px rgb(51 255 102 / 0.35);
+}

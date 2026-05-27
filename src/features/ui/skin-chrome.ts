@@ -41,6 +41,7 @@ export const SKIN_CHROME: Record<UiSkinId, SkinChromeProfile> = {
   glass: { ...DEFAULT_PROFILE },
   pixel: {
     ...IMMERSIVE_BASE,
+    canvasWallpaper: false,
     searchPrefix: '>',
     scrollTopLabel: 'LV',
     scrollBottomLabel: '0',

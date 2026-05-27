@@ -42,9 +42,9 @@ html[data-ui='blueprint'] .site-nav-link.is-active {
 html[data-ui='scholar'] .site-nav-shell,
 html[data-ui='scholar'] .glass-container,
 html[data-ui='scholar'] .pixel-card {
-  background: rgb(244 236 216 / 0.96) !important;
-  border: 1px solid rgb(139 90 43 / 0.3) !important;
-  color: rgb(60 40 20) !important;
+  background: var(--glass-bg-strong) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: var(--text-primary) !important;
   font-family: 'EB Garamond', Georgia, serif;
 }
 
@@ -87,9 +87,9 @@ html[data-ui='observatory'] .pixel-card {
 html[data-ui='herbarium'] .site-nav-shell,
 html[data-ui='herbarium'] .glass-container,
 html[data-ui='herbarium'] .pixel-card {
-  background: rgb(244 236 216 / 0.95) !important;
-  border: 1px solid rgb(45 90 61 / 0.3) !important;
-  color: rgb(45 90 61) !important;
+  background: var(--glass-bg-strong) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: var(--text-primary) !important;
   font-family: Georgia, serif;
 }
 
@@ -97,9 +97,9 @@ html[data-ui='herbarium'] .pixel-card {
 html[data-ui='ink'] .site-nav-shell,
 html[data-ui='ink'] .glass-container,
 html[data-ui='ink'] .pixel-card {
-  background: rgb(247 243 234 / 0.96) !important;
-  border: 1px solid rgb(26 26 26 / 0.12) !important;
-  color: rgb(26 26 26) !important;
+  background: var(--glass-bg-strong) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: var(--text-primary) !important;
   font-family: 'Noto Serif SC', serif;
 }
 
@@ -154,13 +154,13 @@ html[data-ui='spacecraft'] :is(.ui-card, .card) {
 }
 
 html[data-ui='scholar'] :is(.ui-card, .card) {
-  background: rgb(244 236 216 / 0.92) !important;
+  background: var(--glass-bg-strong) !important;
   box-shadow: 1px 2px 0 rgb(139 90 43 / 0.1) !important;
 }
 
 html[data-ui='ink'] :is(.ui-card, .card) {
-  background: rgb(247 243 234 / 0.94) !important;
-  border: 1px solid rgb(26 26 26 / 0.1) !important;
+  background: var(--glass-bg-strong) !important;
+  border: 1px solid var(--glass-border) !important;
 }
 
 /* 图谱页 HUD 样式扩展至各皮肤 — 见 graph-hud.css；此处补充非 hud 皮肤 */

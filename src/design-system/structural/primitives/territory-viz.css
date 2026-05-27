@@ -1,0 +1,94 @@
+/* Territory map · 9-skin */
+
+.skin-territory {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  font-size: 0.78rem;
+}
+
+.skin-territory__hint {
+  margin: 0 0 6px;
+  font-family: var(--struct-font-display);
+  font-size: 0.38rem;
+  color: var(--struct-accent);
+  opacity: 0.85;
+}
+
+.skin-territory__hud {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--struct-accent) 40%, var(--struct-frame-border));
+  background: color-mix(in srgb, var(--struct-panel-bg) 92%, #000);
+  font-family: var(--struct-font-display);
+  font-size: 0.34rem;
+  line-height: 1.45;
+  pointer-events: none;
+}
+
+.skin-territory__hud-title {
+  margin-bottom: 2px;
+  color: var(--struct-accent);
+}
+
+.skin-territory__lock {
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+.skin-territory__canvas {
+  position: relative;
+  flex: 1;
+  min-height: 280px;
+  border: 1px solid color-mix(in srgb, var(--struct-accent) 25%, var(--struct-frame-border));
+  overflow: hidden;
+}
+
+.skin-territory__empty {
+  padding: 48px 20px;
+  text-align: center;
+  opacity: 0.65;
+}
+
+.skin-territory--terminal .skin-territory__hud {
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 4px rgb(51 255 102 / 0.3);
+}
+
+.skin-territory--crt .skin-territory__hud {
+  color: #ffb000;
+  border-color: #ffb000;
+}
+
+.skin-territory--observatory .skin-territory__hud {
+  border-radius: 8px;
+}
+
+.skin-territory--ink .skin-territory__hud {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.65rem;
+  border: none;
+  border-left: 2px solid #1a1a1a;
+}
+
+.skin-territory--rpg .skin-territory__hud {
+  border-color: rgb(212 175 55 / 0.55);
+  color: #e8dcc8;
+}
+
+.skin-territory--spacecraft .skin-territory__hud {
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.06em;
+}
+
+.skin-territory--blueprint .skin-territory__canvas {
+  background:
+    linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+    color-mix(in srgb, var(--struct-panel-bg) 92%, #000);
+  background-size: 12px 12px;
+}

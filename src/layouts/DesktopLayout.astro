@@ -31,8 +31,10 @@ const {
       const theme = localStorage.getItem('theme');
       if (theme === 'light') {
         document.documentElement.classList.remove('dark');
+        document.documentElement.setAttribute('data-theme', 'light');
       } else if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
       }
       const font = localStorage.getItem('second-brain:font-family');
       if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {

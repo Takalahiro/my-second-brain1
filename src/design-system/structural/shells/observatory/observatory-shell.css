@@ -1,0 +1,184 @@
+/* 天文台 · 星图穹顶 */
+
+.obs-float-root {
+  position: fixed;
+  z-index: 90;
+  touch-action: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.obs-dome {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background:
+    radial-gradient(1px 1px at 20% 30%, rgb(255 255 255 / 0.35), transparent),
+    radial-gradient(1px 1px at 70% 60%, rgb(255 255 255 / 0.25), transparent),
+    #0a0e27;
+  color: #e8c547;
+  border: 1px solid rgb(232 196 71 / 0.35);
+  border-radius: 8px 8px 4px 4px;
+  box-shadow: inset 0 0 40px rgb(0 0 0 / 0.45), 0 0 16px rgb(232 196 71 / 0.08);
+  overflow: hidden;
+}
+
+.obs-reticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+  opacity: 0.08;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.obs-head {
+  position: relative;
+  z-index: 1;
+  padding: 8px 10px;
+  border-bottom: 1px dashed rgb(232 196 71 / 0.35);
+  cursor: grab;
+  user-select: none;
+}
+
+.obs-head__log {
+  display: block;
+  font-size: 0.58rem;
+  opacity: 0.65;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.obs-head__title {
+  margin: 0;
+  font-family: var(--struct-font-h1);
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 8px rgb(232 196 71 / 0.25);
+}
+
+.obs-head__sub {
+  margin: 2px 0 0;
+  font-size: 0.62rem;
+  opacity: 0.6;
+}
+
+.obs-head__acts {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.obs-btn {
+  border: 1px solid rgb(232 196 71 / 0.4);
+  background: rgb(232 196 71 / 0.08);
+  color: #e8c547;
+  font-family: inherit;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.obs-btn.is-active {
+  box-shadow: 0 0 8px rgb(232 196 71 / 0.35);
+}
+
+.obs-btn--abort {
+  border-color: rgb(255 80 80 / 0.45);
+  color: #ff8888;
+}
+
+.obs-panel {
+  position: relative;
+  z-index: 1;
+  padding: 8px 10px;
+  border-bottom: 1px dashed rgb(232 196 71 / 0.25);
+  font-size: 0.62rem;
+}
+
+.obs-panel__label {
+  letter-spacing: 0.1em;
+  opacity: 0.65;
+}
+
+.obs-panel__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 6px;
+  margin-top: 4px;
+  align-items: center;
+}
+
+.obs-body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 10px;
+}
+
+.obs-foot {
+  position: relative;
+  z-index: 1;
+  padding: 4px 10px;
+  font-size: 0.58rem;
+  opacity: 0.45;
+  text-align: center;
+}
+
+/* 控制中心 */
+.obs-drawer-chrome {
+  flex: 0 0 auto;
+  border-bottom: 1px dashed rgb(232 196 71 / 0.35);
+  background: #0a0e27;
+  color: #e8c547;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.obs-drawer-chrome__bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.obs-drawer-chrome__log {
+  display: block;
+  font-size: 0.58rem;
+  opacity: 0.65;
+}
+
+.obs-drawer-chrome__title {
+  margin: 2px 0 0;
+  font-family: var(--struct-font-h1);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+
+.obs-drawer-chrome__back {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.62rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 2px;
+}
+
+.obs-drawer-chrome__close {
+  border: 1px solid rgb(232 196 71 / 0.35);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.58rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  align-self: start;
+}

@@ -1,0 +1,15 @@
+/* 学者 · 羊皮纸文献（默认亮色） */
+html:not(.dark)[data-ui='scholar'] {
+  --struct-frame-bg: #f4ecd8;
+  --struct-frame-fg: #3d2b1f;
+  --struct-frame-muted: #7a5c44;
+  --struct-frame-border: #5c4033;
+  --struct-frame-header-bg: #ebe0c8;
+  --struct-frame-header-fg: #3d2b1f;
+  --struct-accent: #8b4513;
+  --struct-panel-bg: #faf6ee;
+  --struct-drawer-bg: #f0e6d0;
+  --struct-drawer-face: #e8dcc4;
+  --struct-radius: 2px;
+  --struct-shadow: 2px 3px 0 rgb(92 64 51 / 0.25);
+}

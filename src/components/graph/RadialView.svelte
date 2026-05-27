@@ -6,7 +6,6 @@
   import ZoomControls from './ZoomControls.svelte';
   import GraphHudNode from './GraphHudNode.svelte';
   import {
-    HUD_GRAPH,
     hudLinkStroke,
     hudNodeCoreColor,
     resolveGraphColor,
@@ -190,26 +189,26 @@
   <defs>
     {#if hudTheme.hud}
       <radialGradient id="rv-bg" cx="50%" cy="48%" r="58%">
-        <stop offset="0%" stop-color="#101d36" stop-opacity="0.95" />
-        <stop offset="60%" stop-color="#0b1426" stop-opacity="0.98" />
-        <stop offset="100%" stop-color="#050a14" stop-opacity="1" />
+        <stop offset="0%" stop-color="var(--graph-hud-space-inner)" stop-opacity="0.95" />
+        <stop offset="60%" stop-color="var(--graph-hud-space-mid)" stop-opacity="0.98" />
+        <stop offset="100%" stop-color="var(--graph-hud-space-deep)" stop-opacity="1" />
       </radialGradient>
       <pattern id="rv-hud-grid" width="36" height="36" patternUnits="userSpaceOnUse">
-        <path d="M 36 0 L 0 0 0 36" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5" />
+        <path d="M 36 0 L 0 0 0 36" fill="none" stroke="var(--graph-hud-grid)" stroke-width="0.5" />
       </pattern>
     {:else}
       <radialGradient id="rv-bg" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#3b234b" stop-opacity="0.9" />
-        <stop offset="60%" stop-color="#1a1024" stop-opacity="0.95" />
-        <stop offset="100%" stop-color="#0a0418" stop-opacity="1" />
+        <stop offset="0%" stop-color="var(--graph-space-inner)" stop-opacity="0.9" />
+        <stop offset="60%" stop-color="var(--graph-space-mid)" stop-opacity="0.95" />
+        <stop offset="100%" stop-color="var(--graph-space-deep)" stop-opacity="1" />
       </radialGradient>
       <radialGradient id="rv-glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="0.7" />
-        <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+        <stop offset="0%" stop-color="var(--graph-glow)" stop-opacity="0.7" />
+        <stop offset="100%" stop-color="var(--graph-glow)" stop-opacity="0" />
       </radialGradient>
       <linearGradient id="rv-link" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="rgb(255 208 230 / 0.55)" />
-        <stop offset="100%" stop-color="rgb(180 140 255 / 0.55)" />
+        <stop offset="0%" stop-color="var(--graph-link-grad-a)" />
+        <stop offset="100%" stop-color="var(--graph-link-grad-b)" />
       </linearGradient>
     {/if}
   </defs>
@@ -222,7 +221,7 @@
   <g transform={`translate(${panX} ${panY}) scale(${zoom})`}>
 
   <!-- 同心圆刻度 -->
-  <g fill="none" stroke={hudTheme.hud ? 'rgba(245,242,235,0.08)' : 'rgba(255,255,255,0.06)'}>
+  <g fill="none" stroke={hudTheme.hud ? 'var(--graph-hud-ring-stroke)' : 'var(--graph-ring-stroke)'}>
     {#each [80, 140, 220, 300, 380, 440] as r}
       <circle cx={cx} cy={cy} r={r} />
     {/each}
@@ -262,7 +261,7 @@
         {@const dim = (folderFocus && a.folder !== folderFocus && b.folder !== folderFocus) || (highlightSet && !(highlightSet.has(l.source) && highlightSet.has(l.target)))}
         {@const hi = highlightSet && highlightSet.has(l.source) && highlightSet.has(l.target)}
         <path d={edgePath(a, b)} fill="none"
-              stroke={hudTheme.hud ? hudLinkStroke(!!dim, !!hi) : (dim ? 'rgba(255,255,255,0.04)' : 'url(#rv-link)')}
+              stroke={hudTheme.hud ? hudLinkStroke(!!dim, !!hi) : (dim ? 'var(--graph-link-dim)' : 'url(#rv-link)')}
               stroke-width={(dim ? 0.4 : (hi ? 1.1 : 0.9)) * settings.edgeScale}
               stroke-linecap="round" />
       {/if}
@@ -299,7 +298,7 @@
               <circle cx={p.x} cy={p.y} r={r * 2.8} fill="url(#rv-glow)" />
             {/if}
             <circle cx={p.x} cy={p.y} r={r} fill={p.color}
-                    stroke={p.orphan ? 'rgb(255 255 255 / 0.45)' : 'none'}
+                    stroke={p.orphan ? 'var(--graph-node-orphan-stroke)' : 'none'}
                     stroke-width="0.6"
                     stroke-dasharray={p.orphan ? '1.5,1.5' : ''}>
               <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
@@ -315,10 +314,10 @@
 
   <!-- 中心 KPI -->
   <g transform={`translate(${cx} ${cy})`}>
-    <circle r="86" fill={hudTheme.hud ? 'rgb(5 10 20 / 0.72)' : 'rgb(0 0 0 / 0.55)'} stroke={hudTheme.hud ? 'rgba(245,242,235,0.18)' : 'rgba(255,255,255,0.12)'} />
-    <text y="-10" text-anchor="middle" fill={hudTheme.hud ? HUD_GRAPH.label : '#fff'} font-size="42" font-weight="800">{data.nodes.length}</text>
-    <text y="14" text-anchor="middle" fill={hudTheme.hud ? HUD_GRAPH.labelMuted : '#d0c4f0'} font-size="11" letter-spacing="2">{hudTheme.hud ? 'NODES' : '笔记节点'}</text>
-    <text y="34" text-anchor="middle" fill={hudTheme.hud ? HUD_GRAPH.telemetry : '#9d8fc0'} font-size="10">{data.links.length} {hudTheme.hud ? 'LINKS' : '条双链'}</text>
+    <circle r="86" fill={hudTheme.hud ? 'var(--graph-hud-center-fill)' : 'var(--graph-center-fill)'} stroke={hudTheme.hud ? 'var(--graph-hud-center-stroke)' : 'var(--graph-center-stroke)'} />
+    <text y="-10" text-anchor="middle" fill={hudTheme.hud ? 'var(--graph-hud-label)' : 'var(--graph-label)'} font-size="42" font-weight="800">{data.nodes.length}</text>
+    <text y="14" text-anchor="middle" fill={hudTheme.hud ? 'var(--graph-hud-label-muted)' : 'var(--graph-label-muted)'} font-size="11" letter-spacing="2">{hudTheme.hud ? 'NODES' : '笔记节点'}</text>
+    <text y="34" text-anchor="middle" fill={hudTheme.hud ? 'var(--graph-telemetry)' : 'var(--graph-label-muted)'} font-size="10">{data.links.length} {hudTheme.hud ? 'LINKS' : '条双链'}</text>
   </g>
 
   </g>
@@ -336,10 +335,8 @@
   .g-node.is-link { cursor: alias; }
   .g-node.is-dim { opacity: 0.18; }
   .g-node.is-orphan { opacity: 0.85; }
-  .g-node.is-sel circle:last-of-type { stroke: #fff; stroke-width: 1.6; }
   .g-label {
-    fill: #fff; font-size: 12px; font-weight: 600;
-    paint-order: stroke; stroke: rgb(20 12 32 / 0.85); stroke-width: 3;
+    font-size: 12px; font-weight: 600;
     pointer-events: none;
   }
 </style>

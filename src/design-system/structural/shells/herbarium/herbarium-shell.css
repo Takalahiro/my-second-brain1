@@ -1,0 +1,178 @@
+/* 博物图鉴 · 标本台纸 */
+
+.herb-float-root {
+  position: fixed;
+  z-index: 90;
+  touch-action: none;
+  box-sizing: border-box;
+  font-family: Georgia, 'Architects Daughter', serif;
+}
+
+.herb-mount {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--struct-frame-bg);
+  color: var(--struct-frame-fg);
+  border: 1px solid color-mix(in srgb, var(--struct-frame-border) 35%, transparent);
+  box-shadow: var(--struct-shadow);
+}
+
+.herb-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px dashed rgb(45 90 61 / 0.35);
+  pointer-events: none;
+}
+
+.herb-corner--tl { top: 6px; left: 6px; border-right: none; border-bottom: none; }
+.herb-corner--tr { top: 6px; right: 6px; border-left: none; border-bottom: none; }
+.herb-corner--bl { bottom: 24px; left: 6px; border-right: none; border-top: none; }
+.herb-corner--br { bottom: 24px; right: 6px; border-left: none; border-top: none; }
+
+.herb-head {
+  padding: 8px 12px;
+  border-bottom: 2px dashed rgb(45 90 61 / 0.35);
+  cursor: grab;
+  user-select: none;
+}
+
+.herb-head__cat {
+  display: block;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  opacity: 0.65;
+  margin-bottom: 2px;
+}
+
+.herb-head__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.herb-head__sub {
+  margin: 2px 0 0;
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+.herb-head__acts {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.herb-stamp {
+  position: relative;
+  flex-shrink: 0;
+  border: 2px solid rgb(106 76 147 / 0.45);
+  border-radius: 999px;
+  background: rgb(106 76 147 / 0.12);
+  color: rgb(75 54 110);
+  font-family: inherit;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  padding: 2px 10px;
+  cursor: pointer;
+}
+
+.herb-stamp.is-on {
+  background: rgb(106 76 147 / 0.28);
+}
+
+.herb-stamp--reject {
+  border-color: rgb(180 60 60 / 0.45);
+  color: rgb(140 40 40);
+}
+
+.herb-label {
+  padding: 8px 12px;
+  border-bottom: 2px dashed rgb(45 90 61 / 0.25);
+}
+
+.herb-label__tag {
+  font-size: 0.65rem;
+  font-style: italic;
+  opacity: 0.65;
+}
+
+.herb-label__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px;
+  font-size: 0.72rem;
+  margin-top: 4px;
+}
+
+.herb-label__row input[type='range'] {
+  grid-column: 1 / -1;
+}
+
+.herb-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 14px;
+}
+
+.herb-foot {
+  padding: 4px 10px;
+  font-size: 0.58rem;
+  opacity: 0.45;
+  text-align: center;
+}
+
+/* 控制中心 */
+.herb-drawer-chrome {
+  flex: 0 0 auto;
+  border-bottom: 2px dashed rgb(45 90 61 / 0.35);
+  background: #f0e6d0;
+  color: rgb(45 90 61);
+  font-family: Georgia, serif;
+}
+
+.herb-drawer-chrome__bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.herb-drawer-chrome__cat {
+  display: block;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+
+.herb-drawer-chrome__title {
+  margin: 2px 0 0;
+  font-size: 0.92rem;
+  font-weight: 400;
+}
+
+.herb-drawer-chrome__back {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 2px;
+}
+
+.herb-drawer-chrome__stamp {
+  border: 2px solid rgb(106 76 147 / 0.45);
+  border-radius: 999px;
+  background: rgb(106 76 147 / 0.15);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  cursor: pointer;
+  align-self: start;
+}

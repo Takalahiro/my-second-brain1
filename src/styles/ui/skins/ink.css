@@ -20,6 +20,7 @@ html[data-ui='ink'] {
 
   --glass-bg: rgb(247 243 234 / 0.94);
   --glass-bg-hover: rgb(252 250 246 / 0.97);
+  --glass-bg-strong: rgb(247 243 234 / 0.96);
   --glass-border: rgb(26 26 26 / 0.14);
 
   --shadow-soft: 2px 3px 12px rgb(26 26 26 / 0.06);
@@ -49,8 +50,31 @@ html.dark[data-ui='ink'] {
   --bg-secondary: #242018;
   --text-primary: #f0ebe0;
   --text-secondary: #b0a898;
-  --glass-bg: rgb(26 24 20 / 0.94);
+  --border-color: rgb(240 235 224 / 0.12);
+
+  --glass-bg: rgb(26 24 20 / 0.88);
+  --glass-bg-hover: rgb(32 28 24 / 0.92);
+  --glass-bg-strong: rgb(26 24 20 / 0.94);
+  --glass-border: rgb(240 235 224 / 0.12);
+
+  --chrome-bg-top: rgb(26 24 20 / 0.94);
+  --chrome-bg-bottom: #242018;
+  --chrome-border: rgb(240 235 224 / 0.12);
+  --chrome-hover: rgb(240 235 224 / 0.08);
+  --chrome-subtle: rgb(240 235 224 / 0.06);
+  --chrome-text: #f0ebe0;
+  --chrome-text-muted: #b0a898;
+
+  --neo-surface: rgb(36 32 28);
+  --neo-track: rgb(176 168 152 / 0.3);
+  --neo-thumb: rgb(52 46 40);
+  --neo-raised: 2px 3px 10px rgb(0 0 0 / 0.35);
+
   --widget-bg-rgb: 26 24 20;
+  --widget-fg: #f0ebe0;
+  --widget-fg-muted: #b0a898;
+  --widget-border: rgb(240 235 224 / 0.14);
+  --widget-header-bg: rgb(36 32 28 / 0.95);
 }
 
 html[data-ui='ink'] body {
@@ -71,9 +95,12 @@ html[data-ui='ink'] .floating-widget,
 html[data-ui='ink'] .site-nav-shell,
 html[data-ui='ink'] .pixel-card,
 html[data-ui='ink'] .glass-container {
-  border: 1px solid rgb(26 26 26 / 0.14);
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-normal);
-  backdrop-filter: none;
+  backdrop-filter: blur(10px) saturate(110%);
+  -webkit-backdrop-filter: blur(10px) saturate(110%);
+  color: var(--text-primary);
 }
 
 html[data-ui='ink'] h1,

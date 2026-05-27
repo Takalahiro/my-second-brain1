@@ -1,0 +1,20 @@
+/* 天文台 · 深空观测（默认暗色） */
+html.dark[data-ui='observatory'] {
+  --struct-frame-bg: #0a0e27;
+  --struct-frame-fg: #e8e0ff;
+  --struct-frame-muted: #9890c0;
+  --struct-frame-border: #4a4080;
+  --struct-frame-header-bg: #121832;
+  --struct-frame-header-fg: #e8c547;
+  --struct-accent: #e8c547;
+  --struct-panel-bg: #080c20;
+  --struct-drawer-bg: #060818;
+  --struct-drawer-face: #101428;
+  --struct-shadow: 0 0 24px rgb(232 197 71 / 0.08);
+}
+
+html.dark[data-ui='observatory'] body {
+  background-image:
+    radial-gradient(circle at 20% 30%, rgb(232 197 71 / 0.08) 1px, transparent 2px),
+    radial-gradient(circle at 80% 70%, rgb(196 160 255 / 0.12) 1px, transparent 2px);
+}

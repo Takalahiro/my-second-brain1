@@ -23,16 +23,16 @@
     z-index: 5;
     display: flex; flex-direction: column;
     gap: 4px;
-    background: rgb(12 8 22 / 0.7);
+    background: var(--graph-panel-bg);
     padding: 4px;
-    border: 1px solid rgb(255 255 255 / 0.16);
+    border: 1px solid var(--graph-canvas-border);
     border-radius: 12px;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }
   .zc-btn {
-    background: rgb(255 255 255 / 0.08);
-    border: 1px solid rgb(255 255 255 / 0.14);
+    background: var(--widget-control-bg);
+    border: 1px solid var(--widget-control-border);
     color: var(--graph-panel-text);
     width: 32px; height: 28px;
     border-radius: 8px;
@@ -42,7 +42,7 @@
     display: inline-flex; align-items: center; justify-content: center;
     transition: background 0.12s ease;
   }
-  .zc-btn:hover { background: rgb(255 255 255 / 0.16); }
+  .zc-btn:hover { background: var(--widget-control-hover); }
   .zc-zoom-val {
     font-variant-numeric: tabular-nums;
     font-size: 0.7rem;

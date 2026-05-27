@@ -1,0 +1,234 @@
+/* RPG · 勇者斗恶龙式对话框壳 */
+
+.rpg-float-root {
+  position: fixed;
+  z-index: 90;
+  touch-action: none;
+  box-sizing: border-box;
+  font-family: 'Cinzel', 'Noto Serif SC', serif;
+}
+
+.rpg-window {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color: #e8dcc8;
+  background: linear-gradient(180deg, rgb(45 27 78 / 0.98) 0%, rgb(26 15 46 / 0.99) 100%);
+  border: 3px solid #d4af37;
+  box-shadow:
+    inset 0 0 0 2px #1a0f2e,
+    inset 0 0 0 5px rgb(212 175 55 / 0.55),
+    0 8px 24px rgb(0 0 0 / 0.55);
+  border-radius: 4px;
+}
+
+.rpg-orn {
+  position: absolute;
+  font-size: 0.55rem;
+  color: #d4af37;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: 2;
+  text-shadow: 0 0 6px rgb(212 175 55 / 0.45);
+}
+
+.rpg-orn--tl { top: 4px; left: 6px; }
+.rpg-orn--tr { top: 4px; right: 6px; }
+.rpg-orn--bl { bottom: 4px; left: 6px; }
+.rpg-orn--br { bottom: 4px; right: 6px; }
+
+.rpg-window__head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 2px solid rgb(212 175 55 / 0.45);
+  background: linear-gradient(180deg, rgb(212 175 55 / 0.12) 0%, transparent 100%);
+  cursor: grab;
+  user-select: none;
+}
+
+.rpg-window__cursor {
+  color: #fff;
+  font-size: 0.85rem;
+  animation: rpg-blink 0.9s step-end infinite;
+}
+
+@keyframes rpg-blink {
+  50% { opacity: 0; }
+}
+
+.rpg-window__title {
+  margin: 0;
+  font-size: 0.82rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffd700;
+  text-shadow: 0 1px 0 #000;
+}
+
+.rpg-window__sub {
+  margin: 2px 0 0;
+  font-size: 0.68rem;
+  color: rgb(232 220 200 / 0.65);
+  font-family: 'Noto Serif SC', serif;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.rpg-window__acts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rpg-cmd {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  color: #e8dcc8;
+  font-family: inherit;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.rpg-cmd__arrow {
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.rpg-cmd:hover .rpg-cmd__arrow,
+.rpg-cmd.is-active .rpg-cmd__arrow {
+  opacity: 1;
+}
+
+.rpg-cmd--close:hover {
+  color: #ff8a94;
+}
+
+.rpg-config {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgb(212 175 55 / 0.25);
+  background: rgb(18 10 32 / 0.9);
+  font-size: 0.68rem;
+}
+
+.rpg-config__label {
+  margin: 0 0 6px;
+  text-align: center;
+  color: rgb(212 175 55 / 0.75);
+  letter-spacing: 0.2em;
+}
+
+.rpg-config__row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.rpg-xpbar {
+  grid-column: 1 / -1;
+  height: 8px;
+  border: 1px solid rgb(212 175 55 / 0.45);
+  background: rgb(0 0 0 / 0.45);
+}
+
+.rpg-xpbar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4169e1, #6495ed);
+  box-shadow: 0 0 8px rgb(100 149 237 / 0.45);
+}
+
+.rpg-window__body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 14px;
+}
+
+/* —— RPG 任务列表 —— */
+.rpg-quest-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.68rem;
+  color: rgb(212 175 55 / 0.85);
+  letter-spacing: 0.08em;
+}
+
+.rpg-quest-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rpg-quest-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 6px;
+  border-bottom: 1px solid rgb(212 175 55 / 0.15);
+  cursor: pointer;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.88rem;
+}
+
+.rpg-quest-item.is-active .rpg-quest-item__arrow {
+  opacity: 1;
+}
+
+.rpg-quest-item.is-done {
+  opacity: 0.5;
+}
+
+.rpg-quest-item.is-done .rpg-quest-item__text {
+  text-decoration: line-through;
+}
+
+.rpg-quest-item__arrow {
+  color: #fff;
+  opacity: 0;
+  font-size: 0.75rem;
+}
+
+.rpg-quest-item__text {
+  line-height: 1.35;
+}
+
+.rpg-quest-add {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.rpg-quest-add input {
+  background: rgb(0 0 0 / 0.35);
+  border: 1px solid rgb(212 175 55 / 0.35);
+  color: #e8dcc8;
+  padding: 8px 10px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.85rem;
+}
+
+.rpg-quest-add button {
+  border: 2px solid #d4af37;
+  background: linear-gradient(180deg, rgb(212 175 55 / 0.25), rgb(212 175 55 / 0.08));
+  color: #ffd700;
+  font-family: inherit;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+

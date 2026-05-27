@@ -223,23 +223,27 @@
   <defs>
     {#if hudTheme.hud}
       <radialGradient id="cv-bg" cx="50%" cy="45%" r="65%">
-        <stop offset="0%" stop-color="#101d36" />
-        <stop offset="55%" stop-color="#0b1426" />
-        <stop offset="100%" stop-color="#050a14" />
+        <stop offset="0%" stop-color="var(--graph-hud-space-inner)" />
+        <stop offset="55%" stop-color="var(--graph-hud-space-mid)" />
+        <stop offset="100%" stop-color="var(--graph-hud-space-deep)" />
       </radialGradient>
       <pattern id="cv-hud-grid" width="34" height="34" patternUnits="userSpaceOnUse">
-        <path d="M 34 0 L 0 0 0 34" fill="none" stroke="rgba(245,242,235,0.05)" stroke-width="0.5" />
+        <path d="M 34 0 L 0 0 0 34" fill="none" stroke="var(--graph-hud-grid)" stroke-width="0.5" />
       </pattern>
     {:else}
       <radialGradient id="cv-bg" cx="50%" cy="50%" r="60%">
-        <stop offset="0%" stop-color="#231434" />
-        <stop offset="60%" stop-color="#10081b" />
-        <stop offset="100%" stop-color="#04020a" />
+        <stop offset="0%" stop-color="var(--graph-space-inner)" />
+        <stop offset="60%" stop-color="var(--graph-space-mid)" />
+        <stop offset="100%" stop-color="var(--graph-space-deep)" />
       </radialGradient>
       <radialGradient id="cv-glow" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#fff" stop-opacity="0.7" />
-        <stop offset="100%" stop-color="#fff" stop-opacity="0" />
+        <stop offset="0%" stop-color="var(--graph-glow)" stop-opacity="0.7" />
+        <stop offset="100%" stop-color="var(--graph-glow)" stop-opacity="0" />
       </radialGradient>
+      <linearGradient id="cv-cross-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="var(--graph-link-grad-a)" />
+        <stop offset="100%" stop-color="var(--graph-link-grad-b)" />
+      </linearGradient>
     {/if}
   </defs>
 
@@ -273,21 +277,13 @@
           x1={a.x} y1={a.y} x2={b.x} y2={b.y}
           stroke={hudTheme.hud
             ? hudLinkStroke(!!dim, !!hi)
-            : (hi ? '#ffd0e6' : (dim ? 'rgba(255,255,255,0.03)' : (sameFolder ? a.color + '99' : 'url(#cv-cross-grad)')))}
+            : (hi ? 'var(--graph-link-hi)' : (dim ? 'var(--graph-link-dim)' : (sameFolder ? a.color + '99' : 'url(#cv-cross-grad)')))}
           stroke-width={(hi ? 1.4 : (dim ? 0.3 : (sameFolder ? 0.6 : 0.5))) * settings.edgeScale}
           stroke-linecap="round"
           stroke-dasharray={hudTheme.hud ? '' : (sameFolder ? '' : '3,3')}
         />
       {/if}
     {/each}
-    {#if !hudTheme.hud}
-    <defs>
-      <linearGradient id="cv-cross-grad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="rgb(255 208 230 / 0.6)" />
-        <stop offset="100%" stop-color="rgb(180 140 255 / 0.6)" />
-      </linearGradient>
-    </defs>
-    {/if}
   </g>
 
   <!-- 节点 -->
@@ -323,7 +319,7 @@
         {:else}
           <circle cx={p.x} cy={p.y} r={r * (p.isCenter ? 1.8 : 2.4)} fill="url(#cv-glow)" />
           <circle cx={p.x} cy={p.y} r={r} fill={p.color}
-                  stroke={p.isCenter ? '#fff' : (p.orphan ? 'rgb(255 255 255 / 0.45)' : 'none')}
+                  stroke={p.isCenter ? 'var(--graph-node-sel)' : (p.orphan ? 'var(--graph-node-orphan-stroke)' : 'none')}
                   stroke-width={p.isCenter ? 1.2 : 0.6}
                   stroke-dasharray={p.orphan && !p.isCenter ? '1.5,1.5' : ''}>
             <title>{p.node.title}（{p.folder}） · 入{p.node.inDegree}/出{p.node.outDegree}{p.orphan ? ' · 孤岛' : ''}{p.isCenter ? ' · 中心' : ''}{settings.clickToOpen ? ' · 单击跳转' : ''}</title>
@@ -348,10 +344,8 @@
   .g-node.is-link { cursor: alias; }
   .g-node.is-dim { opacity: 0.18; }
   .g-node.is-orphan { opacity: 0.78; }
-  .g-node.is-sel circle:last-of-type { stroke: #fff; stroke-width: 1.8; }
   .g-label {
-    fill: #fff; font-size: 11px; font-weight: 600;
-    paint-order: stroke; stroke: rgb(20 12 32 / 0.85); stroke-width: 2.5;
+    font-size: 11px; font-weight: 600;
     pointer-events: none;
   }
   .g-node.is-center .g-label { font-size: 14px; font-weight: 800; }

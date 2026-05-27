@@ -21,26 +21,28 @@ import { NEURAL_LAB } from '../lib/neural-lab-meta';
 
 <style>
   .digits-fallback {
-    min-height: calc(100vh - 88px);
+    min-height: calc(100dvh - var(--site-nav-offset, 88px));
     display: grid;
     place-items: center;
-    padding: 2rem;
-    color: var(--text-secondary);
+    padding: var(--space-5);
+    color: var(--text-muted, var(--text-secondary));
   }
   .digits-fallback-inner {
     text-align: center;
-    padding: 2rem 2.5rem;
-    border-radius: 16px;
-    border: 1px dashed rgb(180 140 255 / 0.25);
-    background: rgb(180 140 255 / 0.05);
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-card);
+    border: 1px dashed color-mix(in srgb, var(--accent-out, var(--ui-accent)) 25%, transparent);
+    background: color-mix(in srgb, var(--accent-out, var(--ui-accent)) 5%, transparent);
+    box-shadow: var(--shadow-sm);
   }
   .digits-fallback-title {
-    margin: 0 0 8px;
-    font-size: 1.1rem;
-    color: var(--text-primary);
+    margin: 0 0 var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    color: var(--text, var(--text-primary));
   }
   .digits-fallback-hint {
     margin: 0;
-    font-size: 0.85rem;
+    font-size: var(--text-sm);
   }
 </style>

@@ -1,0 +1,180 @@
+/* 水墨古籍 · 卷轴 */
+
+.ink-float-root {
+  position: fixed;
+  z-index: 90;
+  touch-action: none;
+  box-sizing: border-box;
+  font-family: 'Noto Serif SC', 'LXGW WenKai', serif;
+}
+
+.ink-scroll {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: var(--struct-frame-bg);
+  color: var(--struct-frame-fg);
+  border: 1px solid color-mix(in srgb, var(--struct-frame-border) 45%, transparent);
+  box-shadow: var(--struct-shadow);
+}
+
+.ink-rod {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(90deg, rgb(60 40 20 / 0.45), rgb(40 30 20 / 0.2));
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ink-rod--l { left: 0; border-radius: 4px 0 0 4px; }
+.ink-rod--r { right: 0; border-radius: 0 4px 4px 0; }
+
+.ink-head {
+  position: relative;
+  z-index: 3;
+  padding: 10px 56px 10px 20px;
+  border-bottom: 2px solid rgb(26 26 26 / 0.35);
+  cursor: grab;
+  user-select: none;
+}
+
+.ink-head__spine {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--struct-frame-muted);
+  margin-bottom: 2px;
+}
+
+.ink-head__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+}
+
+.ink-head__sub {
+  margin: 2px 0 0;
+  font-size: 0.75rem;
+  opacity: 0.65;
+}
+
+.ink-head__acts {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  display: flex;
+  gap: 6px;
+}
+
+.ink-seal {
+  width: 26px;
+  height: 26px;
+  border: 2px solid rgb(192 57 43 / 0.55);
+  border-radius: 3px;
+  background: rgb(192 57 43 / 0.08);
+  color: rgb(140 40 30);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.ink-seal.is-on {
+  background: rgb(192 57 43 / 0.22);
+  color: #c0392b;
+}
+
+.ink-seal--off {
+  opacity: 0.55;
+  border-color: color-mix(in srgb, var(--struct-frame-border) 35%, transparent);
+  color: var(--struct-frame-muted);
+  background: transparent;
+}
+
+.ink-note {
+  position: relative;
+  z-index: 3;
+  padding: 10px 22px;
+  border-bottom: 1px solid rgb(26 26 26 / 0.15);
+}
+
+.ink-note__tag {
+  font-size: 0.75rem;
+  color: #c0392b;
+}
+
+.ink-note__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px;
+  font-size: 0.72rem;
+  margin-top: 4px;
+}
+
+.ink-note__row input[type='range'] {
+  grid-column: 1 / -1;
+}
+
+.ink-body {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px 18px;
+}
+
+/* 控制中心 */
+.ink-drawer-chrome {
+  flex: 0 0 auto;
+  border-bottom: 2px solid color-mix(in srgb, var(--struct-frame-border) 35%, transparent);
+  background: var(--struct-frame-header-bg);
+  color: var(--struct-frame-header-fg);
+  font-family: 'Noto Serif SC', serif;
+}
+
+.ink-drawer-chrome__bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  padding: 8px 14px;
+}
+
+.ink-drawer-chrome__spine {
+  display: block;
+  font-size: 0.68rem;
+  opacity: 0.55;
+}
+
+.ink-drawer-chrome__title {
+  margin: 2px 0 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+}
+
+.ink-drawer-chrome__back {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 2px;
+}
+
+.ink-drawer-chrome__close {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgb(192 57 43 / 0.55);
+  border-radius: 3px;
+  background: transparent;
+  color: #c0392b;
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}

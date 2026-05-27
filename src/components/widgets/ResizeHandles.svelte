@@ -103,12 +103,14 @@
 <style>
   .rh { position: absolute; z-index: 6; touch-action: none; }
   .rh-n, .rh-s { left: 14px; right: 14px; height: 8px; cursor: ns-resize; }
-  .rh-e, .rh-w { top: 14px; bottom: 14px; width: 8px; cursor: ew-resize; }
+  /* 侧边手柄避开标题栏/设置条，仅贴壳体外缘 */
+  .rh-e, .rh-w { top: 48px; bottom: 14px; width: 8px; cursor: ew-resize; }
   .rh-n { top: -4px; } .rh-s { bottom: -4px; }
   .rh-e { right: -4px; } .rh-w { left: -4px; }
   .rh-ne, .rh-nw, .rh-se, .rh-sw { width: 16px; height: 16px; border-radius: 6px; }
-  .rh-ne { top: -4px; right: -4px; cursor: nesw-resize; }
-  .rh-nw { top: -4px; left: -4px;  cursor: nwse-resize; }
+  /* 角手柄下移，避免挡住右上角设置/关闭按钮 */
+  .rh-ne { top: 44px; right: -4px; cursor: nesw-resize; }
+  .rh-nw { top: 44px; left: -4px;  cursor: nwse-resize; }
   .rh-se { bottom: -4px; right: -4px; cursor: nwse-resize; }
   .rh-sw { bottom: -4px; left: -4px;  cursor: nesw-resize; }
   .rh:hover {

@@ -69,3 +69,12 @@ export function mulberry32(seed: number) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+/** 与顶栏 ThemeToggle / structural-theme 同步 */
+export function isWallpaperDark(): boolean {
+  if (typeof document === 'undefined') return true;
+  const theme = document.documentElement.getAttribute('data-theme');
+  if (theme === 'light') return false;
+  if (theme === 'dark') return true;
+  return document.documentElement.classList.contains('dark');
+}

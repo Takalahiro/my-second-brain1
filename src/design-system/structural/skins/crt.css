@@ -1,0 +1,18 @@
+/* CRT · 琥珀色显像管（默认暗色） */
+html.dark[data-ui='crt'] {
+  --struct-frame-bg: #1a1200;
+  --struct-frame-fg: #ffb000;
+  --struct-frame-muted: #b87800;
+  --struct-frame-border: #805800;
+  --struct-frame-header-bg: #2a1c00;
+  --struct-frame-header-fg: #ffc840;
+  --struct-accent: #ffb000;
+  --struct-panel-bg: #120c00;
+  --struct-drawer-bg: #0e0800;
+  --struct-drawer-face: #221800;
+  --struct-shadow: 0 0 18px rgb(255 176 0 / 0.2), inset 0 0 40px rgb(255 176 0 / 0.03);
+}
+
+html.dark[data-ui='crt'] .structural-frame__body {
+  text-shadow: 0 0 8px rgb(255 176 0 / 0.45);
+}

@@ -1,0 +1,818 @@
+/* 结构换皮 · 全局明暗主题（9 skin × light/dark） */
+
+html[data-ui='blueprint'],
+html[data-ui='scholar'],
+html[data-ui='terminal'],
+html[data-ui='crt'],
+html[data-ui='observatory'],
+html[data-ui='herbarium'],
+html[data-ui='ink'],
+html[data-ui='rpg'],
+html[data-ui='spacecraft'] {
+  --struct-theme-transition: background 0.28s ease, color 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+}
+
+html[data-ui='blueprint'] :is(
+    .skin-menu-bar,
+    .skin-menu-bar__dropdown,
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .skin-menubar-ctl,
+    .mac-settings.structural-drawer-root
+  ),
+html[data-ui='scholar'] :is(
+    .skin-menu-bar,
+    .skin-menu-bar__dropdown,
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .skin-menubar-ctl,
+    .mac-settings.structural-drawer-root
+  ),
+html[data-ui='terminal'] :is(
+    .skin-menu-bar,
+    .skin-menu-bar__dropdown,
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .skin-menubar-ctl,
+    .mac-settings.structural-drawer-root
+  ),
+html[data-ui='crt'] :is(
+    .skin-menu-bar,
+    .skin-menu-bar__dropdown,
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .skin-menubar-ctl,
+    .mac-settings.structural-drawer-root
+  ),
+html[data-ui='observatory'] :is(
+    .skin-menu-bar,
+    .skin-menu-bar__dropdown,
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .skin-menubar-ctl,
+    .mac-settings.structural-drawer-root
+  ),
+html[data-ui='herbarium'] :is(
+    .skin-menu-bar,
+    .skin-menu-bar__dropdown,
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .skin-menubar-ctl,
+    .mac-settings.structural-drawer-root
+  ),
+html[data-ui='ink'] :is(
+    .skin-menu-bar,
+    .skin-menu-bar__dropdown,
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .skin-menubar-ctl,
+    .mac-settings.structural-drawer-root
+  ),
+html[data-ui='rpg'] :is(
+    .skin-menu-bar,
+    .skin-menu-bar__dropdown,
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .skin-menubar-ctl,
+    .mac-settings.structural-drawer-root
+  ),
+html[data-ui='spacecraft'] :is(
+    .skin-menu-bar,
+    .skin-menu-bar__dropdown,
+    .structural-frame,
+    .bp-sheet,
+    .folio-page,
+    .term-pane,
+    .crt-screen,
+    .obs-dome,
+    .herb-mount,
+    .ink-scroll,
+    .rpg-window,
+    .sc-panel,
+    .skin-menubar-ctl,
+    .mac-settings.structural-drawer-root
+  ) {
+  transition: var(--struct-theme-transition);
+}
+
+html.dark[data-ui='blueprint'] .skin-menu-bar__backdrop,
+html.dark[data-ui='scholar'] .skin-menu-bar__backdrop,
+html.dark[data-ui='terminal'] .skin-menu-bar__backdrop,
+html.dark[data-ui='crt'] .skin-menu-bar__backdrop,
+html.dark[data-ui='observatory'] .skin-menu-bar__backdrop,
+html.dark[data-ui='herbarium'] .skin-menu-bar__backdrop,
+html.dark[data-ui='ink'] .skin-menu-bar__backdrop,
+html.dark[data-ui='rpg'] .skin-menu-bar__backdrop,
+html.dark[data-ui='spacecraft'] .skin-menu-bar__backdrop {
+  background: rgb(0 0 0 / 0.42);
+}
+
+html:not(.dark)[data-ui='blueprint'] .skin-menu-bar__backdrop,
+html:not(.dark)[data-ui='scholar'] .skin-menu-bar__backdrop,
+html:not(.dark)[data-ui='terminal'] .skin-menu-bar__backdrop,
+html:not(.dark)[data-ui='crt'] .skin-menu-bar__backdrop,
+html:not(.dark)[data-ui='observatory'] .skin-menu-bar__backdrop,
+html:not(.dark)[data-ui='herbarium'] .skin-menu-bar__backdrop,
+html:not(.dark)[data-ui='ink'] .skin-menu-bar__backdrop,
+html:not(.dark)[data-ui='rpg'] .skin-menu-bar__backdrop,
+html:not(.dark)[data-ui='spacecraft'] .skin-menu-bar__backdrop {
+  background: rgb(0 0 0 / 0.14);
+}
+
+/* —— blueprint · 亮：晒图白图纸 —— */
+html:not(.dark)[data-ui='blueprint'] {
+  --struct-frame-bg: #dbeaf5;
+  --struct-frame-fg: #0e3a5f;
+  --struct-frame-muted: #4a7a9a;
+  --struct-frame-border: #0e3a5f;
+  --struct-frame-header-bg: #c5dff0;
+  --struct-frame-header-fg: #0e3a5f;
+  --struct-accent: #e63946;
+  --struct-panel-bg: #e8f2fa;
+  --struct-drawer-bg: #d4e8f6;
+  --struct-drawer-face: #b8d4ea;
+  --struct-shadow: 0 0 0 1px rgb(14 58 95 / 0.22);
+}
+
+html:not(.dark)[data-ui='blueprint'] body {
+  background-color: #e8f2fa;
+  background-image:
+    linear-gradient(rgb(14 58 95 / 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(14 58 95 / 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+html:not(.dark)[data-ui='blueprint'] .bp-sheet {
+  background:
+    linear-gradient(rgb(14 58 95 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(14 58 95 / 0.08) 1px, transparent 1px),
+    #e8f2fa;
+  background-size: 16px 16px, 16px 16px, auto;
+  color: #0e3a5f;
+  border-color: rgb(14 58 95 / 0.55);
+  box-shadow: 0 0 0 3px rgb(14 58 95 / 0.12), inset 0 0 0 1px rgb(14 58 95 / 0.08);
+}
+
+html:not(.dark)[data-ui='blueprint'] :is(.bp-titleblock, .bp-drawer-chrome) {
+  background: rgb(197 223 240 / 0.95);
+  border-color: rgb(14 58 95 / 0.35);
+}
+
+html:not(.dark)[data-ui='blueprint'] .bp-titleblock__sheet,
+html:not(.dark)[data-ui='blueprint'] .bp-drawer-chrome__sheet {
+  color: #0e3a5f;
+  border-color: rgb(14 58 95 / 0.45);
+}
+
+html:not(.dark)[data-ui='blueprint'] .bp-reg--tl,
+html:not(.dark)[data-ui='blueprint'] .bp-reg--tr,
+html:not(.dark)[data-ui='blueprint'] .bp-reg--bl,
+html:not(.dark)[data-ui='blueprint'] .bp-reg--br {
+  border-color: #e63946;
+}
+
+html:not(.dark)[data-ui='blueprint'] .skin-menu-bar--blueprint {
+  background:
+    linear-gradient(rgb(14 58 95 / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(14 58 95 / 0.08) 1px, transparent 1px),
+    rgb(232 242 250 / 0.98);
+  background-size: 12px 12px, 12px 12px, auto;
+  color: #0e3a5f;
+  border-color: rgb(14 58 95 / 0.45);
+  box-shadow: 0 0 0 3px rgb(14 58 95 / 0.1);
+}
+
+/* —— scholar · 亮：羊皮纸（body） —— */
+html:not(.dark)[data-ui='scholar'] body {
+  background: #f4ecd8;
+}
+
+html:not(.dark)[data-ui='herbarium'] body {
+  background: #eef4ea;
+}
+
+html:not(.dark)[data-ui='ink'] body {
+  background: #faf8f2;
+}
+
+/* —— scholar · 暗：深夜书房 —— */
+html.dark[data-ui='scholar'] {
+  --struct-frame-bg: #2c1810;
+  --struct-frame-fg: #e8dcc8;
+  --struct-frame-muted: #a89078;
+  --struct-frame-border: #5c4033;
+  --struct-frame-header-bg: #3d2818;
+  --struct-frame-header-fg: #e8dcc8;
+  --struct-accent: #c9844a;
+  --struct-panel-bg: #241610;
+  --struct-drawer-bg: #1e120c;
+  --struct-drawer-face: #352418;
+  --struct-shadow: 3px 3px 0 rgb(0 0 0 / 0.45);
+}
+
+html.dark[data-ui='scholar'] body {
+  background: #1a1008;
+}
+
+html.dark[data-ui='scholar'] .folio-page {
+  background: #2c1810;
+  color: #e8dcc8;
+  border-color: #5c4033;
+  box-shadow: 3px 4px 0 rgb(0 0 0 / 0.45), inset 0 0 40px rgb(0 0 0 / 0.25);
+}
+
+html.dark[data-ui='scholar'] .folio-head {
+  background: #3d2818;
+  border-color: #5c4033;
+}
+
+html.dark[data-ui='scholar'] .folio-head__chapter {
+  color: rgb(232 220 200 / 0.55);
+}
+
+html.dark[data-ui='scholar'] .skin-menu-bar--scholar {
+  background: linear-gradient(180deg, #3d2818, #2c1810);
+  color: #e8dcc8;
+  border-color: #5c4033;
+  box-shadow: 3px 3px 0 rgb(0 0 0 / 0.45);
+}
+
+html.dark[data-ui='scholar'] .skin-menu-bar--scholar .skin-menu-bar__stamp {
+  border-color: #c9844a;
+  color: #c9844a;
+}
+
+/* —— terminal · 亮：绿条纸终端 —— */
+html:not(.dark)[data-ui='terminal'] {
+  --struct-frame-bg: #e8f5ec;
+  --struct-frame-fg: #1a5c2a;
+  --struct-frame-muted: #4a8058;
+  --struct-frame-border: #1a9940;
+  --struct-frame-header-bg: #d8eedc;
+  --struct-frame-header-fg: #1a5c2a;
+  --struct-accent: #1a9940;
+  --struct-panel-bg: #f0faf2;
+  --struct-drawer-bg: #dceee0;
+  --struct-drawer-face: #c8e0cc;
+  --struct-shadow: 0 0 0 1px rgb(26 153 64 / 0.25);
+}
+
+html:not(.dark)[data-ui='terminal'] body {
+  background: #eef8f0;
+  text-shadow: none;
+}
+
+html:not(.dark)[data-ui='terminal'] .term-pane {
+  background: #f0faf2;
+  color: #1a5c2a;
+  border-color: #1a9940;
+  box-shadow: 0 0 0 1px rgb(26 153 64 / 0.2);
+}
+
+html:not(.dark)[data-ui='terminal'] .term-head {
+  background: #d8eedc;
+  border-color: rgb(26 153 64 / 0.35);
+}
+
+html:not(.dark)[data-ui='terminal'] :is(.structural-frame__title, .structural-frame__body) {
+  text-shadow: none;
+}
+
+html:not(.dark)[data-ui='terminal'] .skin-menu-bar--terminal {
+  background: #eef8f0;
+  color: #1a5c2a;
+  border-color: #1a9940;
+  box-shadow: 0 0 0 1px rgb(26 153 64 / 0.2);
+  text-shadow: none;
+}
+
+/* —— terminal · 暗：Dracula 紫 —— */
+html.dark[data-ui='terminal'] {
+  --struct-frame-fg: #bd93f9;
+  --struct-frame-muted: rgb(189 147 249 / 0.55);
+  --struct-frame-border: #bd93f9;
+  --struct-frame-header-fg: #bd93f9;
+  --struct-accent: #ff79c6;
+}
+
+html.dark[data-ui='terminal'] .term-pane {
+  color: #bd93f9;
+  border-color: #bd93f9;
+}
+
+html.dark[data-ui='terminal'] .skin-menu-bar--terminal {
+  color: #bd93f9;
+  border-color: #bd93f9;
+  text-shadow: 0 0 4px rgb(189 147 249 / 0.35);
+}
+
+/* —— crt · 亮：日光显像 —— */
+html:not(.dark)[data-ui='crt'] {
+  --struct-frame-bg: #f5e6c8;
+  --struct-frame-fg: #805800;
+  --struct-frame-muted: #a87800;
+  --struct-frame-border: #b87800;
+  --struct-frame-header-bg: #edd8a8;
+  --struct-frame-header-fg: #805800;
+  --struct-accent: #b87800;
+  --struct-panel-bg: #faf0dc;
+  --struct-drawer-bg: #edd8a8;
+  --struct-drawer-face: #e0c890;
+  --struct-shadow: inset 0 0 20px rgb(184 120 0 / 0.08);
+}
+
+html:not(.dark)[data-ui='crt'] body {
+  background: #f8eed8;
+}
+
+html:not(.dark)[data-ui='crt'] .crt-screen {
+  background: #faf0dc;
+  color: #805800;
+  border-color: rgb(184 120 0 / 0.45);
+  box-shadow: inset 0 0 30px rgb(184 120 0 / 0.06);
+}
+
+html:not(.dark)[data-ui='crt'] .structural-frame__body {
+  text-shadow: none;
+}
+
+html:not(.dark)[data-ui='crt'] .skin-menu-bar--crt {
+  background: #f5e6c8;
+  color: #805800;
+  border-color: #b87800;
+  box-shadow: inset 0 0 20px rgb(184 120 0 / 0.06);
+}
+
+/* —— observatory · 亮：白昼观测 —— */
+html:not(.dark)[data-ui='observatory'] {
+  --struct-frame-bg: #dce4f0;
+  --struct-frame-fg: #1a2848;
+  --struct-frame-muted: #5a6888;
+  --struct-frame-border: #6888b0;
+  --struct-frame-header-bg: #c8d4e8;
+  --struct-frame-header-fg: #1a2848;
+  --struct-accent: #c89820;
+  --struct-panel-bg: #e8eef8;
+  --struct-drawer-bg: #d0dce8;
+  --struct-drawer-face: #b8c8dc;
+  --struct-shadow: 0 4px 16px rgb(26 40 72 / 0.12);
+}
+
+html:not(.dark)[data-ui='observatory'] body {
+  background: #e8eef8;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgb(200 152 32 / 0.08) 1px, transparent 2px),
+    radial-gradient(circle at 80% 70%, rgb(100 140 200 / 0.1) 1px, transparent 2px);
+}
+
+html:not(.dark)[data-ui='observatory'] .obs-dome {
+  background:
+    radial-gradient(1px 1px at 20% 30%, rgb(26 40 72 / 0.15), transparent),
+    radial-gradient(1px 1px at 70% 60%, rgb(26 40 72 / 0.1), transparent),
+    #dce4f0;
+  color: #1a2848;
+  border-color: rgb(104 136 176 / 0.45);
+  box-shadow: inset 0 0 24px rgb(255 255 255 / 0.35), 0 4px 16px rgb(26 40 72 / 0.1);
+}
+
+html:not(.dark)[data-ui='observatory'] .skin-menu-bar--observatory {
+  background: linear-gradient(180deg, rgb(220 228 240 / 0.98), rgb(200 212 232 / 0.99));
+  color: #1a2848;
+  border-color: rgb(104 136 176 / 0.45);
+  box-shadow: 0 4px 16px rgb(26 40 72 / 0.1);
+}
+
+/* —— herbarium · 暗：标本柜 —— */
+html.dark[data-ui='herbarium'] {
+  --struct-frame-bg: #1a2e1a;
+  --struct-frame-fg: #c8e0c8;
+  --struct-frame-muted: #7a9878;
+  --struct-frame-border: #4a6848;
+  --struct-frame-header-bg: #243824;
+  --struct-frame-header-fg: #c8e0c8;
+  --struct-accent: #6ec86e;
+  --struct-panel-bg: #142014;
+  --struct-drawer-bg: #101a10;
+  --struct-drawer-face: #203020;
+  --struct-shadow: 2px 3px 0 rgb(0 0 0 / 0.4);
+}
+
+html.dark[data-ui='herbarium'] body {
+  background: #0e180e;
+}
+
+html.dark[data-ui='herbarium'] .herb-mount {
+  background: #1a2e1a;
+  color: #c8e0c8;
+  border-color: rgb(74 104 72 / 0.55);
+  box-shadow: 2px 3px 0 rgb(0 0 0 / 0.35);
+}
+
+html.dark[data-ui='herbarium'] .skin-menu-bar--herbarium {
+  background: #1a2e1a;
+  color: #c8e0c8;
+  border-color: #4a6848;
+  box-shadow: 2px 4px 0 rgb(0 0 0 / 0.35);
+}
+
+/* —— ink · 暗：夜读墨卷 —— */
+html.dark[data-ui='ink'] {
+  --struct-frame-bg: #1a1a1a;
+  --struct-frame-fg: #e8e0d4;
+  --struct-frame-muted: #989088;
+  --struct-frame-border: #666;
+  --struct-frame-header-bg: #242424;
+  --struct-frame-header-fg: #e8e0d4;
+  --struct-accent: #e74c3c;
+  --struct-panel-bg: #141414;
+  --struct-drawer-bg: #101010;
+  --struct-drawer-face: #282828;
+  --struct-shadow: 3px 3px 0 rgb(0 0 0 / 0.45);
+}
+
+html.dark[data-ui='ink'] body {
+  background: #0e0e0e;
+}
+
+html.dark[data-ui='ink'] .ink-scroll {
+  background: #1a1a1a;
+  color: #e8e0d4;
+  border-color: rgb(232 224 212 / 0.25);
+  box-shadow: 2px 3px 0 rgb(0 0 0 / 0.35);
+}
+
+html.dark[data-ui='ink'] .skin-menu-bar--ink {
+  background: #1a1a1a;
+  color: #e8e0d4;
+  border-bottom-color: rgb(232 224 212 / 0.35);
+}
+
+/* —— rpg · 亮：羊皮任务卷 —— */
+html:not(.dark)[data-ui='rpg'] {
+  --struct-frame-bg: #f0e8f8;
+  --struct-frame-fg: #3d2860;
+  --struct-frame-muted: #786898;
+  --struct-frame-border: #8060b0;
+  --struct-frame-header-bg: #e0d0f0;
+  --struct-frame-header-fg: #3d2860;
+  --struct-accent: #b87800;
+  --struct-panel-bg: #f8f0ff;
+  --struct-drawer-bg: #e8dcf8;
+  --struct-drawer-face: #d8c8e8;
+  --struct-shadow: 0 0 0 2px #8060b0, 3px 3px 0 rgb(61 40 96 / 0.2);
+}
+
+html:not(.dark)[data-ui='rpg'] body {
+  background: #f4ecfc;
+}
+
+html:not(.dark)[data-ui='rpg'] .rpg-window {
+  color: #3d2860;
+  background: linear-gradient(180deg, rgb(240 232 248 / 0.98), rgb(232 220 248 / 0.99));
+  border-color: #b87800;
+  box-shadow:
+    inset 0 0 0 2px #f0e8f8,
+    inset 0 0 0 5px rgb(184 120 0 / 0.35),
+    0 6px 18px rgb(61 40 96 / 0.15);
+}
+
+html:not(.dark)[data-ui='rpg'] .rpg-orn {
+  color: #b87800;
+}
+
+html:not(.dark)[data-ui='rpg'] .structural-frame__header {
+  background: linear-gradient(180deg, #e8dcf8, #d8c8e8);
+}
+
+html:not(.dark)[data-ui='rpg'] .rpg-drawer-chrome {
+  background: linear-gradient(180deg, rgb(232 220 248 / 0.95), rgb(216 200 232 / 0.98));
+  border-color: rgb(184 120 0 / 0.45);
+}
+
+html:not(.dark)[data-ui='rpg'] .rpg-drawer-chrome__title {
+  color: #b87800;
+}
+
+html:not(.dark)[data-ui='rpg'] .skin-menu-bar--rpg {
+  background: linear-gradient(180deg, rgb(240 232 248 / 0.97), rgb(232 220 248 / 0.99));
+  color: #3d2860;
+  border-color: rgb(184 120 0 / 0.55);
+  box-shadow: 0 0 12px rgb(184 120 0 / 0.08);
+}
+
+html:not(.dark)[data-ui='rpg'] .skin-menu-bar--rpg .skin-menu-bar__app {
+  color: #b87800;
+}
+
+/* —— spacecraft · 亮：舱内日光灯 —— */
+html:not(.dark)[data-ui='spacecraft'] {
+  --struct-frame-bg: #dce8f4;
+  --struct-frame-fg: #1a3050;
+  --struct-frame-muted: #5a7898;
+  --struct-frame-border: #6888a8;
+  --struct-frame-header-bg: #c8d8e8;
+  --struct-frame-header-fg: #1a3050;
+  --struct-accent: #d88800;
+  --struct-panel-bg: #e8f0f8;
+  --struct-drawer-bg: #d0dce8;
+  --struct-drawer-face: #b8c8d8;
+  --struct-shadow: inset 0 0 0 1px rgb(104 136 168 / 0.2), 0 3px 0 rgb(26 48 80 / 0.12);
+}
+
+html:not(.dark)[data-ui='spacecraft'] body {
+  background: #e8f0f8;
+}
+
+html:not(.dark)[data-ui='spacecraft'] .sc-panel {
+  background: linear-gradient(180deg, #e8f0f8, #dce8f4);
+  color: #1a3050;
+  border-color: rgb(104 136 168 / 0.45);
+}
+
+html:not(.dark)[data-ui='spacecraft'] .skin-menu-bar--spacecraft {
+  background: linear-gradient(180deg, #e8f0f8, #dce8f4);
+  color: #1a3050;
+  border-color: rgb(104 136 168 / 0.45);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.65);
+}
+
+html:not(.dark)[data-ui='spacecraft'] .skin-menu-bar--spacecraft .skin-menu-bar__clock {
+  border-color: rgb(104 136 168 / 0.45);
+  color: #2868a8;
+}
+
+/* —— 顶栏控件 / 按钮 / 下拉 · 通用明暗 —— */
+html.dark[data-ui='blueprint'] .skin-menu-bar__gear.is-active,
+html.dark[data-ui='terminal'] .skin-menu-bar__gear.is-active,
+html.dark[data-ui='crt'] .skin-menu-bar__gear.is-active,
+html.dark[data-ui='observatory'] .skin-menu-bar__gear.is-active,
+html.dark[data-ui='rpg'] .skin-menu-bar__gear.is-active,
+html.dark[data-ui='spacecraft'] .skin-menu-bar__gear.is-active {
+  color: #fff;
+}
+
+html:not(.dark)[data-ui='scholar'] .skin-menu-bar__gear.is-active,
+html:not(.dark)[data-ui='herbarium'] .skin-menu-bar__gear.is-active,
+html:not(.dark)[data-ui='ink'] .skin-menu-bar__gear.is-active,
+html:not(.dark)[data-ui='blueprint'] .skin-menu-bar__gear.is-active,
+html:not(.dark)[data-ui='terminal'] .skin-menu-bar__gear.is-active,
+html:not(.dark)[data-ui='crt'] .skin-menu-bar__gear.is-active,
+html:not(.dark)[data-ui='observatory'] .skin-menu-bar__gear.is-active,
+html:not(.dark)[data-ui='rpg'] .skin-menu-bar__gear.is-active,
+html:not(.dark)[data-ui='spacecraft'] .skin-menu-bar__gear.is-active {
+  color: var(--struct-frame-fg);
+}
+
+html.dark[data-ui='scholar'] .skin-menu-bar__gear.is-active,
+html.dark[data-ui='herbarium'] .skin-menu-bar__gear.is-active,
+html.dark[data-ui='ink'] .skin-menu-bar__gear.is-active {
+  color: var(--struct-frame-fg);
+}
+
+/* 控制中心 drawer chrome */
+html:not(.dark)[data-ui='blueprint'] .bp-drawer-chrome {
+  background: rgb(197 223 240 / 0.95);
+  border-color: rgb(14 58 95 / 0.35);
+}
+
+html:not(.dark)[data-ui='blueprint'] .bp-drawer-chrome__title {
+  color: #0e3a5f;
+}
+
+html:not(.dark)[data-ui='blueprint'] .bp-drawer-chrome__back {
+  color: rgb(14 58 95 / 0.65);
+}
+
+html.dark[data-ui='scholar'] .structural-drawer-chrome,
+html.dark[data-ui='herbarium'] .structural-drawer-chrome,
+html.dark[data-ui='ink'] .structural-drawer-chrome {
+  background: var(--struct-drawer-face);
+  border-color: var(--struct-frame-border);
+  color: var(--struct-frame-fg);
+}
+
+html:not(.dark)[data-ui='terminal'] .structural-chrome-btn.is-active,
+html:not(.dark)[data-ui='spacecraft'] .structural-chrome-btn.is-active {
+  color: #fff;
+}
+
+html.dark[data-ui='spacecraft'] .structural-chrome-btn.is-active {
+  color: #000;
+}
+
+/* —— 浮动壳标题栏 · 明暗 —— */
+html:not(.dark)[data-ui='terminal'] .term-head {
+  color: inherit;
+}
+
+html.dark[data-ui='crt'] .crt-head {
+  border-color: rgb(255 176 0 / 0.35);
+}
+
+html:not(.dark)[data-ui='crt'] .crt-head {
+  border-color: rgb(184 120 0 / 0.35);
+}
+
+html.dark[data-ui='observatory'] .obs-head {
+  border-color: rgb(232 196 71 / 0.25);
+}
+
+html:not(.dark)[data-ui='observatory'] .obs-head {
+  border-color: rgb(104 136 176 / 0.35);
+  color: #1a2848;
+}
+
+html.dark[data-ui='herbarium'] .herb-head {
+  background: rgb(36 56 36 / 0.85);
+  border-color: rgb(74 104 72 / 0.45);
+}
+
+html:not(.dark)[data-ui='herbarium'] .herb-head {
+  background: rgb(220 232 216 / 0.85);
+}
+
+html.dark[data-ui='ink'] .ink-head {
+  border-color: rgb(232 224 212 / 0.25);
+  background: rgb(36 36 36 / 0.6);
+}
+
+html:not(.dark)[data-ui='ink'] .ink-head {
+  background: rgb(245 235 220 / 0.6);
+}
+
+html:not(.dark)[data-ui='rpg'] .rpg-window__head {
+  background: linear-gradient(180deg, rgb(232 220 248 / 0.95), rgb(216 200 232 / 0.9));
+  color: #3d2860;
+}
+
+html.dark[data-ui='rpg'] .rpg-window__head {
+  color: #e8dcc8;
+}
+
+html:not(.dark)[data-ui='spacecraft'] .sc-head {
+  background: rgb(200 216 232 / 0.85);
+  border-color: rgb(104 136 168 / 0.35);
+  color: #1a3050;
+}
+
+html.dark[data-ui='spacecraft'] .sc-head {
+  border-color: rgb(74 144 217 / 0.35);
+}
+
+html:not(.dark)[data-ui='spacecraft'] .sc-drawer-chrome {
+  background: #dce8f4;
+  color: #1a3050;
+  border-color: rgb(104 136 168 / 0.35);
+}
+
+html:not(.dark)[data-ui='spacecraft'] .sc-drawer-chrome__id {
+  color: #d88800;
+}
+
+html.dark[data-ui='rpg'] .rpg-drawer-chrome {
+  background: linear-gradient(180deg, rgb(45 27 78 / 0.95), rgb(26 15 46 / 0.98));
+}
+
+html.dark[data-ui='blueprint'] .bp-drawer-chrome {
+  background: rgb(8 40 64 / 0.95);
+  border-color: rgb(255 255 255 / 0.45);
+}
+
+html.dark[data-ui='blueprint'] .bp-drawer-chrome__title {
+  color: #f0f6ff;
+}
+
+/* 顶栏图标按钮跟随 token */
+html[data-ui='blueprint'] :is(.skin-menu-bar__brand-btn, .skin-menu-bar__icon),
+html[data-ui='scholar'] :is(.skin-menu-bar__brand-btn, .skin-menu-bar__icon),
+html[data-ui='terminal'] :is(.skin-menu-bar__brand-btn, .skin-menu-bar__icon),
+html[data-ui='crt'] :is(.skin-menu-bar__brand-btn, .skin-menu-bar__icon),
+html[data-ui='observatory'] :is(.skin-menu-bar__brand-btn, .skin-menu-bar__icon),
+html[data-ui='herbarium'] :is(.skin-menu-bar__brand-btn, .skin-menu-bar__icon),
+html[data-ui='ink'] :is(.skin-menu-bar__brand-btn, .skin-menu-bar__icon),
+html[data-ui='rpg'] :is(.skin-menu-bar__brand-btn, .skin-menu-bar__icon),
+html[data-ui='spacecraft'] :is(.skin-menu-bar__brand-btn, .skin-menu-bar__icon) {
+  border-color: var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, var(--struct-frame-bg));
+  color: var(--struct-frame-fg);
+  transition: var(--struct-theme-transition, background 0.28s ease, color 0.28s ease, border-color 0.28s ease);
+}
+
+html[data-ui='blueprint'] .skin-menu-bar__clock,
+html[data-ui='scholar'] .skin-menu-bar__clock,
+html[data-ui='terminal'] .skin-menu-bar__clock,
+html[data-ui='crt'] .skin-menu-bar__clock,
+html[data-ui='observatory'] .skin-menu-bar__clock,
+html[data-ui='herbarium'] .skin-menu-bar__clock,
+html[data-ui='ink'] .skin-menu-bar__clock,
+html[data-ui='rpg'] .skin-menu-bar__clock,
+html[data-ui='spacecraft'] .skin-menu-bar__clock {
+  color: var(--struct-frame-fg);
+  border-color: color-mix(in srgb, var(--struct-accent) 40%, var(--struct-frame-border));
+  background: color-mix(in srgb, var(--struct-panel-bg) 90%, var(--struct-frame-bg));
+}
+
+html[data-ui='blueprint'] .skin-menu-bar__stamp,
+html[data-ui='scholar'] .skin-menu-bar__stamp,
+html[data-ui='terminal'] .skin-menu-bar__stamp,
+html[data-ui='crt'] .skin-menu-bar__stamp,
+html[data-ui='observatory'] .skin-menu-bar__stamp,
+html[data-ui='herbarium'] .skin-menu-bar__stamp,
+html[data-ui='ink'] .skin-menu-bar__stamp,
+html[data-ui='rpg'] .skin-menu-bar__stamp,
+html[data-ui='spacecraft'] .skin-menu-bar__stamp {
+  border-color: color-mix(in srgb, var(--struct-accent) 55%, var(--struct-frame-border));
+  color: var(--struct-accent);
+}
+
+html[data-ui='blueprint'] .skin-menu-bar__nav-link,
+html[data-ui='scholar'] .skin-menu-bar__nav-link,
+html[data-ui='terminal'] .skin-menu-bar__nav-link,
+html[data-ui='crt'] .skin-menu-bar__nav-link,
+html[data-ui='observatory'] .skin-menu-bar__nav-link,
+html[data-ui='herbarium'] .skin-menu-bar__nav-link,
+html[data-ui='ink'] .skin-menu-bar__nav-link,
+html[data-ui='rpg'] .skin-menu-bar__nav-link,
+html[data-ui='spacecraft'] .skin-menu-bar__nav-link {
+  color: var(--struct-frame-fg);
+}
+
+html[data-ui='blueprint'] .skin-menu-bar__app,
+html[data-ui='scholar'] .skin-menu-bar__app,
+html[data-ui='terminal'] .skin-menu-bar__app,
+html[data-ui='crt'] .skin-menu-bar__app,
+html[data-ui='observatory'] .skin-menu-bar__app,
+html[data-ui='herbarium'] .skin-menu-bar__app,
+html[data-ui='ink'] .skin-menu-bar__app,
+html[data-ui='rpg'] .skin-menu-bar__app,
+html[data-ui='spacecraft'] .skin-menu-bar__app {
+  color: var(--struct-frame-fg);
+}
+
+html[data-ui='rpg'] .skin-menu-bar__app {
+  color: var(--struct-accent);
+}

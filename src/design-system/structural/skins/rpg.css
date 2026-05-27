@@ -1,0 +1,18 @@
+/* RPG · 地下城任务栏（默认暗色） */
+html.dark[data-ui='rpg'] {
+  --struct-frame-bg: #1a0f2e;
+  --struct-frame-fg: #f0e8ff;
+  --struct-frame-muted: #a890c8;
+  --struct-frame-border: #8060b0;
+  --struct-frame-header-bg: #2d1b4e;
+  --struct-frame-header-fg: #ffd700;
+  --struct-accent: #ffd700;
+  --struct-panel-bg: #140a24;
+  --struct-drawer-bg: #100820;
+  --struct-drawer-face: #241840;
+  --struct-shadow: 0 0 0 2px #8060b0, 4px 4px 0 rgb(0 0 0 / 0.5);
+}
+
+html.dark[data-ui='rpg'] .structural-frame__header {
+  background: linear-gradient(180deg, #3d2860 0%, #2d1b4e 100%);
+}

@@ -148,7 +148,7 @@
       type="text"
       placeholder={m.notes.searchPlaceholder}
       bind:value={searchQuery}
-      class="notes-search"
+      class="notes-search ui-input"
     />
     <div class="notes-layout-switch">
       <button
@@ -210,12 +210,12 @@
 <style>
   .notes-toolbar {
     border-width: var(--border-thin);
-    padding: 0.9rem 1rem;
-    margin-bottom: 1.5rem;
+    padding: var(--space-4);
+    margin-bottom: var(--space-5);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.8rem;
+    gap: var(--space-3);
     flex-wrap: wrap;
   }
   .notes-toolbar-title {
@@ -241,14 +241,17 @@
     justify-content: center;
     width: 34px;
     height: 34px;
-    border-radius: 9px;
-    background: rgb(180 140 255 / 0.12);
-    color: rgb(140 100 220);
+    border-radius: var(--radius-button);
+    background: color-mix(in srgb, var(--accent-out, var(--ui-accent)) 12%, transparent);
+    color: var(--accent-out, var(--ui-accent));
   }
   .notes-toolbar-text {
     margin: 0;
-    font-size: 1.7rem;
-    line-height: 1;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-tight);
+    line-height: var(--leading-tight);
   }
   .notes-toolbar-actions {
     display: inline-flex;
@@ -258,18 +261,13 @@
   }
   .notes-search {
     min-width: 210px;
-    padding: 0.55rem 0.8rem;
-    border: var(--border-thick) solid var(--border-color);
-    border-radius: var(--radius-button);
-    background: var(--glass-bg);
-    color: var(--text-primary);
-    outline: none;
-    transition: border-color var(--motion-fast) var(--motion-ease),
-      box-shadow var(--motion-fast) var(--motion-ease);
+    width: auto;
   }
   .notes-search:focus {
-    border-color: var(--accent-pink);
-    box-shadow: var(--shadow-pixel);
+    border-color: color-mix(in srgb, var(--accent, var(--ui-accent)) 55%, var(--border, var(--border-color)));
+    box-shadow:
+      var(--neo-inset),
+      0 0 0 3px color-mix(in srgb, var(--accent, var(--ui-accent)) 18%, transparent);
   }
   .notes-layout-switch {
     display: inline-flex;

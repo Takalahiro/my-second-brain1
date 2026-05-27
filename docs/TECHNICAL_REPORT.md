@@ -2,8 +2,8 @@
 
 > **文档类型：** 架构与设计技术报告  
 > **适用范围：** my-second-brain 全站（SSG 知识库 + 桌面 OS 壳 + 13 套 UI 皮肤 + 3DGS / HUD 壁纸 + 浏览器内计算工具）  
-> **当前版本：** 1.4.0  
-> **最后更新：** 2026-05-20  
+> **当前版本：** 1.5.0  
+> **最后更新：** 2026-05-26  
 > **用户文档：** [README.md](../README.md) · [README.en.md](../README.en.md)
 
 ---
@@ -18,16 +18,17 @@
 6. [内容管道（Obsidian → Web）](#6-内容管道obsidian--web)
 7. [桌面 OS 壳层](#7-桌面-os-壳层)
 8. [UI 皮肤与 Skin Chrome](#8-ui-皮肤与-skin-chrome)
-9. [壁纸子系统](#9-壁纸子系统)
-10. [3DGS 环境壁纸](#10-3dgs-环境壁纸)
-11. [HUD Canvas 壁纸](#11-hud-canvas-壁纸)
-12. [笔记页工具层](#12-笔记页工具层)
-13. [浏览器内计算栈](#13-浏览器内计算栈)
-14. [国际化（i18n）](#14-国际化i18n)
-15. [Vite 分包策略](#15-vite-分包策略)
-16. [源码索引](#16-源码索引)
-17. [测试与验证](#17-测试与验证)
-18. [已知限制与后续方向](#18-已知限制与后续方向)
+9. [设计系统与主题 Token](#9-设计系统与主题-token)
+10. [壁纸子系统](#10-壁纸子系统)
+11. [3DGS 环境壁纸](#11-3dgs-环境壁纸)
+12. [HUD Canvas 壁纸](#12-hud-canvas-壁纸)
+13. [笔记页工具层](#13-笔记页工具层)
+14. [浏览器内计算栈](#14-浏览器内计算栈)
+15. [国际化（i18n）](#15-国际化i18n)
+16. [Vite 分包策略](#16-vite-分包策略)
+17. [源码索引](#17-源码索引)
+18. [测试与验证](#18-测试与验证)
+19. [已知限制与后续方向](#19-已知限制与后续方向)
 
 ---
 
@@ -50,6 +51,7 @@
 
 | 版本 | 日期 | 摘要 |
 |------|------|------|
+| **1.5.0** | 2026-05-26 | **设计系统统一**：`theme-tokens.css` 语义变量、`design-system.css` 子页 spacing/阴影/组件类、`ThemeBoot.astro` 全站预水合；笔记/工具/图谱/MATLAB/Python/神经网络/白板子页对齐 mac 皮肤；图谱画布与 GraphWidget 主题化；`design-system/` structural widget 双轨；文档 [subpage-design-sync.md](./subpage-design-sync.md) · [theme-color-audit.md](./theme-color-audit.md) |
 | **1.4.0** | 2026-05-20 | **13 套 UI 皮肤**与 **Skin Chrome** 体系统一（状态条、CLI 搜索、滚动高度计）；控制中心右侧固定锚点；沉浸式皮肤恢复视频/海报壁纸；重写 README 与中英文文档 |
 | **1.3.0** | 2026-05-20 | NASA-punk **HUD 皮肤**（Canvas 壁纸、任务状态条、日全食 intro）；**NotesToolHost**（笔记页 Python / MATLAB / 白板）；修复笔记工具开关双触发 |
 | 1.2.0 | 2026-05-15 | 3DGS 环境壁纸、媒体 manifest、vault 同步与 git mtime |
@@ -382,9 +384,67 @@ DOM：`html[data-ui='{id}']`，沉浸式额外 `html[data-ui-immersive]`
 
 ---
 
-## 9. 壁纸子系统
+## 9. 设计系统与主题 Token
 
-### 9.1 三模互斥
+### 9.1 分层
+
+```
+src/styles/theme-tokens.css     ← 单一事实来源：--bg / --surface / --text / --accent-* / 图谱 / widget 壳层
+src/styles/design-system.css    ← 子页：--space-* / --shadow-* / .ui-* / .subpage-* / .tool-shell
+src/styles/graph-canvas.css     ← 图谱画布圆角、渐隐遮罩
+src/lib/theme/css-vars.ts       ← readCssVar() — Canvas / JS 读 CSS 变量
+src/components/ThemeBoot.astro  ← <html> 预水合：theme / font / data-ui
+src/components/ui/              ← UiButton / UiCard / UiTag / UiInput
+```
+
+### 9.2 布局壳
+
+| 布局 | 用途 | 要点 |
+|------|------|------|
+| `DesktopLayout` | 首页 `/` | WidgetHost + MacMenuBar |
+| `BaseLayout` | 笔记、标签、文件夹、图谱 | `subpage-shell`；可选 `wide` |
+| `ToolLayout` | Python / MATLAB / digits / teaching / whiteboard | `tool-shell` / `tool-shell--flush` |
+
+子页导航：`SiteNavBar.svelte`（`variant="site" | "tool"`），顶栏使用 `--glass-bg-strong` 等语义变量，沉浸式皮肤（scholar / herbarium / ink）深色 token 与页面背景一致。
+
+### 9.3 主题切换
+
+```
+localStorage['theme'] → ThemeBoot（首屏前）
+  → html.dark / html[data-theme='dark']
+  → theme-tokens.css 暗色块覆盖
+  → 组件仅引用 var(--*)，禁止硬编码 # / rgb()
+```
+
+Cursor 规则：`.cursor/rules/theme-colors.mdc`
+
+### 9.4 子页同步范围
+
+| 页面 | 主要改动 |
+|------|----------|
+| `/notes` | NotesExplorer、NoteSearch → `.ui-input` |
+| `/folder/*` `/tags/*` | `.ui-list-card`、`.ui-tag` |
+| `/python` `/matlab` | 工具面板 token 化、主按钮渐变 |
+| `/digits` | NeuralLab Tab / Tag |
+| `/whiteboard` | Excalidraw 顶栏与 iframe 背景 |
+| `/graph` | GraphExplorer + graph-canvas 主题 |
+
+验收清单：[subpage-design-sync.md](./subpage-design-sync.md)
+
+### 9.5 Widget 双轨（design-system/）
+
+`src/design-system/` 将桌面小组件分为：
+
+- **pixel/** — Game Boy 像素皮肤专用实现
+- **structural/** — 11 套沉浸式皮肤的结构壳 + 各 widget body
+
+`WidgetHost.svelte` 按 `data-ui` 解析 loader，structural 路径共享 `structural-tokens-base.css` 与各 skin CSS。
+
+---
+
+## 10. 壁纸子系统
+
+### 10.1 三模互斥
 
 `src/features/wallpaper/state/mode.ts` / `src/lib/wallpaper-mode.ts`：
 
@@ -396,7 +456,7 @@ DOM：`html[data-ui='{id}']`，沉浸式额外 `html[data-ui-immersive]`
 
 切换经 `patchFromMode()` 写回 `second-brain:widgets` 中的 `bg` 状态。
 
-### 9.2 BackgroundLayer
+### 10.2 BackgroundLayer
 
 **入口：** `src/components/widgets/BackgroundLayer.svelte`
 
@@ -408,7 +468,7 @@ DOM：`html[data-ui='{id}']`，沉浸式额外 `html[data-ui-immersive]`
 | 移动降级 | UA 检测 → poster |
 | 点云 body 类 | `ply-wallpaper-active` → 全站毛玻璃 |
 
-### 9.3 媒体清单
+### 10.3 媒体清单
 
 `scripts/build-media-manifest.mjs` 扫描：
 
@@ -422,9 +482,9 @@ DOM：`html[data-ui='{id}']`，沉浸式额外 `html[data-ui-immersive]`
 
 ---
 
-## 10. 3DGS 环境壁纸
+## 11. 3DGS 环境壁纸
 
-### 10.1 设计目标
+### 11.1 设计目标
 
 参考 Apple Vision Pro 环境壁纸：**沉浸、柔和、不抢戏**。
 
@@ -437,7 +497,7 @@ DOM：`html[data-ui='{id}']`，沉浸式额外 `html[data-ui-immersive]`
 | 电影感 | CSS 径向羽化、柔焦、缓入 |
 | UI 统一 | `body.ply-wallpaper-active` 提升 glass 参数 |
 
-### 10.2 渲染器
+### 11.2 渲染器
 
 **主路径：** `@mkkellogg/gaussian-splats-3d`（`src/features/wallpaper/render/gs3/gs3-wallpaper.ts`）
 
@@ -452,7 +512,7 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
 
 **备用探索：** `legacy/am15/`（antimatter15/splat 风格，保留参考）
 
-### 10.3 资产策略
+### 11.3 资产策略
 
 | 文件 | 大小 | Git | 部署 |
 |------|------|-----|------|
@@ -461,7 +521,7 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
 
 离线转换：`scripts/convert-ply-to-sog.mjs`
 
-### 10.4 相机与视差
+### 11.4 相机与视差
 
 `spatial-camera.ts`：
 
@@ -470,7 +530,7 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
 | DeviceOrientationEvent | 陀螺仪视差（iOS 需用户授权） |
 | pointermove | 极弱鼠标视差 |
 
-### 10.5 生命周期
+### 11.5 生命周期
 
 `BackgroundPlyLayer.svelte`：
 
@@ -480,7 +540,7 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
 
 ---
 
-## 11. HUD Canvas 壁纸
+## 12. HUD Canvas 壁纸
 
 **仅 `data-ui='hud'` 启用。**
 
@@ -506,7 +566,7 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
 
 ---
 
-## 12. 笔记页工具层
+## 13. 笔记页工具层
 
 **入口：** `src/components/widgets/NotesToolHost.svelte`  
 **挂载：** `BaseLayout` 在笔记相关路由
@@ -523,9 +583,9 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
 
 ---
 
-## 13. 浏览器内计算栈
+## 14. 浏览器内计算栈
 
-### 13.1 模块矩阵
+### 14.1 模块矩阵
 
 | 模块 | 路径 | 技术 | GPU |
 |------|------|------|-----|
@@ -536,7 +596,7 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
 | 3DGS | 壁纸 ply 模式 | gaussian-splats-3d | WebGL2 |
 | MATLAB | `/matlab` | mathjs + 自研引擎 | Canvas 2D |
 
-### 13.2 资源仲裁
+### 14.2 资源仲裁
 
 | 策略 | 位置 |
 |------|------|
@@ -548,7 +608,7 @@ ML_SHARP_ROTATION: X 轴 π  // MLSharp 导出朝向修正
 
 AIM：避免移动端 Safari OOM 与 WebGL context 争用。
 
-### 13.3 Python IDE 流程
+### 14.3 Python IDE 流程
 
 ```
 用户代码
@@ -558,7 +618,7 @@ AIM：避免移动端 Safari OOM 与 WebGL context 争用。
   → JSON steps → PythonStepPanel
 ```
 
-### 13.4 公式 OCR 流程
+### 14.4 公式 OCR 流程
 
 ```
 384×384 画板
@@ -572,7 +632,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 
 ---
 
-## 14. 国际化（i18n）
+## 15. 国际化（i18n）
 
 **模块：** `src/lib/i18n/`
 
@@ -587,7 +647,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 
 ---
 
-## 15. Vite 分包策略
+## 16. Vite 分包策略
 
 `astro.config.mjs` → `manualChunks`：
 
@@ -609,9 +669,9 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 
 ---
 
-## 16. 源码索引
+## 17. 源码索引
 
-### 16.1 页面与布局
+### 17.1 页面与布局
 
 | 路径 | 说明 |
 |------|------|
@@ -621,7 +681,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 | `src/layouts/BaseLayout.astro` | 基础布局 + NotesToolHost |
 | `src/layouts/DesktopLayout.astro` | 桌面模式布局 |
 
-### 16.2 桌面与壁纸
+### 17.2 桌面与壁纸
 
 | 路径 | 说明 |
 |------|------|
@@ -633,7 +693,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 | `src/features/wallpaper/render/gs3/` | GS3 渲染封装 |
 | `src/styles/gs-wallpaper.css` | 壁纸 CSS 后期 |
 
-### 16.3 UI 皮肤
+### 17.3 UI 皮肤
 
 | 路径 | 说明 |
 |------|------|
@@ -643,7 +703,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 | `src/styles/ui/skin-chrome-mission.css` | 任务 chrome 样式 |
 | `src/styles/ui/skins/*.css` | 各皮肤 CSS |
 
-### 16.4 内容与 Markdown
+### 17.4 内容与 Markdown
 
 | 路径 | 说明 |
 |------|------|
@@ -653,7 +713,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 | `src/lib/remark-mermaid.mjs` | Mermaid |
 | `scripts/build-wikilinks.mjs` | 双链图构建 |
 
-### 16.5 工具与实验室
+### 17.5 工具与实验室
 
 | 路径 | 说明 |
 |------|------|
@@ -664,7 +724,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 | `src/lib/components/DigitRecognizer/` | MNIST |
 | `src/components/python/` | Python IDE UI |
 
-### 16.6 构建脚本
+### 17.6 构建脚本
 
 | 路径 | 说明 |
 |------|------|
@@ -676,7 +736,7 @@ FormulaNet **运行时**从 Hugging Face 下载（~77 MiB，不载入 git）。
 
 ---
 
-## 17. 测试与验证
+## 18. 测试与验证
 
 | 脚本 | 用途 |
 |------|------|
@@ -697,7 +757,7 @@ pnpm check:self http://localhost:4321
 
 ---
 
-## 18. 已知限制与后续方向
+## 19. 已知限制与后续方向
 
 | 限制 | 说明 |
 |------|------|

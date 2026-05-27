@@ -1,0 +1,72 @@
+/* Pomodoro · 9-skin */
+
+.skin-pomo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+}
+
+.skin-pomo__display {
+  font-family: var(--struct-font-display);
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--struct-accent);
+  padding: 8px 16px;
+  border: 2px solid color-mix(in srgb, var(--struct-accent) 45%, var(--struct-frame-border));
+  min-width: 6rem;
+  text-align: center;
+}
+
+.skin-pomo__ring {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 120px;
+}
+
+.skin-pomo__ring span {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-panel-bg) 88%, #000);
+}
+
+.skin-pomo__ring span.lit {
+  background: var(--struct-accent);
+}
+
+.skin-pomo__start {
+  border: 2px solid var(--struct-frame-border);
+  background: color-mix(in srgb, var(--struct-accent) 30%, transparent);
+  color: inherit;
+  font-family: var(--struct-font-display);
+  font-size: 0.42rem;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.skin-pomo--terminal .skin-pomo__display {
+  font-family: 'JetBrains Mono', monospace;
+  text-shadow: 0 0 8px rgb(51 255 102 / 0.4);
+}
+
+.skin-pomo--crt .skin-pomo__display {
+  font-family: 'VT323', monospace;
+  font-size: 2rem;
+  color: #ffb000;
+}
+
+.skin-pomo--ink .skin-pomo__display {
+  font-family: 'Noto Serif SC', serif;
+  border: none;
+  border-bottom: 2px solid #1a1a1a;
+}
+
+.skin-pomo--rpg .skin-pomo__display {
+  font-family: Cinzel, serif;
+  color: #ffd700;
+}

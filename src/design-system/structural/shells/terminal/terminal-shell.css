@@ -1,0 +1,162 @@
+/* 终端 · tmux ASCII 框 */
+
+.term-float-root {
+  position: fixed;
+  z-index: 90;
+  touch-action: none;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.term-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #000a05;
+  color: #33ff66;
+  border: 1px solid #33ff66;
+  box-shadow: 0 0 14px rgb(51 255 102 / 0.12);
+}
+
+.term-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 6px;
+  align-items: start;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgb(51 255 102 / 0.35);
+  background: #000f06;
+  cursor: grab;
+  user-select: none;
+}
+
+.term-head__box-l,
+.term-head__box-r {
+  font-size: 0.85rem;
+  opacity: 0.55;
+  line-height: 1;
+}
+
+.term-head__prompt {
+  margin: 0 0 2px;
+  font-size: 0.58rem;
+  opacity: 0.75;
+  text-shadow: 0 0 6px rgb(51 255 102 / 0.35);
+}
+
+.term-head__title {
+  margin: 0;
+  font-size: 0.78rem;
+  text-shadow: 0 0 6px rgb(51 255 102 / 0.35);
+}
+
+.term-head__sub {
+  margin: 2px 0 0;
+  font-size: 0.62rem;
+  opacity: 0.55;
+}
+
+.term-head__acts {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.term-cmd {
+  border: none;
+  background: transparent;
+  color: #33ff66;
+  font-family: inherit;
+  font-size: 0.62rem;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.term-cmd.is-active {
+  text-shadow: 0 0 8px #33ff66;
+}
+
+.term-cmd--exit {
+  opacity: 0.65;
+}
+
+.term-config {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgb(51 255 102 / 0.25);
+  font-size: 0.62rem;
+}
+
+.term-config__bar {
+  margin: 0 0 4px;
+}
+
+.term-config input[type='range'] {
+  width: 100%;
+}
+
+.term-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 10px;
+}
+
+.term-foot {
+  padding: 4px 10px;
+  font-size: 0.58rem;
+  opacity: 0.45;
+  border-top: 1px solid rgb(51 255 102 / 0.2);
+}
+
+/* 控制中心 */
+.term-drawer-chrome {
+  flex: 0 0 auto;
+  border-bottom: 1px solid #33ff66;
+  background: #000805;
+  font-family: inherit;
+  color: #33ff66;
+}
+
+.term-drawer-chrome__bar {
+  padding: 6px 10px;
+}
+
+.term-drawer-chrome__prompt {
+  margin: 0 0 2px;
+  font-size: 0.58rem;
+  opacity: 0.75;
+}
+
+.term-drawer-chrome__title {
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+.term-drawer-chrome__back {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.62rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 2px;
+}
+
+.term-drawer-chrome__acts {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.term-drawer-chrome__close {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.62rem;
+  cursor: pointer;
+}

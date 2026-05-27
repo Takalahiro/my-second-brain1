@@ -17,19 +17,26 @@ const { tag, notes } = Astro.props;
 ---
 
 <BaseLayout title={`#${tag}`}>
-  <h1 class="text-3xl font-bold mb-6">#{tag}</h1>
-  <p class="text-gray-500 mb-6">{notes.length} 篇笔记</p>
-  <ul class="space-y-3">
-    {notes.map((note) => {
-      const slug = noteIdToSlug(note.id);
-      const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
-      return (
-        <li>
-          <a href={`/notes/${slug}`} class="block p-4 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-blue-500 transition">
-            <h2 class="font-semibold">{title}</h2>
-          </a>
-        </li>
-      );
-    })}
-  </ul>
+  <section class="subpage-section">
+    <nav class="subpage-breadcrumb">
+      <a href="/tags">标签</a>
+      <span>/</span>
+      <span>#{tag}</span>
+    </nav>
+    <h1 class="subpage-title">#{tag}</h1>
+    <p class="subpage-muted" style="margin-bottom: var(--space-4);">{notes.length} 篇笔记</p>
+    <ul class="subpage-stack-md" style="list-style: none; margin: 0; padding: 0;">
+      {notes.map((note) => {
+        const slug = noteIdToSlug(note.id);
+        const title = note.data.title ?? note.id.replace(/\.md$/, '').split('/').pop();
+        return (
+          <li>
+            <a href={`/notes/${slug}`} class="ui-list-card">
+              <h2 class="ui-list-card-title">{title}</h2>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
 </BaseLayout>

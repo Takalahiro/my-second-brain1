@@ -1,0 +1,35 @@
+---
+/** 全站主题 / 字体 / 皮肤预水合 — BaseLayout 与 ToolLayout 共用 */
+---
+<script is:inline>
+  const theme = localStorage.getItem('theme');
+  if (theme === 'light') {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.setAttribute('data-theme', 'light');
+  } else if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+
+  const font = localStorage.getItem('second-brain:font-family');
+  if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {
+    document.documentElement.setAttribute('data-font', font);
+  }
+
+  const notesMode = localStorage.getItem('second-brain:notes-display-mode');
+  if (notesMode === 'widgets' || notesMode === 'recursive') {
+    document.documentElement.setAttribute('data-notes-mode', notesMode);
+  }
+
+  const loc = localStorage.getItem('second-brain:locale');
+  if (loc === 'en') {
+    document.documentElement.lang = 'en';
+    document.documentElement.dataset.locale = 'en';
+  }
+
+  const ui = localStorage.getItem('second-brain:ui-skin');
+  if (ui) document.documentElement.setAttribute('data-ui', ui);
+  if (localStorage.getItem('second-brain:ui-debug') === '1') {
+    document.documentElement.classList.add('ui-debug', 'debug');
+  }
+</script>

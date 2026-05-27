@@ -1,0 +1,176 @@
+/* CRT · 琥珀磷光 */
+
+.crt-float-root {
+  position: fixed;
+  z-index: 90;
+  touch-action: none;
+  box-sizing: border-box;
+  font-family: 'VT323', monospace;
+}
+
+.crt-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #1a0f00;
+  color: #ffb000;
+  border: 2px solid rgb(255 176 0 / 0.45);
+  box-shadow: inset 0 0 50px rgb(0 0 0 / 0.5), 0 0 20px rgb(255 176 0 / 0.1);
+  overflow: hidden;
+}
+
+.crt-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgb(0 0 0 / 0.12) 0, rgb(0 0 0 / 0.12) 1px, transparent 1px, transparent 3px);
+  z-index: 2;
+}
+
+.crt-head {
+  position: relative;
+  z-index: 1;
+  padding: 8px 10px;
+  border-bottom: 2px solid rgb(255 176 0 / 0.35);
+  cursor: grab;
+  user-select: none;
+}
+
+.crt-head__marquee {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  animation: crt-pulse 2s ease-in-out infinite;
+  margin-bottom: 4px;
+}
+
+@keyframes crt-pulse {
+  50% { opacity: 0.65; text-shadow: 0 0 8px rgb(255 176 0 / 0.5); }
+}
+
+.crt-head__title {
+  margin: 0;
+  font-size: 1.1rem;
+  text-shadow: 0 0 8px rgb(255 176 0 / 0.35);
+}
+
+.crt-head__sub {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.65;
+}
+
+.crt-head__acts {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.crt-key {
+  border: 1px solid rgb(255 176 0 / 0.45);
+  background: rgb(255 176 0 / 0.08);
+  color: #ffb000;
+  font-family: inherit;
+  font-size: 0.78rem;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.crt-key.is-active {
+  background: rgb(255 176 0 / 0.22);
+}
+
+.crt-key--abort {
+  border-color: rgb(255 80 0 / 0.55);
+  color: #ff8800;
+}
+
+.crt-setup {
+  position: relative;
+  z-index: 1;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgb(255 176 0 / 0.25);
+}
+
+.crt-setup__label {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+}
+
+.crt-setup__bar {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+}
+
+.crt-body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 8px 10px;
+}
+
+.crt-foot {
+  position: relative;
+  z-index: 1;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  opacity: 0.45;
+  text-align: right;
+}
+
+/* 控制中心 */
+.crt-drawer-chrome {
+  flex: 0 0 auto;
+  border-bottom: 2px solid rgb(255 176 0 / 0.45);
+  background: #1a0f00;
+  color: #ffb000;
+  font-family: 'VT323', monospace;
+}
+
+.crt-drawer-chrome__bar {
+  padding: 8px 10px;
+}
+
+.crt-drawer-chrome__marquee {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  animation: crt-pulse 2s ease-in-out infinite;
+}
+
+.crt-drawer-chrome__title {
+  margin: 4px 0 0;
+  font-size: 1rem;
+}
+
+.crt-drawer-chrome__back {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 4px;
+}
+
+.crt-drawer-chrome__close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: 1px solid rgb(255 176 0 / 0.45);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.crt-drawer-chrome__bar {
+  position: relative;
+}

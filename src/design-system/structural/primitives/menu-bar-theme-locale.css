@@ -1,0 +1,544 @@
+/* 顶栏 Theme / Locale · 九皮肤物理隐喻 */
+
+.skin-mb-theme,
+.skin-mb-locale {
+  min-width: auto;
+  padding: 2px 8px;
+  height: 32px;
+}
+
+.skin-mb-theme.is-pulse,
+.skin-mb-locale.is-pulse {
+  animation: mb-ctl-pulse 0.35s ease;
+}
+
+@keyframes mb-ctl-pulse {
+  50% { filter: brightness(1.15); }
+}
+
+/* —— Theme —— */
+
+/* Blueprint · 照明回路 */
+.skin-mb-theme--blueprint .skin-mb-theme__bp {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  color: #f4ecd8;
+}
+
+.skin-mb-theme--blueprint .skin-mb-theme__bp-lamp {
+  color: #e63946;
+  transition: transform 0.25s;
+}
+
+.skin-mb-theme--blueprint.is-dark .skin-mb-theme__bp-lamp {
+  transform: rotate(-12deg);
+}
+
+.skin-mb-theme--blueprint .skin-mb-theme__bp-line {
+  width: 14px;
+  height: 1px;
+  background: rgb(244 236 216 / 0.75);
+  transition: background 0.25s;
+}
+
+.skin-mb-theme--blueprint.is-dark .skin-mb-theme__bp-line {
+  background: #e63946;
+}
+
+.skin-mb-theme--blueprint .skin-mb-theme__bp-tag {
+  font-size: 0.48rem;
+  color: #e63946;
+}
+
+/* Scholar · 烛火 */
+.skin-mb-theme--scholar .skin-mb-theme__scholar {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.skin-mb-theme--scholar .skin-mb-theme__flame {
+  width: 8px;
+  height: 10px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: rgb(120 120 120 / 0.45);
+  transition: background 0.35s, box-shadow 0.35s;
+}
+
+.skin-mb-theme--scholar .skin-mb-theme__flame.is-lit {
+  background: radial-gradient(circle at 50% 80%, #ff8c42, #e74c3c);
+  box-shadow: 0 0 6px rgb(231 76 60 / 0.55);
+}
+
+.skin-mb-theme--scholar.is-pulse .skin-mb-theme__flame.is-lit {
+  animation: scholar-flame 0.4s ease;
+}
+
+@keyframes scholar-flame {
+  50% { transform: scaleY(1.15); }
+}
+
+.skin-mb-theme--scholar .skin-mb-theme__scholar-cap {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 0.42rem;
+  color: rgb(60 40 20 / 0.55);
+}
+
+.skin-mb-theme--scholar.is-dark .skin-mb-theme__scholar-cap {
+  color: #8b0000;
+}
+
+/* Terminal · DARK_MODE */
+.skin-mb-theme--terminal .skin-mb-theme__term {
+  display: inline-flex;
+  gap: 1px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  white-space: nowrap;
+}
+
+.skin-mb-theme--terminal .skin-mb-theme__term-prompt {
+  color: rgb(51 255 102 / 0.45);
+}
+
+.skin-mb-theme--terminal .skin-mb-theme__term-val {
+  color: #666;
+  min-width: 1ch;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+.skin-mb-theme--terminal.is-dark .skin-mb-theme__term-val {
+  color: #33ff66;
+  text-shadow: 0 0 6px rgb(51 255 102 / 0.45);
+}
+
+.skin-mb-theme--terminal.is-pulse {
+  animation: term-bel 0.12s 2;
+}
+
+@keyframes term-bel {
+  50% { filter: brightness(1.6); }
+}
+
+/* CRT · 亮度通道 */
+.skin-mb-theme--crt .skin-mb-theme__crt {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  font-family: 'VT323', monospace;
+}
+
+.skin-mb-theme--crt .skin-mb-theme__crt-ch {
+  font-size: 0.48rem;
+  color: rgb(255 176 0 / 0.45);
+}
+
+.skin-mb-theme--crt .skin-mb-theme__crt-face {
+  font-size: 0.82rem;
+  color: #5a3f00;
+  padding: 0 4px;
+  transition: filter 0.15s;
+}
+
+.skin-mb-theme--crt.is-dark .skin-mb-theme__crt-face {
+  filter: invert(1);
+  text-shadow: 0 0 6px #ffb000;
+}
+
+.skin-mb-theme--crt.is-pulse .skin-mb-theme__crt-face {
+  animation: crt-switch-flicker 0.15s 2;
+}
+
+@keyframes crt-switch-flicker {
+  50% { opacity: 0.45; transform: translateX(-1px); }
+}
+
+/* Observatory · 圆顶 */
+.skin-mb-theme--observatory .skin-mb-theme__obs {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.skin-mb-theme--observatory .skin-mb-theme__dome {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgb(139 0 0 / 0.45);
+  background: rgb(139 0 0 / 0.15);
+  transition: background 0.5s, box-shadow 0.5s;
+}
+
+.skin-mb-theme--observatory .skin-mb-theme__dome.is-open {
+  background: rgb(200 160 80 / 0.35);
+  box-shadow: 0 0 6px rgb(200 160 80 / 0.35);
+}
+
+.skin-mb-theme--observatory.is-dark .skin-mb-theme__dome {
+  background: #8b0000;
+  box-shadow: 0 0 8px rgb(139 0 0 / 0.55);
+  animation: obs-pulse 2s ease-in-out infinite;
+}
+
+.skin-mb-theme--observatory .skin-mb-theme__obs-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.06em;
+  opacity: 0.65;
+}
+
+/* Herbarium · 曝光印章 */
+.skin-mb-theme--herbarium .skin-mb-theme__herb-stamp {
+  font-family: 'Special Elite', Georgia, serif;
+  font-size: 0.48rem;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border: 2px dashed rgb(106 13 173 / 0.35);
+  border-radius: 999px;
+  color: rgb(106 13 173 / 0.45);
+  transform: rotate(-2deg);
+  transition: background 0.3s, border 0.3s, transform 0.3s;
+}
+
+.skin-mb-theme--herbarium:not(.is-dark) .skin-mb-theme__herb-stamp {
+  border-style: solid;
+  background: rgb(106 13 173 / 0.12);
+  color: #6a0dad;
+}
+
+.skin-mb-theme--herbarium.is-pulse:not(.is-dark) .skin-mb-theme__herb-stamp {
+  animation: herb-stamp 0.4s ease;
+}
+
+/* Ink · 明/暗印 */
+.skin-mb-theme--ink .skin-mb-theme__ink-seal {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.78rem;
+  border: 2px solid #3a3a3a;
+  color: #3a3a3a;
+  transition: color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.skin-mb-theme--ink:not(.is-dark) .skin-mb-theme__ink-seal {
+  color: #c0392b;
+  border-color: #c0392b;
+  box-shadow: 0 0 4px 2px rgb(192 57 43 / 0.3);
+}
+
+.skin-mb-theme--ink.is-pulse:not(.is-dark) .skin-mb-theme__ink-seal {
+  animation: ink-press 0.35s ease;
+}
+
+@keyframes ink-press {
+  50% { transform: scale(0.92); }
+}
+
+/* RPG · 日/夜 */
+.skin-mb-theme--rpg .skin-mb-theme__rpg {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.skin-mb-theme--rpg .skin-mb-theme__rpg-icon {
+  font-size: 0.75rem;
+  color: rgb(212 175 55 / 0.35);
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.skin-mb-theme--rpg.is-dark .skin-mb-theme__rpg-icon {
+  color: #9370db;
+  text-shadow: 0 0 8px rgb(147 112 219 / 0.55);
+}
+
+.skin-mb-theme--rpg:not(.is-dark) .skin-mb-theme__rpg-icon {
+  color: #ffd700;
+  text-shadow: 0 0 8px rgb(255 215 0 / 0.45);
+}
+
+.skin-mb-theme--rpg .skin-mb-theme__rpg-lbl {
+  font-family: Cinzel, serif;
+  font-size: 0.38rem;
+  letter-spacing: 0.08em;
+}
+
+/* Spacecraft · 舱内照明 */
+.skin-mb-theme--spacecraft .skin-mb-theme__sc {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.skin-mb-theme--spacecraft .skin-mb-theme__sc-lamps {
+  display: flex;
+  gap: 4px;
+}
+
+.skin-mb-theme--spacecraft .skin-mb-theme__sc-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid rgb(136 192 255 / 0.35);
+  background: #444;
+  transition: background 0.25s, box-shadow 0.25s;
+}
+
+.skin-mb-theme--spacecraft .skin-mb-theme__sc-led.is-on {
+  background: #ffaa00;
+  box-shadow: 0 0 6px #ffaa00;
+}
+
+.skin-mb-theme--spacecraft.is-dark .skin-mb-theme__sc-led.is-on {
+  background: #6ec4ff;
+  box-shadow: 0 0 6px #6ec4ff;
+}
+
+.skin-mb-theme--spacecraft .skin-mb-theme__sc-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.1em;
+}
+
+/* —— Locale —— */
+
+/* Blueprint · 双端子语言 */
+.skin-mb-locale--blueprint .skin-mb-locale__bp {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  color: #f4ecd8;
+}
+
+.skin-mb-locale--blueprint .skin-mb-locale__term {
+  font-size: 0.45rem;
+  opacity: 0.65;
+}
+
+.skin-mb-locale--blueprint .skin-mb-locale__circuit {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.skin-mb-locale--blueprint .skin-mb-locale__circuit span {
+  opacity: 0.4;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.skin-mb-locale--blueprint .skin-mb-locale__circuit span.lit {
+  opacity: 1;
+  color: #e63946;
+}
+
+.skin-mb-locale--blueprint .skin-mb-locale__gap {
+  width: 6px;
+  height: 1px;
+  background: rgb(244 236 216 / 0.5);
+}
+
+/* Scholar · 漢/Lat */
+.skin-mb-locale--scholar .skin-mb-locale__scholar {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: 0.72rem;
+  display: inline-flex;
+  gap: 3px;
+}
+
+.skin-mb-locale--scholar .skin-mb-locale__scholar span {
+  opacity: 0.4;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.skin-mb-locale--scholar .skin-mb-locale__scholar span.lit {
+  opacity: 1;
+  color: #8b0000;
+}
+
+.skin-mb-locale--scholar .skin-mb-locale__sep {
+  opacity: 0.35 !important;
+}
+
+/* Terminal · LANG= */
+.skin-mb-locale--terminal .skin-mb-locale__term-line {
+  display: inline-flex;
+  gap: 1px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  white-space: nowrap;
+}
+
+.skin-mb-locale--terminal .skin-mb-locale__prompt {
+  color: rgb(51 255 102 / 0.45);
+}
+
+.skin-mb-locale--terminal .skin-mb-locale__val {
+  color: #33ff66;
+  text-shadow: 0 0 4px rgb(51 255 102 / 0.3);
+}
+
+.skin-mb-locale--terminal.is-pulse {
+  animation: term-bel 0.12s 2;
+}
+
+/* CRT · 字幕轨 */
+.skin-mb-locale--crt .skin-mb-locale__crt {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'VT323', monospace;
+}
+
+.skin-mb-locale--crt .skin-mb-locale__crt-ch {
+  font-size: 0.45rem;
+  color: rgb(255 176 0 / 0.45);
+}
+
+.skin-mb-locale--crt .skin-mb-locale__crt-face {
+  font-size: 0.82rem;
+  color: #ffb000;
+}
+
+.skin-mb-locale--crt.is-pulse .skin-mb-locale__crt-face {
+  animation: crt-switch-flicker 0.12s 2;
+}
+
+/* Observatory · 半球 */
+.skin-mb-locale--observatory .skin-mb-locale__obs {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.skin-mb-locale--observatory .skin-mb-locale__hemi {
+  width: 14px;
+  height: 14px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgb(139 0 0 / 0.45);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.48rem;
+  opacity: 0.45;
+  transition: opacity 0.25s, background 0.25s, box-shadow 0.25s;
+}
+
+.skin-mb-locale--observatory .skin-mb-locale__hemi.lit {
+  opacity: 1;
+  background: rgb(139 0 0 / 0.35);
+  box-shadow: 0 0 6px rgb(139 0 0 / 0.35);
+}
+
+/* Herbarium · 目录章 */
+.skin-mb-locale--herbarium .skin-mb-locale__herb-stamp {
+  font-family: 'Special Elite', Georgia, serif;
+  font-size: 0.48rem;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border: 2px solid rgb(106 13 173 / 0.35);
+  border-radius: 999px;
+  color: #6a0dad;
+  transform: rotate(2deg);
+  transition: transform 0.35s;
+}
+
+.skin-mb-locale--herbarium.is-pulse .skin-mb-locale__herb-stamp {
+  animation: herb-stamp 0.4s ease;
+}
+
+/* Ink · 双印 */
+.skin-mb-locale--ink .skin-mb-locale__ink {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.skin-mb-locale--ink .skin-mb-locale__seal {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  font-family: 'Noto Serif SC', serif;
+  font-size: 0.62rem;
+  border: 1px solid #3a3a3a;
+  color: rgb(58 58 58 / 0.45);
+  transition: color 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.skin-mb-locale--ink .skin-mb-locale__seal.lit {
+  color: #c0392b;
+  border-color: #c0392b;
+  box-shadow: 0 0 3px 1px rgb(192 57 43 / 0.25);
+}
+
+.skin-mb-locale--ink.is-pulse .skin-mb-locale__seal.lit {
+  animation: ink-press 0.35s ease;
+}
+
+/* RPG · 语言页签 */
+.skin-mb-locale--rpg .skin-mb-locale__rpg {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.skin-mb-locale--rpg .skin-mb-locale__rpg-tab {
+  font-family: Cinzel, serif;
+  font-size: 0.48rem;
+  letter-spacing: 0.04em;
+  padding: 2px 4px;
+  border: 1px solid rgb(212 175 55 / 0.25);
+  color: rgb(232 220 200 / 0.4);
+  transition: color 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+
+.skin-mb-locale--rpg .skin-mb-locale__rpg-tab.lit {
+  color: #ffd700;
+  border-color: #d4af37;
+  box-shadow: 0 0 8px rgb(255 215 0 / 0.15);
+}
+
+/* Spacecraft · 通讯频道 */
+.skin-mb-locale--spacecraft .skin-mb-locale__sc {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.skin-mb-locale--spacecraft .skin-mb-locale__sc-ch {
+  width: 14px;
+  height: 14px;
+  display: grid;
+  place-items: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem;
+  border: 1px solid rgb(80 120 160 / 0.45);
+  opacity: 0.45;
+  transition: opacity 0.25s, background 0.25s, box-shadow 0.25s;
+}
+
+.skin-mb-locale--spacecraft .skin-mb-locale__sc-ch.lit {
+  opacity: 1;
+  background: rgb(51 255 102 / 0.15);
+  box-shadow: 0 0 6px rgb(51 255 102 / 0.35);
+  color: #33ff66;
+}
+
+.skin-mb-locale--spacecraft .skin-mb-locale__sc-lbl {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.38rem;
+  letter-spacing: 0.08em;
+  color: rgb(136 192 255 / 0.65);
+}

@@ -1,0 +1,15 @@
+/* 植物标本馆 · 博物标签（默认亮色） */
+html:not(.dark)[data-ui='herbarium'] {
+  --struct-frame-bg: #e8efe4;
+  --struct-frame-fg: #2a4030;
+  --struct-frame-muted: #5a7058;
+  --struct-frame-border: #3a5840;
+  --struct-frame-header-bg: #dce8d8;
+  --struct-frame-header-fg: #2a4030;
+  --struct-accent: #4a8050;
+  --struct-panel-bg: #f4f8f2;
+  --struct-drawer-bg: #e0ece0;
+  --struct-drawer-face: #d0e0d0;
+  --struct-radius: 4px;
+  --struct-shadow: 2px 3px 0 rgb(58 88 64 / 0.2);
+}
