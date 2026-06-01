@@ -69,7 +69,10 @@ if (isCiBuild()) {
   }
 }
 
-// Step 2 — CI/Cloudflare 经常是 shallow clone，git log --follow 几乎没用
+// Step 2b — Obsidian 备份偶发写入孤立 `---`，会在 astro content sync 时炸 YAML
+runRequired('node', [path.join(SCRIPTS, 'sanitize-vault-frontmatter.mjs')]);
+
+// Step 3 — CI/Cloudflare 经常是 shallow clone，git log --follow 几乎没用
 //   这里 best-effort unshallow；失败了也无所谓，后面 fs mtime 会兜底
 const isShallow = (() => {
   try {
@@ -86,22 +89,22 @@ if (isShallow) {
   if (!ok) console.warn('  ⚠ unshallow 失败，将退回到文件 mtime 作为兜底');
 }
 
-// Step 3 — 图片/PDF/视频 flat copy 到 public/vault-assets/
+// Step 4 — 图片/PDF/视频 flat copy 到 public/vault-assets/
 runRequired('node', [path.join(SCRIPTS, 'sync-assets.mjs')]);
 
-// Step 4 — notes-mtime.json（git log + fs.stat 双保险）
+// Step 5 — notes-mtime.json（git log + fs.stat 双保险）
 runRequired('node', [path.join(SCRIPTS, 'build-mtime-manifest.mjs')]);
 
-// Step 4b — vault-sync-meta.json（笔记页「下次同步」小字）
+// Step 5b — vault-sync-meta.json（笔记页「下次同步」小字）
 runRequired('node', [path.join(SCRIPTS, 'build-vault-sync-meta.mjs')]);
 
-// Step 5 — public/video|picture|music → media-manifest.json（背景 + 播放器用）
+// Step 6 — public/video|picture|music → media-manifest.json（背景 + 播放器用）
 runRequired('node', [path.join(SCRIPTS, 'build-media-manifest.mjs')]);
 
-// Step 6 — stats.json（笔记数 / 字数 / tags / heatmap 那些）
+// Step 7 — stats.json（笔记数 / 字数 / tags / heatmap 那些）
 runRequired('node', [path.join(SCRIPTS, 'build-stats.mjs')]);
 
-// Step 7 — wikilinks scan → graph 数据 + 报告
+// Step 8 — wikilinks scan → graph 数据 + 报告
 runRequired('node', [path.join(SCRIPTS, 'build-wikilinks.mjs')]);
 
 console.log('✅ vault prepared.');
