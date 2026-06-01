@@ -9,7 +9,7 @@ export const zh = {
     notes: '笔记',
     notesTitle: '笔记浏览',
     teaching: '教学',
-    teachingTitle: '数学 · 微积分复习',
+    teachingTitle: '教学 · 知识之海',
     python: 'Python',
     pythonTitle: 'Python IDE',
     matlab: 'MATLAB',

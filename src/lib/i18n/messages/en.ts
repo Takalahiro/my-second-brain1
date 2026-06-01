@@ -11,7 +11,7 @@ export const en: Messages = {
     notes: 'Notes',
     notesTitle: 'Browse notes',
     teaching: 'Teaching',
-    teachingTitle: 'Math · Calculus review',
+    teachingTitle: 'Teaching · Sea of Knowledge',
     python: 'Python',
     pythonTitle: 'Python IDE',
     matlab: 'MATLAB',

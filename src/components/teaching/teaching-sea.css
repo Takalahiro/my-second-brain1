@@ -1,0 +1,673 @@
+/* 知识之海 · 教学页沉浸式布局 */
+
+.knowledge-sea {
+  --sea-deep: #060a12;
+  --sea-mid: #0c1220;
+  --sea-panel: rgb(16 22 36 / 0.72);
+  --sea-panel-strong: rgb(20 28 44 / 0.88);
+  --sea-border: rgb(255 255 255 / 0.09);
+  --sea-border-soft: rgb(255 255 255 / 0.05);
+  --sea-text: #eef2fb;
+  --sea-muted: rgb(180 192 218 / 0.72);
+
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - var(--site-nav-offset, 88px));
+  color: var(--sea-text);
+  background: var(--sea-deep);
+  overflow: hidden;
+  font-family: var(--font-body, system-ui, sans-serif);
+}
+
+/* ── Header ── */
+
+.knowledge-sea__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6) var(--space-4);
+  position: relative;
+  z-index: 2;
+}
+
+.knowledge-sea__brand h1 {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+}
+
+.knowledge-sea__brand p {
+  margin: 6px 0 0;
+  max-width: 22rem;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--sea-muted);
+}
+
+.knowledge-sea__nav {
+  justify-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  max-width: min(680px, 92vw);
+  padding: 5px;
+  border-radius: 999px;
+  background: var(--sea-panel-strong);
+  border: 1px solid var(--sea-border);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.03) inset,
+    0 16px 48px rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(20px) saturate(1.25);
+}
+
+.knowledge-sea__nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(200 210 230 / 0.78);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.knowledge-sea__nav-btn:hover {
+  background: rgb(255 255 255 / 0.07);
+  color: #fff;
+}
+
+.knowledge-sea__nav-btn[aria-pressed='true'] {
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08) inset;
+}
+
+.knowledge-sea__search {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 260px);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--sea-panel-strong);
+  border: 1px solid var(--sea-border);
+  color: rgb(180 192 218 / 0.65);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 0.35);
+  backdrop-filter: blur(16px);
+}
+
+.knowledge-sea__search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--sea-text);
+  font-size: 0.8125rem;
+  outline: none;
+}
+
+.knowledge-sea__search input::placeholder {
+  color: rgb(160 175 205 / 0.55);
+}
+
+/* ── Stage ── */
+
+.knowledge-sea__stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 var(--space-6) var(--space-5);
+}
+
+.knowledge-sea__title {
+  text-align: center;
+  margin-bottom: var(--space-4);
+}
+
+.knowledge-sea__title h2 {
+  margin: 0;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(1.125rem, 2.2vw, 1.5rem);
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgb(230 236 250 / 0.95);
+}
+
+.knowledge-sea__title h2 .deco {
+  letter-spacing: 0;
+  text-indent: 0;
+  color: rgb(200 210 235 / 0.55);
+  font-size: 0.85em;
+}
+
+.knowledge-sea__title p {
+  margin: 10px 0 0;
+  font-size: var(--text-sm);
+  color: var(--sea-muted);
+}
+
+.knowledge-sea__canvas {
+  position: relative;
+  flex: 1;
+  min-height: clamp(480px, 62vh, 680px);
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid var(--sea-border-soft);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.02) inset,
+    0 24px 80px rgb(0 0 0 / 0.55);
+}
+
+/* Background layers */
+
+.sea-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sea-bg--stars {
+  background-image:
+    radial-gradient(1px 1px at 8% 12%, rgb(255 255 255 / 0.9), transparent),
+    radial-gradient(1px 1px at 18% 28%, rgb(255 255 255 / 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 28% 8%, rgb(255 255 255 / 0.75), transparent),
+    radial-gradient(1px 1px at 42% 18%, rgb(255 255 255 / 0.45), transparent),
+    radial-gradient(1px 1px at 55% 6%, rgb(255 255 255 / 0.65), transparent),
+    radial-gradient(1px 1px at 68% 22%, rgb(255 255 255 / 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 78% 10%, rgb(255 255 255 / 0.8), transparent),
+    radial-gradient(1px 1px at 88% 26%, rgb(255 255 255 / 0.4), transparent),
+    radial-gradient(1px 1px at 92% 8%, rgb(255 255 255 / 0.7), transparent),
+    radial-gradient(1px 1px at 12% 52%, rgb(255 255 255 / 0.35), transparent),
+    radial-gradient(1px 1px at 35% 44%, rgb(255 255 255 / 0.5), transparent),
+    radial-gradient(1px 1px at 62% 38%, rgb(255 255 255 / 0.4), transparent),
+    radial-gradient(1px 1px at 82% 48%, rgb(255 255 255 / 0.55), transparent);
+  opacity: 0.85;
+}
+
+.sea-bg--horizon {
+  background:
+    radial-gradient(ellipse 90% 55% at 50% 105%, rgb(20 40 72 / 0.55), transparent 58%),
+    radial-gradient(ellipse 60% 40% at 15% 90%, rgb(40 80 130 / 0.18), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 85% 88%, rgb(90 60 140 / 0.14), transparent 48%),
+    linear-gradient(180deg, rgb(8 12 22) 0%, rgb(6 10 18) 45%, rgb(4 8 14) 100%);
+}
+
+.sea-bg--waves {
+  bottom: 0;
+  height: 45%;
+  background:
+    repeating-linear-gradient(
+      105deg,
+      transparent 0,
+      transparent 48px,
+      rgb(255 255 255 / 0.012) 48px,
+      rgb(255 255 255 / 0.012) 49px
+    ),
+    linear-gradient(0deg, rgb(8 16 28 / 0.65), transparent 80%);
+  animation: sea-drift 14s ease-in-out infinite alternate;
+}
+
+@keyframes sea-drift {
+  from {
+    transform: translateX(0);
+    opacity: 0.55;
+  }
+  to {
+    transform: translateX(-1.5%);
+    opacity: 0.75;
+  }
+}
+
+.sea-bg--vignette {
+  background: radial-gradient(ellipse 85% 75% at 50% 45%, transparent 35%, rgb(0 0 0 / 0.45) 100%);
+}
+
+/* ── Islands ── */
+
+.sea-island {
+  position: absolute;
+  left: var(--island-x);
+  top: var(--island-y);
+  transform: translate(-50%, -50%) scale(var(--island-scale, 1));
+  z-index: 2;
+  transition: z-index 0s, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sea-island.is-active {
+  z-index: 6;
+  transform: translate(-50%, -50%) scale(calc(var(--island-scale, 1) * 1.05));
+}
+
+.sea-island__hit {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+}
+
+.sea-island__halo {
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  width: 130%;
+  height: 48px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, var(--island-glow), transparent 72%);
+  filter: blur(10px);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  opacity: 0.75;
+}
+
+.sea-island__hit:hover ~ .sea-island__halo,
+.sea-island.is-active .sea-island__halo {
+  opacity: 1;
+}
+
+.sea-island__card {
+  position: absolute;
+  width: 196px;
+  padding: 14px 16px 12px;
+  border-radius: 16px;
+  background: linear-gradient(155deg, rgb(24 32 48 / 0.92), rgb(12 16 26 / 0.82));
+  border: 1px solid var(--sea-border);
+  box-shadow:
+    0 0 0 1px rgb(255 255 255 / 0.04) inset,
+    0 18px 48px rgb(0 0 0 / 0.42),
+    0 0 36px color-mix(in srgb, var(--island-accent) 18%, transparent);
+  backdrop-filter: blur(18px) saturate(1.15);
+  text-align: left;
+  pointer-events: none;
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.sea-island.is-active .sea-island__card,
+.sea-island__hit:hover ~ .sea-island__card {
+  border-color: color-mix(in srgb, var(--island-accent) 35%, var(--sea-border));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--island-accent) 12%, transparent) inset,
+    0 22px 56px rgb(0 0 0 / 0.48),
+    0 0 48px color-mix(in srgb, var(--island-accent) 28%, transparent);
+}
+
+.sea-island__card--bl {
+  top: calc(100% - 8px);
+  left: -24px;
+}
+
+.sea-island__card--br {
+  top: calc(100% - 8px);
+  right: -24px;
+}
+
+.sea-island__card--r {
+  top: 50%;
+  left: calc(100% + 12px);
+  transform: translateY(-50%);
+}
+
+.sea-island__card--l {
+  top: 50%;
+  right: calc(100% + 12px);
+  transform: translateY(-50%);
+}
+
+.sea-island.is-active .sea-island__card--r,
+.sea-island__hit:hover ~ .sea-island__card--r {
+  transform: translateY(-50%) translateX(4px);
+}
+
+.sea-island__icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 8px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--island-accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--island-accent) 38%, transparent);
+  color: var(--island-accent);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--island-accent) 25%, transparent);
+}
+
+.sea-island__card h3 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.sea-island__card p {
+  margin: 5px 0 8px;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--sea-muted);
+}
+
+.sea-island__count {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgb(150 165 195 / 0.75);
+}
+
+/* CS sub-nodes */
+
+.sea-links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sea-links path {
+  fill: none;
+  stroke: rgb(155 123 212 / 0.4);
+  stroke-width: 0.28;
+  stroke-dasharray: 1.4 1.4;
+  stroke-linecap: round;
+}
+
+.sea-island.is-math .sea-island__halo {
+  background: radial-gradient(ellipse, rgb(91 159 212 / 0.55), transparent 72%);
+}
+
+.sea-island.is-cs .sea-island__card {
+  width: 184px;
+}
+
+.sea-sub {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 3;
+}
+
+.sea-sub__land {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.sea-sub__land:hover {
+  transform: translateY(-3px);
+}
+
+.sea-sub__label {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: rgb(210 200 240 / 0.92);
+  background: rgb(20 16 32 / 0.78);
+  border: 1px solid rgb(155 123 212 / 0.35);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+}
+
+.sea-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--sea-muted);
+  font-size: var(--text-sm);
+  z-index: 4;
+}
+
+/* ── Footer ── */
+
+.knowledge-sea__footer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-6) var(--space-5);
+}
+
+.sea-progress {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: var(--sea-panel-strong);
+  border: 1px solid var(--sea-border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 36px rgb(0 0 0 / 0.35);
+  width: fit-content;
+}
+
+.sea-progress__ring {
+  --pct: 75;
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #8ec5f0;
+  background: conic-gradient(#5b9fd4 calc(var(--pct) * 1%), rgb(255 255 255 / 0.07) 0);
+  box-shadow: 0 0 20px rgb(91 159 212 / 0.25);
+}
+
+.sea-progress__ring::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--sea-deep);
+}
+
+.sea-progress__ring span {
+  position: relative;
+  z-index: 1;
+}
+
+.sea-progress strong {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.sea-progress p {
+  margin: 3px 0 0;
+  font-size: 0.75rem;
+  color: var(--sea-muted);
+}
+
+.sea-dock {
+  justify-self: center;
+  display: flex;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--sea-panel-strong);
+  border: 1px solid var(--sea-border);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.4);
+}
+
+.sea-dock a {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: rgb(200 210 230 / 0.72);
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sea-dock a:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.sea-dock a.is-current {
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
+}
+
+.sea-expand {
+  justify-self: end;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--sea-border);
+  background: var(--sea-panel);
+  color: rgb(200 210 230 / 0.7);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sea-expand:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 1024px) {
+  .knowledge-sea__header {
+    grid-template-columns: 1fr;
+    padding-inline: var(--space-4);
+  }
+
+  .knowledge-sea__nav {
+    justify-self: stretch;
+    border-radius: 18px;
+  }
+
+  .knowledge-sea__search {
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .knowledge-sea__stage,
+  .knowledge-sea__footer {
+    padding-inline: var(--space-4);
+  }
+}
+
+@media (max-width: 768px) {
+  .knowledge-sea__canvas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-5) var(--space-4);
+    min-height: auto;
+    overflow: auto;
+    background: linear-gradient(180deg, rgb(8 12 22), rgb(6 10 18));
+  }
+
+  .sea-bg {
+    display: none;
+  }
+
+  .sea-links {
+    display: none;
+  }
+
+  .sea-island {
+    position: relative;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: min(100%, 320px);
+  }
+
+  .sea-island.is-active {
+    transform: none !important;
+  }
+
+  .sea-island__hit {
+    display: flex;
+    justify-content: center;
+  }
+
+  .sea-island__card {
+    position: relative;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    width: 100%;
+    margin-top: var(--space-2);
+    pointer-events: auto;
+  }
+
+  .sea-sub {
+    position: relative;
+    left: auto !important;
+    top: auto !important;
+    transform: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+  }
+
+  .knowledge-sea__footer {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .sea-expand {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sea-bg--waves {
+    animation: none;
+  }
+
+  .island-scene,
+  .sea-island,
+  .sea-island__card,
+  .sea-sub__land {
+    transition: none;
+  }
+}

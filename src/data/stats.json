@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-05-27T06:10:52.305Z",
-  "totalNotes": 130,
-  "totalWords": 255091,
+  "generatedAt": "2026-06-01T02:29:16.613Z",
+  "totalNotes": 138,
+  "totalWords": 262596,
   "byFolder": [
     {
       "name": "计算机",
@@ -10,8 +10,8 @@
     },
     {
       "name": "MATH",
-      "count": 7,
-      "words": 20809
+      "count": 8,
+      "words": 21787
     },
     {
       "name": "DATA1001",
@@ -20,8 +20,18 @@
     },
     {
       "name": "INFO1110",
-      "count": 4,
-      "words": 5248
+      "count": 5,
+      "words": 11834
+    },
+    {
+      "name": "2026-05-28.md",
+      "count": 1,
+      "words": 0
+    },
+    {
+      "name": "2026-05-31.md",
+      "count": 1,
+      "words": 0
     },
     {
       "name": "202605250907.md",
@@ -29,22 +39,32 @@
       "words": 0
     },
     {
+      "name": "202605311555.md",
+      "count": 1,
+      "words": 0
+    },
+    {
+      "name": "202605311557.md",
+      "count": 1,
+      "words": 2
+    },
+    {
+      "name": "202605311558.md",
+      "count": 1,
+      "words": 0
+    },
+    {
+      "name": "202605311559.md",
+      "count": 1,
+      "words": 0
+    },
+    {
       "name": "INFO1111",
       "count": 1,
       "words": 5047
-    },
-    {
-      "name": "_Inbox 入口",
-      "count": 1,
-      "words": 4767
     }
   ],
   "byMonth": [
-    {
-      "month": "2025-06",
-      "label": "6月",
-      "count": 0
-    },
     {
       "month": "2025-07",
       "label": "7月",
@@ -98,31 +118,16 @@
     {
       "month": "2026-05",
       "label": "5月",
-      "count": 130
+      "count": 138
+    },
+    {
+      "month": "2026-06",
+      "label": "6月",
+      "count": 0
     }
   ],
   "topTags": [],
   "heatmap": [
-    {
-      "date": "2026-03-05",
-      "count": 0
-    },
-    {
-      "date": "2026-03-06",
-      "count": 0
-    },
-    {
-      "date": "2026-03-07",
-      "count": 0
-    },
-    {
-      "date": "2026-03-08",
-      "count": 0
-    },
-    {
-      "date": "2026-03-09",
-      "count": 0
-    },
     {
       "date": "2026-03-10",
       "count": 0
@@ -409,7 +414,7 @@
     },
     {
       "date": "2026-05-20",
-      "count": 121
+      "count": 119
     },
     {
       "date": "2026-05-21",
@@ -433,10 +438,30 @@
     },
     {
       "date": "2026-05-26",
-      "count": 2
+      "count": 1
     },
     {
       "date": "2026-05-27",
+      "count": 1
+    },
+    {
+      "date": "2026-05-28",
+      "count": 3
+    },
+    {
+      "date": "2026-05-29",
+      "count": 0
+    },
+    {
+      "date": "2026-05-30",
+      "count": 0
+    },
+    {
+      "date": "2026-05-31",
+      "count": 7
+    },
+    {
+      "date": "2026-06-01",
       "count": 0
     }
   ]
