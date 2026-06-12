@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-06-01T02:29:16.717Z",
+  "generatedAt": "2026-06-12T03:11:06.987Z",
   "stats": {
-    "totalFiles": 138,
-    "totalLinks": 195,
+    "totalFiles": 142,
+    "totalLinks": 203,
     "resolved": 98,
-    "broken": 97,
+    "broken": 105,
     "headingLinks": 7,
     "aliased": 4
   },
@@ -80,6 +80,13 @@
       "inDegree": 2
     },
     {
+      "id": "DATA1001/Notes/考前",
+      "title": "考前",
+      "folder": "DATA1001",
+      "outDegree": 0,
+      "inDegree": 0
+    },
+    {
       "id": "DATA1001/Quarto/Quarto技术文档",
       "title": "Quarto技术文档",
       "folder": "DATA1001",
@@ -105,6 +112,13 @@
       "title": "INFO 1110 ADVANCE ASSESSMENT",
       "folder": "INFO1110",
       "outDegree": 4,
+      "inDegree": 0
+    },
+    {
+      "id": "INFO1110/assessment/练习",
+      "title": "练习",
+      "folder": "INFO1110",
+      "outDegree": 0,
       "inDegree": 0
     },
     {
@@ -183,6 +197,20 @@
       "folder": "MATH",
       "outDegree": 0,
       "inDegree": 1
+    },
+    {
+      "id": "MATH/模拟",
+      "title": "模拟",
+      "folder": "MATH",
+      "outDegree": 0,
+      "inDegree": 0
+    },
+    {
+      "id": "MATH/焚绝",
+      "title": "焚绝",
+      "folder": "MATH",
+      "outDegree": 0,
+      "inDegree": 0
     },
     {
       "id": "MATH/练习",
@@ -948,13 +976,6 @@
       "inDegree": 1
     },
     {
-      "id": "计算机/_Overview 总览/computer science 1st",
-      "title": "computer science 1st",
-      "folder": "计算机",
-      "outDegree": 0,
-      "inDegree": 0
-    },
-    {
       "id": "计算机/_Overview 总览/COMPUTER SCIENCE 2nd",
       "title": "COMPUTER SCIENCE 2nd",
       "folder": "计算机",
@@ -967,6 +988,13 @@
       "folder": "计算机",
       "outDegree": 31,
       "inDegree": 6
+    },
+    {
+      "id": "计算机/_Overview 总览/computer science 1st",
+      "title": "computer science 1st",
+      "folder": "计算机",
+      "outDegree": 0,
+      "inDegree": 0
     },
     {
       "id": "计算机/数据结构与算法/算法",
@@ -1565,6 +1593,21 @@
       "target": "Pasted image 20260512205146.png"
     },
     {
+      "from": "DATA1001/Notes/考前.md",
+      "raw": "[[Pasted image 20260610212139.png]]",
+      "target": "Pasted image 20260610212139.png"
+    },
+    {
+      "from": "DATA1001/Notes/考前.md",
+      "raw": "[[Pasted image 20260611111016.png]]",
+      "target": "Pasted image 20260611111016.png"
+    },
+    {
+      "from": "DATA1001/Notes/考前.md",
+      "raw": "[[Pasted image 20260611113704.png]]",
+      "target": "Pasted image 20260611113704.png"
+    },
+    {
       "from": "DATA1001/Quarto/Quarto技术文档.md",
       "raw": "[[params$column]]",
       "target": "params$column"
@@ -1613,6 +1656,31 @@
       "from": "INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）.md",
       "raw": "[[7.png]]",
       "target": "7.png"
+    },
+    {
+      "from": "MATH/焚绝.md",
+      "raw": "[[Pasted image 20260608192205.png]]",
+      "target": "Pasted image 20260608192205.png"
+    },
+    {
+      "from": "MATH/焚绝.md",
+      "raw": "[[Pasted image 20260609081103.png]]",
+      "target": "Pasted image 20260609081103.png"
+    },
+    {
+      "from": "MATH/焚绝.md",
+      "raw": "[[Pasted image 20260609081421.png]]",
+      "target": "Pasted image 20260609081421.png"
+    },
+    {
+      "from": "MATH/焚绝.md",
+      "raw": "[[Pasted image 20260609080600.png]]",
+      "target": "Pasted image 20260609080600.png"
+    },
+    {
+      "from": "MATH/焚绝.md",
+      "raw": "[[Pasted image 20260609080203.png]]",
+      "target": "Pasted image 20260609080203.png"
     },
     {
       "from": "计算机/Machine Learning/基础机器学习 Machine Learning.md",
@@ -1983,10 +2051,14 @@
     "202605311557",
     "202605311558",
     "202605311559",
+    "DATA1001/Notes/考前",
     "DATA1001/Structure/REPORT",
     "INFO1110/assessment/Advance code review",
+    "INFO1110/assessment/练习",
     "INFO1110/foundition/Codereview",
     "INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）",
+    "MATH/模拟",
+    "MATH/焚绝",
     "MATH/练习",
     "_Inbox 入口/笔记",
     "计算机/Computer Graphics 计算机图形学/OpenGL-WebGL",

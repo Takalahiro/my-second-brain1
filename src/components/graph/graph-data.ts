@@ -72,10 +72,12 @@ export function watchWikiRefresh(onData: (d: WikiData) => void, intervalMs = 5 *
   };
 }
 
-// 笔记 id（如 MATH/Algebra）→ /notes/<basename>/
+import { noteIdToSlug } from '../../lib/slugify';
+
+// 笔记 id（如 INFO1110/assessment/练习）→ /notes/<full-path-slug>/
 export function noteHref(id: string) {
-  const base = id.split('/').pop() ?? id;
-  return `/notes/${encodeURI(base)}/`;
+  const withExt = id.endsWith('.md') ? id : `${id}.md`;
+  return `/notes/${noteIdToSlug(withExt)}/`;
 }
 
 // ---- 图谱设置（localStorage 持久化）----

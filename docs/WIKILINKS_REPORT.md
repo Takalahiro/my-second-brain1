@@ -1,18 +1,18 @@
 # 双链 (Wikilinks) 检查报告
 
-> 生成时间：2026-06-01T02:29:16.717Z
+> 生成时间：2026-06-12T03:11:06.987Z
 
 ## 概览
 
 | 指标 | 数值 |
 |---|---|
-| 笔记总数 | 138 |
-| 双链总数 | 195 |
+| 笔记总数 | 142 |
+| 双链总数 | 203 |
 | ✓ 解析成功 | 98 |
-| ✗ 悬空链接 | 97 |
+| ✗ 悬空链接 | 105 |
 | 带 alias 链接 | 4 |
 | 含 #heading 链接 | 7 |
-| 孤岛笔记 (无入也无出) | 79 |
+| 孤岛笔记 (无入也无出) | 83 |
 | 同名冲突链接 | 2 |
 
 ## 🔥 热点 Top 20（按总度数 入+出）
@@ -40,7 +40,7 @@
 | `图` | 计算机 | 2 | 0 |
 | `Scikit-Learn` | 计算机 | 2 | 0 |
 
-## ✗ 悬空链接（97 条）
+## ✗ 悬空链接（105 条）
 
 | 源笔记 | 链接文本 | 目标 |
 |---|---|---|
@@ -63,6 +63,9 @@
 | `DATA1001/Notes/统计学与数据科学 Statistics and Data Science.md` | `[[Pasted image 20260512204612.png]]` | `Pasted image 20260512204612.png` |
 | `DATA1001/Notes/统计学与数据科学 Statistics and Data Science.md` | `[[Pasted image 20260512204638.png]]` | `Pasted image 20260512204638.png` |
 | `DATA1001/Notes/统计学与数据科学 Statistics and Data Science.md` | `[[Pasted image 20260512205146.png]]` | `Pasted image 20260512205146.png` |
+| `DATA1001/Notes/考前.md` | `[[Pasted image 20260610212139.png]]` | `Pasted image 20260610212139.png` |
+| `DATA1001/Notes/考前.md` | `[[Pasted image 20260611111016.png]]` | `Pasted image 20260611111016.png` |
+| `DATA1001/Notes/考前.md` | `[[Pasted image 20260611113704.png]]` | `Pasted image 20260611113704.png` |
 | `DATA1001/Quarto/Quarto技术文档.md` | `[[params$column]]` | `params$column` |
 | `DATA1001/Quarto/Quarto技术文档.md` | `[[params$variable]]` | `params$variable` |
 | `INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）.md` | `[[0.png]]` | `0.png` |
@@ -73,6 +76,11 @@
 | `INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）.md` | `[[5.png]]` | `5.png` |
 | `INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）.md` | `[[6.png]]` | `6.png` |
 | `INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）.md` | `[[7.png]]` | `7.png` |
+| `MATH/焚绝.md` | `[[Pasted image 20260608192205.png]]` | `Pasted image 20260608192205.png` |
+| `MATH/焚绝.md` | `[[Pasted image 20260609081103.png]]` | `Pasted image 20260609081103.png` |
+| `MATH/焚绝.md` | `[[Pasted image 20260609081421.png]]` | `Pasted image 20260609081421.png` |
+| `MATH/焚绝.md` | `[[Pasted image 20260609080600.png]]` | `Pasted image 20260609080600.png` |
+| `MATH/焚绝.md` | `[[Pasted image 20260609080203.png]]` | `Pasted image 20260609080203.png` |
 | `计算机/Machine Learning/基础机器学习 Machine Learning.md` | `[[Pasted image 20260510023018.png]]` | `Pasted image 20260510023018.png` |
 | `计算机/Machine Learning/基础机器学习 Machine Learning.md` | `[[Pasted image 20260510023037.png]]` | `Pasted image 20260510023037.png` |
 | `计算机/Machine Learning/基础机器学习 Machine Learning.md` | `[[Pasted image 20260510091016.png]]` | `Pasted image 20260510091016.png` |
@@ -149,7 +157,7 @@
 | `MATH/MATH.md` | `[[MATH/Algebra 代数/题型条件反射\|题型条件反射]]` | `MATH/Algebra 代数/题型条件反射` / `MATH/Calculus 微积分/题型条件反射` |
 | `MATH/MATH.md` | `[[MATH/Calculus 微积分/题型条件反射\|题型条件反射]]` | `MATH/Algebra 代数/题型条件反射` / `MATH/Calculus 微积分/题型条件反射` |
 
-## 🏝 孤岛笔记（79 条）
+## 🏝 孤岛笔记（83 条）
 
 这些笔记既没有出链也没有入链，建议补充关联：
 
@@ -160,10 +168,14 @@
 - `202605311557`
 - `202605311558`
 - `202605311559`
+- `DATA1001/Notes/考前`
 - `DATA1001/Structure/REPORT`
 - `INFO1110/assessment/Advance code review`
+- `INFO1110/assessment/练习`
 - `INFO1110/foundition/Codereview`
 - `INFO1111/Vocabulary 词汇/INFO1111 高频考词预测（含释义与例题）`
+- `MATH/模拟`
+- `MATH/焚绝`
 - `MATH/练习`
 - `_Inbox 入口/笔记`
 - `计算机/Computer Graphics 计算机图形学/OpenGL-WebGL`

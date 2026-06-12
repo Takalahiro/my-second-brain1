@@ -1,20 +1,17 @@
-// 笔记名 / wiki link → 路由 slug
-// 必须跟 Astro 6 glob loader 的 generateId 一致：
-//   - 全小写
-//   - 去掉半角/全角括号 (）
-//   - 空白变 -（Astro 不会合并连续 -，比如 "ECMA-262 ) " → "ecma-262--"）
-//
-// 别乱加 trim、合并 --- 之类的，不然跟 Astro id 对不上会 404
+import GithubSlugger from 'github-slugger';
+
+// 单段标题 / [[wiki link]] 目标 → slug（与 github-slugger 一致）
 export function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[()（）]/g, '')
-    .replace(/\s/g, '-');
+  return new GithubSlugger().slug(name);
 }
 
-// collection id（带子路径 + Astro 已归一化的 basename）→ URL 末段 slug
-// 只取最后一段，别再 slugify 一遍——Astro 已经处理过 basename，
-// 再 slugify 会把 -- 并成 -，跟实际 URL 对不上
+// collection id（如 INFO1110/assessment/练习.md）→ URL slug
+// 使用完整子路径，避免不同文件夹下同名笔记（如 MATH/练习 vs INFO1110/.../练习）冲突
 export function noteIdToSlug(id: string): string {
-  return id.split('/').pop() ?? id;
+  const withoutExt = id.replace(/\.md$/i, '');
+  const slugger = new GithubSlugger();
+  return withoutExt
+    .split('/')
+    .map((segment) => slugger.slug(segment))
+    .join('/');
 }
