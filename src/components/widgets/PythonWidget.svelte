@@ -33,7 +33,7 @@
   ariaLabel="Python 编译器"
   title="Python"
   icon="python"
-  href="/python"
+  href="/compilers/?lang=python"
   className="python-widget"
   defaultWidth={520}
   defaultHeight={560}

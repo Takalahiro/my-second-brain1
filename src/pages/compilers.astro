@@ -1,0 +1,8 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import CompilerLab from '../components/CompilerLab.svelte';
+---
+
+<ToolLayout title="编译器 · My Second Brain" description="Python 与 AVR 汇编逐步追踪，同一个编译器子界面">
+  <CompilerLab client:only="svelte" />
+</ToolLayout>
