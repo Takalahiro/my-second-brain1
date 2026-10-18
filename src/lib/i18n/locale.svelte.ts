@@ -100,7 +100,7 @@ export function getSiteNavLinks(): SiteNavLink[] {
   return [
     { href: '/notes', label: m.nav.notes, title: m.nav.notesTitle, icon: 'notes' },
     { href: '/teaching', label: m.nav.teaching, title: m.nav.teachingTitle, icon: 'book' },
-    { href: '/python', label: m.nav.python, title: m.nav.pythonTitle, icon: 'python' },
+    { href: '/compilers', label: m.nav.compilers, title: m.nav.compilersTitle, icon: 'terminal' },
     { href: '/matlab', label: m.nav.matlab, title: m.nav.matlabTitle, icon: 'matlab' },
     { href: '/digits', label: m.nav.neural, title: m.nav.neuralTitle, icon: 'digits' },
     { href: '/whiteboard', label: m.nav.whiteboard, title: m.nav.whiteboardTitle, icon: 'whiteboard' },

@@ -18,7 +18,7 @@
   let show = $state(false);
 
   const dockLinks = SITE_NAV_LINKS.filter((l) =>
-    ['/notes', '/python', '/graph'].includes(l.href),
+    ['/notes', '/compilers', '/graph'].includes(l.href),
   );
 
   onMount(() => {

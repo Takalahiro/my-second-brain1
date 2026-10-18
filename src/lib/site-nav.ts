@@ -15,7 +15,7 @@ export type SiteNavLink = {
 export const SITE_NAV_LINKS: SiteNavLink[] = [
   { href: '/notes', label: zh.nav.notes, title: zh.nav.notesTitle, icon: 'notes' },
   { href: '/teaching', label: zh.nav.teaching, title: zh.nav.teachingTitle, icon: 'book' },
-  { href: '/python', label: zh.nav.python, title: zh.nav.pythonTitle, icon: 'python' },
+  { href: '/compilers', label: zh.nav.compilers, title: zh.nav.compilersTitle, icon: 'terminal' },
   { href: '/matlab', label: zh.nav.matlab, title: zh.nav.matlabTitle, icon: 'matlab' },
   { href: '/digits', label: zh.nav.neural, title: zh.nav.neuralTitle, icon: 'digits' },
   { href: '/whiteboard', label: zh.nav.whiteboard, title: zh.nav.whiteboardTitle, icon: 'whiteboard' },

@@ -42,7 +42,7 @@ const zh: ManualContent = {
       items: [
         '<a href="/notes">笔记</a>：小组件 / 折叠树；文末显示 Git 最后更新时间',
         '阅读笔记时点 <strong>工具按钮</strong>：浮窗打开 Python / MATLAB / 白板',
-        '顶栏 Logo 菜单：<a href="/python">Python</a> · <a href="/matlab">MATLAB</a> · <a href="/whiteboard">白板</a> · <a href="/graph">图谱</a>',
+        '顶栏 Logo 菜单：<a href="/compilers">编译器</a>（Python / AVR）· <a href="/matlab">MATLAB</a> · <a href="/whiteboard">白板</a> · <a href="/graph">图谱</a>',
       ],
     },
     {
@@ -87,7 +87,7 @@ const en: ManualContent = {
       items: [
         '<a href="/notes">Notes</a>: widget / tree views; Git last-updated at the bottom',
         'While reading, use the <strong>tools button</strong> to open Python / MATLAB / Whiteboard',
-        'Logo menu: <a href="/python">Python</a> · <a href="/matlab">MATLAB</a> · <a href="/whiteboard">Whiteboard</a> · <a href="/graph">Graph</a>',
+        'Logo menu: <a href="/compilers">Compilers</a> (Python / AVR) · <a href="/matlab">MATLAB</a> · <a href="/whiteboard">Whiteboard</a> · <a href="/graph">Graph</a>',
       ],
     },
     {

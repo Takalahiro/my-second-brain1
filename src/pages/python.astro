@@ -1,8 +1,3 @@
 ---
-import ToolLayout from '../layouts/ToolLayout.astro';
-import PythonIDE from '../components/PythonIDE.svelte';
+return Astro.redirect('/compilers/?lang=python');
 ---
-
-<ToolLayout title="Python 在线编译器 · My Second Brain" description="Pyodide 浏览器内运行 Python，逐步追踪解释每行代码在做什么">
-  <PythonIDE client:only="svelte" />
-</ToolLayout>
