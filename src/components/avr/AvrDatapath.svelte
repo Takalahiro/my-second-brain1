@@ -275,7 +275,8 @@
   </div>
   <p class="spec-note">{spec.note}</p>
 
-  <svg class="sheet" viewBox="0 0 920 560" role="img" aria-label="固定坐标数据通路" onwheel={onWheel}>
+  <div class="diagram">
+  <svg class="sheet" viewBox="0 0 920 560" preserveAspectRatio="xMidYMid meet" role="img" aria-label="固定坐标数据通路" onwheel={onWheel}>
     <defs>
       <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 L8 4 L0 8 Z" class="arrow-head" />
@@ -449,6 +450,7 @@
       <path role="img" aria-label="数据总线到 I/O" d="M660 440 V500 M790 440 V500" onmouseenter={(e) => enter('io', e)} onmousemove={place} onmouseleave={() => (hover = null)} />
     </g>
   </svg>
+  </div>
 
   {#each prefs.openParts as part (part)}
     <div class="overlay" style="left: {ANCHOR[part].x}%; top: {ANCHOR[part].y}%">
@@ -474,6 +476,7 @@
     </div>
   {/if}
 
+  <div class="sheet-foot">
   <div class="time">
     <button type="button" onclick={() => bump(-1)}>上一拍</button>
     <input
@@ -548,10 +551,13 @@
       {/each}
     </details>
   {/if}
+  </div>
 </div>
 
 <style>
-  .sheet-wrap { position: relative; display: flex; flex-direction: column; min-height: 0; height: 100%; padding: var(--space-2); overflow: auto; }
+  .sheet-wrap { position: relative; display: flex; flex-direction: column; min-height: 0; height: 100%; padding: var(--space-2); overflow: hidden; }
+  .diagram { flex: 1 1 auto; min-height: 8rem; overflow: hidden; }
+  .sheet-foot { flex: 0 1 auto; max-height: 42%; min-height: 0; overflow: auto; }
   .sheet-bar, .tools, .time, .ticks { display: flex; flex-wrap: wrap; gap: var(--space-1); align-items: center; }
   .sheet-title, .spec-note, .story, .perf { font-size: var(--text-xs); color: var(--text-muted); }
   .spec-note, .story, .perf { margin: 2px 0; }
@@ -568,7 +574,7 @@
   .ticks button.mark { color: var(--accent-in); }
   .ticks button.chain { background: var(--overlay-subtle); }
   .scale, .tools label, details label { font-size: var(--text-xs); color: var(--text-muted); display: inline-flex; gap: var(--space-1); align-items: center; }
-  .sheet { width: 100%; height: auto; flex: none; }
+  .sheet { width: 100%; height: 100%; display: block; }
   .box rect { fill: var(--bg); stroke: var(--text); stroke-width: 1.25; }
   .box.on rect { stroke: var(--accent); stroke-width: 2.25; fill: var(--overlay-subtle); }
   .box.seek rect { stroke: var(--accent-in); }

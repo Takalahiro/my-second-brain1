@@ -66,6 +66,7 @@
     flex-direction: column;
     height: calc(100dvh - var(--site-nav-offset, 88px));
     min-height: 0;
+    overflow: hidden;
   }
   .compiler-tabs {
     display: flex;
@@ -94,7 +95,7 @@
   }
   .compiler-tab-label { font-size: var(--text-sm); font-weight: var(--weight-semibold); }
   .compiler-tab-hint { font-size: var(--text-xs); }
-  .compiler-stage { flex: 1; min-height: 0; position: relative; }
+  .compiler-stage { flex: 1; min-height: 0; position: relative; overflow: hidden; }
   .compiler-pane { height: 100%; min-height: 0; }
   .compiler-pane[hidden] { display: none; }
   .compiler-pane :global(.py-ide),

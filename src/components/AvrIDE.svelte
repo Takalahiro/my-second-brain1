@@ -93,7 +93,9 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
-    height: calc(100dvh - var(--site-nav-offset, 88px));
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
     padding: var(--space-3) var(--space-4) var(--space-4);
     color: var(--text);
   }
@@ -118,6 +120,7 @@
   .avr-workspace {
     flex: 1;
     min-height: 0;
+    overflow: hidden;
     display: grid;
     grid-template-columns: minmax(300px, 1.1fr) minmax(280px, 0.9fr);
     gap: var(--space-3);
@@ -132,9 +135,9 @@
     overflow: hidden;
     box-shadow: var(--shadow-sm);
   }
-  .avr-side { display: flex; flex-direction: column; gap: var(--space-3); min-height: 0; }
-  .avr-steps { flex: 0.9; padding: var(--space-3); }
-  .avr-path { flex: 1.15; }
+  .avr-side { display: flex; flex-direction: column; gap: var(--space-3); min-height: 0; overflow: hidden; }
+  .avr-steps { flex: 0 1 32%; min-height: 0; padding: var(--space-3); }
+  .avr-path { flex: 1 1 68%; min-height: 0; overflow: hidden; }
   .avr-pane-head {
     display: flex;
     justify-content: space-between;
