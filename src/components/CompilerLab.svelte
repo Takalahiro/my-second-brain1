@@ -17,7 +17,7 @@
 
   const tabs: { id: Lang; label: string; hint: string }[] = [
     { id: 'python', label: 'Python', hint: 'Pyodide 逐步追踪' },
-    { id: 'avr', label: 'AVR 汇编', hint: '教学子集模拟' },
+    { id: 'avr', label: 'AVR 汇编', hint: '完整指令集模拟' },
   ];
 
   function select(next: Lang) {

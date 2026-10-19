@@ -1,4 +1,6 @@
-/** 教学型 AVR 子集：汇编 + 逐步模拟（非周期精确）。 */
+/** AVR 汇编教学模拟：完整指令集，按效果逐步执行（非周期精确）。 */
+
+import { AVR_MNEMONIC_SET, encodeInst, executeInst, type Inst } from './isa';
 
 export type AvrEvent = 'execute' | 'branch' | 'io' | 'halt' | 'exception';
 
@@ -8,6 +10,13 @@ export type AvrSnapshot = {
   regs: number[];
   portb: number;
   ddrb: number;
+  /** SREG：I T H S V N Z C */
+  i: boolean;
+  t: boolean;
+  h: boolean;
+  s: boolean;
+  v: boolean;
+  n: boolean;
   z: boolean;
   c: boolean;
   /** 数据段字节（相对 dataBase） */
@@ -23,6 +32,7 @@ export type AvrFlow = {
   ptr?: 'x' | 'y' | 'z';
   post?: boolean;
   pre?: boolean;
+  disp?: number;
 };
 
 export type AvrTraceStep = {
@@ -46,40 +56,25 @@ export type AvrTraceResult = {
   symbols: Record<string, number>;
 };
 
-const IO_NAMES: Record<string, number> = {
-  pinb: 0x03,
-  ddrb: 0x04,
-  portb: 0x05,
-};
-
-type Inst = {
-  op: string;
-  line: number;
-  text: string;
-  rd?: number;
-  rr?: number;
-  k?: number;
-  a?: number;
-  target?: number;
-  ptrBase?: number;
-  ptrPre?: boolean;
-  ptrPost?: boolean;
-};
-
-const MNEMONICS = new Set([
-  'ldi', 'mov', 'add', 'sub', 'and', 'or', 'eor', 'inc', 'dec',
-  'cpi', 'cp', 'subi', 'rjmp', 'jmp', 'breq', 'brne', 'out', 'in', 'nop',
-  'ld', 'st', 'ret',
-]);
-
 const DATA_BASE = 0x100;
 const MAX_STEPS = 256;
 const REPEAT_FOLD = 40;
 
-const PTR_BASE: Record<string, number> = { x: 26, y: 28, z: 30 };
-
 function emptySnap(): AvrSnapshot {
-  return { regs: Array(32).fill(0), portb: 0, ddrb: 0, z: false, c: false, data: [] };
+  return {
+    regs: Array(32).fill(0),
+    portb: 0,
+    ddrb: 0,
+    i: false,
+    t: false,
+    h: false,
+    s: false,
+    v: false,
+    n: false,
+    z: false,
+    c: false,
+    data: [],
+  };
 }
 
 export function emptyTrace(): AvrTraceResult {
@@ -94,48 +89,40 @@ export const EVENT_LABELS: Record<AvrEvent, string> = {
   exception: '错误',
 };
 
-function parseReg(tok: string): number | null {
-  const m = /^r(\d{1,2})$/i.exec(tok);
-  if (!m) return null;
-  const n = Number(m[1]);
-  return n <= 31 ? n : null;
-}
-
-function parseImm(tok: string): number | null {
-  if (/^0x[0-9a-f]+$/i.test(tok)) return Number(tok) & 0xff;
-  if (/^\$[0-9a-f]+$/i.test(tok)) return parseInt(tok.slice(1), 16) & 0xff;
-  if (/^\d+$/.test(tok)) return Number(tok) & 0xff;
+function parseByte(tok: string): number | null {
+  if (/^0x[0-9a-f]+$/i.test(tok)) {
+    const n = Number(tok);
+    return n <= 0xff ? n : null;
+  }
+  if (/^\$[0-9a-f]+$/i.test(tok)) {
+    const n = parseInt(tok.slice(1), 16);
+    return n <= 0xff ? n : null;
+  }
+  if (/^\d+$/.test(tok)) {
+    const n = Number(tok);
+    return n <= 0xff ? n : null;
+  }
   return null;
 }
 
-function parseIo(tok: string): number | null {
-  const named = IO_NAMES[tok.toLowerCase()];
-  if (named != null) return named;
-  return parseImm(tok);
+function parseWord(tok: string): number | null {
+  if (/^0x[0-9a-f]+$/i.test(tok)) {
+    const n = Number(tok);
+    return n <= 0xffff ? n : null;
+  }
+  if (/^\$[0-9a-f]+$/i.test(tok)) {
+    const n = parseInt(tok.slice(1), 16);
+    return n <= 0xffff ? n : null;
+  }
+  if (/^\d+$/.test(tok)) {
+    const n = Number(tok);
+    return n <= 0xffff ? n : null;
+  }
+  return null;
 }
 
 function splitOps(rest: string): string[] {
   return rest.split(',').map((s) => s.trim()).filter(Boolean);
-}
-
-function parsePtr(tok: string): { base: number; pre: boolean; post: boolean } | null {
-  const m = /^(-)?([XYZ])(\+)?$/i.exec(tok);
-  if (!m || (m[1] && m[3])) return null;
-  return { base: PTR_BASE[m[2].toLowerCase()], pre: Boolean(m[1]), post: Boolean(m[3]) };
-}
-
-function parseImmOrAddr(tok: string, dataSymbols: Map<string, number>): number | null {
-  const lo = /^lo8\(([A-Za-z_]\w*)\)$/i.exec(tok);
-  if (lo) {
-    const addr = dataSymbols.get(lo[1].toLowerCase());
-    return addr == null ? null : addr & 0xff;
-  }
-  const hi = /^hi8\(([A-Za-z_]\w*)\)$/i.exec(tok);
-  if (hi) {
-    const addr = dataSymbols.get(hi[1].toLowerCase());
-    return addr == null ? null : (addr >> 8) & 0xff;
-  }
-  return parseImm(tok);
 }
 
 export function assemble(source: string): {
@@ -194,6 +181,34 @@ export function assemble(source: string): {
         if (err) return failAll(err);
         continue;
       }
+      const byteDir = /^(?:([A-Za-z_]\w*):)?\s*\.(?:byte|db)\s+(.+)$/i.exec(text);
+      if (byteDir) {
+        const parts = byteDir[2].split(',').map((s) => s.trim()).filter(Boolean);
+        const bytes: number[] = [];
+        for (const part of parts) {
+          const n = parseByte(part);
+          if (n == null) return failAll(`L${lineNo}: .byte 需要 0–255 的数`);
+          bytes.push(n);
+        }
+        if (!bytes.length) return failAll(`L${lineNo}: .byte 缺少数值`);
+        const err = place(byteDir[1]?.toLowerCase() ?? null, bytes, lineNo);
+        if (err) return failAll(err);
+        continue;
+      }
+      const wordDir = /^(?:([A-Za-z_]\w*):)?\s*\.dw\s+(.+)$/i.exec(text);
+      if (wordDir) {
+        const parts = wordDir[2].split(',').map((s) => s.trim()).filter(Boolean);
+        const bytes: number[] = [];
+        for (const part of parts) {
+          const n = parseWord(part);
+          if (n == null) return failAll(`L${lineNo}: .dw 需要 0–65535 的数`);
+          bytes.push(n & 0xff, (n >> 8) & 0xff);
+        }
+        if (!bytes.length) return failAll(`L${lineNo}: .dw 缺少数值`);
+        const err = place(wordDir[1]?.toLowerCase() ?? null, bytes, lineNo);
+        if (err) return failAll(err);
+        continue;
+      }
       const space = /^(?:([A-Za-z_]\w*):)?\s*\.space\s+(\d+)\s*(?:,\s*(\d+))?\s*$/i.exec(text);
       if (space) {
         const n = Number(space[2]);
@@ -231,8 +246,8 @@ export function assemble(source: string): {
 
     const parts = body.split(/\s+/);
     const mnemonic = parts[0].toLowerCase();
-    if (!MNEMONICS.has(mnemonic)) {
-      return failAll(`L${lineNo}: 未知指令 ${parts[0]}（教学子集不含此助记符）`);
+    if (!AVR_MNEMONIC_SET.has(mnemonic)) {
+      return failAll(`L${lineNo}: 不认识的指令 ${parts[0]}`);
     }
     pending.push({
       line: lineNo,
@@ -244,106 +259,9 @@ export function assemble(source: string): {
 
   const program: Inst[] = [];
   for (const row of pending) {
-    const fail = (msg: string) => failAll(`L${row.line}: ${msg}`);
-    const need = (n: number) => row.args.length === n;
-
-    const reg = (tok: string | undefined, name: string) => {
-      if (!tok) return null;
-      const r = parseReg(tok);
-      return r;
-    };
-
-    if (row.mnemonic === 'nop') {
-      if (!need(0)) return fail('NOP 不接受操作数');
-      program.push({ op: 'nop', line: row.line, text: row.text });
-      continue;
-    }
-
-    if (row.mnemonic === 'ldi' || row.mnemonic === 'cpi' || row.mnemonic === 'subi') {
-      if (!need(2)) return fail(`${row.mnemonic.toUpperCase()} Rd, K`);
-      const rd = reg(row.args[0], 'Rd');
-      const k = parseImmOrAddr(row.args[1], dataSymbols);
-      if (rd == null || k == null) return fail('寄存器、立即数或 lo8/hi8 符号无法解析');
-      if (rd < 16) return fail(`${row.mnemonic.toUpperCase()} 只能用于 R16–R31`);
-      program.push({ op: row.mnemonic, line: row.line, text: row.text, rd, k });
-      continue;
-    }
-
-    if (row.mnemonic === 'mov' || row.mnemonic === 'add' || row.mnemonic === 'sub'
-      || row.mnemonic === 'and' || row.mnemonic === 'or' || row.mnemonic === 'eor' || row.mnemonic === 'cp') {
-      if (!need(2)) return fail(`${row.mnemonic.toUpperCase()} Rd, Rr`);
-      const rd = reg(row.args[0], 'Rd');
-      const rr = reg(row.args[1], 'Rr');
-      if (rd == null || rr == null) return fail('需要两个寄存器');
-      program.push({ op: row.mnemonic, line: row.line, text: row.text, rd, rr });
-      continue;
-    }
-
-    if (row.mnemonic === 'inc' || row.mnemonic === 'dec') {
-      if (!need(1)) return fail(`${row.mnemonic.toUpperCase()} Rd`);
-      const rd = reg(row.args[0], 'Rd');
-      if (rd == null) return fail('需要寄存器');
-      program.push({ op: row.mnemonic, line: row.line, text: row.text, rd });
-      continue;
-    }
-
-    if (row.mnemonic === 'ld') {
-      if (!need(2)) return fail('LD Rd, X+');
-      const rd = reg(row.args[0], 'Rd');
-      const ptr = parsePtr(row.args[1]);
-      if (rd == null || !ptr) return fail('LD 需要寄存器和 X/Y/Z 指针');
-      program.push({
-        op: 'ld', line: row.line, text: row.text, rd,
-        ptrBase: ptr.base, ptrPre: ptr.pre, ptrPost: ptr.post,
-      });
-      continue;
-    }
-
-    if (row.mnemonic === 'st') {
-      if (!need(2)) return fail('ST Z+, Rr');
-      const ptr = parsePtr(row.args[0]);
-      const rr = reg(row.args[1], 'Rr');
-      if (!ptr || rr == null) return fail('ST 需要 X/Y/Z 指针和寄存器');
-      program.push({
-        op: 'st', line: row.line, text: row.text, rr,
-        ptrBase: ptr.base, ptrPre: ptr.pre, ptrPost: ptr.post,
-      });
-      continue;
-    }
-
-    if (row.mnemonic === 'ret') {
-      if (!need(0)) return fail('RET 不接受操作数');
-      program.push({ op: 'ret', line: row.line, text: row.text });
-      continue;
-    }
-
-    if (row.mnemonic === 'rjmp' || row.mnemonic === 'jmp' || row.mnemonic === 'breq' || row.mnemonic === 'brne') {
-      if (!need(1)) return fail(`${row.mnemonic.toUpperCase()} 标签`);
-      const label = row.args[0].toLowerCase();
-      if (!labels.has(label)) return fail(`找不到标签 ${row.args[0]}`);
-      program.push({ op: row.mnemonic, line: row.line, text: row.text, target: labels.get(label) });
-      continue;
-    }
-
-    if (row.mnemonic === 'out') {
-      if (!need(2)) return fail('OUT A, Rr');
-      const a = parseIo(row.args[0]);
-      const rr = reg(row.args[1], 'Rr');
-      if (a == null || rr == null) return fail('端口或寄存器无法解析');
-      program.push({ op: 'out', line: row.line, text: row.text, a, rr });
-      continue;
-    }
-
-    if (row.mnemonic === 'in') {
-      if (!need(2)) return fail('IN Rd, A');
-      const rd = reg(row.args[0], 'Rd');
-      const a = parseIo(row.args[1]);
-      if (rd == null || a == null) return fail('寄存器或端口无法解析');
-      program.push({ op: 'in', line: row.line, text: row.text, rd, a });
-      continue;
-    }
-
-    return fail(`无法编码 ${row.mnemonic}`);
+    const encoded = encodeInst(row, labels, dataSymbols);
+    if (typeof encoded === 'string') return failAll(`L${row.line}: ${encoded}`);
+    program.push(encoded);
   }
 
   const symbols = Object.fromEntries(dataSymbols);
@@ -358,7 +276,20 @@ export function assemble(source: string): {
 }
 
 function cloneSnap(s: AvrSnapshot, data: number[]): AvrSnapshot {
-  return { regs: s.regs.slice(), portb: s.portb, ddrb: s.ddrb, z: s.z, c: s.c, data: data.slice() };
+  return {
+    regs: s.regs.slice(),
+    portb: s.portb,
+    ddrb: s.ddrb,
+    i: s.i,
+    t: s.t,
+    h: s.h,
+    s: s.s,
+    v: s.v,
+    n: s.n,
+    z: s.z,
+    c: s.c,
+    data: data.slice(),
+  };
 }
 
 function readCString(sram: Uint8Array, addr: number): string {
@@ -369,27 +300,6 @@ function readCString(sram: Uint8Array, addr: number): string {
     s += c >= 32 && c < 127 ? String.fromCharCode(c) : '.';
   }
   return s;
-}
-
-function ptrWord(regs: number[], base: number): number {
-  return (regs[base] | (regs[base + 1] << 8)) & 0xffff;
-}
-
-function setPtrWord(regs: number[], base: number, value: number) {
-  regs[base] = value & 0xff;
-  regs[base + 1] = (value >> 8) & 0xff;
-}
-
-function bits(n: number): string {
-  return (n & 0xff).toString(2).padStart(8, '0');
-}
-
-function hex(n: number): string {
-  return `0x${(n & 0xff).toString(16).toUpperCase().padStart(2, '0')}`;
-}
-
-function hex16(n: number): string {
-  return `0x${(n & 0xffff).toString(16).toUpperCase().padStart(4, '0')}`;
 }
 
 export function runAvr(source: string): AvrTraceResult {
@@ -436,26 +346,27 @@ export function runAvr(source: string): AvrTraceResult {
   function flowOf(inst: Inst | null): AvrFlow | undefined {
     if (!inst) return undefined;
     const ptr = inst.ptrBase === 26 ? 'x' : inst.ptrBase === 28 ? 'y' : inst.ptrBase === 30 ? 'z' : undefined;
+    const ioOp = inst.op === 'in' || inst.op === 'out' || inst.op === 'sbi' || inst.op === 'cbi' || inst.op === 'sbic' || inst.op === 'sbis';
     return {
       op: inst.op,
       rd: inst.rd,
       rr: inst.rr,
       k: inst.k,
-      io: inst.op === 'in' || inst.op === 'out' ? inst.a : undefined,
+      io: ioOp ? inst.a : undefined,
       ptr,
       post: inst.ptrPost,
       pre: inst.ptrPre,
+      disp: inst.disp,
     };
   }
 
-  const syncIo = () => {
-    state.portb = io[0x05];
-    state.ddrb = io[0x04];
-  };
+  const flash = new Uint8Array(0x10000);
+  const sp = { v: 0x08ff };
+  let runError: string | null = null;
 
   while (!stop && steps.length < MAX_STEPS) {
     if (pc < 0 || pc >= program.length) {
-      push(null, 'halt', 'misc', pc >= program.length ? 'PC 越过末条指令，程序结束' : 'PC 越界');
+      push(null, 'halt', 'misc', pc >= program.length ? '程序走到头了' : '程序计数器跑出这段代码了');
       break;
     }
 
@@ -463,191 +374,36 @@ export function runAvr(source: string): AvrTraceResult {
     hits.set(pc, seen);
     if (seen >= REPEAT_FOLD) {
       const inst = program[pc];
-      push(inst, 'halt', 'ctrl', `同一指令已重复执行，循环折叠（教学上限）`, seen);
+      push(inst, 'halt', 'ctrl', '这条指令已经重复太多次，循环在这里收起来，免得一直转下去', seen);
       break;
     }
 
     const inst = program[pc];
     const next = pc + 1;
-
-    const alu2 = (name: string, fn: (a: number, b: number) => { v: number; c: boolean }) => {
-      const a = state.regs[inst.rd!];
-      const b = state.regs[inst.rr!];
-      const { v, c } = fn(a, b);
-      state.regs[inst.rd!] = v & 0xff;
-      state.z = (v & 0xff) === 0;
-      state.c = c;
-      push(inst, 'execute', 'alu', `${name} R${inst.rd}：${hex(a)} 与 ${hex(b)} → ${hex(v)}，Z=${state.z ? 1 : 0} C=${c ? 1 : 0}`);
-      pc = next;
-    };
-
-    switch (inst.op) {
-      case 'nop':
-        push(inst, 'execute', 'misc', 'NOP：空操作，PC + 1');
-        pc = next;
-        break;
-      case 'ldi': {
-        state.regs[inst.rd!] = inst.k! & 0xff;
-        push(inst, 'execute', 'load', `LDI 把立即数 ${hex(inst.k!)} 写入 R${inst.rd}`);
-        pc = next;
-        break;
-      }
-      case 'mov': {
-        state.regs[inst.rd!] = state.regs[inst.rr!];
-        push(inst, 'execute', 'load', `MOV：R${inst.rd} ← R${inst.rr} = ${hex(state.regs[inst.rd!])}`);
-        pc = next;
-        break;
-      }
-      case 'add':
-        alu2('ADD', (a, b) => ({ v: a + b, c: a + b > 255 }));
-        break;
-      case 'sub':
-        alu2('SUB', (a, b) => ({ v: (a - b) & 0xff, c: a < b }));
-        break;
-      case 'and':
-        alu2('AND', (a, b) => ({ v: a & b, c: state.c }));
-        break;
-      case 'or':
-        alu2('OR', (a, b) => ({ v: a | b, c: state.c }));
-        break;
-      case 'eor':
-        alu2('EOR', (a, b) => ({ v: a ^ b, c: state.c }));
-        break;
-      case 'inc': {
-        const a = state.regs[inst.rd!];
-        const v = (a + 1) & 0xff;
-        state.regs[inst.rd!] = v;
-        state.z = v === 0;
-        push(inst, 'execute', 'alu', `INC R${inst.rd}：${hex(a)} → ${hex(v)}`);
-        pc = next;
-        break;
-      }
-      case 'dec': {
-        const a = state.regs[inst.rd!];
-        const v = (a - 1) & 0xff;
-        state.regs[inst.rd!] = v;
-        state.z = v === 0;
-        state.c = a === 0;
-        push(inst, 'execute', 'alu', `DEC R${inst.rd}：${hex(a)} → ${hex(v)}`);
-        pc = next;
-        break;
-      }
-      case 'subi': {
-        const a = state.regs[inst.rd!];
-        const k = inst.k!;
-        const v = (a - k) & 0xff;
-        state.regs[inst.rd!] = v;
-        state.z = v === 0;
-        state.c = a < k;
-        const ch = v >= 32 && v < 127 ? ` '${String.fromCharCode(v)}'` : '';
-        push(inst, 'execute', 'alu', `SUBI R${inst.rd}：${hex(a)} - ${k} → ${hex(v)}${ch}`);
-        pc = next;
-        break;
-      }
-      case 'ld': {
-        let addr = ptrWord(state.regs, inst.ptrBase!);
-        if (inst.ptrPre) addr = (addr - 1) & 0xffff;
-        const v = sram[addr] ?? 0;
-        state.regs[inst.rd!] = v;
-        if (inst.ptrPre) setPtrWord(state.regs, inst.ptrBase!, addr);
-        if (inst.ptrPost) setPtrWord(state.regs, inst.ptrBase!, (addr + 1) & 0xffff);
-        const ch = v >= 32 && v < 127 ? ` '${String.fromCharCode(v)}'` : v === 0 ? ' NUL' : '';
-        push(inst, 'execute', 'load', `LD R${inst.rd} ← SRAM[${hex16(addr)}] = ${hex(v)}${ch}`);
-        pc = next;
-        break;
-      }
-      case 'st': {
-        let addr = ptrWord(state.regs, inst.ptrBase!);
-        if (inst.ptrPre) addr = (addr - 1) & 0xffff;
-        const v = state.regs[inst.rr!];
-        sram[addr] = v;
-        if (inst.ptrPre) setPtrWord(state.regs, inst.ptrBase!, addr);
-        if (inst.ptrPost) setPtrWord(state.regs, inst.ptrBase!, (addr + 1) & 0xffff);
-        const ch = v >= 32 && v < 127 ? ` '${String.fromCharCode(v)}'` : '';
-        push(inst, 'execute', 'load', `ST SRAM[${hex16(addr)}] ← R${inst.rr} = ${hex(v)}${ch}`);
-        pc = next;
-        break;
-      }
-      case 'jmp': {
-        const dest = inst.target!;
-        push(inst, 'branch', 'ctrl', `JMP：跳到指令 #${dest}`);
-        pc = dest;
-        break;
-      }
-      case 'ret': {
-        push(inst, 'halt', 'ctrl', 'RET：函数返回');
-        stop = true;
-        break;
-      }
-      case 'cpi': {
-        const a = state.regs[inst.rd!];
-        const k = inst.k!;
-        const v = (a - k) & 0xff;
-        state.z = v === 0;
-        state.c = a < k;
-        push(inst, 'execute', 'alu', `CPI：比较 R${inst.rd}=${hex(a)} 与 ${hex(k)}，不写回寄存器。Z=${state.z ? 1 : 0}`);
-        pc = next;
-        break;
-      }
-      case 'cp': {
-        const a = state.regs[inst.rd!];
-        const b = state.regs[inst.rr!];
-        const v = (a - b) & 0xff;
-        state.z = v === 0;
-        state.c = a < b;
-        push(inst, 'execute', 'alu', `CP：比较 R${inst.rd}=${hex(a)} 与 R${inst.rr}=${hex(b)}。Z=${state.z ? 1 : 0}`);
-        pc = next;
-        break;
-      }
-      case 'rjmp': {
-        const dest = inst.target!;
-        push(inst, 'branch', 'ctrl', `RJMP：无条件跳到指令 #${dest}`);
-        pc = dest;
-        break;
-      }
-      case 'breq':
-      case 'brne': {
-        const take = inst.op === 'breq' ? state.z : !state.z;
-        const dest = inst.target!;
-        if (take) {
-          push(inst, 'branch', 'ctrl', `${inst.op.toUpperCase()} 条件成立（Z=${state.z ? 1 : 0}），跳到 #${dest}`);
-          pc = dest;
-        } else {
-          push(inst, 'branch', 'ctrl', `${inst.op.toUpperCase()} 条件不成立（Z=${state.z ? 1 : 0}），顺序执行`);
-          pc = next;
-        }
-        break;
-      }
-      case 'out': {
-        const prev = io[inst.a!];
-        io[inst.a!] = state.regs[inst.rr!];
-        if (inst.a === 0x05) io[0x03] = io[0x05];
-        syncIo();
-        const name = inst.a === 0x05 ? 'PORTB' : inst.a === 0x04 ? 'DDRB' : `IO ${hex(inst.a!)}`;
-        push(inst, 'io', 'io', `OUT ${name} ← R${inst.rr} = ${hex(io[inst.a!])} (${bits(io[inst.a!])})`);
-        if (inst.a === 0x05 && prev !== io[0x05]) {
-          logs.push(`PORTB ${bits(prev)} → ${bits(io[0x05])}`);
-        }
-        pc = next;
-        break;
-      }
-      case 'in': {
-        const v = io[inst.a!];
-        state.regs[inst.rd!] = v;
-        syncIo();
-        const name = inst.a === 0x05 ? 'PORTB' : inst.a === 0x04 ? 'DDRB' : inst.a === 0x03 ? 'PINB' : `IO ${hex(inst.a!)}`;
-        push(inst, 'io', 'io', `IN R${inst.rd} ← ${name} = ${hex(v)}`);
-        pc = next;
-        break;
-      }
-      default:
-        push(inst, 'exception', 'misc', `未实现的操作 ${inst.op}`);
-        return { steps, log: logs.join('\n'), error: `未实现 ${inst.op}` };
+    const outcome = executeInst({
+      inst,
+      state,
+      sram,
+      flash,
+      io,
+      pc,
+      next,
+      programLength: program.length,
+      sp,
+    });
+    if (outcome.log) logs.push(outcome.log);
+    push(inst, outcome.event, outcome.category, outcome.explanation);
+    pc = outcome.pc;
+    if (outcome.event === 'exception') {
+      runError = outcome.explanation;
+      stop = true;
+    } else if (outcome.stop) {
+      stop = true;
     }
   }
 
   if (!stop && steps.length >= MAX_STEPS && steps[steps.length - 1]?.event !== 'halt') {
-    push(program[Math.min(pc, program.length - 1)] ?? null, 'halt', 'misc', '达到单次追踪步数上限');
+    push(program[Math.min(pc, program.length - 1)] ?? null, 'halt', 'misc', '步数太多，这次追踪先停在这里');
   }
 
   const sol = symbols.sol;
@@ -655,7 +411,7 @@ export function runAvr(source: string): AvrTraceResult {
     logs.push(`sol = "${readCString(sram, sol)}"`);
   }
 
-  return { steps, log: logs.join('\n'), error: null, dataBase, symbols };
+  return { steps, log: logs.join('\n'), error: runError, dataBase, symbols };
 }
 
 export const SAMPLE_STRINGS = `.section .data
@@ -706,7 +462,7 @@ upper:
 .end
 `;
 
-export const SAMPLE_BLINK = `; AVR 教学子集 · PORTB 走灯
+export const SAMPLE_BLINK = `; AVR 教学模拟 · PORTB 走灯
 ; DDRB=0x04  PORTB=0x05
 ldi r16, 0xFF
 out DDRB, r16

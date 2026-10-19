@@ -244,7 +244,7 @@
       ctrl: { title: 'Control Signals', carry: '不携带数据。', logic: signals.join(' · ') },
       toAlu: { title: '寄存器 → ALU', carry: '操作数进入 ALU。', logic: step ? `R16=${hex(step.snap.regs[16])}` : '空闲' },
       fromAlu: { title: 'ALU → 寄存器', carry: '结果写回。比较指令不写回。', logic: op === 'cpi' || op === 'cp' ? '只留标志' : '写回 Rd' },
-      sreg: { title: 'ALU → SREG', carry: 'Z 与 C。', logic: step ? `Z=${step.snap.z ? 1 : 0} C=${step.snap.c ? 1 : 0}` : '—' },
+      sreg: { title: 'ALU → SREG', carry: '八个标志：中断、T、半进位、符号、溢出、负、零、进位。', logic: step ? `Z=${step.snap.z ? 1 : 0} C=${step.snap.c ? 1 : 0} N=${step.snap.n ? 1 : 0} V=${step.snap.v ? 1 : 0}` : '—' },
       indirect: { title: '间接寻址', carry: 'X/Y/Z 地址。', logic: mem ? `${op.toUpperCase()} ${addr != null ? hex(addr, 4) : ''}` : '本步不用' },
       direct: { title: '直接寻址', carry: '立即数或口地址来自指令字。', logic: op === 'ldi' ? `K=${hex(step?.flow?.k ?? 0)}` : '本步不用' },
       dbus: { title: '8-bit Data Bus', carry: '数据字节。指令不走这里。', logic: op === 'ld' ? `SRAM → R${step?.flow?.rd ?? 16}` : op === 'st' ? '寄存器 → SRAM' : '空闲' },
@@ -397,7 +397,7 @@
     <g class="box" class:on={on('sreg')}>
       <rect x="268" y="372" width="124" height="40" />
       <text x="330" y="390" text-anchor="middle">Status Register</text>
-      {#if detailOn && step}<text class="sub" x="330" y="406" text-anchor="middle">Z {step.snap.z ? 1 : 0}  C {step.snap.c ? 1 : 0}</text>{/if}
+      {#if detailOn && step}<text class="sub" x="330" y="406" text-anchor="middle">Z{step.snap.z ? 1 : 0} C{step.snap.c ? 1 : 0} N{step.snap.n ? 1 : 0} V{step.snap.v ? 1 : 0}</text>{/if}
     </g>
     <g class="box" class:on={on('dmem')}>
       <rect x="440" y="268" width="160" height="132" />

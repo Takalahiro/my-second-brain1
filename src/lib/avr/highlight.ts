@@ -1,4 +1,6 @@
-const OPS = String.raw`\b(ldi|mov|add|subi|sub|and|or|eor|inc|dec|cpi|cp|rjmp|jmp|breq|brne|out|in|nop|ld|st|ret|lo8|hi8|asciz|space|section|global)\b`;
+import { AVR_MNEMONICS } from './isa';
+
+const OPS = `\\b(${[...AVR_MNEMONICS, 'lo8', 'hi8', 'asciz', 'byte', 'db', 'dw', 'space', 'section', 'global', 'end'].join('|')})\\b`;
 const REGS = String.raw`\b(r\d{1,2}|ddrb|portb|pinb)\b`;
 const NUMS = String.raw`\b(0x[0-9a-f]+|\$[0-9a-f]+|\d+)\b`;
 const LBL = String.raw`(^|[\s])([A-Za-z_]\w*):`;

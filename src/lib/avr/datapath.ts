@@ -1,4 +1,5 @@
 import type { AvrFlow, AvrTraceStep } from './engine';
+import { ALU_OPS, BRANCH_OPS, DIRECT_MEM_OPS, INDIRECT_OPS, IO_OPS } from './isa';
 
 export type ArchId = 'harvard' | 'vonNeumann' | 'modified';
 export type Density = 'simple' | 'detail';
@@ -83,8 +84,8 @@ export type Hot =
   | 'dmem' | 'dbus' | 'abus' | 'indirect' | 'direct' | 'io'
   | 'unified' | 'icache' | 'dcache' | 'backing';
 
-const ALU = new Set(['add', 'sub', 'and', 'or', 'eor', 'inc', 'dec', 'subi', 'cpi', 'cp']);
-const BRANCH = new Set(['rjmp', 'jmp', 'breq', 'brne', 'ret']);
+const ALU = ALU_OPS;
+const BRANCH = BRANCH_OPS;
 
 export function hotSet(flow: AvrFlow | undefined, arch: ArchId): Set<Hot> {
   const hot = new Set<Hot>(['pc', 'ir', 'decode']);
@@ -102,10 +103,11 @@ export function hotSet(flow: AvrFlow | undefined, arch: ArchId): Set<Hot> {
     hot.add('alu');
     hot.add('sreg');
     hot.add('ctrl');
-  } else if (op === 'ld' || op === 'st' || op === 'mov') {
+  } else if (INDIRECT_OPS.has(op) || DIRECT_MEM_OPS.has(op) || op === 'mov' || op === 'movw' || op === 'push' || op === 'pop') {
     hot.add('regs');
     hot.add('ctrl');
-    if (op !== 'mov') {
+    if (DIRECT_MEM_OPS.has(op)) hot.add('direct');
+    if (INDIRECT_OPS.has(op)) {
       hot.add('indirect');
       hot.add('abus');
       hot.add('dbus');
@@ -116,15 +118,15 @@ export function hotSet(flow: AvrFlow | undefined, arch: ArchId): Set<Hot> {
         hot.add('backing');
       }
     }
-  } else if (op === 'ldi') {
+  } else if (op === 'ldi' || op === 'ser') {
     hot.add('regs');
     hot.add('ctrl');
     hot.add('direct');
   } else if (BRANCH.has(op)) {
     hot.add('ctrl');
     hot.add('pc');
-    if (op === 'breq' || op === 'brne') hot.add('sreg');
-  } else if (op === 'in' || op === 'out') {
+    hot.add('sreg');
+  } else if (IO_OPS.has(op)) {
     hot.add('regs');
     hot.add('io');
     hot.add('dbus');
@@ -140,14 +142,13 @@ export function controlSignals(flow: AvrFlow | undefined): string[] {
   const op = flow?.op;
   if (!op) return ['取指'];
   const list = ['PC+1', 'IR ← 程序字'];
-  if (ALU.has(op)) list.push('ALU 使能', 'SREG 写回', op === 'cpi' || op === 'cp' ? '禁止写寄存器' : 'Rd 写回');
-  if (op === 'ldi') list.push('立即数通道', `写 R${flow?.rd ?? '?'}`);
-  if (op === 'ld') list.push(`${(flow?.ptr ?? 'x').toUpperCase()} 间接读`, '数据总线 → Rd', flow?.post ? '指针后增' : '保持指针');
-  if (op === 'st') list.push(`${(flow?.ptr ?? 'z').toUpperCase()} 间接写`, 'Rr → 数据总线', flow?.post ? '指针后增' : '保持指针');
-  if (op === 'breq' || op === 'brne') list.push('读 Z 标志', '条件改写 PC');
-  if (op === 'jmp' || op === 'rjmp') list.push('PC ← 目标');
-  if (op === 'ret') list.push('PC ← 返回');
-  if (op === 'out' || op === 'in') list.push('I/O 地址译码');
+  if (ALU.has(op)) list.push('ALU 使能', 'SREG 写回', op === 'cpi' || op === 'cp' || op === 'cpc' ? '禁止写寄存器' : 'Rd 写回');
+  if (op === 'ldi' || op === 'ser') list.push('立即数通道', `写 R${flow?.rd ?? '?'}`);
+  if (op === 'ld' || op === 'ldd') list.push(`${(flow?.ptr ?? 'x').toUpperCase()} 间接读`, '数据总线 → Rd', flow?.post ? '指针后增' : '保持指针');
+  if (op === 'st' || op === 'std') list.push(`${(flow?.ptr ?? 'z').toUpperCase()} 间接写`, 'Rr → 数据总线', flow?.post ? '指针后增' : '保持指针');
+  if (BRANCH.has(op)) list.push('读状态寄存器', '条件改写 PC');
+  if (DIRECT_MEM_OPS.has(op)) list.push(op === 'lds' ? '直接寻址读' : '直接寻址写');
+  if (IO_OPS.has(op)) list.push('I/O 地址译码');
   return list;
 }
 
@@ -175,6 +176,6 @@ export function pointerAddr(step: AvrTraceStep): number | null {
   if (!flow?.ptr) return null;
   const base = flow.ptr === 'x' ? 26 : flow.ptr === 'y' ? 28 : 30;
   const now = (step.snap.regs[base] | (step.snap.regs[base + 1] << 8)) & 0xffff;
-  if (flow.post) return (now - 1) & 0xffff;
-  return now;
+  if (flow.post) return ((now - 1) + (flow.disp ?? 0)) & 0xffff;
+  return (now + (flow.disp ?? 0)) & 0xffff;
 }

@@ -63,7 +63,7 @@ export function tickStride(scale: number, grain: StepGrain): number {
   return 1;
 }
 
-const MEM = new Set(['ld', 'st']);
+const MEM = new Set(['ld', 'ldd', 'st', 'std', 'lds', 'sts', 'lpm', 'elpm', 'push', 'pop']);
 
 export function beatsFor(step: AvrTraceStep | undefined, arch: ArchId): number {
   const op = step?.flow?.op ?? '';
@@ -80,8 +80,8 @@ function memAddr(step: AvrTraceStep): number | null {
   if (!flow?.ptr) return null;
   const base = flow.ptr === 'x' ? 26 : flow.ptr === 'y' ? 28 : 30;
   const now = (step.snap.regs[base] | (step.snap.regs[base + 1] << 8)) & 0xffff;
-  if (flow.post) return (now - 1) & 0xffff;
-  return now;
+  if (flow.post) return ((now - 1) + (flow.disp ?? 0)) & 0xffff;
+  return (now + (flow.disp ?? 0)) & 0xffff;
 }
 
 export function cyclesUpTo(steps: AvrTraceStep[], index: number, arch: ArchId): number {
@@ -113,11 +113,13 @@ export type FlagCell = { name: string; bit: number; value: 0 | 1; delta: 'up' | 
 
 const FLAG_NAMES = ['I', 'T', 'H', 'S', 'V', 'N', 'Z', 'C'] as const;
 
+const FLAG_KEY = { I: 'i', T: 't', H: 'h', S: 's', V: 'v', N: 'n', Z: 'z', C: 'c' } as const;
+
 export function flagCells(step: AvrTraceStep | null, prev: AvrTraceStep | null): FlagCell[] {
   return FLAG_NAMES.map((name, bit) => {
-    if (name !== 'Z' && name !== 'C') return { name, bit, value: 0 as const, delta: 'na' as const };
-    const cur = name === 'Z' ? !!step?.snap.z : !!step?.snap.c;
-    const was = name === 'Z' ? !!prev?.snap.z : !!prev?.snap.c;
+    const key = FLAG_KEY[name];
+    const cur = !!step?.snap[key];
+    const was = !!prev?.snap[key];
     const value = cur ? 1 : 0;
     const delta = !prev ? 'same' : cur === was ? 'same' : cur ? 'up' : 'down';
     return { name, bit, value: value as 0 | 1, delta };
@@ -125,9 +127,11 @@ export function flagCells(step: AvrTraceStep | null, prev: AvrTraceStep | null):
 }
 
 export function flagHex(step: AvrTraceStep | null): string {
-  const z = step?.snap.z ? 2 : 0;
-  const c = step?.snap.c ? 1 : 0;
-  return (z | c).toString(16).toUpperCase().padStart(2, '0');
+  const snap = step?.snap;
+  if (!snap) return '00';
+  const n = (snap.i ? 0x80 : 0) | (snap.t ? 0x40 : 0) | (snap.h ? 0x20 : 0) | (snap.s ? 0x10 : 0)
+    | (snap.v ? 0x08 : 0) | (snap.n ? 0x04 : 0) | (snap.z ? 0x02 : 0) | (snap.c ? 0x01 : 0);
+  return n.toString(16).toUpperCase().padStart(2, '0');
 }
 
 export function changedRegs(step: AvrTraceStep | null, prev: AvrTraceStep | null): Set<number> {
