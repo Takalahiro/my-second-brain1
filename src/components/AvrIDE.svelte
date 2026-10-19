@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import AvrCodeEditor from './avr/AvrCodeEditor.svelte';
   import AvrAnnotatedSource from './avr/AvrAnnotatedSource.svelte';
   import AvrStepPanel from './avr/AvrStepPanel.svelte';
@@ -11,6 +12,14 @@
   let trace = $state<AvrTraceResult | null>(null);
   let activeStep = $state(0);
   let codeView = $state<CodeView>('edit');
+  let codeRatio = $state(0.54);
+  let stepsRatio = $state(0.34);
+  let stacked = $state(false);
+  let dragging = $state<'code' | 'steps' | null>(null);
+  let workspaceEl = $state<HTMLDivElement | null>(null);
+  let sideEl = $state<HTMLElement | null>(null);
+
+  const LAYOUT_KEY = 'second-brain:avr-split';
 
   const steps = $derived(trace?.steps ?? []);
 
@@ -31,6 +40,68 @@
     code = '';
     trace = emptyTrace();
     codeView = 'edit';
+  }
+
+  function clamp(v: number, lo: number, hi: number) {
+    return Math.min(hi, Math.max(lo, v));
+  }
+
+  function persistSplit() {
+    try {
+      localStorage.setItem(LAYOUT_KEY, JSON.stringify({ codeRatio, stepsRatio }));
+    } catch { /* ignore */ }
+  }
+
+  onMount(() => {
+    try {
+      const raw = localStorage.getItem(LAYOUT_KEY);
+      if (raw) {
+        const saved = JSON.parse(raw) as { codeRatio?: number; stepsRatio?: number };
+        if (typeof saved.codeRatio === 'number') codeRatio = clamp(saved.codeRatio, 0.22, 0.78);
+        if (typeof saved.stepsRatio === 'number') stepsRatio = clamp(saved.stepsRatio, 0.16, 0.72);
+      }
+    } catch { /* ignore */ }
+    const mq = window.matchMedia('(max-width: 900px)');
+    const sync = () => { stacked = mq.matches; };
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  });
+
+  function dragSplit(which: 'code' | 'steps', e: PointerEvent) {
+    const handle = e.currentTarget;
+    if (!(handle instanceof HTMLElement)) return;
+    const host = which === 'code' ? workspaceEl : sideEl;
+    if (!host) return;
+    dragging = which;
+    e.preventDefault();
+    try { handle.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+    const axis: 'x' | 'y' = which === 'steps' || stacked ? 'y' : 'x';
+    const move = (ev: PointerEvent) => {
+      const box = host.getBoundingClientRect();
+      const span = axis === 'x' ? box.width : box.height;
+      const offset = axis === 'x' ? ev.clientX - box.left : ev.clientY - box.top;
+      if (span <= 0) return;
+      const next = offset / span;
+      if (which === 'code') codeRatio = clamp(next, 0.22, 0.78);
+      else stepsRatio = clamp(next, 0.16, 0.72);
+    };
+    const end = () => {
+      dragging = null;
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', end);
+      window.removeEventListener('pointercancel', end);
+      persistSplit();
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+  }
+
+  function nudge(which: 'code' | 'steps', dir: number) {
+    if (which === 'code') codeRatio = clamp(codeRatio + dir * 0.02, 0.22, 0.78);
+    else stepsRatio = clamp(stepsRatio + dir * 0.02, 0.16, 0.72);
+    persistSplit();
   }
 </script>
 
@@ -57,8 +128,8 @@
     {/each}
   </div>
 
-  <div class="avr-workspace">
-    <section class="avr-pane">
+  <div class="avr-workspace" class:stacked class:is-dragging={dragging} bind:this={workspaceEl}>
+    <section class="avr-pane avr-code" style="flex-basis: {codeRatio * 100}%">
       <div class="avr-pane-head">
         <div class="avr-tabs">
           <button type="button" class:active={codeView === 'edit'} onclick={() => (codeView = 'edit')}>编辑</button>
@@ -77,10 +148,42 @@
       </div>
     </section>
 
-    <aside class="avr-side">
-      <section class="avr-pane avr-steps">
+    <button
+      type="button"
+      class="avr-split"
+      role="separator"
+      class:row={stacked}
+      aria-label="调整代码框宽度"
+      aria-orientation={stacked ? 'horizontal' : 'vertical'}
+      aria-valuemin={22}
+      aria-valuemax={78}
+      aria-valuenow={Math.round(codeRatio * 100)}
+      onpointerdown={(e) => dragSplit('code', e)}
+      onkeydown={(e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') nudge('code', -1);
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nudge('code', 1);
+      }}
+    ></button>
+
+    <aside class="avr-side" bind:this={sideEl}>
+      <section class="avr-pane avr-steps" style="flex-basis: {stepsRatio * 100}%">
         <AvrStepPanel {trace} bind:activeStep />
       </section>
+      <button
+        type="button"
+        class="avr-split row"
+        role="separator"
+        aria-label="调整取指结果高度"
+        aria-orientation="horizontal"
+        aria-valuemin={16}
+        aria-valuemax={72}
+        aria-valuenow={Math.round(stepsRatio * 100)}
+        onpointerdown={(e) => dragSplit('steps', e)}
+        onkeydown={(e) => {
+          if (e.key === 'ArrowUp') nudge('steps', -1);
+          if (e.key === 'ArrowDown') nudge('steps', 1);
+        }}
+      ></button>
       <section class="avr-pane avr-path">
         <AvrDatapath {steps} bind:activeStep />
       </section>
@@ -121,10 +224,12 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
-    display: grid;
-    grid-template-columns: minmax(300px, 1.1fr) minmax(280px, 0.9fr);
-    gap: var(--space-3);
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
   }
+  .avr-workspace.stacked { flex-direction: column; }
+  .avr-workspace.is-dragging { user-select: none; }
   .avr-pane {
     display: flex;
     flex-direction: column;
@@ -135,9 +240,29 @@
     overflow: hidden;
     box-shadow: var(--shadow-sm);
   }
-  .avr-side { display: flex; flex-direction: column; gap: var(--space-3); min-height: 0; overflow: hidden; }
-  .avr-steps { flex: 0 1 32%; min-height: 0; padding: var(--space-3); }
-  .avr-path { flex: 1 1 68%; min-height: 0; overflow: hidden; }
+  .avr-code { flex: 0 0 auto; min-width: 0; min-height: 0; }
+  .avr-side { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+  .avr-steps { flex: 0 0 auto; min-height: 0; padding: var(--space-3); }
+  .avr-path { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+  .avr-split {
+    flex: 0 0 10px;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    cursor: col-resize;
+    position: relative;
+  }
+  .avr-split.row { cursor: row-resize; }
+  .avr-split::after {
+    content: '';
+    position: absolute;
+    border-radius: 999px;
+    background: var(--border);
+  }
+  .avr-split:not(.row)::after { top: 12px; bottom: 12px; left: 4px; width: 2px; }
+  .avr-split.row::after { left: 12px; right: 12px; top: 4px; height: 2px; }
+  .avr-split:hover::after, .avr-split:focus-visible::after { background: var(--accent); }
+  .avr-split:focus-visible { outline: none; }
   .avr-pane-head {
     display: flex;
     justify-content: space-between;
@@ -151,7 +276,6 @@
   .avr-step-badge { font-size: var(--text-xs); color: var(--color-success); font-variant-numeric: tabular-nums; }
   .avr-code-body { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
   @media (max-width: 900px) {
-    .avr-workspace { grid-template-columns: 1fr; overflow: auto; }
-    .avr-ide { height: auto; min-height: calc(100dvh - var(--site-nav-offset, 88px)); }
+    .avr-split:not(.row)::after { left: 12px; right: 12px; top: 4px; bottom: auto; width: auto; height: 2px; }
   }
 </style>
