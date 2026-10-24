@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MazeCar 仿真</title>
+<style>
+  :root {
+    --bg: #12161c;
+    --panel: #1a212b;
+    --surface: #232c38;
+    --border: #354252;
+    --text: #e8eef4;
+    --muted: #9aabbc;
+    --accent: #3db89a;
+    --accent-dim: #2a7f6c;
+    --warn: #d4a017;
+    --danger: #d4544a;
+    --visited: rgba(61, 184, 154, 0.22);
+    --trail: rgba(212, 160, 23, 0.55);
+    --wall: #c5d0db;
+    --robot: #f0c14a;
+    --ray-f: #5ec8ff;
+    --ray-l: #7ed957;
+    --ray-r: #ff8f6b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    background: var(--bg); color: var(--text);
+    font: 14px/1.45 "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  body {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    min-height: 100vh;
+  }
+  body.embed header h1 .badge { display: none; }
+  body.embed header { padding: 0.4rem 0.65rem; }
+  body.embed main { grid-template-columns: 1fr 260px; }
+  header {
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(180deg, #1c2430, #151a22);
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    margin: 0; font-size: 1.15rem; font-weight: 650;
+    letter-spacing: 0.02em;
+  }
+  header .badge {
+    font-size: 0.75rem; color: var(--muted);
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 0.15rem 0.45rem;
+  }
+  .done-banner {
+    display: none; margin-left: auto;
+    background: var(--accent-dim); color: #fff;
+    font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 4px;
+  }
+  .done-banner.show { display: inline-block; }
+  main {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 0; min-height: 0;
+  }
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; grid-template-rows: auto auto; }
+  }
+  .canvas-wrap {
+    position: relative; min-height: 0;
+    background:
+      radial-gradient(ellipse at 30% 20%, #1a2834 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 80%, #1a222c 0%, transparent 50%),
+      var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    padding: 0.75rem;
+  }
+  canvas {
+    max-width: 100%; max-height: calc(100vh - 7rem);
+    background: #0e1218;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: crosshair;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+  }
+  aside {
+    background: var(--panel);
+    border-left: 1px solid var(--border);
+    padding: 0.75rem 0.9rem 1.2rem;
+    overflow: auto;
+    display: flex; flex-direction: column; gap: 0.75rem;
+  }
+  .group {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.65rem 0.7rem;
+  }
+  .group h2 {
+    margin: 0 0 0.45rem; font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); font-weight: 600;
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+  button, select {
+    background: #2a3442; color: var(--text);
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 0.35rem 0.55rem; cursor: pointer; font: inherit;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent-dim); border-color: var(--accent); }
+  button.active { outline: 1px solid var(--warn); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  label { color: var(--muted); font-size: 0.85rem; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  .hud {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 0.78rem; line-height: 1.55;
+    color: var(--text);
+  }
+  .hud .k { color: var(--muted); }
+  .hud .v { color: var(--accent); }
+  .leds { display: flex; gap: 0.5rem; margin-top: 0.35rem; }
+  .led {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #2a3340; border: 1px solid var(--border);
+  }
+  .led.on-l { background: #7ed957; box-shadow: 0 0 8px #7ed95788; }
+  .led.on-m { background: #f0c14a; box-shadow: 0 0 8px #f0c14a88; }
+  .led.on-r { background: #ff8f6b; box-shadow: 0 0 8px #ff8f6b88; }
+  .log {
+    max-height: 140px; overflow: auto;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 0.7rem; color: var(--muted);
+    white-space: pre-wrap; word-break: break-all;
+  }
+  .hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>MazeCar 仿真</h1>
+  <span class="badge">file:// · DFS 探索</span>
+  <span id="doneBanner" class="done-banner">EXPLORE DONE</span>
+</header>
+<main>
+  <div class="canvas-wrap">
+    <canvas id="cv" width="720" height="720"></canvas>
+  </div>
+  <aside>
+    <div class="group">
+      <h2>控制</h2>
+      <div class="row">
+        <button class="primary" id="btnStart">开始</button>
+        <button id="btnPause">暂停</button>
+        <button id="btnStep">单步</button>
+        <button id="btnReset">重置</button>
+      </div>
+      <label style="display:block;margin-top:0.5rem">速度 <span id="speedLabel">1.0×</span></label>
+      <input type="range" id="speed" min="0.1" max="10" step="0.1" value="1" />
+    </div>
+    <div class="group">
+      <h2>迷宫</h2>
+      <div class="row">
+        <select id="preset">
+          <option value="mvp">默认走廊+路口</option>
+          <option value="perimeter">仅外框</option>
+          <option value="deadend">死胡同</option>
+          <option value="ubend">U 弯</option>
+          <option value="open">双侧开放走廊</option>
+          <option value="multi">多路口</option>
+        </select>
+        <button id="btnRandom">随机完美迷宫</button>
+      </div>
+      <div class="row" style="margin-top:0.4rem">
+        <button id="btnPlaceStart">放置起点</button>
+        <button id="btnRotate">旋转朝向</button>
+      </div>
+      <p class="hint">点击靠近格边切换墙；「放置起点」模式下点格子设起点。</p>
+    </div>
+    <div class="group">
+      <h2>HUD</h2>
+      <div class="hud" id="hud"></div>
+      <div class="leds">
+        <div class="led" id="ledL" title="LED_L (A2)"></div>
+        <div class="led" id="ledM" title="LED_M (A1)"></div>
+        <div class="led" id="ledR" title="LED_R (A0)"></div>
+      </div>
+    </div>
+    <div class="group">
+      <h2>串口日志</h2>
+      <div class="log" id="log"></div>
+    </div>
+  </aside>
+</main>
+<script>
+(() => {
+"use strict";
+
+// ═══════════════════════════════════════════════════════════
+// Constants (from dfs-sample.cpp)
+// ═══════════════════════════════════════════════════════════
+const LEFT_SERVO = 13, RIGHT_SERVO = 12;
+const LEFT_TX = 10, LEFT_RX = 11;
+const FRONT_TX = 6, FRONT_RX = 7;
+const RIGHT_TX = 2, RIGHT_RX = 3;
+const LED_L = 16, LED_M = 15, LED_R = 14; // A2,A1,A0
+const HIGH = 1, LOW = 0;
+const OUTPUT = 1, INPUT = 0;
+
+const LEFT_STOP_PWM = 1490, RIGHT_STOP_PWM = 1495;
+const LEFT_FORWARD = 1550, RIGHT_FORWARD = 1438;
+const LEFT_BACKWARD = 1430, RIGHT_BACKWARD = 1552;
+const SPIN_LEFT_L = 1430, SPIN_LEFT_R = 1425;
+const SPIN_RIGHT_L = 1570, SPIN_RIGHT_R = 1575;
+const UTURN_LEFT_L = 1430, UTURN_LEFT_R = 1425;
+const UTURN_RIGHT_L = 1570, UTURN_RIGHT_R = 1575;
+const JUNCTION_FORWARD_L = 1517, JUNCTION_FORWARD_R = 1469;
+
+const LEFT_TURN_MS = 475, RIGHT_TURN_MS = 475;
+const UTURN_LEFT_MS = 1140, UTURN_RIGHT_MS = 1140;
+const START_ALIGN_MS = 1500, TURN_ALIGN_MS = 1500;
+const TURN_SETTLE_MS = 150, POST_TURN_REARM_MS = 120;
+const ESCAPE_BACKUP_MS = 200, ACTION_PAUSE_MS = 100;
+const ESCAPE_TIMEOUT_MS = 5000, ESCAPE_SETTLE_MS = 100;
+const ESCAPE_CONFIRM_COUNT = 3;
+const TIME_SMALL = 190, TIME_AFTER_TURN = 250;
+const LED_SHOW_MS = 5000, LED_BLINK_MS = 1000;
+const OPEN_ADVANCE_TIMEOUT_MS = 3000, OPEN_EXIT_CONFIRM_COUNT = 3;
+
+const FRONT_WALL_THRESHOLD = 3;
+const SIDE_WALL_THRESHOLD = 2;
+const SIDE_WALL_MIN_VOTES = 3;
+const SIDE_OPEN_THRESHOLD = 0;
+const SIDE_OPEN_MAX_VOTES = 1;
+const JUNCTION_SAMPLES = 7;
+const SIDE_CONFIRM_VOTES = 5;
+const FRONT_CONFIRM_VOTES = 6;
+
+const frequencies = [38000, 39000, 40000, 41000, 42000];
+const FILTER_OLD_WEIGHT = 0.20;
+const CORRECTION_GAIN = 2.0;
+const ERROR_DEADBAND = 2.0;
+const ALIGN_LEFT_TARGET = 7, ALIGN_RIGHT_TARGET = 7;
+const MAX_CORRECTION = 22, SINGLE_WALL_MAX_CORRECTION = 12;
+const CORRECTION_STEP = 4, CAUTION_DRIVE_PERCENT = 60;
+const DFS_MAX_DEPTH = 24;
+
+const GRID = 16;
+const BODY_R = 0.22;
+const IR_RANGE = 1.75;
+const IR_FALLOFF = 1.15;
+const IR_FWD = 0.16, IR_SIDE = 0.12;
+
+// ═══════════════════════════════════════════════════════════
+// Sim / maze state
+// ═══════════════════════════════════════════════════════════
+const sim = {
+  millis: 0,
+  running: false,
+  speed: 1,
+  leftUs: LEFT_STOP_PWM,
+  rightUs: RIGHT_STOP_PWM,
+  pins: Object.create(null),
+  pose: { x: 8.5, y: 8.5, angle: -Math.PI / 2 },
+  trail: [],
+  lastIr: { L: { bands: 0, votes: 0, d: Infinity },
+            F: { bands: 0, votes: 0, d: Infinity },
+            R: { bands: 0, votes: 0, d: Infinity } },
+  lastRays: { L: null, F: null, R: null },
+};
+
+let hWalls, vWalls, segments = [];
+let visited;
+let gx = 8, gy = 8, heading = 0; // 0=N,1=E,2=S,3=W
+let startGx = 8, startGy = 8, startHeading = 0;
+let placeStartMode = false;
+let sketchGen = 0;
+let delayWaiters = [];
+let logLines = [];
+
+function constrain(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function arduinoMin(a, b) { return a < b ? a : b; }
+function arduinoMax(a, b) { return a > b ? a : b; }
+
+function millis() { return sim.millis; }
+
+function digitalWrite(pin, val) { sim.pins[pin] = val ? HIGH : LOW; }
+function digitalRead(pin) { return sim.pins[pin] ? HIGH : LOW; }
+function pinMode() {}
+function tone() {}
+function noTone() {}
+
+function delayMicroseconds() { /* IR abstracted */ }
+
+function serialPrintln(msg) {
+  const s = String(msg);
+  logLines.push(`[${sim.millis}] ${s}`);
+  if (logLines.length > 80) logLines.shift();
+  const el = document.getElementById("log");
+  if (el) { el.textContent = logLines.join("\n"); el.scrollTop = el.scrollHeight; }
+}
+const Serial = {
+  begin() {},
+  print(m) { this._buf = (this._buf || "") + String(m); },
+  println(m) {
+    serialPrintln((this._buf || "") + (m != null ? String(m) : ""));
+    this._buf = "";
+  },
+};
+
+// ═══════════════════════════════════════════════════════════
+// Maze walls
+// ═══════════════════════════════════════════════════════════
+function allocWalls(solidInterior) {
+  hWalls = Array.from({ length: GRID + 1 }, () => Array(GRID).fill(!!solidInterior));
+  vWalls = Array.from({ length: GRID }, () => Array(GRID + 1).fill(!!solidInterior));
+  // outer boundary always solid
+  for (let c = 0; c < GRID; c++) {
+    hWalls[0][c] = true;
+    hWalls[GRID][c] = true;
+  }
+  for (let r = 0; r < GRID; r++) {
+    vWalls[r][0] = true;
+    vWalls[r][GRID] = true;
+  }
+}
+
+function clearInterior() {
+  for (let r = 1; r < GRID; r++)
+    for (let c = 0; c < GRID; c++) hWalls[r][c] = false;
+  for (let r = 0; r < GRID; r++)
+    for (let c = 1; c < GRID; c++) vWalls[r][c] = false;
+}
+
+function setH(r, c, on) {
+  if (r <= 0 || r >= GRID) return; // keep outer
+  if (c < 0 || c >= GRID) return;
+  hWalls[r][c] = on;
+}
+function setV(r, c, on) {
+  if (c <= 0 || c >= GRID) return;
+  if (r < 0 || r >= GRID) return;
+  vWalls[r][c] = on;
+}
+
+function rebuildSegments() {
+  segments = [];
+  for (let r = 0; r <= GRID; r++) {
+    for (let c = 0; c < GRID; c++) {
+      if (hWalls[r][c]) segments.push({ x1: c, y1: r, x2: c + 1, y2: r });
+    }
+  }
+  for (let r = 0; r < GRID; r++) {
+    for (let c = 0; c <= GRID; c++) {
+      if (vWalls[r][c]) segments.push({ x1: c, y1: r, x2: c, y2: r + 1 });
+    }
+  }
+}
+
+function allWallsOn() {
+  allocWalls(true);
+}
+
+function carvePassage(x1, y1, x2, y2) {
+  if (x1 === x2 && y1 === y2 + 1) setH(y1, x1, false); // remove north of (x2,y2)? 
+  // Passage between adjacent cells: remove shared wall
+  if (x1 === x2) {
+    const r = Math.max(y1, y2);
+    setH(r, x1, false);
+  } else if (y1 === y2) {
+    const c = Math.max(x1, x2);
+    setV(y1, c, false);
+  }
+}
+
+function loadPreset(name) {
+  allocWalls(true);
+  const carve = (a, b) => carvePassage(a[0], a[1], b[0], b[1]);
+
+  if (name === "perimeter") {
+    clearInterior();
+  } else if (name === "deadend") {
+    // corridor north from (8,8) into dead end at (8,5)
+    for (let y = 8; y > 5; y--) carve([8, y], [8, y - 1]);
+  } else if (name === "ubend") {
+    // U: north, west, south
+    for (let y = 8; y > 5; y--) carve([8, y], [8, y - 1]);
+    carve([8, 5], [7, 5]); carve([7, 5], [6, 5]);
+    for (let y = 5; y < 8; y++) carve([6, y], [6, y + 1]);
+  } else if (name === "open") {
+    // long N-S corridor, both sides open at mid
+    for (let y = 10; y > 4; y--) carve([8, y], [8, y - 1]);
+    carve([8, 7], [7, 7]); carve([7, 7], [6, 7]);
+    carve([8, 7], [9, 7]); carve([9, 7], [10, 7]);
+  } else if (name === "multi") {
+    // cross + side branches around start
+    for (let y = 11; y > 4; y--) carve([8, y], [8, y - 1]);
+    for (let x = 5; x < 8; x++) carve([x, 7], [x + 1, 7]);
+    for (let x = 8; x < 11; x++) carve([x, 7], [x + 1, 7]);
+    for (let y = 7; y > 4; y--) carve([6, y], [6, y - 1]);
+    for (let y = 7; y > 4; y--) carve([10, y], [10, y - 1]);
+    carve([6, 5], [7, 5]); carve([7, 5], [8, 5]);
+    carve([8, 5], [9, 5]); carve([9, 5], [10, 5]);
+    carve([6, 9], [7, 9]); carve([7, 9], [8, 9]);
+    carve([8, 9], [9, 9]); carve([9, 9], [10, 9]);
+  } else {
+    // MVP default: corridor + T-junction inside 16×16 around (8,8)
+    // Main corridor N from (8,10) to (8,4)
+    for (let y = 10; y > 4; y--) carve([8, y], [8, y - 1]);
+    // T at (8,6): left and right arms
+    carve([8, 6], [7, 6]); carve([7, 6], [6, 6]);
+    carve([8, 6], [9, 6]); carve([9, 6], [10, 6]);
+    // small spur south of start for return path variety
+    carve([8, 10], [8, 11]);
+    carve([8, 11], [7, 11]);
+    // north dead-end pocket at (8,4) with side room
+    carve([8, 4], [7, 4]);
+  }
+  rebuildSegments();
+}
+
+function generatePerfectMaze() {
+  allWallsOn();
+  const seen = Array.from({ length: GRID }, () => Array(GRID).fill(false));
+  const stack = [[startGx, startGy]];
+  seen[startGy][startGx] = true;
+  const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]];
+  while (stack.length) {
+    const [cx, cy] = stack[stack.length - 1];
+    const nbrs = [];
+    for (const [dx, dy] of dirs) {
+      const nx = cx + dx, ny = cy + dy;
+      if (nx >= 0 && ny >= 0 && nx < GRID && ny < GRID && !seen[ny][nx]) {
+        nbrs.push([nx, ny]);
+      }
+    }
+    if (!nbrs.length) { stack.pop(); continue; }
+    const [nx, ny] = nbrs[Math.floor(Math.random() * nbrs.length)];
+    carvePassage(cx, cy, nx, ny);
+    seen[ny][nx] = true;
+    stack.push([nx, ny]);
+  }
+  rebuildSegments();
+}
+
+// ═══════════════════════════════════════════════════════════
+// Geometry / physics
+// ═══════════════════════════════════════════════════════════
+function segHit(px, py, qx, qy, ax, ay, bx, by) {
+  const rx = qx - px, ry = qy - py;
+  const sx = bx - ax, sy = by - ay;
+  const den = rx * sy - ry * sx;
+  if (Math.abs(den) < 1e-9) return null;
+  const t = ((ax - px) * sy - (ay - py) * sx) / den;
+  const u = ((ax - px) * ry - (ay - py) * rx) / den;
+  if (t >= 0 && t <= 1 && u >= 0 && u <= 1) return t;
+  return null;
+}
+
+function rayDistance(x, y, angle, range) {
+  const x2 = x + Math.cos(angle) * range;
+  const y2 = y + Math.sin(angle) * range;
+  let best = Infinity;
+  for (const s of segments) {
+    const t = segHit(x, y, x2, y2, s.x1, s.y1, s.x2, s.y2);
+    if (t != null && t < best) best = t;
+  }
+  if (best > 1) return Infinity;
+  return best * range;
+}
+
+function resolveBody(x, y) {
+  let nx = x, ny = y;
+  for (let iter = 0; iter < 6; iter++) {
+    for (const s of segments) {
+      const dx = s.x2 - s.x1, dy = s.y2 - s.y1;
+      const len2 = dx * dx + dy * dy || 1;
+      let t = ((nx - s.x1) * dx + (ny - s.y1) * dy) / len2;
+      t = constrain(t, 0, 1);
+      const cx = s.x1 + t * dx, cy = s.y1 + t * dy;
+      let ox = nx - cx, oy = ny - cy;
+      let d = Math.hypot(ox, oy);
+      if (d < 1e-8) {
+        const fx = -dy, fy = dx;
+        const fl = Math.hypot(fx, fy) || 1;
+        ox = fx / fl; oy = fy / fl; d = 0;
+      }
+      if (d < BODY_R) {
+        const push = BODY_R - d + 1e-4;
+        nx += (ox / (d || 1)) * push;
+        ny += (oy / (d || 1)) * push;
+      }
+    }
+  }
+  nx = constrain(nx, BODY_R, GRID - BODY_R);
+  ny = constrain(ny, BODY_R, GRID - BODY_R);
+  return { x: nx, y: ny };
+}
+
+function usToForward(us, side) {
+  const delta = us - 1500;
+  if (Math.abs(delta) < 12) return 0;
+  const d = delta / 200;
+  return side === "left" ? d : -d;
+}
+
+function stepPhysics1ms() {
+  const dt = 0.001;
+  const l = usToForward(sim.leftUs, "left");
+  const r = usToForward(sim.rightUs, "right");
+  let v = (l + r) * 0.9;
+  const diff = l - r;
+  const ad = Math.abs(diff);
+  const wGain = ad > 0.45 ? 4.55 : ad > 0.22 ? 1.8 : 0.7;
+  let w = diff * wGain;
+
+  let headingA = sim.pose.angle + w * dt;
+  while (headingA > Math.PI) headingA -= Math.PI * 2;
+  while (headingA < -Math.PI) headingA += Math.PI * 2;
+
+  // hard front wall: zero v if very close ahead
+  const frontD = rayDistance(sim.pose.x, sim.pose.y, headingA, IR_RANGE);
+  if (frontD < BODY_R + 0.05 && v > 0) v = 0;
+
+  const c = Math.cos(headingA), s = Math.sin(headingA);
+  const dx = c * v * dt, dy = s * v * dt;
+  const x0 = sim.pose.x, y0 = sim.pose.y;
+  let resolved = resolveBody(x0 + dx, y0 + dy);
+  if (Math.hypot(resolved.x - x0, resolved.y - y0) < Math.hypot(dx, dy) * 0.15) {
+    const onlyX = resolveBody(x0 + dx, y0);
+    const onlyY = resolveBody(x0, y0 + dy);
+    const mx = Math.hypot(onlyX.x - x0, onlyX.y - y0);
+    const my = Math.hypot(onlyY.x - x0, onlyY.y - y0);
+    resolved = mx >= my ? onlyX : onlyY;
+  }
+  sim.pose.x = resolved.x;
+  sim.pose.y = resolved.y;
+  sim.pose.angle = headingA;
+
+  // trail
+  const last = sim.trail[sim.trail.length - 1];
+  if (!last || Math.hypot(last.x - sim.pose.x, last.y - sim.pose.y) > 0.08) {
+    sim.trail.push({ x: sim.pose.x, y: sim.pose.y });
+    if (sim.trail.length > 600) sim.trail.shift();
+  }
+
+  updateGridFromPose();
+  sim.millis++;
+}
+
+function angleToDiscrete(a) {
+  // 0=N(-π/2), 1=E(0), 2=S(π/2), 3=W(π)
+  const targets = [-Math.PI / 2, 0, Math.PI / 2, Math.PI];
+  let best = 0, bestDiff = Infinity;
+  for (let i = 0; i < 4; i++) {
+    let d = a - targets[i];
+    while (d > Math.PI) d -= Math.PI * 2;
+    while (d < -Math.PI) d += Math.PI * 2;
+    // W also at -π
+    if (i === 3) {
+      let d2 = a - (-Math.PI);
+      while (d2 > Math.PI) d2 -= Math.PI * 2;
+      while (d2 < -Math.PI) d2 += Math.PI * 2;
+      if (Math.abs(d2) < Math.abs(d)) d = d2;
+    }
+    if (Math.abs(d) < bestDiff) { bestDiff = Math.abs(d); best = i; }
+  }
+  return best;
+}
+
+function discreteToAngle(h) {
+  return [-Math.PI / 2, 0, Math.PI / 2, Math.PI][h];
+}
+
+function neighborCell(x, y, h) {
+  const dx = [0, 1, 0, -1][h];
+  const dy = [-1, 0, 1, 0][h];
+  return [x + dx, y + dy];
+}
+
+function inGrid(x, y) {
+  return x >= 0 && y >= 0 && x < GRID && y < GRID;
+}
+
+function updateGridFromPose() {
+  const ngx = Math.floor(sim.pose.x);
+  const ngy = Math.floor(sim.pose.y);
+  gx = constrain(ngx, 0, GRID - 1);
+  gy = constrain(ngy, 0, GRID - 1);
+  heading = angleToDiscrete(sim.pose.angle);
+  if (inGrid(gx, gy)) visited[gy][gx] = true;
+}
+
+function resetVisited() {
+  visited = Array.from({ length: GRID }, () => Array(GRID).fill(false));
+}
+
+function applyStartPose() {
+  sim.pose.x = startGx + 0.5;
+  sim.pose.y = startGy + 0.5;
+  sim.pose.angle = discreteToAngle(startHeading);
+  gx = startGx; gy = startGy; heading = startHeading;
+  const p = resolveBody(sim.pose.x, sim.pose.y);
+  sim.pose.x = p.x; sim.pose.y = p.y;
+  resetVisited();
+  updateGridFromPose();
+  sim.trail = [];
+}
+
+// ═══════════════════════════════════════════════════════════
+// Sensors (raycast → strength → bands/votes)
+// ═══════════════════════════════════════════════════════════
+function irOrigin(side) {
+  // side: 'F'|'L'|'R' — local +x forward, +y left
+  const h = sim.pose.angle;
+  const c = Math.cos(h), s = Math.sin(h);
+  let lat = 0, ang = h;
+  if (side === "L") { lat = IR_SIDE; ang = h - Math.PI / 2; }
+  else if (side === "R") { lat = -IR_SIDE; ang = h + Math.PI / 2; }
+  else { ang = h; }
+  return {
+    x: sim.pose.x + c * IR_FWD - s * lat,
+    y: sim.pose.y + s * IR_FWD + c * lat,
+    angle: ang,
+  };
+}
+
+function distanceToReading(d) {
+  const result = { bands: 0, votes: 0, d };
+  if (!isFinite(d)) return result;
+  const strength = Math.exp(-d * IR_FALLOFF);
+  // higher bands need closer (stronger) signal — mirrors freq sweep
+  const thresholds = [0.12, 0.22, 0.35, 0.50, 0.65];
+  for (let band = 0; band < 5; band++) {
+    let hits = 0;
+    for (let sample = 0; sample < 3; sample++) {
+      // tiny deterministic jitter from millis+band+sample
+      const jitter = ((sim.millis * 17 + band * 31 + sample * 13) % 100) / 2000 - 0.025;
+      if (strength + jitter >= thresholds[band]) hits++;
+    }
+    result.votes += hits;
+    if (hits >= 2) result.bands++;
+  }
+  return result;
+}
+
+function readSensor(tx, rx) {
+  let side = "F";
+  if (tx === LEFT_TX) side = "L";
+  else if (tx === RIGHT_TX) side = "R";
+  const o = irOrigin(side);
+  const d = rayDistance(o.x, o.y, o.angle, IR_RANGE);
+  const reading = distanceToReading(d);
+  const end = isFinite(d)
+    ? { x: o.x + Math.cos(o.angle) * d, y: o.y + Math.sin(o.angle) * d }
+    : { x: o.x + Math.cos(o.angle) * IR_RANGE, y: o.y + Math.sin(o.angle) * IR_RANGE };
+  sim.lastRays[side] = { x1: o.x, y1: o.y, x2: end.x, y2: end.y, hit: isFinite(d) };
+  sim.lastIr[side] = reading;
+  return { bands: reading.bands, votes: reading.votes };
+}
+
+// ═══════════════════════════════════════════════════════════
+// Async delay + servo
+// ═══════════════════════════════════════════════════════════
+function delay(ms) {
+  const target = sim.millis + Math.max(0, Math.floor(ms));
+  return new Promise((resolve) => {
+    delayWaiters.push({ target, resolve });
+  });
+}
+
+function resolveDelays() {
+  if (!delayWaiters.length) return;
+  const ready = [];
+  const pending = [];
+  for (const w of delayWaiters) {
+    if (sim.millis >= w.target) ready.push(w);
+    else pending.push(w);
+  }
+  delayWaiters = pending;
+  for (const w of ready) w.resolve();
+}
+
+const leftServo = {
+  attach() {},
+  writeMicroseconds(us) { sim.leftUs = us; },
+};
+const rightServo = {
+  attach() {},
+  writeMicroseconds(us) { sim.rightUs = us; },
+};
+
+// ═══════════════════════════════════════════════════════════
+// Sketch globals (ported)
+// ═══════════════════════════════════════════════════════════
+let openAdvanceActive = false;
+let openAdvanceStartedAt = 0;
+let openAdvanceWallCount = 0;
+let filteredError = 0.0;
+let lastCorrection = 0;
+let correctionWallMask = -1;
+let startupTime = 0;
+let turnFinishedTime = 0;
+let alignStartedAt = 0;
+let alignActive = false;
+let turnArmed = true;
+let lastNormalTurnLeft = true;
+let clearVotes = 0;
+let ledScenario = -1;
+let ledStartedTime = 0;
+let lastPrintTime = 0;
+let lastWaitPrintTime = 0;
+let escapeScenario = 0;
+let escapeTurningLeft = true;
+let escapeConfirming = false;
+let escapeFrontClearCount = 0;
+let escapeStartedAt = 0;
+let escapeStoppedAt = 0;
+let motionFault = false;
+let dfsStack = Array.from({ length: DFS_MAX_DEPTH }, () => ({ tryLeft: false, tryFront: false, tryRight: false }));
+let dfsTop = -1;
+let dfsReturning = false;
+let ringTaskDone = false;
+let prevLeftWall = false;
+let prevRightWall = false;
+
+function motors(leftPWM, rightPWM) {
+  leftServo.writeMicroseconds(leftPWM);
+  rightServo.writeMicroseconds(rightPWM);
+}
+function stopRobot() { motors(LEFT_STOP_PWM, RIGHT_STOP_PWM); }
+function forwardRobot() { motors(LEFT_FORWARD, RIGHT_FORWARD); }
+function spinLeft() { motors(SPIN_LEFT_L, SPIN_LEFT_R); }
+function spinRight() { motors(SPIN_RIGHT_L, SPIN_RIGHT_R); }
+
+function resetCorrection() {
+  filteredError = 0.0;
+  lastCorrection = 0;
+  correctionWallMask = -1;
+}
+
+async function backupFor(duration) {
+  motors(LEFT_BACKWARD, RIGHT_BACKWARD);
+  await delay(duration);
+  stopRobot();
+  await delay(ACTION_PAUSE_MS);
+}
+async function forwardFor(duration) {
+  forwardRobot();
+  await delay(duration);
+  stopRobot();
+  await delay(ACTION_PAUSE_MS);
+}
+async function spinLeftFor(duration) {
+  spinLeft();
+  await delay(duration);
+  stopRobot();
+  await delay(ACTION_PAUSE_MS);
+}
+async function spinRightFor(duration) {
+  spinRight();
+  await delay(duration);
+  stopRobot();
+  await delay(ACTION_PAUSE_MS);
+}
+
+function ledsOff() {
+  digitalWrite(LED_L, LOW);
+  digitalWrite(LED_M, LOW);
+  digitalWrite(LED_R, LOW);
+  ledScenario = -1;
+}
+
+function showScenario(scenario) {
+  if (scenario < 0 || scenario > 10) { ledsOff(); return; }
+  if (ledScenario !== scenario) {
+    ledScenario = scenario;
+    ledStartedTime = millis();
+  }
+  if (scenario <= 7) {
+    digitalWrite(LED_R, (scenario & 1) ? HIGH : LOW);
+    digitalWrite(LED_M, (scenario & 2) ? HIGH : LOW);
+    digitalWrite(LED_L, (scenario & 4) ? HIGH : LOW);
+    return;
+  }
+  const on = Math.floor((millis() - ledStartedTime) / LED_BLINK_MS) % 2 === 0;
+  digitalWrite(LED_L, LOW);
+  digitalWrite(LED_R, (on && (scenario === 8 || scenario === 10)) ? HIGH : LOW);
+  digitalWrite(LED_M, (on && (scenario === 9 || scenario === 10)) ? HIGH : LOW);
+}
+
+function showWaiting() {
+  ledScenario = -1;
+  const on = Math.floor(millis() / 250) % 2 !== 0;
+  digitalWrite(LED_L, on ? HIGH : LOW);
+  digitalWrite(LED_M, on ? HIGH : LOW);
+  digitalWrite(LED_R, on ? HIGH : LOW);
+}
+
+async function showScenarioAndHold(scenario) {
+  stopRobot();
+  resetCorrection();
+  ledsOff();
+  const started = millis();
+  while (millis() - started < LED_SHOW_MS) {
+    showScenario(scenario);
+    await delay(10);
+  }
+  ledsOff();
+}
+
+function readAll() {
+  const front = readSensor(FRONT_TX, FRONT_RX);
+  if (front.bands >= FRONT_WALL_THRESHOLD) stopRobot();
+  const L = readSensor(LEFT_TX, LEFT_RX);
+  const R = readSensor(RIGHT_TX, RIGHT_RX);
+  return { L, front, R };
+}
+
+function sideIsOpen(r) {
+  return r.bands <= SIDE_OPEN_THRESHOLD && r.votes <= SIDE_OPEN_MAX_VOTES;
+}
+function sideHasWall(r) {
+  return r.bands >= SIDE_WALL_THRESHOLD || r.votes >= SIDE_WALL_MIN_VOTES;
+}
+
+function printWait(message) {
+  const now = millis();
+  if (now - lastWaitPrintTime < 500) return;
+  lastWaitPrintTime = now;
+  Serial.println(message);
+}
+
+function printReadings(L, front, R) {
+  const now = millis();
+  if (now - lastPrintTime < 200) return;
+  lastPrintTime = now;
+  Serial.println(`L=${L.bands}/${L.votes} F=${front.bands}/${front.votes} R=${R.bands}/${R.votes}`);
+}
+
+function driveStraight(L, front, R) {
+  if (front.bands >= FRONT_WALL_THRESHOLD) {
+    stopRobot();
+    resetCorrection();
+    return;
+  }
+  const now = millis();
+  if (alignActive && now - alignStartedAt >= TURN_ALIGN_MS) alignActive = false;
+  const leftWall = sideHasWall(L);
+  const rightWall = sideHasWall(R);
+  const mask = (leftWall ? 2 : 0) | (rightWall ? 1 : 0);
+  if (mask !== correctionWallMask) {
+    resetCorrection();
+    correctionWallMask = mask;
+  }
+  let rawError = 0.0;
+  if (leftWall && rightWall) {
+    rawError = (L.votes - ALIGN_LEFT_TARGET) - (R.votes - ALIGN_RIGHT_TARGET);
+  } else if (leftWall) {
+    const excess = L.votes - ALIGN_LEFT_TARGET;
+    rawError = excess > 0 ? excess : 0.0;
+  } else if (rightWall) {
+    const excess = R.votes - ALIGN_RIGHT_TARGET;
+    rawError = excess > 0 ? -excess : 0.0;
+  }
+  filteredError = FILTER_OLD_WEIGHT * filteredError + (1.0 - FILTER_OLD_WEIGHT) * rawError;
+  if (!(leftWall && rightWall) && rawError === 0.0) {
+    filteredError = 0.0;
+    lastCorrection = 0;
+  }
+  const slow = now - startupTime < START_ALIGN_MS ||
+    alignActive || !leftWall || !rightWall ||
+    front.bands >= 1 || front.votes >= 3 ||
+    filteredError > 3.0 || filteredError < -3.0;
+  const percent = slow ? CAUTION_DRIVE_PERCENT : 100;
+  const leftOffset = Math.floor((LEFT_FORWARD - LEFT_STOP_PWM) * percent / 100);
+  const rightOffset = Math.floor((RIGHT_STOP_PWM - RIGHT_FORWARD) * percent / 100);
+  let wanted = 0;
+  if (filteredError > ERROR_DEADBAND || filteredError < -ERROR_DEADBAND) {
+    wanted = Math.floor(filteredError * CORRECTION_GAIN);
+  }
+  let limit = (leftWall && rightWall) ? MAX_CORRECTION : SINGLE_WALL_MAX_CORRECTION;
+  let motorLimit = arduinoMin(leftOffset, rightOffset) - 5;
+  motorLimit = arduinoMax(0, motorLimit);
+  limit = arduinoMin(limit, motorLimit);
+  wanted = constrain(wanted, -limit, limit);
+  let correction = constrain(wanted, lastCorrection - CORRECTION_STEP, lastCorrection + CORRECTION_STEP);
+  correction = constrain(correction, -limit, limit);
+  lastCorrection = correction;
+  motors(LEFT_STOP_PWM + leftOffset + correction, RIGHT_STOP_PWM - rightOffset + correction);
+  if (correction < 0) showScenario(5);
+  else if (correction > 0) showScenario(6);
+  else showScenario(1);
+}
+
+function clearJunctionTracking() {
+  openAdvanceActive = false;
+  openAdvanceStartedAt = 0;
+  openAdvanceWallCount = 0;
+}
+
+function stopWithFault(message) {
+  stopRobot();
+  resetCorrection();
+  motionFault = true;
+  Serial.println(message);
+}
+
+function sideState(openVotes, wallVotes) {
+  if (openVotes >= SIDE_CONFIRM_VOTES) return 1;
+  if (wallVotes >= SIDE_CONFIRM_VOTES) return 0;
+  return -1;
+}
+
+async function checkJunction() {
+  let leftOpen = 0, leftWall = 0, rightOpen = 0, rightWall = 0, frontWall = 0;
+  stopRobot();
+  for (let i = 0; i < JUNCTION_SAMPLES; i++) {
+    const { L, front, R } = readAll();
+    if (sideIsOpen(L)) leftOpen++;
+    else if (sideHasWall(L)) leftWall++;
+    if (sideIsOpen(R)) rightOpen++;
+    else if (sideHasWall(R)) rightWall++;
+    if (front.bands >= FRONT_WALL_THRESHOLD) frontWall++;
+    showWaiting();
+    await delay(10);
+  }
+  return {
+    leftState: sideState(leftOpen, leftWall),
+    rightState: sideState(rightOpen, rightWall),
+    frontConfirmed: frontWall >= FRONT_CONFIRM_VOTES,
+  };
+}
+
+function markTurnFinished(armed) {
+  stopRobot();
+  resetCorrection();
+  clearJunctionTracking();
+  turnArmed = armed;
+  clearVotes = 0;
+  turnFinishedTime = millis();
+  alignActive = true;
+  alignStartedAt = millis();
+}
+
+async function executeTurnLeft(duration, scenario) {
+  stopRobot();
+  resetCorrection();
+  showScenario(scenario);
+  lastNormalTurnLeft = true;
+  await delay(100);
+  spinLeft();
+  await delay(duration);
+  stopRobot();
+  await delay(TURN_SETTLE_MS);
+  await forwardFor(TIME_AFTER_TURN);
+  markTurnFinished(false);
+}
+
+async function executeTurnRight(duration, scenario) {
+  stopRobot();
+  resetCorrection();
+  showScenario(scenario);
+  lastNormalTurnLeft = false;
+  await delay(100);
+  spinRight();
+  await delay(duration);
+  stopRobot();
+  await delay(TURN_SETTLE_MS);
+  await forwardFor(TIME_AFTER_TURN);
+  markTurnFinished(false);
+}
+
+async function executeScenario7() {
+  await showScenarioAndHold(7);
+  await spinRightFor(TIME_SMALL);
+  await forwardFor(TIME_AFTER_TURN);
+  lastNormalTurnLeft = false;
+  markTurnFinished(false);
+}
+
+async function executeScenario8() {
+  await showScenarioAndHold(8);
+  await spinLeftFor(TIME_SMALL);
+  await forwardFor(TIME_AFTER_TURN);
+  lastNormalTurnLeft = true;
+  markTurnFinished(false);
+}
+
+function runEscapeMotor() {
+  if (escapeScenario === 9) {
+    if (escapeTurningLeft) motors(UTURN_LEFT_L, UTURN_LEFT_R);
+    else motors(UTURN_RIGHT_L, UTURN_RIGHT_R);
+  } else {
+    if (escapeTurningLeft) spinLeft();
+    else spinRight();
+  }
+}
+
+async function beginEscape(scenario, turnLeft) {
+  stopRobot();
+  resetCorrection();
+  clearJunctionTracking();
+  alignActive = false;
+  await delay(ACTION_PAUSE_MS);
+  await backupFor(ESCAPE_BACKUP_MS);
+  escapeScenario = scenario;
+  escapeTurningLeft = turnLeft;
+  escapeConfirming = false;
+  escapeFrontClearCount = 0;
+  showScenario(scenario);
+  Serial.println("ESCAPE: " + scenario);
+  runEscapeMotor();
+  escapeStartedAt = millis();
+}
+
+function finishEscape() {
+  stopRobot();
+  escapeScenario = 0;
+  escapeConfirming = false;
+  escapeFrontClearCount = 0;
+  markTurnFinished(true);
+  Serial.println("ESCAPE: corrected drive next frame");
+}
+
+function updateEscape(front) {
+  const now = millis();
+  showScenario(escapeScenario);
+  if (now - escapeStartedAt >= ESCAPE_TIMEOUT_MS) {
+    stopWithFault("ESCAPE_TIMEOUT: reposition and reset");
+    return;
+  }
+  if (escapeScenario === 9 && !escapeConfirming) {
+    const duration = escapeTurningLeft ? UTURN_LEFT_MS : UTURN_RIGHT_MS;
+    if (now - escapeStartedAt < duration) return;
+    stopRobot();
+    escapeConfirming = true;
+    escapeFrontClearCount = 0;
+    escapeStoppedAt = millis();
+    return;
+  }
+  const frontClear = front.bands === 0 && front.votes <= 1;
+  if (escapeConfirming) {
+    stopRobot();
+    if (now - escapeStoppedAt < ESCAPE_SETTLE_MS) return;
+    if (frontClear) {
+      escapeFrontClearCount++;
+      if (escapeFrontClearCount >= ESCAPE_CONFIRM_COUNT) finishEscape();
+      return;
+    }
+    escapeFrontClearCount = 0;
+    if (escapeScenario === 9) {
+      if (now - escapeStoppedAt > 800) finishEscape();
+      return;
+    }
+    escapeConfirming = false;
+    runEscapeMotor();
+    return;
+  }
+  if (frontClear) {
+    stopRobot();
+    escapeConfirming = true;
+    escapeFrontClearCount = 0;
+    escapeStoppedAt = millis();
+    return;
+  }
+  runEscapeMotor();
+}
+
+function dfsPush(leftState, rightState, frontConfirmed) {
+  if (dfsTop >= DFS_MAX_DEPTH - 1) {
+    Serial.println("DFS: stack overflow");
+    return;
+  }
+  dfsTop++;
+  dfsStack[dfsTop].tryLeft = (leftState === 1);
+  dfsStack[dfsTop].tryFront = (!frontConfirmed);
+  dfsStack[dfsTop].tryRight = (rightState === 1);
+
+  // visited neighbor pruning (环不死循环)
+  const h = heading;
+  if (dfsStack[dfsTop].tryLeft) {
+    const [nx, ny] = neighborCell(gx, gy, (h + 3) % 4);
+    if (inGrid(nx, ny) && visited[ny][nx]) dfsStack[dfsTop].tryLeft = false;
+  }
+  if (dfsStack[dfsTop].tryFront) {
+    const [nx, ny] = neighborCell(gx, gy, h);
+    if (inGrid(nx, ny) && visited[ny][nx]) dfsStack[dfsTop].tryFront = false;
+  }
+  if (dfsStack[dfsTop].tryRight) {
+    const [nx, ny] = neighborCell(gx, gy, (h + 1) % 4);
+    if (inGrid(nx, ny) && visited[ny][nx]) dfsStack[dfsTop].tryRight = false;
+  }
+
+  Serial.println(
+    `DFS PUSH depth=${dfsTop} L=${dfsStack[dfsTop].tryLeft|0} F=${dfsStack[dfsTop].tryFront|0} R=${dfsStack[dfsTop].tryRight|0}`
+  );
+}
+
+async function dfsDecide() {
+  while (dfsTop >= 0) {
+    const n = dfsStack[dfsTop];
+    if (n.tryLeft) {
+      n.tryLeft = false;
+      Serial.println("DFS: go LEFT");
+      await executeTurnLeft(LEFT_TURN_MS, 3);
+      return true;
+    }
+    if (n.tryFront) {
+      n.tryFront = false;
+      Serial.println("DFS: go FRONT");
+      markTurnFinished(true);
+      return true;
+    }
+    if (n.tryRight) {
+      n.tryRight = false;
+      Serial.println("DFS: go RIGHT");
+      await executeTurnRight(RIGHT_TURN_MS, 2);
+      return true;
+    }
+    dfsTop--;
+    Serial.println("DFS: backtrack, depth now=" + dfsTop);
+    if (dfsTop < 0) return false;
+    dfsReturning = true;
+    await beginEscape(9, true);
+    return true;
+  }
+  return false;
+}
+
+async function setup() {
+  Serial.begin(9600);
+  pinMode(LEFT_TX, OUTPUT);
+  pinMode(FRONT_TX, OUTPUT);
+  pinMode(RIGHT_TX, OUTPUT);
+  digitalWrite(LEFT_TX, LOW);
+  digitalWrite(FRONT_TX, LOW);
+  digitalWrite(RIGHT_TX, LOW);
+  pinMode(LEFT_RX, INPUT);
+  pinMode(FRONT_RX, INPUT);
+  pinMode(RIGHT_RX, INPUT);
+  pinMode(LED_L, OUTPUT);
+  pinMode(LED_M, OUTPUT);
+  pinMode(LED_R, OUTPUT);
+  ledsOff();
+  leftServo.attach(LEFT_SERVO);
+  rightServo.attach(RIGHT_SERVO);
+  stopRobot();
+  await delay(1000);
+  clearJunctionTracking();
+  startupTime = millis();
+  prevLeftWall = false;
+  prevRightWall = false;
+  Serial.println("READY: DFS exploration mode");
+  Serial.println("OPEN: continuous slow straight enabled");
+}
+
+async function loop() {
+  if (ringTaskDone) {
+    stopRobot();
+    await delay(20);
+    return;
+  }
+  if (motionFault) {
+    stopRobot();
+    showWaiting();
+    printWait("FAULT: reposition and reset");
+    await delay(10);
+    return;
+  }
+  if (escapeScenario === 9 && !escapeConfirming) {
+    updateEscape({ bands: 0, votes: 0 });
+    await delay(1);
+    return;
+  }
+  if (escapeScenario === 9 || escapeScenario === 10) {
+    if (escapeConfirming && millis() - escapeStoppedAt < ESCAPE_SETTLE_MS) {
+      stopRobot();
+      showScenario(escapeScenario);
+      await delay(5);
+      return;
+    }
+    const front = readSensor(FRONT_TX, FRONT_RX);
+    updateEscape(front);
+    await delay(5);
+    return;
+  }
+  if (openAdvanceActive && millis() - openAdvanceStartedAt >= OPEN_ADVANCE_TIMEOUT_MS) {
+    stopRobot();
+    clearJunctionTracking();
+    Serial.println("OPEN_TIMEOUT: waiting for wall");
+  }
+  const { L, front, R } = readAll();
+
+  if (!turnArmed) {
+    if (clearVotes < 3) clearVotes++;
+    if (clearVotes >= 3 && millis() - turnFinishedTime >= POST_TURN_REARM_MS) {
+      turnArmed = true;
+    }
+  }
+
+  if (front.bands >= FRONT_WALL_THRESHOLD) {
+    stopRobot();
+    resetCorrection();
+    clearJunctionTracking();
+    if (!turnArmed) {
+      await delay(10);
+      return;
+    }
+    clearVotes = 0;
+    showWaiting();
+    await delay(70);
+    const j = await checkJunction();
+    if (!j.frontConfirmed) {
+      printWait("WAIT: FRONT_NOT_CONFIRMED");
+      return;
+    }
+    if (dfsReturning) {
+      dfsReturning = false;
+      if (!(await dfsDecide())) {
+        ringTaskDone = true;
+        stopRobot();
+        resetCorrection();
+        clearJunctionTracking();
+        Serial.println("DFS: exploration complete, stopped");
+      }
+      return;
+    }
+    if (j.leftState !== 1 && j.rightState !== 1 && j.frontConfirmed && dfsTop < 0) {
+      Serial.println("DFS: spurious dead-end ignored");
+      markTurnFinished(true);
+      await delay(30);
+      return;
+    }
+    dfsPush(j.leftState, j.rightState, j.frontConfirmed);
+    if (!(await dfsDecide())) {
+      ringTaskDone = true;
+      stopRobot();
+      resetCorrection();
+      clearJunctionTracking();
+      Serial.println("DFS: exploration complete, stopped");
+    }
+    return;
+  }
+
+  const bothOpen = sideIsOpen(L) && sideIsOpen(R);
+  const bothWalls = sideHasWall(L) && sideHasWall(R);
+  if (!openAdvanceActive && bothOpen) {
+    openAdvanceActive = true;
+    openAdvanceStartedAt = millis();
+    openAdvanceWallCount = 0;
+    resetCorrection();
+    Serial.println("OPEN: slow straight, checking front");
+  }
+  if (openAdvanceActive) {
+    if (bothWalls) {
+      if (openAdvanceWallCount < OPEN_EXIT_CONFIRM_COUNT) openAdvanceWallCount++;
+    } else {
+      openAdvanceWallCount = 0;
+    }
+    if (openAdvanceWallCount >= OPEN_EXIT_CONFIRM_COUNT) {
+      clearJunctionTracking();
+      resetCorrection();
+      alignActive = true;
+      alignStartedAt = millis();
+      Serial.println("OPEN: corridor recovered");
+    } else {
+      motors(JUNCTION_FORWARD_L, JUNCTION_FORWARD_R);
+      showScenario(1);
+      printReadings(L, front, R);
+      await delay(5);
+      prevLeftWall = sideHasWall(L);
+      prevRightWall = sideHasWall(R);
+      return;
+    }
+  }
+
+  const leftNowWall = sideHasWall(L);
+  const rightNowWall = sideHasWall(R);
+  const leftJustOpened = prevLeftWall && !leftNowWall;
+  const rightJustOpened = prevRightWall && !rightNowWall;
+  if ((leftJustOpened || rightJustOpened) && turnArmed && !openAdvanceActive) {
+    stopRobot();
+    const j = await checkJunction();
+    if (!dfsReturning) {
+      const hasExit = (j.leftState === 1) || (j.rightState === 1) || (!j.frontConfirmed);
+      if (!hasExit && dfsTop < 0) {
+        Serial.println("DFS: spurious dead-end ignored");
+        markTurnFinished(true);
+        prevLeftWall = sideHasWall(L);
+        prevRightWall = sideHasWall(R);
+        return;
+      }
+      dfsPush(j.leftState, j.rightState, j.frontConfirmed);
+    } else {
+      dfsReturning = false;
+    }
+    if (!(await dfsDecide())) {
+      ringTaskDone = true;
+      stopRobot();
+      resetCorrection();
+      clearJunctionTracking();
+      Serial.println("DFS: exploration complete, stopped");
+    }
+    prevLeftWall = sideHasWall(L);
+    prevRightWall = sideHasWall(R);
+    return;
+  }
+  prevLeftWall = leftNowWall;
+  prevRightWall = rightNowWall;
+  driveStraight(L, front, R);
+  printReadings(L, front, R);
+  await delay(10);
+}
+
+async function mainSketch(gen) {
+  try {
+    await setup();
+    while (gen === sketchGen) {
+      await loop();
+    }
+  } catch (e) {
+    console.error(e);
+    Serial.println("SKETCH ERROR: " + e.message);
+  }
+}
+
+function resetSketchState() {
+  openAdvanceActive = false;
+  openAdvanceStartedAt = 0;
+  openAdvanceWallCount = 0;
+  filteredError = 0;
+  lastCorrection = 0;
+  correctionWallMask = -1;
+  startupTime = 0;
+  turnFinishedTime = 0;
+  alignStartedAt = 0;
+  alignActive = false;
+  turnArmed = true;
+  lastNormalTurnLeft = true;
+  clearVotes = 0;
+  ledScenario = -1;
+  ledStartedTime = 0;
+  lastPrintTime = 0;
+  lastWaitPrintTime = 0;
+  escapeScenario = 0;
+  escapeTurningLeft = true;
+  escapeConfirming = false;
+  escapeFrontClearCount = 0;
+  escapeStartedAt = 0;
+  escapeStoppedAt = 0;
+  motionFault = false;
+  dfsTop = -1;
+  dfsReturning = false;
+  ringTaskDone = false;
+  prevLeftWall = false;
+  prevRightWall = false;
+  sim.millis = 0;
+  sim.leftUs = LEFT_STOP_PWM;
+  sim.rightUs = RIGHT_STOP_PWM;
+  sim.pins = Object.create(null);
+  delayWaiters = [];
+  logLines = [];
+  document.getElementById("log").textContent = "";
+  applyStartPose();
+}
+
+function hardResetAndMaybeRun(autoStart) {
+  sketchGen++;
+  // resolve any hanging delays so old sketch can exit
+  const old = delayWaiters.splice(0);
+  for (const w of old) w.resolve();
+  resetSketchState();
+  updateDoneBanner();
+  if (autoStart) {
+    sim.running = true;
+    mainSketch(sketchGen);
+  } else {
+    sim.running = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// Canvas draw
+// ═══════════════════════════════════════════════════════════
+const cv = document.getElementById("cv");
+const ctx = cv.getContext("2d");
+
+function worldToScreen(x, y, pad, scale) {
+  // math y-up → canvas y-down
+  return {
+    sx: pad + x * scale,
+    sy: pad + (GRID - y) * scale,
+  };
+}
+
+function draw() {
+  const W = cv.width, H = cv.height;
+  const pad = 24;
+  const scale = (Math.min(W, H) - pad * 2) / GRID;
+  ctx.fillStyle = "#0e1218";
+  ctx.fillRect(0, 0, W, H);
+
+  // visited
+  for (let r = 0; r < GRID; r++) {
+    for (let c = 0; c < GRID; c++) {
+      if (!visited[r][c]) continue;
+      const p = worldToScreen(c, r + 1, pad, scale);
+      ctx.fillStyle = "rgba(61, 184, 154, 0.22)";
+      ctx.fillRect(p.sx, p.sy, scale, scale);
+    }
+  }
+
+  // grid faint
+  ctx.strokeStyle = "rgba(53,66,82,0.45)";
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= GRID; i++) {
+    const a = worldToScreen(0, i, pad, scale);
+    const b = worldToScreen(GRID, i, pad, scale);
+    ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+    const c = worldToScreen(i, 0, pad, scale);
+    const d = worldToScreen(i, GRID, pad, scale);
+    ctx.beginPath(); ctx.moveTo(c.sx, c.sy); ctx.lineTo(d.sx, d.sy); ctx.stroke();
+  }
+
+  // walls
+  ctx.strokeStyle = "#c5d0db";
+  ctx.lineWidth = 2.5;
+  ctx.lineCap = "round";
+  for (const s of segments) {
+    const a = worldToScreen(s.x1, s.y1, pad, scale);
+    const b = worldToScreen(s.x2, s.y2, pad, scale);
+    ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+  }
+
+  // trail
+  if (sim.trail.length > 1) {
+    ctx.strokeStyle = "rgba(212, 160, 23, 0.55)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let i = 0; i < sim.trail.length; i++) {
+      const p = worldToScreen(sim.trail[i].x, sim.trail[i].y, pad, scale);
+      if (i === 0) ctx.moveTo(p.sx, p.sy); else ctx.lineTo(p.sx, p.sy);
+    }
+    ctx.stroke();
+  }
+
+  // IR rays
+  const rayColors = { F: "#5ec8ff", L: "#7ed957", R: "#ff8f6b" };
+  for (const side of ["L", "F", "R"]) {
+    const ray = sim.lastRays[side];
+    if (!ray) continue;
+    const a = worldToScreen(ray.x1, ray.y1, pad, scale);
+    const b = worldToScreen(ray.x2, ray.y2, pad, scale);
+    ctx.strokeStyle = rayColors[side];
+    ctx.globalAlpha = 0.75;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+
+  // robot triangle (nose = forward)
+  {
+    const ang = sim.pose.angle;
+    // canvas angle: math angle, but y flipped so rotate carefully
+    const p = worldToScreen(sim.pose.x, sim.pose.y, pad, scale);
+    const nose = 0.28 * scale;
+    const wing = 0.18 * scale;
+    // forward in screen: cos(ang)*scale x, -sin(ang)*scale y
+    const fx = Math.cos(ang), fy = -Math.sin(ang);
+    const lx = Math.cos(ang + 2.4), ly = -Math.sin(ang + 2.4);
+    const rx = Math.cos(ang - 2.4), ry = -Math.sin(ang - 2.4);
+    ctx.fillStyle = "#f0c14a";
+    ctx.beginPath();
+    ctx.moveTo(p.sx + fx * nose, p.sy + fy * nose);
+    ctx.lineTo(p.sx + lx * wing, p.sy + ly * wing);
+    ctx.lineTo(p.sx + rx * wing, p.sy + ry * wing);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // IR text
+  const ir = sim.lastIr;
+  ctx.fillStyle = "#9aabbc";
+  ctx.font = "12px ui-monospace, Consolas, monospace";
+  ctx.fillText(
+    `L ${ir.L.bands}/${ir.L.votes}   F ${ir.F.bands}/${ir.F.votes}   R ${ir.R.bands}/${ir.R.votes}`,
+    pad, H - 10
+  );
+
+  if (ringTaskDone) {
+    ctx.fillStyle = "rgba(0,0,0,0.45)";
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#3db89a";
+    ctx.font = "bold 36px Segoe UI, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("EXPLORE DONE", W / 2, H / 2);
+    ctx.textAlign = "left";
+  }
+
+  updateHud();
+  updateLeds();
+  updateDoneBanner();
+}
+
+function headingName(h) { return ["N", "E", "S", "W"][h] || "?"; }
+
+function updateHud() {
+  const el = document.getElementById("hud");
+  el.innerHTML = [
+    `<span class="k">millis</span> <span class="v">${sim.millis}</span>`,
+    `<span class="k">cell</span> <span class="v">(${gx},${gy}) ${headingName(heading)}</span>`,
+    `<span class="k">pose</span> <span class="v">${sim.pose.x.toFixed(2)}, ${sim.pose.y.toFixed(2)} ∠${(sim.pose.angle * 180 / Math.PI).toFixed(0)}°</span>`,
+    `<span class="k">dfsTop</span> <span class="v">${dfsTop}</span>  <span class="k">escape</span> <span class="v">${escapeScenario}</span>`,
+    `<span class="k">turnArmed</span> <span class="v">${turnArmed}</span>  <span class="k">openAdv</span> <span class="v">${openAdvanceActive}</span>`,
+    `<span class="k">ringTaskDone</span> <span class="v">${ringTaskDone}</span>  <span class="k">fault</span> <span class="v">${motionFault}</span>`,
+    `<span class="k">PWM</span> <span class="v">L${sim.leftUs} R${sim.rightUs}</span>`,
+  ].join("<br>");
+}
+
+function updateLeds() {
+  document.getElementById("ledL").className = "led" + (sim.pins[LED_L] ? " on-l" : "");
+  document.getElementById("ledM").className = "led" + (sim.pins[LED_M] ? " on-m" : "");
+  document.getElementById("ledR").className = "led" + (sim.pins[LED_R] ? " on-r" : "");
+}
+
+function updateDoneBanner() {
+  document.getElementById("doneBanner").classList.toggle("show", !!ringTaskDone);
+}
+
+// ═══════════════════════════════════════════════════════════
+// Interaction
+// ═══════════════════════════════════════════════════════════
+function canvasToWorld(mx, my) {
+  const rect = cv.getBoundingClientRect();
+  const sx = (mx - rect.left) * (cv.width / rect.width);
+  const sy = (my - rect.top) * (cv.height / rect.height);
+  const pad = 24;
+  const scale = (Math.min(cv.width, cv.height) - pad * 2) / GRID;
+  const x = (sx - pad) / scale;
+  const y = GRID - (sy - pad) / scale;
+  return { x, y };
+}
+
+cv.addEventListener("click", (ev) => {
+  const { x, y } = canvasToWorld(ev.clientX, ev.clientY);
+  if (placeStartMode) {
+    const cx = constrain(Math.floor(x), 0, GRID - 1);
+    const cy = constrain(Math.floor(y), 0, GRID - 1);
+    startGx = cx; startGy = cy;
+    hardResetAndMaybeRun(false);
+    placeStartMode = false;
+    document.getElementById("btnPlaceStart").classList.remove("active");
+    return;
+  }
+  // toggle nearest edge (not outer boundary)
+  const fx = x - Math.floor(x);
+  const fy = y - Math.floor(y);
+  const cx = Math.floor(x), cy = Math.floor(y);
+  const distEdge = [
+    { d: fy, kind: "h", r: cy, c: cx },
+    { d: 1 - fy, kind: "h", r: cy + 1, c: cx },
+    { d: fx, kind: "v", r: cy, c: cx },
+    { d: 1 - fx, kind: "v", r: cy, c: cx + 1 },
+  ];
+  distEdge.sort((a, b) => a.d - b.d);
+  const e = distEdge[0];
+  if (e.d > 0.28) return;
+  if (e.kind === "h") {
+    if (e.r <= 0 || e.r >= GRID) return;
+    if (e.c < 0 || e.c >= GRID) return;
+    hWalls[e.r][e.c] = !hWalls[e.r][e.c];
+  } else {
+    if (e.c <= 0 || e.c >= GRID) return;
+    if (e.r < 0 || e.r >= GRID) return;
+    vWalls[e.r][e.c] = !vWalls[e.r][e.c];
+  }
+  rebuildSegments();
+});
+
+document.getElementById("btnStart").onclick = () => {
+  if (!window.__sketchAlive) {
+    const gen = ++sketchGen;
+    const old = delayWaiters.splice(0);
+    for (const w of old) w.resolve();
+    resetSketchState();
+    sim.running = true;
+    window.__sketchAlive = true;
+    mainSketch(gen).finally(() => {
+      if (gen === sketchGen) window.__sketchAlive = false;
+    });
+  } else {
+    sim.running = true;
+  }
+};
+
+document.getElementById("btnPause").onclick = () => { sim.running = false; };
+
+document.getElementById("btnStep").onclick = () => {
+  if (!window.__sketchAlive) {
+    document.getElementById("btnStart").onclick();
+    sim.running = false;
+  }
+  const before = delayWaiters.slice();
+  let guard = 0;
+  // Run physics until the current (or next) delay completes
+  while (guard++ < 20000) {
+    if (delayWaiters.length === 0) {
+      // sketch between delays — nudge clock so microtasks can schedule next delay
+      stepPhysics1ms();
+      resolveDelays();
+      if (delayWaiters.length > 0) continue;
+      if (guard > 50) break;
+      continue;
+    }
+    const t = delayWaiters[0].target;
+    while (sim.millis < t && guard++ < 20000) {
+      stepPhysics1ms();
+      resolveDelays();
+    }
+    resolveDelays();
+    break;
+  }
+  void before;
+};
+
+document.getElementById("btnReset").onclick = () => {
+  hardResetAndMaybeRun(false);
+  window.__sketchAlive = false;
+};
+
+document.getElementById("speed").oninput = (e) => {
+  sim.speed = parseFloat(e.target.value) || 1;
+  document.getElementById("speedLabel").textContent = sim.speed.toFixed(1) + "×";
+};
+
+document.getElementById("preset").onchange = (e) => {
+  loadPreset(e.target.value);
+  hardResetAndMaybeRun(false);
+  window.__sketchAlive = false;
+};
+
+document.getElementById("btnRandom").onclick = () => {
+  generatePerfectMaze();
+  hardResetAndMaybeRun(false);
+  window.__sketchAlive = false;
+};
+
+document.getElementById("btnPlaceStart").onclick = () => {
+  placeStartMode = !placeStartMode;
+  document.getElementById("btnPlaceStart").classList.toggle("active", placeStartMode);
+};
+
+document.getElementById("btnRotate").onclick = () => {
+  startHeading = (startHeading + 1) % 4;
+  hardResetAndMaybeRun(false);
+  window.__sketchAlive = false;
+};
+
+// ═══════════════════════════════════════════════════════════
+// rAF driver
+// ═══════════════════════════════════════════════════════════
+let lastFrame = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - lastFrame) / 1000);
+  lastFrame = now;
+  if (sim.running) {
+    let budget = Math.floor(sim.speed * dt * 1000);
+    budget = constrain(budget, 0, 200); // cap per frame
+    for (let i = 0; i < budget; i++) {
+      stepPhysics1ms();
+      resolveDelays();
+    }
+  }
+  // if sketch waiting and clock already past, resolve
+  resolveDelays();
+  draw();
+  requestAnimationFrame(frame);
+}
+
+// boot
+if (new URLSearchParams(location.search).has("embed")) {
+  document.body.classList.add("embed");
+}
+loadPreset("mvp");
+resetSketchState();
+window.__sketchAlive = false;
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

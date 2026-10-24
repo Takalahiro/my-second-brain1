@@ -204,46 +204,77 @@
   });
 
   onMount(() => {
-    const skinId = initUiSkin();
-    globalMuted = readGlobalMuted();
-    let storedEnabled: Enabled | null = null;
+    // 任何解析/皮肤初始化失败都不能让 ready 永远为 false（否则整桌面空白）
+    let mqCleanup: (() => void) | null = null;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const s = JSON.parse(raw);
-        if (s.bg && typeof s.bg === 'object') {
-          bg = {
-            sceneId: typeof s.bg.sceneId === 'string' ? s.bg.sceneId : bg.sceneId,
-            useVideo: s.bg.useVideo !== false,
-            usePly: !!s.bg.usePly,
-            rain: !!s.bg.rain,
-            rainDrops: !!s.bg.rainDrops,
-            rainDropsLinked: s.bg.rainDropsLinked !== false,
-            sakura: s.bg.sceneId === 'kyoto' ? !!s.bg.sakura : false,
-            brightness: typeof s.bg.brightness === 'number' ? s.bg.brightness : 1,
-            speed: typeof s.bg.speed === 'number' ? s.bg.speed : 1,
-            mobileIndex: typeof s.bg.mobileIndex === 'number' ? s.bg.mobileIndex : 0,
-          };
+      const skinId = initUiSkin();
+      globalMuted = readGlobalMuted();
+      let storedEnabled: Enabled | null = null;
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          let s: unknown;
+          try {
+            s = JSON.parse(raw);
+          } catch {
+            localStorage.removeItem(STORAGE_KEY);
+            s = null;
+          }
+          if (s && typeof s === 'object') {
+            const obj = s as { bg?: Record<string, unknown>; enabled?: unknown };
+            if (obj.bg && typeof obj.bg === 'object') {
+              const b = obj.bg;
+              bg = {
+                sceneId: typeof b.sceneId === 'string' ? b.sceneId : bg.sceneId,
+                useVideo: b.useVideo !== false,
+                usePly: !!b.usePly,
+                rain: !!b.rain,
+                rainDrops: !!b.rainDrops,
+                rainDropsLinked: b.rainDropsLinked !== false,
+                sakura: b.sceneId === 'kyoto' ? !!b.sakura : false,
+                brightness: typeof b.brightness === 'number' ? b.brightness : 1,
+                speed: typeof b.speed === 'number' ? b.speed : 1,
+                mobileIndex: typeof b.mobileIndex === 'number' ? b.mobileIndex : 0,
+              };
+            }
+            storedEnabled = parseStoredEnabled(obj, backgroundDefault);
+          }
         }
-        storedEnabled = parseStoredEnabled(s, backgroundDefault);
+      } catch {
+        try { localStorage.removeItem(STORAGE_KEY); } catch { /* ignore */ }
       }
-    } catch {}
-    enabled = resolveEnabledOnLoad(storedEnabled, skinId, backgroundDefault, bg.useVideo, desktopMode);
-    lastWeatherCode = readCachedWeatherCode();
-    syncLinkedRainDrops(lastWeatherCode);
-    window.addEventListener('weather:sync', onWeatherSync);
-    snapshot = null;
-    // 监听移动端断点 —— 时钟在此条件下永远不 pin
-    try {
-      const mq = window.matchMedia('(max-width: 768px)');
-      isMobile = mq.matches;
-      const onChange = (e: MediaQueryListEvent) => { isMobile = e.matches; };
-      if (mq.addEventListener) mq.addEventListener('change', onChange);
-      else mq.addListener(onChange);
-    } catch {}
-    ready = true;
-    persist();
-    return () => window.removeEventListener('weather:sync', onWeatherSync);
+      try {
+        enabled = resolveEnabledOnLoad(storedEnabled, skinId, backgroundDefault, bg.useVideo, desktopMode);
+      } catch {
+        enabled = createEmptyEnabled(backgroundDefault);
+      }
+      lastWeatherCode = readCachedWeatherCode();
+      syncLinkedRainDrops(lastWeatherCode);
+      window.addEventListener('weather:sync', onWeatherSync);
+      snapshot = null;
+      try {
+        const mq = window.matchMedia('(max-width: 768px)');
+        isMobile = mq.matches;
+        const onChange = (e: MediaQueryListEvent) => { isMobile = e.matches; };
+        if (mq.addEventListener) {
+          mq.addEventListener('change', onChange);
+          mqCleanup = () => mq.removeEventListener('change', onChange);
+        } else {
+          mq.addListener(onChange);
+          mqCleanup = () => mq.removeListener(onChange);
+        }
+      } catch { /* ignore */ }
+    } catch (e) {
+      console.error('[WidgetHost] init failed, using defaults', e);
+      enabled = createEmptyEnabled(backgroundDefault);
+    } finally {
+      ready = true;
+      try { persist(); } catch { /* ignore */ }
+    }
+    return () => {
+      window.removeEventListener('weather:sync', onWeatherSync);
+      mqCleanup?.();
+    };
   });
 
   // 桌面 + 开了背景 + 用视频时，时钟钉右下角
@@ -677,19 +708,19 @@
         <LazyWidget show={true} loader={wl('world')} props={{ onClose: () => toggleEnabled('world') }} />
       {/if}
       {#if ready && enabled.graph}
-        <LazyWidget show={true} loader={widgetLoaders.graph} props={{ onClose: () => toggleEnabled('graph') }} />
+        <LazyWidget show={true} loader={widgetLoaders.graph} loadingHint="加载关系图谱（首次可能较慢）…" props={{ onClose: () => toggleEnabled('graph') }} />
       {/if}
       {#if ready && enabled.territory}
-        <LazyWidget show={true} loader={widgetLoaders.territory} props={{ onClose: () => toggleEnabled('territory') }} />
+        <LazyWidget show={true} loader={widgetLoaders.territory} loadingHint="加载文件夹地图…" props={{ onClose: () => toggleEnabled('territory') }} />
       {/if}
       {#if ready && enabled.calculator}
         <LazyWidget show={true} loader={widgetLoaders.calculator} props={{ onClose: () => toggleEnabled('calculator') }} />
       {/if}
       {#if ready && enabled.python}
-        <LazyWidget show={true} loader={widgetLoaders.python} props={{ onClose: () => toggleEnabled('python') }} />
+        <LazyWidget show={true} loader={widgetLoaders.python} loadingHint="加载 Python 组件（Pyodide 不会自动下载）…" props={{ onClose: () => toggleEnabled('python') }} />
       {/if}
       {#if ready && enabled.whiteboard}
-        <LazyWidget show={true} loader={widgetLoaders.whiteboard} props={{ onClose: () => toggleEnabled('whiteboard') }} />
+        <LazyWidget show={true} loader={widgetLoaders.whiteboard} loadingHint="加载白板…" props={{ onClose: () => toggleEnabled('whiteboard') }} />
       {/if}
       {#if ready && enabled.whitenoise}
         <LazyWidget
@@ -794,20 +825,20 @@
     <LazyWidget show={true} loader={wl('world')} props={{ onClose: () => toggleEnabled('world') }} />
   {/if}
   {#if ready && enabled.graph}
-    <LazyWidget show={true} loader={widgetLoaders.graph} props={{ onClose: () => toggleEnabled('graph') }} />
-  {/if}
-  {#if ready && enabled.territory}
-    <LazyWidget show={true} loader={widgetLoaders.territory} props={{ onClose: () => toggleEnabled('territory') }} />
-  {/if}
-  {#if ready && enabled.calculator}
-    <LazyWidget show={true} loader={widgetLoaders.calculator} props={{ onClose: () => toggleEnabled('calculator') }} />
-  {/if}
-  {#if ready && enabled.python}
-    <LazyWidget show={true} loader={widgetLoaders.python} props={{ onClose: () => toggleEnabled('python') }} />
-  {/if}
-  {#if ready && enabled.whiteboard}
-    <LazyWidget show={true} loader={widgetLoaders.whiteboard} props={{ onClose: () => toggleEnabled('whiteboard') }} />
-  {/if}
+        <LazyWidget show={true} loader={widgetLoaders.graph} loadingHint="加载关系图谱（首次可能较慢）…" props={{ onClose: () => toggleEnabled('graph') }} />
+      {/if}
+      {#if ready && enabled.territory}
+        <LazyWidget show={true} loader={widgetLoaders.territory} loadingHint="加载文件夹地图…" props={{ onClose: () => toggleEnabled('territory') }} />
+      {/if}
+      {#if ready && enabled.calculator}
+        <LazyWidget show={true} loader={widgetLoaders.calculator} props={{ onClose: () => toggleEnabled('calculator') }} />
+      {/if}
+      {#if ready && enabled.python}
+        <LazyWidget show={true} loader={widgetLoaders.python} loadingHint="加载 Python 组件（Pyodide 不会自动下载）…" props={{ onClose: () => toggleEnabled('python') }} />
+      {/if}
+      {#if ready && enabled.whiteboard}
+        <LazyWidget show={true} loader={widgetLoaders.whiteboard} loadingHint="加载白板…" props={{ onClose: () => toggleEnabled('whiteboard') }} />
+      {/if}
   {#if ready && enabled.whitenoise}
     <LazyWidget
       show={true}

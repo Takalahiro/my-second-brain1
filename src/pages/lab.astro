@@ -1,0 +1,8 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import LabHub from '../components/LabHub.svelte';
+---
+
+<ToolLayout title="学堂 · My Second Brain" description="教学、编译器与 Arduino 迷宫小车，同一个子界面">
+  <LabHub client:only="svelte" />
+</ToolLayout>

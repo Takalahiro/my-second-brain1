@@ -13,7 +13,7 @@
   let activeStep = $state(0);
   let codeView = $state<CodeView>('edit');
   let codeRatio = $state(0.54);
-  let stepsRatio = $state(0.34);
+  let stepsRatio = $state(0.24);
   let stacked = $state(false);
   let dragging = $state<'code' | 'steps' | null>(null);
   let workspaceEl = $state<HTMLDivElement | null>(null);
@@ -243,7 +243,11 @@
   .avr-code { flex: 0 0 auto; min-width: 0; min-height: 0; }
   .avr-side { flex: 1 1 auto; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
   .avr-steps { flex: 0 0 auto; min-height: 0; padding: var(--space-3); }
-  .avr-path { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+  .avr-path {
+    flex: 1 1 auto;
+    min-height: min(48vh, 20rem);
+    overflow: hidden;
+  }
   .avr-split {
     flex: 0 0 10px;
     border: 0;

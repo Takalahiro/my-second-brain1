@@ -3,7 +3,7 @@
 > **文档类型：** 架构与设计技术报告  
 > **适用范围：** my-second-brain 全站（SSG 知识库 + 桌面 OS 壳 + 13 套 UI 皮肤 + 3DGS / HUD 壁纸 + 浏览器内计算工具）  
 > **当前版本：** 1.5.0  
-> **最后更新：** 2026-05-26  
+> **最后更新：** 2026-10-24  
 > **用户文档：** [README.md](../README.md) · [README.en.md](../README.en.md)
 
 ---
@@ -51,6 +51,7 @@
 
 | 版本 | 日期 | 摘要 |
 |------|------|------|
+| **1.5.1** | 2026-10-24 | **线上稳定 + 教学骨架**：WidgetHost `ready` 容错、HomeHero intro 超时、LazyWidget 加载/失败/重试、safe-storage + IndexedDB 进度、`/teaching/` 大厅、404/OG/canonical、MazeCar 仿真页；见 [LEARNING_UNIVERSE.md](./LEARNING_UNIVERSE.md) |
 | **1.5.0** | 2026-05-26 | **设计系统统一**：`theme-tokens.css` 语义变量、`design-system.css` 子页 spacing/阴影/组件类、`ThemeBoot.astro` 全站预水合；笔记/工具/图谱/MATLAB/Python/神经网络/白板子页对齐 mac 皮肤；图谱画布与 GraphWidget 主题化；`design-system/` structural widget 双轨；文档 [subpage-design-sync.md](./subpage-design-sync.md) · [theme-color-audit.md](./theme-color-audit.md) |
 | **1.4.0** | 2026-05-20 | **13 套 UI 皮肤**与 **Skin Chrome** 体系统一（状态条、CLI 搜索、滚动高度计）；控制中心右侧固定锚点；沉浸式皮肤恢复视频/海报壁纸；重写 README 与中英文文档 |
 | **1.3.0** | 2026-05-20 | NASA-punk **HUD 皮肤**（Canvas 壁纸、任务状态条、日全食 intro）；**NotesToolHost**修复（笔记页 Python / MATLAB / 白板）；修复笔记工具开关双触发 |

@@ -276,10 +276,17 @@
   <p class="spec-note">{spec.note}</p>
 
   <div class="diagram">
-  <svg class="sheet" viewBox="0 0 920 560" preserveAspectRatio="xMidYMid meet" role="img" aria-label="固定坐标数据通路" onwheel={onWheel}>
+  <svg
+    class="sheet"
+    viewBox="0 0 920 560"
+    preserveAspectRatio="xMidYMid meet"
+    role="img"
+    aria-label="固定坐标数据通路"
+    onwheel={onWheel}
+  >
     <defs>
-      <marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 L8 4 L0 8 Z" class="arrow-head" />
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" class="arrow-head" />
       </marker>
     </defs>
 
@@ -290,7 +297,7 @@
       <path marker-end="url(#arr)" d="M360 212 V260" />
       <path marker-end="url(#arr)" d="M520 212 V260" />
     </g>
-    <text class="label" x="470" y="160">Control Signals</text>
+    <text class="label" x="470" y="158">控制信号 Control</text>
 
     <g class="wire bus-fetch" class:hot={on('pc') || on('pmem')} class:hover={hover === 'pc'}>
       <path marker-end="url(#arr)" d="M118 48 H148" />
@@ -316,22 +323,22 @@
     <g class="wire" class:hot={on('indirect')} class:hover={hover === 'indirect'}>
       <path marker-end="url(#arr)" d="M123 420 V458 H500 V400" />
     </g>
-    <text class="label" x="150" y="448">Indirect Addressing</text>
+    <text class="label" x="150" y="448">间接寻址 Indirect</text>
 
     <g class="wire" class:hot={on('direct')} class:hover={hover === 'direct'}>
       <path marker-end="url(#arr)" d="M350 190 H500 V268" />
     </g>
-    <text class="label" x="392" y="206">Direct Addressing</text>
+    <text class="label" x="392" y="206">直接寻址 Direct</text>
 
     <g class="bus bus-shared">
       <path marker-start="url(#arr)" marker-end="url(#arr)" d="M250 96 H520 V268" />
     </g>
-    <text class="label bus-shared" x="400" y="88">Shared Bus</text>
+    <text class="label bus-shared" x="400" y="86">共享总线 Shared Bus</text>
 
     <g class="bus bus-data" class:hot={on('dbus') || on('dmem') || on('io')} class:hover={hover === 'dbus'}>
       <path marker-start="url(#arr)" marker-end="url(#arr)" d="M24 500 H896" />
     </g>
-    <text class="label bus-name bus-data" x="300" y="492">{arch === 'vonNeumann' ? 'Shared Bus' : '8-bit Data Bus'}</text>
+    <text class="label bus-name bus-data" x="300" y="490">{arch === 'vonNeumann' ? '共享总线 Shared Bus' : '8 位数据总线 Data Bus'}</text>
     <g class="wire bus-data" class:hot={on('dbus') || on('dmem')} class:hover={hover === 'dbus'}>
       <path marker-end="url(#arr)" d="M520 400 V500" />
       <path marker-end="url(#arr)" d="M120 420 V500" />
@@ -356,85 +363,86 @@
     </g>
 
     <g class="box" class:on={on('pc')} class:seek={query.trim().toLowerCase() === 'pc'}>
-      <rect x="16" y="28" width="102" height="40" />
-      <text x="67" y="46" text-anchor="middle">PC</text>
-      {#if detailOn}<text class="sub" x="67" y="60" text-anchor="middle">#{step?.pc ?? 0}</text>{/if}
+      <rect x="16" y="24" width="110" height="48" rx="4" />
+      <text class="title" x="71" y="44" text-anchor="middle">PC</text>
+      {#if detailOn}<text class="sub" x="71" y="62" text-anchor="middle">#{step?.pc ?? 0}</text>{/if}
     </g>
     <g class="box" class:on={on('pmem')}>
-      <rect x="148" y="16" width="204" height="80" />
-      <text x="250" y="40" text-anchor="middle">Program Memory</text>
-      <text class="sub" x="250" y="58" text-anchor="middle">32 Kbytes</text>
-      <text class="sub" x="250" y="76" text-anchor="middle">16 bit addressable</text>
-      <text class="sub cache-note" x="250" y="90" text-anchor="middle">I-Cache</text>
+      <rect x="148" y="12" width="210" height="88" rx="4" />
+      <text class="title" x="253" y="36" text-anchor="middle">程序存储器</text>
+      <text class="sub" x="253" y="54" text-anchor="middle">Program Memory · 32KB</text>
+      <text class="sub" x="253" y="72" text-anchor="middle">16-bit 字寻址</text>
+      <text class="sub cache-note" x="253" y="90" text-anchor="middle">I-Cache</text>
     </g>
     <g class="box" class:on={on('ir')}>
-      <rect x="160" y="110" width="180" height="44" />
-      <text x="250" y="128" text-anchor="middle">Instruction Register</text>
-      {#if detailOn}<text class="sub" x="250" y="146" text-anchor="middle">{step?.flow?.op?.toUpperCase() ?? ''}</text>{/if}
+      <rect x="160" y="108" width="186" height="48" rx="4" />
+      <text class="title" x="253" y="128" text-anchor="middle">指令寄存器 IR</text>
+      {#if detailOn}<text class="sub" x="253" y="146" text-anchor="middle">{step?.flow?.op?.toUpperCase() ?? ''}</text>{/if}
     </g>
     <g class="box" class:on={on('decode')}>
-      <rect x="150" y="168" width="200" height="44" />
-      <text x="250" y="194" text-anchor="middle">Instruction Decoder</text>
+      <rect x="150" y="166" width="206" height="48" rx="4" />
+      <text class="title" x="253" y="196" text-anchor="middle">指令译码器</text>
     </g>
     <g class="box" class:on={on('regs')} class:seek={seek != null}>
-      <rect x="16" y="260" width="214" height="160" />
-      <text x="123" y="284" text-anchor="middle">Register File</text>
-      <text class="sub" x="123" y="304" text-anchor="middle">32 registers · 8 bits each</text>
-      <text class="sub" x="123" y="322" text-anchor="middle">R0 – R31</text>
+      <rect x="16" y="256" width="220" height="168" rx="4" />
+      <text class="title" x="126" y="282" text-anchor="middle">寄存器堆</text>
+      <text class="sub" x="126" y="302" text-anchor="middle">32 × 8-bit · R0–R31</text>
       {#if detailOn && step}
-        <text class="sub" class:dirty={dirty.has(16)} x="28" y="348">R16 {hex(step.snap.regs[16])}</text>
-        <text class="sub" class:dirty={dirty.has(17)} x="120" y="348">R17 {hex(step.snap.regs[17])}</text>
-        <text class="sub" x="28" y="370">X {hex(xPtr, 4)}</text>
-        <text class="sub" x="120" y="370">Z {hex(zPtr, 4)}</text>
-        {#if step.flow?.rd != null}<text class="sub" x="28" y="396">Rd = R{step.flow.rd}</text>{/if}
+        <text class="sub" class:dirty={dirty.has(16)} x="32" y="334">R16 {hex(step.snap.regs[16])}</text>
+        <text class="sub" class:dirty={dirty.has(17)} x="126" y="334">R17 {hex(step.snap.regs[17])}</text>
+        <text class="sub" x="32" y="358">X {hex(xPtr, 4)}</text>
+        <text class="sub" x="126" y="358">Z {hex(zPtr, 4)}</text>
+        {#if step.flow?.rd != null}<text class="sub" x="32" y="386">Rd = R{step.flow.rd}</text>{/if}
+      {:else}
+        <text class="sub" x="126" y="340" text-anchor="middle">运行后显示数值</text>
       {/if}
     </g>
     <g class="box" class:on={on('alu')}>
-      <rect x="268" y="268" width="124" height="80" />
-      <text x="330" y="304" text-anchor="middle">ALU</text>
-      {#if detailOn}<text class="sub" x="330" y="326" text-anchor="middle">{step?.flow?.op?.toUpperCase() ?? ''}</text>{/if}
+      <rect x="268" y="264" width="128" height="84" rx="4" />
+      <text class="title" x="332" y="300" text-anchor="middle">ALU</text>
+      {#if detailOn}<text class="sub" x="332" y="324" text-anchor="middle">{step?.flow?.op?.toUpperCase() ?? '运算单元'}</text>{/if}
     </g>
     <g class="box" class:on={on('sreg')}>
-      <rect x="268" y="372" width="124" height="40" />
-      <text x="330" y="390" text-anchor="middle">Status Register</text>
-      {#if detailOn && step}<text class="sub" x="330" y="406" text-anchor="middle">Z{step.snap.z ? 1 : 0} C{step.snap.c ? 1 : 0} N{step.snap.n ? 1 : 0} V{step.snap.v ? 1 : 0}</text>{/if}
+      <rect x="268" y="368" width="128" height="48" rx="4" />
+      <text class="title" x="332" y="388" text-anchor="middle">状态寄存器</text>
+      {#if detailOn && step}<text class="sub" x="332" y="406" text-anchor="middle">Z{step.snap.z ? 1 : 0} C{step.snap.c ? 1 : 0} N{step.snap.n ? 1 : 0} V{step.snap.v ? 1 : 0}</text>{/if}
     </g>
     <g class="box" class:on={on('dmem')}>
-      <rect x="440" y="268" width="160" height="132" />
-      <text x="520" y="296" text-anchor="middle">Data Memory</text>
-      <text class="sub" x="520" y="316" text-anchor="middle">2 Kbytes</text>
-      <text class="sub cache-note" x="520" y="336" text-anchor="middle">D-Cache</text>
+      <rect x="436" y="264" width="168" height="140" rx="4" />
+      <text class="title" x="520" y="292" text-anchor="middle">数据存储器</text>
+      <text class="sub" x="520" y="314" text-anchor="middle">SRAM · 2KB</text>
+      <text class="sub cache-note" x="520" y="334" text-anchor="middle">D-Cache</text>
       {#if detailOn}
-        <text class="sub" x="520" y="356" text-anchor="middle">{on('indirect') ? `${(step?.flow?.ptr ?? 'x').toUpperCase()} pointer` : ' '}</text>
-        {#if addr != null}<text class="sub" x="520" y="376" text-anchor="middle">{hex(addr, 4)}</text>{/if}
+        <text class="sub" x="520" y="356" text-anchor="middle">{on('indirect') ? `${(step?.flow?.ptr ?? 'x').toUpperCase()} 指针` : ' '}</text>
+        {#if addr != null}<text class="sub" x="520" y="378" text-anchor="middle">{hex(addr, 4)}</text>{/if}
       {/if}
     </g>
     <g class="box io" class:on={on('io')}>
-      <rect x="620" y="360" width="80" height="36" />
-      <text x="660" y="382" text-anchor="middle">Module 1</text>
+      <rect x="620" y="356" width="86" height="40" rx="4" />
+      <text class="title sm" x="663" y="382" text-anchor="middle">模块 1</text>
     </g>
     <g class="box io" class:on={on('io')}>
-      <rect x="620" y="404" width="80" height="36" />
-      <text x="660" y="426" text-anchor="middle">Module n</text>
+      <rect x="620" y="404" width="86" height="40" rx="4" />
+      <text class="title sm" x="663" y="430" text-anchor="middle">模块 n</text>
     </g>
     <g class="box io">
-      <rect x="730" y="360" width="110" height="36" />
-      <text x="785" y="382" text-anchor="middle">Timer</text>
+      <rect x="726" y="356" width="118" height="40" rx="4" />
+      <text class="title sm" x="785" y="382" text-anchor="middle">定时器</text>
     </g>
     <g class="box io">
-      <rect x="730" y="404" width="110" height="36" />
-      <text x="785" y="426" text-anchor="middle">Interrupt Unit</text>
+      <rect x="726" y="404" width="118" height="40" rx="4" />
+      <text class="title sm" x="785" y="430" text-anchor="middle">中断单元</text>
     </g>
 
     <g class="picks">
-      <rect data-part="pc" role="button" tabindex="0" aria-label="展开 PC" x="16" y="28" width="102" height="40" onclick={() => togglePart('pc')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('pc'); }} onmouseenter={(e) => enterPart('pc', e)} onmouseleave={() => (partHover = null)} />
-      <rect data-part="pmem" role="button" tabindex="0" aria-label="展开程序存储器" x="148" y="16" width="204" height="80" onclick={() => togglePart('pmem')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('pmem'); }} onmouseenter={(e) => enterPart('pmem', e)} onmouseleave={() => (partHover = null)} />
-      <rect data-part="ir" role="button" tabindex="0" aria-label="展开指令寄存器" x="160" y="110" width="180" height="44" onclick={() => togglePart('ir')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('ir'); }} onmouseenter={(e) => enterPart('ir', e)} onmouseleave={() => (partHover = null)} />
-      <rect data-part="decode" role="button" tabindex="0" aria-label="展开译码器" x="150" y="168" width="200" height="44" onclick={() => togglePart('decode')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('decode'); }} onmouseenter={(e) => enterPart('decode', e)} onmouseleave={() => (partHover = null)} />
-      <rect data-part="regs" role="button" tabindex="0" aria-label="展开寄存器堆" x="16" y="260" width="214" height="160" onclick={() => togglePart('regs')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('regs'); }} onmouseenter={(e) => enterPart('regs', e)} onmouseleave={() => (partHover = null)} />
-      <rect data-part="alu" role="button" tabindex="0" aria-label="展开 ALU" x="268" y="268" width="124" height="80" onclick={() => togglePart('alu')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('alu'); }} onmouseenter={(e) => enterPart('alu', e)} onmouseleave={() => (partHover = null)} />
-      <rect data-part="sreg" role="button" tabindex="0" aria-label="展开状态寄存器" x="268" y="372" width="124" height="40" onclick={() => togglePart('sreg')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('sreg'); }} onmouseenter={(e) => enterPart('sreg', e)} onmouseleave={() => (partHover = null)} />
-      <rect data-part="dmem" role="button" tabindex="0" aria-label="展开数据存储器" x="440" y="268" width="160" height="132" onclick={() => togglePart('dmem')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('dmem'); }} onmouseenter={(e) => enterPart('dmem', e)} onmouseleave={() => (partHover = null)} />
+      <rect data-part="pc" role="button" tabindex="0" aria-label="展开 PC" x="16" y="24" width="110" height="48" onclick={() => togglePart('pc')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('pc'); }} onmouseenter={(e) => enterPart('pc', e)} onmouseleave={() => (partHover = null)} />
+      <rect data-part="pmem" role="button" tabindex="0" aria-label="展开程序存储器" x="148" y="12" width="210" height="88" onclick={() => togglePart('pmem')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('pmem'); }} onmouseenter={(e) => enterPart('pmem', e)} onmouseleave={() => (partHover = null)} />
+      <rect data-part="ir" role="button" tabindex="0" aria-label="展开指令寄存器" x="160" y="108" width="186" height="48" onclick={() => togglePart('ir')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('ir'); }} onmouseenter={(e) => enterPart('ir', e)} onmouseleave={() => (partHover = null)} />
+      <rect data-part="decode" role="button" tabindex="0" aria-label="展开译码器" x="150" y="166" width="206" height="48" onclick={() => togglePart('decode')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('decode'); }} onmouseenter={(e) => enterPart('decode', e)} onmouseleave={() => (partHover = null)} />
+      <rect data-part="regs" role="button" tabindex="0" aria-label="展开寄存器堆" x="16" y="256" width="220" height="168" onclick={() => togglePart('regs')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('regs'); }} onmouseenter={(e) => enterPart('regs', e)} onmouseleave={() => (partHover = null)} />
+      <rect data-part="alu" role="button" tabindex="0" aria-label="展开 ALU" x="268" y="264" width="128" height="84" onclick={() => togglePart('alu')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('alu'); }} onmouseenter={(e) => enterPart('alu', e)} onmouseleave={() => (partHover = null)} />
+      <rect data-part="sreg" role="button" tabindex="0" aria-label="展开状态寄存器" x="268" y="368" width="128" height="48" onclick={() => togglePart('sreg')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('sreg'); }} onmouseenter={(e) => enterPart('sreg', e)} onmouseleave={() => (partHover = null)} />
+      <rect data-part="dmem" role="button" tabindex="0" aria-label="展开数据存储器" x="436" y="264" width="168" height="140" onclick={() => togglePart('dmem')} onkeydown={(e) => { if (e.key === 'Enter') togglePart('dmem'); }} onmouseenter={(e) => enterPart('dmem', e)} onmouseleave={() => (partHover = null)} />
     </g>
     <g class="hits">
       <path role="img" aria-label="PC 到程序存储器" d="M118 48 H148" onmouseenter={(e) => enter('pc', e)} onmousemove={place} onmouseleave={() => (hover = null)} />
@@ -506,20 +514,23 @@
     <label>找寄存器 <input bind:value={query} placeholder="r16" /></label>
     <button type="button" onclick={exportSvg}>导出 SVG</button>
     <button type="button" onclick={copyLink}>复制短链</button>
-    <label>脉冲 <input type="range" min="0.4" max="2.4" step="0.1" bind:value={prefs.pulse} /></label>
   </div>
 
-  {#if lod.layer >= 1}
-    <p class="perf">CPI {perf.cpi.toFixed(2)} · 周期 {perf.cycles} · 约 {perf.ns.toFixed(1)} µs @ {prefs.sandbox.clockMHz} MHz</p>
-  {/if}
-  {#if lod.layer >= 2}
-    <p class="perf">mix ALU {mix.alu} / 访存 {mix.load} / 控制 {mix.ctrl} / IO {mix.io}</p>
-  {/if}
-  {#if lod.layer >= 3}
-    <p class="perf">寄存器压力 {regPressure(step)} / 32{#if seek != null} · r{seek} 溯源 {chain.map((i) => i + 1).join(' ← ') || '尚无写入'}{/if}</p>
-  {/if}
-  <p class="perf">同一段代码：哈佛 {compare.harvard} 拍 · 改进哈佛 {compare.modified} 拍 · 冯·诺依曼 {compare.vonNeumann} 拍</p>
-  <p class="perf">理想单周期 RISC：{Math.min(steps.length, activeStep + 1)} 拍（对照，不含哈佛总线差异）</p>
+  <details class="perf-box">
+    <summary>性能对照 · CPI / 架构拍数</summary>
+    {#if lod.layer >= 1}
+      <p class="perf">CPI {perf.cpi.toFixed(2)} · 周期 {perf.cycles} · 约 {perf.ns.toFixed(1)} µs @ {prefs.sandbox.clockMHz} MHz</p>
+    {/if}
+    {#if lod.layer >= 2}
+      <p class="perf">mix ALU {mix.alu} / 访存 {mix.load} / 控制 {mix.ctrl} / IO {mix.io}</p>
+    {/if}
+    {#if lod.layer >= 3}
+      <p class="perf">寄存器压力 {regPressure(step)} / 32{#if seek != null} · r{seek} 溯源 {chain.map((i) => i + 1).join(' ← ') || '尚无写入'}{/if}</p>
+    {/if}
+    <p class="perf">同一段代码：哈佛 {compare.harvard} 拍 · 改进哈佛 {compare.modified} 拍 · 冯·诺依曼 {compare.vonNeumann} 拍</p>
+    <p class="perf">理想单周期 RISC：{Math.min(steps.length, activeStep + 1)} 拍（对照）</p>
+    <label class="pulse-lab">脉冲速度 <input type="range" min="0.4" max="2.4" step="0.1" bind:value={prefs.pulse} /></label>
+  </details>
 
   <details>
     <summary>假设与自定义接线</summary>
@@ -555,53 +566,112 @@
 </div>
 
 <style>
-  .sheet-wrap { position: relative; display: flex; flex-direction: column; min-height: 0; height: 100%; padding: var(--space-2); overflow: hidden; }
-  .diagram { flex: 1 1 auto; min-height: 8rem; overflow: hidden; }
-  .sheet-foot { flex: 0 1 auto; max-height: 42%; min-height: 0; overflow: auto; }
+  .sheet-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    padding: var(--space-2);
+    overflow: hidden;
+    gap: 2px;
+  }
+  /* 图优先：宁可脚栏滚动，也不把 SVG 压到字糊 */
+  .diagram {
+    flex: 1 1 auto;
+    min-height: min(52vh, 22rem);
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+  }
+  .sheet-foot {
+    flex: 0 1 auto;
+    max-height: 30%;
+    min-height: 0;
+    overflow: auto;
+  }
   .sheet-bar, .tools, .time, .ticks { display: flex; flex-wrap: wrap; gap: var(--space-1); align-items: center; }
-  .sheet-title, .spec-note, .story, .perf { font-size: var(--text-xs); color: var(--text-muted); }
-  .spec-note, .story, .perf { margin: 2px 0; }
+  .sheet-title { font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--text); }
+  .spec-note, .story, .perf { font-size: var(--text-sm); color: var(--text-muted); margin: 2px 0; line-height: 1.4; }
   .sheet-bar button, .tools button, .time button, .ticks button, details button {
     border: 1px solid var(--border);
     background: var(--bg);
-    color: var(--text-muted);
+    color: var(--text);
     border-radius: 999px;
-    font-size: var(--text-xs);
-    padding: 2px var(--space-2);
+    font-size: var(--text-sm);
+    padding: 4px var(--space-2);
     cursor: pointer;
   }
-  button.active, .ticks button.now { color: var(--text); border-color: var(--accent); }
-  .ticks button.mark { color: var(--accent-in); }
+  button.active, .ticks button.now { color: var(--on-accent); background: var(--accent); border-color: transparent; }
+  .ticks button.mark { outline: 2px solid var(--accent-in); }
   .ticks button.chain { background: var(--overlay-subtle); }
-  .scale, .tools label, details label { font-size: var(--text-xs); color: var(--text-muted); display: inline-flex; gap: var(--space-1); align-items: center; }
-  .sheet { width: 100%; height: 100%; display: block; }
-  .box rect { fill: var(--bg); stroke: var(--text); stroke-width: 1.25; }
-  .box.on rect { stroke: var(--accent); stroke-width: 2.25; fill: var(--overlay-subtle); }
+  .scale, .tools label, details label, .pulse-lab {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    display: inline-flex;
+    gap: var(--space-1);
+    align-items: center;
+  }
+  .sheet {
+    width: 100%;
+    height: auto;
+    min-height: 22rem;
+    display: block;
+    shape-rendering: geometricPrecision;
+    text-rendering: geometricPrecision;
+  }
+  .box rect {
+    fill: var(--surface);
+    stroke: var(--text);
+    stroke-width: 1.75;
+  }
+  .box.on rect {
+    stroke: var(--accent);
+    stroke-width: 2.75;
+    fill: var(--overlay-subtle);
+  }
   .box.seek rect { stroke: var(--accent-in); }
-  .box text { fill: var(--text); font-size: 13px; font-family: var(--font-body); }
-  .box text.sub { font-size: 11px; fill: var(--text-muted); opacity: var(--detail-opacity, 1); }
+  .box text.title {
+    fill: var(--text);
+    font-size: 17px;
+    font-weight: 650;
+    font-family: var(--font-body);
+  }
+  .box text.title.sm { font-size: 15px; }
+  .box text.sub {
+    font-size: 13px;
+    fill: var(--text-muted);
+    opacity: var(--detail-opacity, 1);
+    font-family: var(--font-mono, ui-monospace, monospace);
+  }
   .cache-note { opacity: 0; }
   .arch-modified .cache-note { opacity: var(--inner-opacity, 0); }
-  .label { fill: var(--text-muted); font-size: 11px; font-family: var(--font-body); }
-  .bus-name { fill: var(--text); font-size: 12px; }
-  .wire path, .bus path { fill: none; stroke: var(--text); stroke-width: 1.35; }
-  .wire.hot path, .bus.hot path { stroke: var(--accent); stroke-width: 2.2; }
+  .label {
+    fill: var(--text);
+    font-size: 13px;
+    font-weight: 560;
+    font-family: var(--font-body);
+  }
+  .bus-name { fill: var(--text); font-size: 14px; font-weight: 650; }
+  .wire path, .bus path { fill: none; stroke: var(--text-muted); stroke-width: 1.85; }
+  .wire.hot path, .bus.hot path { stroke: var(--accent); stroke-width: 2.6; }
   .ctrl path { stroke-dasharray: 5 4; }
-  .wire.hover path, .bus.hover path { stroke: var(--accent); stroke-width: 2.6; }
+  .wire.hover path, .bus.hover path { stroke: var(--accent); stroke-width: 3; }
   .arch-harvard .bus-shared, .arch-modified .bus-shared { display: none; }
-  .arch-vonNeumann .bus-fetch { opacity: 0.25; }
-  .arch-vonNeumann .bus-data { opacity: 0.35; }
+  .arch-vonNeumann .bus-fetch { opacity: 0.35; }
+  .arch-vonNeumann .bus-data { opacity: 0.45; }
   .hits path, .picks rect { fill: transparent; stroke: transparent; stroke-width: 14; cursor: pointer; }
   .hits path { pointer-events: stroke; cursor: help; }
   .pulse { fill: var(--accent); }
   .pulse.t2 { fill: var(--accent-in); }
   .pulse.t3 { fill: var(--accent-out); }
-  text.dirty { fill: var(--accent-in); }
+  text.dirty { fill: var(--accent-in); font-weight: 700; }
   .overlay { position: absolute; z-index: 4; }
   .tip {
     position: absolute;
     z-index: 6;
-    max-width: 16rem;
+    max-width: 18rem;
     padding: var(--space-2) var(--space-3);
     border: 1px solid var(--accent);
     border-radius: var(--radius-card);
@@ -610,11 +680,18 @@
     box-shadow: var(--shadow-sm);
     pointer-events: none;
   }
-  .tip strong { display: block; font-size: var(--text-xs); }
-  .tip p { margin: var(--space-1) 0 0; font-size: var(--text-xs); color: var(--text-muted); }
+  .tip strong { display: block; font-size: var(--text-sm); }
+  .tip p { margin: var(--space-1) 0 0; font-size: var(--text-sm); color: var(--text-muted); }
   .tip p.logic { color: var(--text); }
-  .arrow-head { fill: var(--text); }
-  details { font-size: var(--text-xs); color: var(--text-muted); }
+  .arrow-head { fill: var(--text-muted); }
+  details { font-size: var(--text-sm); color: var(--text-muted); margin-top: 2px; }
+  details summary { cursor: pointer; color: var(--text); font-weight: 560; }
   details form, details p { display: flex; flex-wrap: wrap; gap: var(--space-1); margin: var(--space-1) 0; }
-  input, select { font-size: var(--text-xs); color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-button); }
+  input, select {
+    font-size: var(--text-sm);
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-button);
+  }
 </style>

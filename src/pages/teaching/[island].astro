@@ -1,0 +1,42 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import TeachingIslandPage from '../../components/teaching/TeachingIslandPage.svelte';
+import { KNOWLEDGE_ISLANDS } from '../../lib/teaching/registry';
+import { getIslandById, getIslandPageTitle } from '../../lib/teaching/routes';
+
+export function getStaticPaths() {
+  return KNOWLEDGE_ISLANDS.map((island) => ({
+    params: { island: island.id },
+  }));
+}
+
+const islandId = Astro.params.island ?? '';
+const island = getIslandById(islandId);
+
+if (!island) {
+  return Astro.redirect('/lab/?tab=teaching');
+}
+
+const pageTitle = getIslandPageTitle(island.id, island.title);
+---
+
+<ToolLayout title={pageTitle} description={island.tagline}>
+  <TeachingIslandPage client:load {island} />
+</ToolLayout>
+
+<style is:global>
+  .tool-body:has(.algo-nav),
+  .tool-body:has(.island-page) {
+    background: #0c0f14;
+  }
+
+  .tool-main:has(.algo-nav),
+  .tool-main:has(.island-page) {
+    max-width: none;
+  }
+
+  .tool-shell:has(.algo-nav),
+  .tool-shell:has(.island-page) {
+    padding: 0;
+  }
+</style>

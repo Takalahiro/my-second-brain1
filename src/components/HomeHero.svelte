@@ -33,7 +33,19 @@
   const manual = $derived(getManualContent(localeState.current));
 
   onMount(() => {
-    initLocale();
+    let introTimer: ReturnType<typeof setTimeout> | null = null;
+    const openFirstManual = () => {
+      manualClosed = false;
+      if (introTimer) {
+        clearTimeout(introTimer);
+        introTimer = null;
+      }
+    };
+
+    try {
+      initLocale();
+    } catch { /* locale 失败不阻塞桌面 */ }
+
     try {
       heroClosed = localStorage.getItem(HERO_KEY) === '1';
       manualClosed = localStorage.getItem(MANUAL_KEY) === '1';
@@ -43,23 +55,25 @@
         heroClosed = true;
         manualClosed = true;
 
-        const openFirstManual = () => {
-          manualClosed = false;
-        };
-
         if (localStorage.getItem(INTRO_KEY)) {
           queueMicrotask(openFirstManual);
         } else {
+          // intro 动画若未触发 done 事件，8s 后强制打开手册，避免“永远加载/永远空白”
           window.addEventListener('second-brain:desktop-intro-done', openFirstManual, { once: true });
+          introTimer = setTimeout(openFirstManual, 8000);
         }
       }
-    } catch {}
+    } catch { /* localStorage 不可用时仍展示默认欢迎 */ }
 
     mounted = true;
 
     const onToggleManual = () => toggleHome();
     window.addEventListener('second-brain:toggle-manual', onToggleManual);
-    return () => window.removeEventListener('second-brain:toggle-manual', onToggleManual);
+    return () => {
+      window.removeEventListener('second-brain:toggle-manual', onToggleManual);
+      window.removeEventListener('second-brain:desktop-intro-done', openFirstManual);
+      if (introTimer) clearTimeout(introTimer);
+    };
   });
 
   function closeHero() {

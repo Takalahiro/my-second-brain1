@@ -25,40 +25,55 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href} />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/logo.png" />
     <link rel="apple-touch-icon" href="/logo.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/logo.png', Astro.site ?? Astro.url.origin).href} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <script is:inline>
-      const theme = localStorage.getItem('theme');
-      if (theme === 'light') {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.setAttribute('data-theme', 'light');
-      } else if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.setAttribute('data-theme', 'dark');
-      }
-      const font = localStorage.getItem('second-brain:font-family');
-      if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {
-        document.documentElement.setAttribute('data-font', font);
-      }
-      const loc = localStorage.getItem('second-brain:locale');
-      if (loc === 'en') {
-        document.documentElement.lang = 'en';
-        document.documentElement.dataset.locale = 'en';
-      }
-      const ui = localStorage.getItem('second-brain:ui-skin');
-      if (ui) document.documentElement.setAttribute('data-ui', ui);
-      if (localStorage.getItem('second-brain:ui-debug') === '1') {
-        document.documentElement.classList.add('ui-debug', 'debug');
-      }
+      try {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        var font = localStorage.getItem('second-brain:font-family');
+        if (font && ['wenkai', 'inter', 'serif', 'plex', 'jp-pixel'].includes(font)) {
+          document.documentElement.setAttribute('data-font', font);
+        }
+        var loc = localStorage.getItem('second-brain:locale');
+        if (loc === 'en') {
+          document.documentElement.lang = 'en';
+          document.documentElement.dataset.locale = 'en';
+        }
+        var ui = localStorage.getItem('second-brain:ui-skin');
+        if (ui) document.documentElement.setAttribute('data-ui', ui);
+        if (localStorage.getItem('second-brain:ui-debug') === '1') {
+          document.documentElement.classList.add('ui-debug', 'debug');
+        }
+      } catch (e) { /* private mode / blocked storage */ }
     </script>
     {introSplash && (
       <script is:inline>
-        var ui = localStorage.getItem('second-brain:ui-skin');
-        if (ui === 'hud') {
-          document.documentElement.classList.add('hud-eclipse-intro-active');
-        } else if (!localStorage.getItem('second-brain:desktop-intro-v1')) {
-          document.documentElement.classList.add('desktop-intro-active');
-        }
+        try {
+          var ui2 = localStorage.getItem('second-brain:ui-skin');
+          if (ui2 === 'hud') {
+            document.documentElement.classList.add('hud-eclipse-intro-active');
+          } else if (!localStorage.getItem('second-brain:desktop-intro-v1')) {
+            document.documentElement.classList.add('desktop-intro-active');
+          }
+        } catch (e) {}
       </script>
     )}
   </head>

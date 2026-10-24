@@ -1,0 +1,67 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="页面未找到 · My Second Brain" description="404 — 找不到该页面">
+  <section class="nf">
+    <p class="nf-code">404</p>
+    <h1>这里没有笔记，也没有星球</h1>
+    <p class="nf-sub">链接可能已失效，或资源尚未同步到构建产物。</p>
+    <nav class="nf-actions" aria-label="快捷入口">
+      <a class="nf-btn primary" href="/">返回桌面首页</a>
+      <a class="nf-btn" href="/notes/">浏览笔记</a>
+      <a class="nf-btn" href="/graph/">关系图谱</a>
+      <a class="nf-btn" href="/lab/?tab=teaching">教学中心</a>
+      <a class="nf-btn" href="/teaching/cs">学习地图</a>
+    </nav>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    max-width: 36rem;
+    margin: 4rem auto;
+    padding: var(--space-4);
+    text-align: center;
+  }
+  .nf-code {
+    margin: 0;
+    font-size: 4rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  h1 {
+    margin: var(--space-2) 0;
+    font-size: var(--text-xl);
+    color: var(--text);
+  }
+  .nf-sub {
+    margin: 0 0 var(--space-5);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+  }
+  .nf-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    justify-content: center;
+  }
+  .nf-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-button);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    text-decoration: none;
+    font-size: var(--text-sm);
+  }
+  .nf-btn.primary {
+    background: var(--accent);
+    color: var(--on-accent);
+    border-color: transparent;
+  }
+</style>

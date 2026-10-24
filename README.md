@@ -39,7 +39,7 @@
 |------|------|
 | 内容 | Obsidian vault（git submodule）在 **构建期** 编译为 HTML |
 | 交互 | Svelte 5 组件在浏览器 **按需加载**（图谱、ML、Pyodide、3DGS 等） |
-| 后端 | **无自建后端**；运行时只读 JSON + localStorage |
+| 后端 | **无自建后端**；运行时只读 JSON；设置用 localStorage，学习进度等大数据用 IndexedDB |
 | 部署 | Cloudflare Pages 静态托管 |
 
 与常见静态博客或 3D 演示站的区别：
@@ -278,7 +278,11 @@ my-second-brain/
 | `/digits?demo=formula` | 公式 OCR + SymPy 求解 |
 | `/formula` | 公式识别独立页 |
 | `/whiteboard` | Excalidraw 白板 |
-| `/teaching` | 教学中心 |
+| `/teaching` | 教学宇宙大厅（学科岛屿入口） |
+| `/teaching/*` | 学科岛屿页 |
+| `/lab` | 学堂（教学地图 / 编译器 / MazeCar） |
+| `/mazecar` | 迷宫小车纯前端仿真（可双击 `public/mazecar/index.html`） |
+| `/avr` | AVR 汇编 Tutor |
 | `/data/notes.json` | 笔记元数据 API |
 | `/data/wikilinks.json` | 双链图数据 API |
 | `/data/media.json` | 媒体清单 API |
@@ -454,6 +458,8 @@ Vault 同步详见 [docs/VAULT_SYNC.md](docs/VAULT_SYNC.md)。
 | [docs/VAULT_SYNC.md](./docs/VAULT_SYNC.md) | Obsidian vault 子模块同步 |
 | [docs/WIKILINKS_REPORT.md](./docs/WIKILINKS_REPORT.md) | 双链图构建报告 |
 | [docs/I18N_NOTES.md](./docs/I18N_NOTES.md) | 国际化说明 |
+| [docs/LEARNING_UNIVERSE.md](./docs/LEARNING_UNIVERSE.md) | 教学宇宙路线与进度存储 |
+| [docs/ASSET_ATTRIBUTION.md](./docs/ASSET_ATTRIBUTION.md) | 外部素材署名与许可证 |
 
 ---
 

@@ -38,7 +38,7 @@ export const DEFAULT_PREFS: DatapathPrefs = {
   showCtrl: true,
   showMem: true,
   showBus: true,
-  scale: 1,
+  scale: 1.2,
   grain: 'insn',
   pulse: 1.1,
   openParts: [],
