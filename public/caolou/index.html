@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>草楼野记</title>
+<meta name="description" content="选地点，准备，进入地界。草楼附近的野外拍摄。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="styles.css?v=fold1">
+<link rel="stylesheet" href="camp_wild.css?v=wild4">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <p class="eyebrow">草楼</p>
+    <h1>草楼野记</h1>
+  </div>
+  <ol class="steps">
+    <li><button type="button" data-view="atlas" class="on">1 选地点</button></li>
+    <li><button type="button" data-view="prep" id="stepPrep" disabled>2 准备</button></li>
+    <li><span id="stepField">3 进入地界</span></li>
+  </ol>
+  <button type="button" class="quiet" data-view="calendar">月历</button>
+  <p class="safety-top">动物不保证出现。靠近和关门以当天公告为准。</p>
+</header>
+
+<div id="filters">
+  <label>最多接受多久路程？ <strong id="maxLabel">150 分钟</strong>
+    <input id="maxMin" type="range" min="40" max="210" step="5" value="150">
+  </label>
+  <label>自然感
+    <select id="wild">
+      <option value="1">不限</option>
+      <option value="4">偏野</option>
+      <option value="5">只要最野</option>
+    </select>
+  </label>
+  <label>拍摄距离
+    <select id="close">
+      <option value="1">不限</option>
+      <option value="3">中等以上</option>
+      <option value="4">容易拍近</option>
+    </select>
+  </label>
+  <label>拍摄对象
+    <select id="theme">
+      <option value="全部">全部</option>
+      <option>鲸</option>
+      <option>有袋类</option>
+      <option>鸟</option>
+      <option>雨林</option>
+      <option>湿地</option>
+      <option>海洋</option>
+      <option>冷门</option>
+    </select>
+  </label>
+  <label>交通方式
+    <select id="transit">
+      <option value="all">不限</option>
+      <option value="nocar">不用开车</option>
+      <option value="car">开车更合适</option>
+    </select>
+  </label>
+  <label>排序
+    <select id="sort">
+      <option value="drive">距离最近</option>
+      <option value="wild">按野性</option>
+      <option value="close">按能靠近的程度</option>
+    </select>
+  </label>
+  <p id="count" class="count"></p>
+  <p id="foundLine" class="count"></p>
+</div>
+
+<div id="view"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="offtrack.js?v=off1"></script>
+<script src="data.js?v=plan1"></script>
+<script src="field.js?v=browser1"></script>
+<script src="fine_gear.js?v=see1"></script>
+<script src="media.js"></script>
+<script src="extra_media.js"></script>
+<script src="more-sites.js?v=plan1"></script>
+<script src="bios.js?v=score1"></script>
+<script src="stops.js"></script>
+<script src="transit.js?v=g1"></script>
+<script src="gear_photos.js?v=browser1"></script>
+<script src="planner.js?v=brief1"></script>
+<script src="app.js?v=fold1"></script>
+<script src="modes.js?v=brief1"></script>
+<script src="camp_closures.js?v=wild3"></script>
+<script src="camp_wild.js?v=off1"></script>
+<script src="access_card.js?v=wild4"></script>
+<script src="brain_mount.js"></script>
+<script src="brief_nov.js?v=off1"></script>
+<script src="permits.js?v=permit2"></script>
+<script src="overnight_facts.js?v=night1"></script>
+<script src="flow.js?v=fold1"></script>
+<script src="gear_layers.js?v=bars2"></script>
+<script src="dive_kit.js?v=gearread1"></script>
+<script src="transit_geom.js?v=geom4"></script>
+<script src="transit_map.js?v=geom5"></script>
+<script src="route_score.js?v=bars1"></script>
+<script src="place_facts.js?v=fold1"></script>
+<script src="atlas_fold.js?v=fold2"></script>
+<script src="tracks.js?v=bm5"></script>
+</body>
+</html>

@@ -20,6 +20,7 @@ export const SITE_NAV_LINKS: SiteNavLink[] = [
   { href: '/digits', label: zh.nav.neural, title: zh.nav.neuralTitle, icon: 'digits' },
   { href: '/whiteboard', label: zh.nav.whiteboard, title: zh.nav.whiteboardTitle, icon: 'whiteboard' },
   { href: '/graph', label: zh.nav.graph, title: zh.nav.graphTitle, icon: 'graph' },
+  { href: '/caolou', label: zh.nav.caolou, title: zh.nav.caolouTitle, icon: 'landscape' },
 ];
 
 export const SITE_TOOL_LINKS = SITE_NAV_LINKS.filter((l) => l.href !== '/notes');

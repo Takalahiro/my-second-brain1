@@ -105,5 +105,6 @@ export function getSiteNavLinks(): SiteNavLink[] {
     { href: '/digits', label: m.nav.neural, title: m.nav.neuralTitle, icon: 'digits' },
     { href: '/whiteboard', label: m.nav.whiteboard, title: m.nav.whiteboardTitle, icon: 'whiteboard' },
     { href: '/graph', label: m.nav.graph, title: m.nav.graphTitle, icon: 'graph' },
+    { href: '/caolou', label: m.nav.caolou, title: m.nav.caolouTitle, icon: 'landscape' },
   ];
 }

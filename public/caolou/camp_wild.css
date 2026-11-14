@@ -1,0 +1,91 @@
+.camp-row {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 12px;
+}
+.camp-row:hover { background: var(--bg-2); }
+.camp-row strong { display: block; font-weight: 500; }
+.camp-row small { display: block; color: var(--muted); margin-top: 4px; }
+.swatch {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--line);
+  margin-top: 2px;
+}
+.swatch.grey {
+  background-color: rgba(120, 118, 108, 0.35);
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(200, 196, 184, 0.85) 3px, rgba(200, 196, 184, 0.85) 4px);
+}
+.swatch.green { background: rgba(120, 168, 96, 0.45); }
+.swatch.red {
+  background-color: rgba(160, 64, 48, 0.25);
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(224, 90, 70, 0.9) 3px, rgba(224, 90, 70, 0.9) 4px);
+}
+.swatch.closed { background: rgba(92, 16, 24, 0.92); }
+.swatch.tent { background: #7eb0c8; border-radius: 50%; }
+.atlas.camp-on { grid-template-columns: minmax(0, 1fr) minmax(360px, 44vw); }
+.camp-detail { padding: 12px 14px 28px; }
+.camp-detail h2 { font-size: 22px; }
+.camp-detail h3 { margin-top: 16px; }
+.fact { margin: 0 0 10px; }
+.fact p { margin: 0 0 4px; }
+.factmeta {
+  color: var(--muted);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  word-break: break-all;
+}
+.factmeta a { color: var(--stop); }
+.recheck {
+  border: 1px solid var(--warn);
+  padding: 8px 10px;
+  margin: 0 0 12px;
+  color: var(--ink);
+}
+.perm { border-top: 1px solid var(--line); padding-top: 8px; }
+.camp-form label, #campFieldBox label {
+  display: block;
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+.camp-form input, .camp-form select, #campFieldBox input, #campFieldBox select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 4px 6px;
+}
+.legend { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.legend span { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+#campFieldBox { border-bottom: 1px solid var(--line); margin: 0 0 12px; padding-bottom: 12px; }
+#campFieldBox h3 { margin-top: 12px; }
+.gpxin {
+  display: inline-block;
+  background: var(--bg-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 6px 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.sheet-tools .gpxin { margin-left: 6px; }
+.access-card {
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  padding: 12px 12px 4px;
+  margin: 12px 0 16px;
+}
+.access-card h3 { margin-top: 0; }
+.access-card p { margin: 0 0 8px; }
+.access-card .factmeta { margin: 0 0 10px; }

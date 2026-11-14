@@ -24,6 +24,8 @@ export const zh = {
     whiteboardTitle: 'Excalidraw 白板',
     graph: '图谱',
     graphTitle: '关系图谱',
+    caolou: '草楼',
+    caolouTitle: '草楼野记 · 选地点、交通、装备',
     home: '返回主界面',
     siteNav: '站点导航',
     tools: '工具',

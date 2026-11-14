@@ -26,6 +26,8 @@ export const en: Messages = {
     whiteboardTitle: 'Excalidraw whiteboard',
     graph: 'Graph',
     graphTitle: 'Knowledge graph',
+    caolou: 'Caolou',
+    caolouTitle: 'Caolou field notes · place, transit, gear',
     home: 'Back to home',
     siteNav: 'Site navigation',
     tools: 'Tools',

@@ -1,0 +1,8 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CaolouShell from '../components/caolou/CaolouShell.svelte';
+---
+
+<BaseLayout title="草楼野记 · My Second Brain" description="整页接入草楼野记。脚本跑完后只读子窗口的挂载结果。" wide>
+  <CaolouShell client:load />
+</BaseLayout>
